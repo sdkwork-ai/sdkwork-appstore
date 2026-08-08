@@ -23,6 +23,7 @@ impl LibraryOperationRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ListLibraryItemsRequest {
     pub cursor: Option<String>,
     pub page_size: Option<i32>,
@@ -48,6 +49,7 @@ impl ListLibraryItemsRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct RetrieveLibraryItemRequest {
     pub library_item_id: String,
 }
@@ -61,6 +63,7 @@ impl RetrieveLibraryItemRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct LibraryInstallRequest {
     pub listing_id: String,
     pub platform: String,
@@ -90,6 +93,7 @@ impl LibraryInstallRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct LibraryUninstallRequest {
     pub library_item_id: String,
 }
@@ -103,6 +107,7 @@ impl LibraryUninstallRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct LibraryUpdatesCheckRequest {
     pub items: Vec<UpdateCheckItem>,
 }
@@ -114,6 +119,7 @@ impl LibraryUpdatesCheckRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ListWishlistItemsRequest {
     pub cursor: Option<String>,
     pub page_size: Option<i32>,
@@ -139,6 +145,7 @@ impl ListWishlistItemsRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct AddWishlistItemRequest {
     pub listing_id: String,
 }
@@ -152,6 +159,7 @@ impl AddWishlistItemRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct RemoveWishlistItemRequest {
     pub listing_id: String,
 }
@@ -165,6 +173,7 @@ impl RemoveWishlistItemRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct CreateDownloadGrantRequest {
     pub artifact_id: String,
 }
@@ -178,6 +187,7 @@ impl CreateDownloadGrantRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ConsumeDownloadGrantRequest {
     pub grant_id: String,
 }

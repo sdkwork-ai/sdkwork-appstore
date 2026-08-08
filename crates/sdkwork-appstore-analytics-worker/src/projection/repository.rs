@@ -3,6 +3,15 @@ use sdkwork_appstore_repository_sqlx::AppstoreSqlxDb;
 use serde_json::json;
 use uuid::Uuid;
 
+fn next_day_date_str(date_str: &str) -> String {
+    match NaiveDate::parse_from_str(date_str, "%Y-%m-%d") {
+        Ok(date) => (date + chrono::Duration::days(1))
+            .format("%Y-%m-%dT00:00:00")
+            .to_string(),
+        Err(_) => format!("{}T00:00:00", date_str),
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct AnalyticsProjectionRepository {
     database: AppstoreSqlxDb,
@@ -33,12 +42,14 @@ impl AnalyticsProjectionRepository {
               SUM(CASE WHEN event_type = 'update' THEN 1 ELSE 0 END) AS update_count
             FROM appstore_install_event
             WHERE tenant_id = ?
-              AND substr(occurred_at, 1, 10) = ?
+              AND occurred_at >= ?
+              AND occurred_at < ?
             GROUP BY listing_id
             "#,
             )
             .bind(tenant_id)
-            .bind(&date_str)
+            .bind(format!("{}T00:00:00", date_str))
+            .bind(next_day_date_str(&date_str))
             .fetch_all(&self.database)
             .await
             .map_err(|e| format!("aggregate install events failed: {e}"))?;
@@ -191,20 +202,6 @@ impl AnalyticsProjectionRepository {
             .await
             .map_err(|e| format!("aggregate search history failed: {e}"))?;
 
-        self.database
-            .query(
-                r#"
-            DELETE FROM appstore_catalog_trending_term
-            WHERE tenant_id = ? AND snapshot_date = ? AND locale = ?
-            "#,
-            )
-            .bind(tenant_id)
-            .bind(&date_str)
-            .bind(locale)
-            .execute_unified(&self.database)
-            .await
-            .map_err(|e| format!("clear prior trending snapshot failed: {e}"))?;
-
         let mut written = 0u64;
         for (rank, (term, search_count)) in rows.into_iter().enumerate() {
             let id = Uuid::new_v4().to_string();
@@ -216,6 +213,10 @@ impl AnalyticsProjectionRepository {
                 INSERT INTO appstore_catalog_trending_term (
                   id, tenant_id, term, locale, rank, score, snapshot_date, created_at, updated_at
                 ) VALUES (?, ?, ?, ?, ?, CAST(? AS REAL), ?, ?, ?)
+                ON CONFLICT(tenant_id, term, locale, snapshot_date) DO UPDATE SET
+                  rank = excluded.rank,
+                  score = excluded.score,
+                  updated_at = excluded.updated_at
                 "#,
                 )
                 .bind(&id)

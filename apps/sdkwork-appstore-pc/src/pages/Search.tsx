@@ -44,7 +44,7 @@ export default function Search() {
     async function loadTrending() {
       try {
         const list = await AppStoreService.getTrendingSearches();
-        setTrending(list.length > 0 ? list : ['千问 AI', 'WPS Office', '微信 PC', '腾讯AI工作台', '无尽冬日', 'OBS Studio']);
+        setTrending(list);
       } catch (err) {
         console.error("Failed to load trending searches", err);
       }

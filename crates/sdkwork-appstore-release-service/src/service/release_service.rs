@@ -166,6 +166,163 @@ impl<R> ReleaseService<R> {
                 .unwrap_or_default()
         )
     }
+
+    fn require_scope(
+        context: &AppstoreRequestContext,
+        required: &str,
+    ) -> AppstoreServiceResult<()> {
+        if sdkwork_appstore_authorization::scope_granted(&context.permission_scopes, required) {
+            Ok(())
+        } else {
+            Err(AppstoreServiceError::PermissionDenied(
+                sdkwork_appstore_authorization::missing_scope_message(required),
+            ))
+        }
+    }
+
+    fn require_user_id(context: &AppstoreRequestContext) -> AppstoreServiceResult<String> {
+        let user_id = context.user_id.as_deref().unwrap_or("").trim();
+        if user_id.is_empty() || user_id == "system" {
+            return Err(AppstoreServiceError::PermissionDenied(
+                "Authenticated user is required".to_string(),
+            ));
+        }
+        Ok(user_id.to_string())
+    }
+}
+
+impl<R> ReleaseService<R>
+where
+    R: ReleaseRepositoryPort,
+{
+    /// Numeric sort key for semver-style version codes (e.g. `1.20.5`).
+    /// Segments beyond the first four are ignored; non-numeric segments
+    /// fall back to zero so ordering stays total and deterministic.
+    fn version_sort_key(code: &str) -> u64 {
+        let mut key: u64 = 0;
+        let mut segments = 0u32;
+        for part in code.split('.') {
+            let number = part.parse::<u64>().unwrap_or(0).min(999_999);
+            key = key * 1_000_000 + number;
+            segments += 1;
+            if segments >= 4 {
+                break;
+            }
+        }
+        key
+    }
+
+    /// Whether the release rollout grants an update to this client.
+    async fn rollout_grants_update(
+        &self,
+        context: &AppstoreRequestContext,
+        release: &Release,
+        request: &CheckUpdateRequest,
+    ) -> AppstoreServiceResult<bool> {
+        let Some(rollout) = self
+            .repository
+            .find_rollout_by_release(context, &release.id)
+            .await?
+        else {
+            return Ok(true);
+        };
+
+        match rollout.rollout_status {
+            RolloutStatus::Paused | RolloutStatus::Cancelled => return Ok(false),
+            RolloutStatus::Completed => return Ok(true),
+            RolloutStatus::Pending | RolloutStatus::InProgress => {}
+        }
+
+        if rollout.rollout_strategy == RolloutStrategy::Full {
+            return Ok(true);
+        }
+        if rollout.target_percentage >= 100 {
+            return Ok(true);
+        }
+        if rollout.target_percentage <= 0 {
+            return Ok(false);
+        }
+
+        // Region filter: when configured, only listed regions receive updates.
+        if !rollout.region_filter.is_empty() {
+            let region = request.region_code.as_deref().unwrap_or("");
+            if !rollout.region_filter.iter().any(|r| r == region) {
+                return Ok(false);
+            }
+        }
+
+        // Deterministic percentage bucketing keyed on the client device.
+        let bucket_input = request
+            .device_id
+            .as_deref()
+            .or(Some(request.architecture.as_deref().unwrap_or("")))
+            .unwrap_or_default();
+        let mut hasher = std::collections::hash_map::DefaultHasher::new();
+        use std::hash::{Hash, Hasher};
+        (release.id.as_str(), bucket_input).hash(&mut hasher);
+        let bucket = (hasher.finish() % 100) as i32;
+        Ok(bucket < rollout.target_percentage)
+    }
+
+    /// Finds the download artifact for a release/platform, preferring the
+    /// exact architecture and falling back to a universal artifact.
+    async fn resolve_update_artifact(
+        &self,
+        context: &AppstoreRequestContext,
+        release: &Release,
+        request: &CheckUpdateRequest,
+    ) -> AppstoreServiceResult<String> {
+        let architecture = request.architecture.as_deref().unwrap_or("any");
+        let exact = self
+            .repository
+            .find_artifact_by_composite(
+                context,
+                &release.id,
+                &request.platform,
+                architecture,
+                "any",
+            )
+            .await?;
+        if let Some(artifact) = exact {
+            return Ok(artifact.id.as_str().to_string());
+        }
+        let universal = self
+            .repository
+            .find_artifact_by_composite(context, &release.id, &request.platform, "any", "any")
+            .await?;
+        Ok(universal
+            .map(|artifact| artifact.id.as_str().to_string())
+            .unwrap_or_default())
+    }
+
+    /// Requires the caller to own the listing's publisher or hold an admin scope.
+    async fn ensure_listing_publisher_access(
+        &self,
+        context: &AppstoreRequestContext,
+        listing_id: &str,
+    ) -> AppstoreServiceResult<String> {
+        if Self::require_scope(context, "appstore.listings.admin").is_ok() {
+            return Ok(String::new());
+        }
+        let user_id = Self::require_user_id(context)?;
+        let publisher_id = self
+            .repository
+            .find_listing_publisher_id(context, listing_id)
+            .await?
+            .ok_or_else(|| {
+                AppstoreServiceError::NotFound(format!("Listing not found: {}", listing_id))
+            })?;
+        let role = self
+            .repository
+            .find_publisher_member_role(context, &publisher_id, &user_id)
+            .await?;
+        if role.is_none() {
+            return Err(AppstoreServiceError::PermissionDenied(
+                "Publisher membership is required".to_string(),
+            ));
+        }
+        Ok(publisher_id)
+    }
 }
 
 #[async_trait::async_trait]
@@ -178,6 +335,9 @@ where
         context: &AppstoreRequestContext,
         request: CreateReleaseRequest,
     ) -> AppstoreServiceResult<CreateReleaseResult> {
+        Self::require_scope(context, "appstore.listings.write")?;
+        self.ensure_listing_publisher_access(context, &request.listing_id)
+            .await?;
         if request.version_name.trim().is_empty() {
             return Err(AppstoreServiceError::ValidationFailed(
                 "Version name is required".to_string(),
@@ -286,6 +446,7 @@ where
         context: &AppstoreRequestContext,
         request: UpdateReleaseRequest,
     ) -> AppstoreServiceResult<UpdateReleaseResult> {
+        Self::require_scope(context, "appstore.listings.write")?;
         let release_id = ReleaseId::new(&request.release_id);
 
         let mut release = self
@@ -295,6 +456,8 @@ where
             .ok_or_else(|| {
                 AppstoreServiceError::NotFound(format!("Release not found: {}", request.release_id))
             })?;
+        self.ensure_listing_publisher_access(context, &release.listing_id)
+            .await?;
 
         if release.is_retired() {
             return Err(AppstoreServiceError::InvalidState(
@@ -334,6 +497,19 @@ where
                     release.approved_at = Some(now);
                 }
                 ReleaseStatus::Published => {
+                    // Publish requires at least one verified artifact.
+                    let has_verified_artifact = self
+                        .repository
+                        .find_artifacts_by_release(context, &release.id)
+                        .await?
+                        .iter()
+                        .any(|artifact| artifact.artifact_status == ArtifactStatus::Verified);
+                    if !has_verified_artifact {
+                        return Err(AppstoreServiceError::InvalidState(
+                            "Release requires at least one verified artifact before publishing"
+                                .to_string(),
+                        ));
+                    }
                     release.published_at = Some(now);
                 }
                 ReleaseStatus::Retired => {
@@ -378,6 +554,8 @@ where
             .ok_or_else(|| {
                 AppstoreServiceError::NotFound(format!("Release not found: {}", request.release_id))
             })?;
+        self.ensure_listing_publisher_access(context, &release.listing_id)
+            .await?;
 
         if release.is_retired() {
             return Err(AppstoreServiceError::InvalidState(
@@ -435,6 +613,7 @@ where
         context: &AppstoreRequestContext,
         request: AttachArtifactRequest,
     ) -> AppstoreServiceResult<AttachArtifactResult> {
+        Self::require_scope(context, "appstore.listings.write")?;
         let release_id = ReleaseId::new(&request.release_id);
 
         let release = self
@@ -444,6 +623,8 @@ where
             .ok_or_else(|| {
                 AppstoreServiceError::NotFound(format!("Release not found: {}", request.release_id))
             })?;
+        self.ensure_listing_publisher_access(context, &release.listing_id)
+            .await?;
 
         if release.is_retired() {
             return Err(AppstoreServiceError::InvalidState(
@@ -500,7 +681,16 @@ where
             platform: request.platform,
             architecture: request.architecture,
             package_format: request.package_format,
-            artifact_status: ArtifactStatus::Pending,
+            // An artifact is considered verified once the publisher attaches a
+            // drive node reference with a SHA-256 checksum; integrity checks
+            // (signature verification) can be layered onto the provider port.
+            artifact_status: if request.drive_node_id.trim().is_empty()
+                || request.checksum_sha256.trim().is_empty()
+            {
+                ArtifactStatus::Pending
+            } else {
+                ArtifactStatus::Verified
+            },
             drive_node_id: request.drive_node_id,
             media_resource_id: request.media_resource_id,
             file_size_bytes: request.file_size_bytes,
@@ -531,6 +721,7 @@ where
         context: &AppstoreRequestContext,
         request: UpdateRolloutRequest,
     ) -> AppstoreServiceResult<UpdateRolloutResult> {
+        Self::require_scope(context, "appstore.listings.write")?;
         let release_id = ReleaseId::new(&request.release_id);
 
         let release = self
@@ -540,6 +731,8 @@ where
             .ok_or_else(|| {
                 AppstoreServiceError::NotFound(format!("Release not found: {}", request.release_id))
             })?;
+        self.ensure_listing_publisher_access(context, &release.listing_id)
+            .await?;
 
         if !release.is_published() {
             return Err(AppstoreServiceError::InvalidState(
@@ -655,6 +848,7 @@ where
         context: &AppstoreRequestContext,
         request: RetireReleaseRequest,
     ) -> AppstoreServiceResult<RetireReleaseResult> {
+        Self::require_scope(context, "appstore.listings.write")?;
         let release_id = ReleaseId::new(&request.release_id);
 
         let mut release = self
@@ -664,6 +858,8 @@ where
             .ok_or_else(|| {
                 AppstoreServiceError::NotFound(format!("Release not found: {}", request.release_id))
             })?;
+        self.ensure_listing_publisher_access(context, &release.listing_id)
+            .await?;
 
         if release.is_retired() {
             return Err(AppstoreServiceError::InvalidState(
@@ -707,52 +903,50 @@ where
                 ))
             })?;
 
-        let latest_release = self
+        let mut releases = self
             .repository
-            .find_latest_release_by_channel_code(context, &listing_id, &request.channel_code)
+            .find_releases_by_channel_code(context, &listing_id, &request.channel_code)
             .await?;
 
-        match latest_release {
-            Some(release) => {
-                if !release.is_published() {
-                    return Ok(CheckUpdateResult::no_update(
-                        "appstore.releases.checkUpdate",
-                    ));
-                }
+        // Newest release first, ordered by semantic version (not row version).
+        releases.sort_by(|a, b| {
+            Self::version_sort_key(&b.version_code)
+                .cmp(&Self::version_sort_key(&a.version_code))
+                .then_with(|| b.id.as_str().cmp(a.id.as_str()))
+        });
 
-                if release.version_code <= request.installed_version_code {
-                    return Ok(CheckUpdateResult::no_update(
-                        "appstore.releases.checkUpdate",
-                    ));
-                }
+        let installed_key = Self::version_sort_key(&request.installed_version_code);
 
-                let artifact_id = self
-                    .repository
-                    .find_artifact_by_composite(
-                        context,
-                        &release.id,
-                        &request.platform,
-                        request.architecture.as_deref().unwrap_or("any"),
-                        "any",
-                    )
-                    .await?;
-
-                let artifact_id_str = artifact_id
-                    .map(|a| a.id.as_str().to_string())
-                    .unwrap_or_default();
-
-                Ok(CheckUpdateResult::update_available(
-                    "appstore.releases.checkUpdate",
-                    release.id.as_str(),
-                    &release.version_name,
-                    &release.version_code,
-                    &artifact_id_str,
-                ))
+        for release in releases {
+            if !release.is_published() {
+                continue;
             }
-            None => Ok(CheckUpdateResult::no_update(
+            if Self::version_sort_key(&release.version_code) <= installed_key {
+                continue;
+            }
+            if !self
+                .rollout_grants_update(context, &release, &request)
+                .await?
+            {
+                continue;
+            }
+
+            let artifact_id = self
+                .resolve_update_artifact(context, &release, &request)
+                .await?;
+
+            return Ok(CheckUpdateResult::update_available(
                 "appstore.releases.checkUpdate",
-            )),
+                release.id.as_str(),
+                &release.version_name,
+                &release.version_code,
+                &artifact_id,
+            ));
         }
+
+        Ok(CheckUpdateResult::no_update(
+            "appstore.releases.checkUpdate",
+        ))
     }
 
     async fn resolve_download(
@@ -779,23 +973,70 @@ where
             ));
         }
 
-        if let Some(ref grant_id_str) = request.grant_id {
-            let grant_id = DownloadGrantId::new(grant_id_str);
-            let grant = self
-                .repository
-                .find_grant_by_id(context, &grant_id)
-                .await?
-                .ok_or_else(|| {
-                    AppstoreServiceError::NotFound(format!(
-                        "Download grant not found: {}",
-                        grant_id_str
-                    ))
-                })?;
+        let release = self
+            .repository
+            .find_release_by_id(context, &artifact.release_id)
+            .await?
+            .ok_or_else(|| {
+                AppstoreServiceError::NotFound(format!(
+                    "Release not found: {}",
+                    artifact.release_id.as_str()
+                ))
+            })?;
 
-            if !grant.is_consumable() {
-                return Err(AppstoreServiceError::InvalidState(
-                    "Download grant is not consumable".to_string(),
-                ));
+        let pricing_model = self
+            .repository
+            .find_listing_pricing_model(context, &release.listing_id)
+            .await?
+            .unwrap_or_default();
+        let is_free = pricing_model.eq_ignore_ascii_case("free");
+
+        match &request.grant_id {
+            Some(grant_id_str) => {
+                let grant_id = DownloadGrantId::new(grant_id_str);
+                let grant = self
+                    .repository
+                    .find_grant_by_id(context, &grant_id)
+                    .await?
+                    .ok_or_else(|| {
+                        AppstoreServiceError::NotFound(format!(
+                            "Download grant not found: {}",
+                            grant_id_str
+                        ))
+                    })?;
+
+                if grant.artifact_id != artifact.id {
+                    return Err(AppstoreServiceError::InvalidState(
+                        "Download grant does not cover this artifact".to_string(),
+                    ));
+                }
+                if !grant.is_consumable() {
+                    return Err(AppstoreServiceError::InvalidState(
+                        "Download grant is not consumable".to_string(),
+                    ));
+                }
+
+                // Atomically consume the grant so a shared grant cannot be
+                // replayed after its single download allowance is spent.
+                self.repository
+                    .consume_grant_atomically(
+                        context,
+                        &grant_id,
+                        context.user_id.as_deref().unwrap_or(""),
+                    )
+                    .await?
+                    .ok_or_else(|| {
+                        AppstoreServiceError::InvalidState(
+                            "Download grant could not be consumed".to_string(),
+                        )
+                    })?;
+            }
+            None => {
+                if !is_free {
+                    return Err(AppstoreServiceError::InvalidState(
+                        "Download grant is required for paid content".to_string(),
+                    ));
+                }
             }
         }
 
@@ -851,6 +1092,7 @@ where
         context: &AppstoreRequestContext,
         request: CreateDownloadGrantRequest,
     ) -> AppstoreServiceResult<CreateDownloadGrantResult> {
+        let user_id = Self::require_user_id(context)?;
         let release_id = ReleaseId::new(&request.release_id);
         let artifact_id = ArtifactId::new(&request.artifact_id);
 
@@ -884,6 +1126,11 @@ where
                 "Artifact is not verified".to_string(),
             ));
         }
+        if artifact.release_id != release_id {
+            return Err(AppstoreServiceError::ValidationFailed(
+                "Artifact does not belong to this release".to_string(),
+            ));
+        }
 
         let now = Utc::now();
         let grant_id = DownloadGrantId::new(Uuid::new_v4().to_string());
@@ -895,17 +1142,15 @@ where
             .and_then(|r| GrantReason::from_str(&r))
             .unwrap_or(GrantReason::Entitlement);
 
-        let user_id = context.user_id.clone();
-
         let grant = DownloadGrant {
             id: grant_id,
             tenant_id: context.tenant_id.clone(),
             organization_id,
             grant_no,
-            listing_id: request.listing_id,
+            listing_id: release.listing_id.clone(),
             release_id,
             artifact_id,
-            user_id,
+            user_id: Some(user_id),
             grant_status: GrantStatus::Active,
             grant_reason,
             expires_at: now + chrono::Duration::hours(24),
@@ -929,11 +1174,12 @@ where
         context: &AppstoreRequestContext,
         request: ConsumeDownloadGrantRequest,
     ) -> AppstoreServiceResult<ConsumeDownloadGrantResult> {
+        let user_id = Self::require_user_id(context)?;
         let grant_id = DownloadGrantId::new(&request.grant_id);
 
-        let mut grant = self
+        let grant = self
             .repository
-            .find_grant_by_id(context, &grant_id)
+            .consume_grant_atomically(context, &grant_id, &user_id)
             .await?
             .ok_or_else(|| {
                 AppstoreServiceError::NotFound(format!(
@@ -941,24 +1187,6 @@ where
                     request.grant_id
                 ))
             })?;
-
-        if !grant.is_consumable() {
-            return Err(AppstoreServiceError::InvalidState(
-                "Download grant is not consumable".to_string(),
-            ));
-        }
-
-        let now = Utc::now();
-        grant.download_count += 1;
-
-        if grant.download_count >= grant.max_download_count {
-            grant.grant_status = GrantStatus::Consumed;
-            grant.consumed_at = Some(now);
-        }
-
-        grant.updated_at = now;
-
-        self.repository.update_grant(context, &grant).await?;
 
         Ok(ConsumeDownloadGrantResult::consumed(
             "appstore.downloadGrants.consume",
@@ -1063,7 +1291,11 @@ where
                 platform: spec.platform.clone(),
                 architecture: spec.architecture.clone(),
                 package_format: spec.package_format.clone(),
-                artifact_status: ArtifactStatus::Pending,
+                artifact_status: if spec.checksum_sha256.trim().is_empty() {
+                    ArtifactStatus::Pending
+                } else {
+                    ArtifactStatus::Verified
+                },
                 drive_node_id: spec.drive_node_id.clone(),
                 media_resource_id: None,
                 file_size_bytes: spec

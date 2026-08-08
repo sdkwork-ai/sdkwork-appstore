@@ -23,15 +23,21 @@ export const ReviewForm: React.FC<ReviewFormProps> = ({
   const [userName, setUserName] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!comment.trim()) return;
+    if (!appId) {
+      setSubmitError(t('appDetail.reviews.missingAppId'));
+      return;
+    }
 
+    setSubmitError(null);
     setIsSubmitting(true);
     try {
       const newReview = await AppStoreService.submitReview({
-        appId: appId || 'app-default',
+        appId,
         user: userName.trim() || t('appDetail.reviews.defaultUser'),
         rating: userRating,
         title: title.trim() || t('appDetail.reviews.defaultTitle'),
@@ -51,6 +57,7 @@ export const ReviewForm: React.FC<ReviewFormProps> = ({
       }, 1500);
     } catch (err) {
       console.error('提交评价失败', err);
+      setSubmitError(err instanceof Error ? err.message : '提交失败，请稍后重试');
     } finally {
       setIsSubmitting(false);
     }

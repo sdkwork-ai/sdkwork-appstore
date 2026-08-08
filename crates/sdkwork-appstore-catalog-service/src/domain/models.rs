@@ -205,6 +205,7 @@ impl PlatformScope {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct Category {
     pub id: CategoryId,
     pub tenant_id: String,
@@ -219,6 +220,7 @@ pub struct Category {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct CategoryLocalization {
     pub id: String,
     pub tenant_id: String,
@@ -231,12 +233,14 @@ pub struct CategoryLocalization {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct CategoryWithLocalizations {
     pub category: Category,
     pub localizations: Vec<CategoryLocalization>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct CatalogCollection {
     pub id: CollectionId,
     pub tenant_id: String,
@@ -253,6 +257,7 @@ pub struct CatalogCollection {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct CatalogCollectionLocalization {
     pub id: String,
     pub tenant_id: String,
@@ -265,6 +270,7 @@ pub struct CatalogCollectionLocalization {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct CatalogCollectionItem {
     pub id: String,
     pub tenant_id: String,
@@ -278,12 +284,14 @@ pub struct CatalogCollectionItem {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct CollectionWithLocalizations {
     pub collection: CatalogCollection,
     pub localizations: Vec<CatalogCollectionLocalization>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct CollectionWithItems {
     pub collection: CatalogCollection,
     pub localizations: Vec<CatalogCollectionLocalization>,
@@ -291,6 +299,7 @@ pub struct CollectionWithItems {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct CatalogFeaturedSlot {
     pub id: FeaturedSlotId,
     pub tenant_id: String,
@@ -307,6 +316,7 @@ pub struct CatalogFeaturedSlot {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct CatalogChartSnapshot {
     pub id: String,
     pub tenant_id: String,
@@ -320,6 +330,7 @@ pub struct CatalogChartSnapshot {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ListingMetricSnapshot {
     pub id: String,
     pub tenant_id: String,
@@ -335,6 +346,7 @@ pub struct ListingMetricSnapshot {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ListingSummary {
     pub id: String,
     pub app_id: String,
@@ -355,6 +367,7 @@ pub struct ListingSummary {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct SearchSuggestion {
     pub text: String,
     pub suggestion_type: String,
@@ -362,6 +375,7 @@ pub struct SearchSuggestion {
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct TrendingTerm {
     pub id: String,
     pub tenant_id: String,
@@ -375,6 +389,7 @@ pub struct TrendingTerm {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct SearchHistoryEntry {
     pub id: String,
     pub tenant_id: String,
@@ -386,6 +401,7 @@ pub struct SearchHistoryEntry {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct PublisherAnalyticsOverview {
     pub publisher_id: String,
     pub listing_count: i32,
@@ -397,6 +413,7 @@ pub struct PublisherAnalyticsOverview {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct PublisherListingMetricsSummary {
     pub listing_id: String,
     pub listing_slug: String,
@@ -409,6 +426,7 @@ pub struct PublisherListingMetricsSummary {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct OperatorDashboardStats {
     pub listing_count: i32,
     pub publisher_count: i32,
@@ -416,6 +434,7 @@ pub struct OperatorDashboardStats {
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct OperatorSearchAnalytics {
     pub recent_searches: Vec<SearchHistoryEntry>,
     pub trending_terms: Vec<TrendingTerm>,
@@ -475,6 +494,7 @@ impl AppTemplateUsageKind {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct AppTemplate {
     pub id: String,
     pub tenant_id: String,
@@ -501,6 +521,7 @@ pub struct AppTemplate {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct AppTemplateUsage {
     pub id: String,
     pub tenant_id: String,
@@ -513,6 +534,7 @@ pub struct AppTemplateUsage {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct AppTemplateUsageCounts {
     pub template_id: String,
     pub star_count: i64,
@@ -521,6 +543,7 @@ pub struct AppTemplateUsageCounts {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct Feedback {
     pub id: String,
     pub tenant_id: String,

@@ -1,7 +1,7 @@
 //! Canonical column registry for `appstore_*` tables.
 //!
 //! Each constant enumerates the column names of one table in the same order as
-//! the migration SQL (`specs/database/migrations/0001_appstore_foundation.sql`)
+//! the authoritative baseline DDL (`database/ddl/baseline/postgres/0001_appstore_baseline.sql`)
 //! and the corresponding `*Row` struct in [`super::rows`]. The registry is the
 //! single source of truth for column metadata — repository implementations
 //! consume it via [`columns_csv`] to build SELECT clauses, and future tooling

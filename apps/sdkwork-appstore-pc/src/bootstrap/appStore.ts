@@ -7,9 +7,10 @@ import {
 
 import type { AppItem, EditorialCollection, EventItem, Review } from '../types';
 
-/** Maximum storefront inventory page for the bounded catalog grid views. */
-const storefrontPageSize = 200;
-const reviewPageSize = 50;
+/** Bounded storefront page for catalog grid views (PAGINATION_SPEC §3: max 200,
+ * keep interactive surfaces small). */
+const storefrontPageSize = 50;
+const reviewPageSize = 20;
 
 interface CategoryRef {
   id: string;
@@ -103,7 +104,7 @@ export function createAppStoreServicePort(
       rating: readNumber(item, 'averageRating', 'average_rating') ?? 0,
       reviewsCount: readNumber(item, 'ratingCount', 'rating_count') ?? 0,
       description: readString(item, 'description') || '',
-      screenshots: [],
+      screenshots: readStringArray(item, 'screenshots', 'mediaScreenshots'),
       icon: visual.icon,
       iconColor: visual.color,
       version: readString(item, 'currentVersion', 'current_version') || '1.0.0',
@@ -709,6 +710,39 @@ function readString(record: Record<string, unknown> | undefined, ...keys: string
     }
   }
   return '';
+}
+
+function readStringArray(
+  record: Record<string, unknown> | undefined,
+  ...keys: string[]
+): string[] {
+  if (!record) {
+    return [];
+  }
+  for (const key of keys) {
+    const value = record[key];
+    if (Array.isArray(value)) {
+      const items = value.filter((entry): entry is string => typeof entry === 'string');
+      if (items.length > 0) {
+        return items;
+      }
+      const nested = value
+        .map((entry) =>
+          entry && typeof entry === 'object'
+            ? (entry as Record<string, unknown>)['url'] ??
+              (entry as Record<string, unknown>)['cdnUrl']
+            : undefined,
+        )
+        .filter((entry): entry is string => typeof entry === 'string' && entry.trim().length > 0);
+      if (nested.length > 0) {
+        return nested;
+      }
+    }
+    if (typeof value === 'string' && value.trim()) {
+      return [value.trim()];
+    }
+  }
+  return [];
 }
 
 function readNumber(record: Record<string, unknown> | undefined, ...keys: string[]): number | undefined {

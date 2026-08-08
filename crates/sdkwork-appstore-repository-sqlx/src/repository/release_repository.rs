@@ -165,6 +165,33 @@ impl ReleaseRepositoryPort for SqlxReleaseRepository {
             .map_err(AppstoreServiceError::Internal)
     }
 
+    async fn find_releases_by_channel_code(
+        &self,
+        context: &AppstoreRequestContext,
+        listing_id: &str,
+        channel_code: &str,
+    ) -> Result<Vec<Release>, AppstoreServiceError> {
+        let rows = self
+            .db
+            .query_as::<ReleaseRow>(&format!(
+                r#"SELECT {} FROM appstore_release r
+            INNER JOIN appstore_release_channel c ON r.channel_id = c.id
+            WHERE r.tenant_id = ? AND r.listing_id = ? AND c.channel_code = ?"#,
+                columns_csv(APPSTORE_RELEASE_COLUMNS)
+            ))
+            .bind(&context.tenant_id)
+            .bind(listing_id)
+            .bind(channel_code)
+            .fetch_all(&self.db)
+            .await
+            .map_err(|e| AppstoreServiceError::Internal(format!("Database error: {}", e)))?;
+
+        rows.into_iter()
+            .map(map_release_row_to_domain)
+            .collect::<Result<Vec<_>, _>>()
+            .map_err(AppstoreServiceError::Internal)
+    }
+
     async fn insert_release(
         &self,
         context: &AppstoreRequestContext,
@@ -422,6 +449,29 @@ impl ReleaseRepositoryPort for SqlxReleaseRepository {
             .map_err(AppstoreServiceError::Internal)
     }
 
+    async fn find_artifacts_by_release(
+        &self,
+        context: &AppstoreRequestContext,
+        release_id: &ReleaseId,
+    ) -> Result<Vec<ReleaseArtifact>, AppstoreServiceError> {
+        let rows = self
+            .db
+            .query_as::<ReleaseArtifactRow>(&format!(
+                r#"SELECT {} FROM appstore_release_artifact WHERE release_id = ? AND tenant_id = ?"#,
+                columns_csv(APPSTORE_RELEASE_ARTIFACT_COLUMNS)
+            ))
+            .bind(release_id.as_str())
+            .bind(&context.tenant_id)
+            .fetch_all(&self.db)
+            .await
+            .map_err(|e| AppstoreServiceError::Internal(format!("Database error: {}", e)))?;
+
+        rows.into_iter()
+            .map(map_artifact_row_to_domain)
+            .collect::<Result<Vec<_>, _>>()
+            .map_err(AppstoreServiceError::Internal)
+    }
+
     async fn find_artifact_by_composite(
         &self,
         context: &AppstoreRequestContext,
@@ -670,6 +720,51 @@ impl ReleaseRepositoryPort for SqlxReleaseRepository {
         Ok(())
     }
 
+    async fn consume_grant_atomically(
+        &self,
+        context: &AppstoreRequestContext,
+        grant_id: &DownloadGrantId,
+        user_id: &str,
+    ) -> Result<Option<DownloadGrant>, AppstoreServiceError> {
+        let now = chrono::Utc::now();
+        let result = self
+            .db
+            .query(
+                r#"UPDATE appstore_download_grant SET
+                    download_count = download_count + 1,
+                    grant_status = CASE
+                        WHEN download_count + 1 >= max_download_count THEN 'consumed'
+                        ELSE grant_status
+                    END,
+                    consumed_at = CASE
+                        WHEN download_count + 1 >= max_download_count THEN ?
+                        ELSE consumed_at
+                    END,
+                    updated_at = ?
+                WHERE id = ? AND tenant_id = ?
+                  AND (? = '' OR user_id = ?)
+                  AND grant_status = 'active'
+                  AND download_count < max_download_count
+                  AND expires_at > ?"#,
+            )
+            .bind(now)
+            .bind(now)
+            .bind(grant_id.as_str())
+            .bind(&context.tenant_id)
+            .bind(user_id)
+            .bind(user_id)
+            .bind(now)
+            .execute_unified(&self.db)
+            .await
+            .map_err(|e| AppstoreServiceError::Internal(format!("Database error: {}", e)))?;
+
+        if result.rows_affected() == 0 {
+            return Ok(None);
+        }
+
+        self.find_grant_by_id(context, grant_id).await
+    }
+
     async fn find_listing_by_app_key(
         &self,
         context: &AppstoreRequestContext,
@@ -687,5 +782,78 @@ impl ReleaseRepositoryPort for SqlxReleaseRepository {
         .map_err(|e| AppstoreServiceError::Internal(format!("Database error: {}", e)))?;
 
         Ok(row.map(|(id,)| id))
+    }
+
+    async fn find_listing_publisher_id(
+        &self,
+        context: &AppstoreRequestContext,
+        listing_id: &str,
+    ) -> Result<Option<String>, AppstoreServiceError> {
+        let row: Option<(String,)> = self
+            .db
+            .query_as::<(String,)>(
+                r#"SELECT publisher_id FROM appstore_listing WHERE tenant_id = ? AND id = ? AND deleted_at IS NULL"#,
+            )
+            .bind(&context.tenant_id)
+            .bind(listing_id)
+            .fetch_optional(&self.db)
+            .await
+            .map_err(|e| AppstoreServiceError::Internal(format!("Database error: {}", e)))?;
+
+        Ok(row.map(|(publisher_id,)| publisher_id))
+    }
+
+    async fn find_listing_pricing_model(
+        &self,
+        context: &AppstoreRequestContext,
+        listing_id: &str,
+    ) -> Result<Option<String>, AppstoreServiceError> {
+        let row: Option<(String,)> = self
+            .db
+            .query_as::<(String,)>(
+                r#"SELECT pricing_model FROM appstore_listing WHERE tenant_id = ? AND id = ? AND deleted_at IS NULL"#,
+            )
+            .bind(&context.tenant_id)
+            .bind(listing_id)
+            .fetch_optional(&self.db)
+            .await
+            .map_err(|e| AppstoreServiceError::Internal(format!("Database error: {}", e)))?;
+
+        Ok(row.map(|(pricing_model,)| pricing_model))
+    }
+
+    async fn find_publisher_member_role(
+        &self,
+        context: &AppstoreRequestContext,
+        publisher_id: &str,
+        user_id: &str,
+    ) -> Result<Option<String>, AppstoreServiceError> {
+        let row: Option<(String,)> = self
+            .db
+            .query_as::<(String,)>(
+                r#"
+                SELECT role FROM (
+                    SELECT 'owner' AS role
+                    FROM appstore_publisher
+                    WHERE tenant_id = ? AND id = ? AND owner_user_id = ? AND deleted_at IS NULL
+                    UNION ALL
+                    SELECT member_role
+                    FROM appstore_publisher_member
+                    WHERE tenant_id = ? AND publisher_id = ? AND user_id = ? AND member_status = 'active'
+                ) publisher_roles
+                LIMIT 1
+                "#,
+            )
+            .bind(&context.tenant_id)
+            .bind(publisher_id)
+            .bind(user_id)
+            .bind(&context.tenant_id)
+            .bind(publisher_id)
+            .bind(user_id)
+            .fetch_optional(&self.db)
+            .await
+            .map_err(|e| AppstoreServiceError::Internal(format!("Database error: {}", e)))?;
+
+        Ok(row.map(|(role,)| role))
     }
 }

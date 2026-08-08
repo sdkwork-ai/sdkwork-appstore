@@ -553,7 +553,7 @@ impl LibraryRepositoryPort for SqlxLibraryRepository {
                     created_at, updated_at
                 FROM appstore_release_artifact
                 WHERE tenant_id = ? AND release_id = ? AND platform = ? AND architecture = ?
-                    AND artifact_status = 'active'
+                    AND artifact_status = 'verified'
                 ORDER BY created_at DESC LIMIT 1"#
                 ))
                 .bind(&context.tenant_id)
@@ -573,7 +573,7 @@ impl LibraryRepositoryPort for SqlxLibraryRepository {
                     created_at, updated_at
                 FROM appstore_release_artifact
                 WHERE tenant_id = ? AND release_id = ? AND platform = ?
-                    AND artifact_status = 'active'
+                    AND artifact_status = 'verified'
                 ORDER BY created_at DESC LIMIT 1"#
                 ))
                 .bind(&context.tenant_id)

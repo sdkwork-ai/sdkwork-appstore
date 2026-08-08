@@ -9,6 +9,7 @@ interface InstallModalProps {
   app: AppItem;
   installState: 'confirm' | 'downloading' | 'success';
   progress: number;
+  error?: string | null;
   onConfirm: () => void;
   onCancel: () => void;
 }
@@ -17,6 +18,7 @@ export function InstallModal({
   app,
   installState,
   progress,
+  error,
   onConfirm,
   onCancel,
 }: InstallModalProps) {
@@ -43,6 +45,12 @@ export function InstallModal({
           </div>
           <h3 className="text-xl font-bold text-[#1C1C1E] dark:text-[#F5F5F5]">{app.name}</h3>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 mb-6">{app.developer}</p>
+
+          {error && (
+            <p className="text-sm text-red-500 dark:text-red-400 mb-4" role="alert">
+              {error}
+            </p>
+          )}
 
           {installState === 'confirm' && (
             <InstallModalConfirmActions onConfirm={onConfirm} onCancel={onCancel} />

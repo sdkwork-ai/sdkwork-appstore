@@ -18,6 +18,7 @@ pub enum MarketDomainEvent {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ChannelCreatedEvent {
     pub channel_id: MarketChannelId,
     pub tenant_id: String,
@@ -28,6 +29,7 @@ pub struct ChannelCreatedEvent {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ChannelUpdatedEvent {
     pub channel_id: MarketChannelId,
     pub tenant_id: String,
@@ -36,6 +38,7 @@ pub struct ChannelUpdatedEvent {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ChannelSuspendedEvent {
     pub channel_id: MarketChannelId,
     pub tenant_id: String,
@@ -44,6 +47,7 @@ pub struct ChannelSuspendedEvent {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ChannelReactivatedEvent {
     pub channel_id: MarketChannelId,
     pub tenant_id: String,
@@ -51,6 +55,7 @@ pub struct ChannelReactivatedEvent {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ReleaseSubmittedEvent {
     pub release_id: MarketReleaseId,
     pub tenant_id: String,
@@ -60,6 +65,7 @@ pub struct ReleaseSubmittedEvent {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ReleaseApprovedEvent {
     pub release_id: MarketReleaseId,
     pub tenant_id: String,
@@ -68,6 +74,7 @@ pub struct ReleaseApprovedEvent {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ReleaseRejectedEvent {
     pub release_id: MarketReleaseId,
     pub tenant_id: String,
@@ -77,6 +84,7 @@ pub struct ReleaseRejectedEvent {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ReleasePublishedEvent {
     pub release_id: MarketReleaseId,
     pub tenant_id: String,
@@ -86,6 +94,7 @@ pub struct ReleasePublishedEvent {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ReleaseRetiredEvent {
     pub release_id: MarketReleaseId,
     pub tenant_id: String,
@@ -94,6 +103,7 @@ pub struct ReleaseRetiredEvent {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ReleaseSyncedEvent {
     pub release_id: MarketReleaseId,
     pub tenant_id: String,

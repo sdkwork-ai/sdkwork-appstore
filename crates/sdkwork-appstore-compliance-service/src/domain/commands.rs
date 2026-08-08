@@ -21,6 +21,7 @@ impl ComplianceOperationRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct RetrieveComplianceProfileRequest {
     pub listing_id: String,
     pub idempotency_key: Option<String>,
@@ -36,6 +37,7 @@ impl RetrieveComplianceProfileRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct UpdateComplianceProfileRequest {
     pub listing_id: String,
     pub privacy_nutrition: Option<serde_json::Value>,
@@ -84,6 +86,7 @@ impl UpdateComplianceProfileRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct PermissionDisclosureItem {
     pub permission_code: String,
     pub usage_purpose: String,
@@ -91,6 +94,7 @@ pub struct PermissionDisclosureItem {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct UpsertPermissionDisclosuresRequest {
     pub listing_id: String,
     pub permissions: Vec<PermissionDisclosureItem>,
@@ -113,6 +117,7 @@ impl UpsertPermissionDisclosuresRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ListIapItemsRequest {
     pub listing_id: String,
     pub cursor: Option<String>,

@@ -23,6 +23,7 @@ impl ListingOperationRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct RetrieveListingRequest {
     pub listing_id: String,
     pub idempotency_key: Option<String>,
@@ -38,6 +39,7 @@ impl RetrieveListingRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct CreateListingRequest {
     pub app_id: String,
     pub app_key: String,
@@ -83,6 +85,7 @@ impl CreateListingRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct UpdateListingRequest {
     pub listing_id: String,
     pub pricing_model: Option<String>,
@@ -131,6 +134,7 @@ impl UpdateListingRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct UpsertListingLocalizationRequest {
     pub listing_id: String,
     pub locale: String,
@@ -186,6 +190,7 @@ impl UpsertListingLocalizationRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ListListingMediaRequest {
     pub listing_id: String,
     pub idempotency_key: Option<String>,
@@ -201,6 +206,7 @@ impl ListListingMediaRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct AttachListingMediaRequest {
     pub listing_id: String,
     pub media_role: String,
@@ -243,6 +249,7 @@ impl AttachListingMediaRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct RemoveListingMediaRequest {
     pub listing_id: String,
     pub media_id: String,
@@ -260,6 +267,7 @@ impl RemoveListingMediaRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct BindListingCategoriesRequest {
     pub listing_id: String,
     pub primary_category_id: Option<String>,
@@ -289,12 +297,14 @@ impl BindListingCategoriesRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct RegionEntry {
     pub region_code: String,
     pub availability_status: String,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct UpdateRegionalAvailabilityRequest {
     pub listing_id: String,
     pub regions: Vec<RegionEntry>,
@@ -317,6 +327,7 @@ impl UpdateRegionalAvailabilityRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ListPublisherListingsRequest {
     pub publisher_id: String,
     pub cursor: Option<String>,
@@ -346,6 +357,7 @@ impl ListPublisherListingsRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ListListingReleasesRequest {
     pub listing_id: String,
     pub cursor: Option<String>,
@@ -380,6 +392,7 @@ impl ListListingReleasesRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct CreateListingSubmissionRequest {
     pub listing_id: String,
     pub submission_type: String,
@@ -409,6 +422,7 @@ impl CreateListingSubmissionRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ApplyModerationDecisionRequest {
     pub submission_id: String,
     pub decision_type: String,
@@ -431,6 +445,7 @@ impl ApplyModerationDecisionRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct AdminListListingsRequest {
     pub status_filter: Option<String>,
     pub review_status_filter: Option<String>,
@@ -484,6 +499,7 @@ impl AdminListListingsRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct AdminRetrieveListingRequest {
     pub listing_id: String,
     pub idempotency_key: Option<String>,
@@ -499,6 +515,7 @@ impl AdminRetrieveListingRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct AdminUpdateListingVisibilityRequest {
     pub listing_id: String,
     pub storefront_visibility: String,
@@ -521,6 +538,7 @@ impl AdminUpdateListingVisibilityRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct PublicRetrieveListingRequest {
     pub listing_slug: String,
     pub idempotency_key: Option<String>,
@@ -536,6 +554,7 @@ impl PublicRetrieveListingRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct BootstrapPublisherAppRequest {
     pub publisher_id: String,
     pub app_key: String,
@@ -568,6 +587,7 @@ impl BootstrapPublisherAppRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ListListingReleaseHistoryRequest {
     pub listing_id: String,
     pub cursor: Option<String>,
@@ -595,6 +615,7 @@ impl ListListingReleaseHistoryRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ListSimilarListingsRequest {
     pub listing_id: String,
     pub cursor: Option<String>,
@@ -622,6 +643,7 @@ impl ListSimilarListingsRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ListDeveloperOtherListingsRequest {
     pub listing_id: String,
     pub cursor: Option<String>,
@@ -649,6 +671,7 @@ impl ListDeveloperOtherListingsRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct RetrieveListingEditorialRequest {
     pub listing_id: String,
 }
@@ -662,6 +685,7 @@ impl RetrieveListingEditorialRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct RatingsListRequest {
     pub listing_id: String,
     pub cursor: Option<String>,
@@ -689,6 +713,7 @@ impl RatingsListRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct RatingUpdateRequest {
     pub listing_id: String,
     pub rating: i32,

@@ -118,7 +118,11 @@ const result = await client.library.appstore.library.items.list(params);
 
 ```typescript
 // List wishlist items
-const result = await client.wishlist.appstore.wishlist.items.list();
+const params = {
+  cursor: 'cursor',
+  page_size: 2,
+};
+const result = await client.wishlist.appstore.wishlist.items.list(params);
 ```
 
 ### download_grants

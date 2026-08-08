@@ -16,6 +16,7 @@ pub const CAPABILITY: IntegrationCapability = IntegrationCapability {
 };
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct NotificationPayload {
     pub notification_type: String,
     pub recipient_user_id: String,
@@ -27,6 +28,7 @@ pub struct NotificationPayload {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct NotificationResult {
     pub notification_id: String,
     pub delivered: bool,

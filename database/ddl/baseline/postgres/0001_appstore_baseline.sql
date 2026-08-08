@@ -867,7 +867,8 @@ CREATE TABLE IF NOT EXISTS appstore_app_template_usage (
     target_app_id BIGINT,
     usage_type INTEGER,
     input_snapshot JSONB,
-    output_snapshot JSONB
+    output_snapshot JSONB,
+    UNIQUE (tenant_id, user_id, template_id, usage_type)
 );
 
 CREATE INDEX IF NOT EXISTS idx_appstore_app_template_usage_template ON appstore_app_template_usage (tenant_id, organization_id, template_id, template_version_id, created_at, id);

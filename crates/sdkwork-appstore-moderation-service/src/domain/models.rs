@@ -225,6 +225,7 @@ impl ReasonCode {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ModerationReview {
     pub id: ModerationReviewId,
     pub tenant_id: String,
@@ -271,6 +272,7 @@ impl ModerationReview {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ModerationDecision {
     pub id: ModerationDecisionId,
     pub tenant_id: String,
@@ -328,6 +330,7 @@ impl AppealStatus {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ModerationAppeal {
     pub id: ModerationAppealId,
     pub tenant_id: String,

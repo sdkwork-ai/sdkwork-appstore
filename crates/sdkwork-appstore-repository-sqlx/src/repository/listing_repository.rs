@@ -1147,7 +1147,7 @@ impl ListingRepositoryPort for SqlxListingRepository {
                     r#"SELECT {} FROM appstore_listing
                 WHERE tenant_id = ? AND primary_category_id = ? AND id != ?
                   AND {visible_filter} AND id > ?
-                ORDER BY featured_score DESC, rating_count DESC, id ASC
+                ORDER BY id ASC
                 LIMIT ?"#,
                     columns_csv(APPSTORE_LISTING_COLUMNS)
                 ))
@@ -1165,7 +1165,7 @@ impl ListingRepositoryPort for SqlxListingRepository {
                     r#"SELECT {} FROM appstore_listing
                 WHERE tenant_id = ? AND primary_category_id = ? AND id != ?
                   AND {visible_filter}
-                ORDER BY featured_score DESC, rating_count DESC, id ASC
+                ORDER BY id ASC
                 LIMIT ?"#,
                     columns_csv(APPSTORE_LISTING_COLUMNS)
                 ))
@@ -1202,7 +1202,7 @@ impl ListingRepositoryPort for SqlxListingRepository {
                     r#"SELECT {} FROM appstore_listing
                 WHERE tenant_id = ? AND publisher_id = ? AND id != ?
                   AND {visible_filter} AND id > ?
-                ORDER BY featured_score DESC, rating_count DESC, id ASC
+                ORDER BY id ASC
                 LIMIT ?"#,
                     columns_csv(APPSTORE_LISTING_COLUMNS)
                 ))
@@ -1220,7 +1220,7 @@ impl ListingRepositoryPort for SqlxListingRepository {
                     r#"SELECT {} FROM appstore_listing
                 WHERE tenant_id = ? AND publisher_id = ? AND id != ?
                   AND {visible_filter}
-                ORDER BY featured_score DESC, rating_count DESC, id ASC
+                ORDER BY id ASC
                 LIMIT ?"#,
                     columns_csv(APPSTORE_LISTING_COLUMNS)
                 ))
@@ -1318,7 +1318,7 @@ impl ListingRepositoryPort for SqlxListingRepository {
         );
         if cursor.is_some() {
             sql.push_str(
-                "  AND id > ?
+                "  AND (created_at, id) < (SELECT created_at, id FROM appstore_listing_rating WHERE id = ? AND tenant_id = ?)
 ",
             );
         }
@@ -1338,7 +1338,7 @@ impl ListingRepositoryPort for SqlxListingRepository {
             .bind(&context.tenant_id)
             .bind(listing_id.as_str());
         if let Some(cursor_id) = cursor {
-            q = q.bind(cursor_id);
+            q = q.bind(cursor_id).bind(&context.tenant_id);
         }
         q = q.bind(limit);
 
@@ -1354,7 +1354,7 @@ impl ListingRepositoryPort for SqlxListingRepository {
 
     async fn upsert_rating(
         &self,
-        _context: &AppstoreRequestContext,
+        context: &AppstoreRequestContext,
         rating: &ListingRating,
     ) -> Result<(), AppstoreServiceError> {
         self.db
@@ -1371,8 +1371,8 @@ impl ListingRepositoryPort for SqlxListingRepository {
                 "#,
             ))
             .bind(&rating.id)
-            .bind(&rating.tenant_id)
-            .bind(&rating.organization_id)
+            .bind(&context.tenant_id)
+            .bind(&context.organization_id)
             .bind(rating.listing_id.as_str())
             .bind(&rating.user_id)
             .bind(rating.rating)
@@ -1419,5 +1419,40 @@ impl ListingRepositoryPort for SqlxListingRepository {
             .await
             .map_err(|e| AppstoreServiceError::Internal(format!("Database error: {e}")))?;
         Ok(())
+    }
+
+    async fn find_publisher_member_role(
+        &self,
+        context: &AppstoreRequestContext,
+        publisher_id: &str,
+        user_id: &str,
+    ) -> Result<Option<String>, AppstoreServiceError> {
+        let row = self
+            .db
+            .query_as::<(String,)>(&self.db.adapt_sql(
+                r#"
+                SELECT role FROM (
+                    SELECT 'owner' AS role
+                    FROM appstore_publisher
+                    WHERE tenant_id = ? AND id = ? AND owner_user_id = ? AND deleted_at IS NULL
+                    UNION ALL
+                    SELECT member_role
+                    FROM appstore_publisher_member
+                    WHERE tenant_id = ? AND publisher_id = ? AND user_id = ? AND member_status = 'active'
+                ) publisher_roles
+                LIMIT 1
+                "#,
+            ))
+            .bind(&context.tenant_id)
+            .bind(publisher_id)
+            .bind(user_id)
+            .bind(&context.tenant_id)
+            .bind(publisher_id)
+            .bind(user_id)
+            .fetch_optional(&self.db)
+            .await
+            .map_err(|e| AppstoreServiceError::Internal(format!("Database error: {e}")))?;
+
+        Ok(row.map(|(role,)| role))
     }
 }

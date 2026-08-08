@@ -372,4 +372,77 @@ impl sdkwork_appstore_compliance_service::ports::repository::ComplianceRepositor
             )
             .collect())
     }
+
+    async fn find_listing_publisher_id(
+        &self,
+        context: &AppstoreRequestContext,
+        listing_id: &str,
+    ) -> Result<Option<String>, AppstoreServiceError> {
+        let row: Option<(String,)> = self
+            .db
+            .query_as::<(String,)>(
+                r#"SELECT publisher_id FROM appstore_listing WHERE tenant_id = ? AND id = ? AND deleted_at IS NULL"#,
+            )
+            .bind(&context.tenant_id)
+            .bind(listing_id)
+            .fetch_optional(&self.db)
+            .await
+            .map_err(|e| AppstoreServiceError::Internal(format!("Database error: {e}")))?;
+
+        Ok(row.map(|(publisher_id,)| publisher_id))
+    }
+
+    async fn find_listing_visibility(
+        &self,
+        context: &AppstoreRequestContext,
+        listing_id: &str,
+    ) -> Result<Option<bool>, AppstoreServiceError> {
+        let row: Option<(String, String)> = self
+            .db
+            .query_as::<(String, String)>(
+                r#"SELECT listing_status, storefront_visibility FROM appstore_listing WHERE tenant_id = ? AND id = ? AND deleted_at IS NULL"#,
+            )
+            .bind(&context.tenant_id)
+            .bind(listing_id)
+            .fetch_optional(&self.db)
+            .await
+            .map_err(|e| AppstoreServiceError::Internal(format!("Database error: {e}")))?;
+
+        Ok(row.map(|(status, visibility)| status == "active" && visibility != "hidden"))
+    }
+
+    async fn find_publisher_member_role(
+        &self,
+        context: &AppstoreRequestContext,
+        publisher_id: &str,
+        user_id: &str,
+    ) -> Result<Option<String>, AppstoreServiceError> {
+        let row: Option<(String,)> = self
+            .db
+            .query_as::<(String,)>(
+                r#"
+                SELECT role FROM (
+                    SELECT 'owner' AS role
+                    FROM appstore_publisher
+                    WHERE tenant_id = ? AND id = ? AND owner_user_id = ? AND deleted_at IS NULL
+                    UNION ALL
+                    SELECT member_role
+                    FROM appstore_publisher_member
+                    WHERE tenant_id = ? AND publisher_id = ? AND user_id = ? AND member_status = 'active'
+                ) publisher_roles
+                LIMIT 1
+                "#,
+            )
+            .bind(&context.tenant_id)
+            .bind(publisher_id)
+            .bind(user_id)
+            .bind(&context.tenant_id)
+            .bind(publisher_id)
+            .bind(user_id)
+            .fetch_optional(&self.db)
+            .await
+            .map_err(|e| AppstoreServiceError::Internal(format!("Database error: {e}")))?;
+
+        Ok(row.map(|(role,)| role))
+    }
 }

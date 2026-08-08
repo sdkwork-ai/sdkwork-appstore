@@ -21,6 +21,7 @@ impl ModerationOperationRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ListModerationQueueRequest {
     pub review_status: Option<String>,
     pub cursor: Option<String>,
@@ -60,6 +61,7 @@ impl ListModerationQueueRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct RetrieveModerationReviewRequest {
     pub review_id: String,
     pub idempotency_key: Option<String>,
@@ -80,6 +82,7 @@ impl RetrieveModerationReviewRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct AssignModerationReviewRequest {
     pub review_id: String,
     pub assigned_to: String,
@@ -102,6 +105,7 @@ impl AssignModerationReviewRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct EnqueueSubmissionReviewRequest {
     pub submission_id: String,
     pub organization_id: String,
@@ -124,6 +128,7 @@ impl EnqueueSubmissionReviewRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct CreateModerationDecisionRequest {
     pub review_id: String,
     pub decision_type: String,
@@ -173,6 +178,7 @@ impl CreateModerationDecisionRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct CreateModerationAppealRequest {
     pub decision_id: String,
     pub appeal_reason: String,
@@ -190,6 +196,7 @@ impl CreateModerationAppealRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ListModerationAppealsRequest {
     pub status: Option<String>,
     pub cursor: Option<String>,
@@ -222,6 +229,7 @@ impl ListModerationAppealsRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct RetrieveModerationAppealRequest {
     pub appeal_id: String,
 }
@@ -235,6 +243,7 @@ impl RetrieveModerationAppealRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct DecideModerationAppealRequest {
     pub appeal_id: String,
     pub decision: String,

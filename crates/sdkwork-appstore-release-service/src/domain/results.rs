@@ -5,6 +5,7 @@ use super::models::{
 };
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ReleaseOperationResult {
     pub operation_id: &'static str,
     pub accepted: bool,
@@ -27,6 +28,7 @@ impl ReleaseOperationResult {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct CreateReleaseResult {
     pub operation_id: &'static str,
     pub release: Release,
@@ -42,6 +44,7 @@ impl CreateReleaseResult {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct RetrieveReleaseResult {
     pub operation_id: &'static str,
     pub release: Option<Release>,
@@ -64,6 +67,7 @@ impl RetrieveReleaseResult {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct UpdateReleaseResult {
     pub operation_id: &'static str,
     pub release: Release,
@@ -79,6 +83,7 @@ impl UpdateReleaseResult {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct UpsertReleaseNotesResult {
     pub operation_id: &'static str,
     pub localization: ReleaseNoteLocalization,
@@ -94,6 +99,7 @@ impl UpsertReleaseNotesResult {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct AttachArtifactResult {
     pub operation_id: &'static str,
     pub artifact: ReleaseArtifact,
@@ -109,6 +115,7 @@ impl AttachArtifactResult {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct UpdateRolloutResult {
     pub operation_id: &'static str,
     pub rollout: ReleaseRollout,
@@ -124,6 +131,7 @@ impl UpdateRolloutResult {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct RetireReleaseResult {
     pub operation_id: &'static str,
     pub release: Release,
@@ -139,6 +147,7 @@ impl RetireReleaseResult {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct CheckUpdateResult {
     pub operation_id: &'static str,
     pub update_available: bool,
@@ -179,6 +188,7 @@ impl CheckUpdateResult {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ResolveDownloadResult {
     pub operation_id: &'static str,
     pub download_url: Option<String>,
@@ -216,6 +226,7 @@ impl ResolveDownloadResult {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct RetrievePublicReleaseResult {
     pub operation_id: &'static str,
     pub release: Option<Release>,
@@ -238,6 +249,7 @@ impl RetrievePublicReleaseResult {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct CreateDownloadGrantResult {
     pub operation_id: &'static str,
     pub grant: DownloadGrant,
@@ -253,6 +265,7 @@ impl CreateDownloadGrantResult {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ConsumeDownloadGrantResult {
     pub operation_id: &'static str,
     pub grant: DownloadGrant,
@@ -268,6 +281,7 @@ impl ConsumeDownloadGrantResult {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct AutomationSubmissionResult {
     pub operation_id: &'static str,
     pub accepted: bool,

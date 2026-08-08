@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 use super::models::{CompliancePermissionDisclosure, ComplianceProfile};
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ComplianceOperationResult {
     pub operation_id: &'static str,
     pub accepted: bool,
@@ -25,6 +26,7 @@ impl ComplianceOperationResult {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct RetrieveComplianceProfileResult {
     pub operation_id: &'static str,
     pub profile: Option<ComplianceProfile>,
@@ -47,6 +49,7 @@ impl RetrieveComplianceProfileResult {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct UpdateComplianceProfileResult {
     pub operation_id: &'static str,
     pub profile: ComplianceProfile,
@@ -69,6 +72,7 @@ impl UpdateComplianceProfileResult {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct UpsertPermissionDisclosuresResult {
     pub operation_id: &'static str,
     pub disclosures: Vec<CompliancePermissionDisclosure>,
@@ -87,6 +91,7 @@ impl UpsertPermissionDisclosuresResult {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ListIapItemsResult {
     pub operation_id: &'static str,
     pub items: Vec<super::models::ListingIapItem>,

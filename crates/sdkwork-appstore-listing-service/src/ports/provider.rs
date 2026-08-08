@@ -25,11 +25,4 @@ pub trait ListingProviderPort: Send + Sync {
         tenant_id: &str,
         media_resource_id: &str,
     ) -> Result<MediaUploadResult, String>;
-
-    async fn validate_publisher_access(
-        &self,
-        tenant_id: &str,
-        publisher_id: &str,
-        user_id: &str,
-    ) -> Result<bool, String>;
 }

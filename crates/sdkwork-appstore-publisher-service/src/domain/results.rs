@@ -5,6 +5,7 @@ use serde::{Deserialize, Serialize};
 use super::models::{Publisher, PublisherMember, PublisherVerification};
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct PublisherOperationResult {
     pub operation_id: &'static str,
     pub accepted: bool,
@@ -27,6 +28,7 @@ impl PublisherOperationResult {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct RetrieveCurrentPublisherResult {
     pub operation_id: &'static str,
     pub publisher: Option<Publisher>,
@@ -49,6 +51,7 @@ impl RetrieveCurrentPublisherResult {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct CreatePublisherResult {
     pub operation_id: &'static str,
     pub publisher: Publisher,
@@ -64,6 +67,7 @@ impl CreatePublisherResult {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct UpdatePublisherResult {
     pub operation_id: &'static str,
     pub publisher: Publisher,
@@ -79,6 +83,7 @@ impl UpdatePublisherResult {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ListPublisherMembersResult {
     pub operation_id: &'static str,
     pub members: Vec<PublisherMember>,
@@ -103,6 +108,7 @@ impl ListPublisherMembersResult {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct InvitePublisherMemberResult {
     pub operation_id: &'static str,
     pub member: PublisherMember,
@@ -118,6 +124,7 @@ impl InvitePublisherMemberResult {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct SubmitPublisherVerificationResult {
     pub operation_id: &'static str,
     pub verification: PublisherVerification,
@@ -133,6 +140,7 @@ impl SubmitPublisherVerificationResult {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct AdminVerifyPublisherResult {
     pub operation_id: &'static str,
     pub verification: PublisherVerification,

@@ -108,6 +108,15 @@ pub trait CatalogRepositoryPort: Send + Sync {
         collection_id: &CollectionId,
     ) -> AppstoreServiceResult<()>;
 
+    /// Atomically replaces all items of a collection (delete + insert in one
+    /// transaction) so a failed update never leaves the collection empty.
+    async fn replace_collection_items(
+        &self,
+        context: &AppstoreRequestContext,
+        collection_id: &CollectionId,
+        items: &[CatalogCollectionItem],
+    ) -> AppstoreServiceResult<()>;
+
     async fn insert_collection_item(
         &self,
         context: &AppstoreRequestContext,

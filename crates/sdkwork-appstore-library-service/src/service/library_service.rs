@@ -106,7 +106,7 @@ where
         context: &AppstoreRequestContext,
         request: ListLibraryItemsRequest,
     ) -> AppstoreServiceResult<ListLibraryItemsResult> {
-        let limit = request.page_size.unwrap_or(20).min(200);
+        let limit = request.page_size.unwrap_or(20).clamp(1, 200);
         let items = self
             .repository
             .find_library_items_by_user(context, request.cursor.as_deref(), limit + 1)
@@ -434,7 +434,7 @@ where
         context: &AppstoreRequestContext,
         request: ListWishlistItemsRequest,
     ) -> AppstoreServiceResult<ListWishlistItemsResult> {
-        let limit = request.page_size.unwrap_or(20).min(200);
+        let limit = request.page_size.unwrap_or(20).clamp(1, 200);
         let items = self
             .repository
             .find_wishlist_items_by_user(context, request.cursor.as_deref(), limit + 1)

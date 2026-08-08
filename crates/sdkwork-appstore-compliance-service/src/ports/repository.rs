@@ -62,4 +62,27 @@ pub trait ComplianceRepositoryPort: Send + Sync {
         cursor: Option<&str>,
         limit: i32,
     ) -> AppstoreServiceResult<Vec<crate::domain::models::ListingIapItem>>;
+
+    /// Resolves the owning publisher of a listing.
+    async fn find_listing_publisher_id(
+        &self,
+        context: &AppstoreRequestContext,
+        listing_id: &str,
+    ) -> AppstoreServiceResult<Option<String>>;
+
+    /// Whether the listing is visible on the public storefront.
+    async fn find_listing_visibility(
+        &self,
+        context: &AppstoreRequestContext,
+        listing_id: &str,
+    ) -> AppstoreServiceResult<Option<bool>>;
+
+    /// Returns the caller's role for a publisher (owner or accepted member)
+    /// when the subject has publisher access; `None` otherwise.
+    async fn find_publisher_member_role(
+        &self,
+        context: &AppstoreRequestContext,
+        publisher_id: &str,
+        user_id: &str,
+    ) -> AppstoreServiceResult<Option<String>>;
 }

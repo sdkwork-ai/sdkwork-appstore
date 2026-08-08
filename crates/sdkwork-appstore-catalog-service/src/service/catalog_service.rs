@@ -436,7 +436,7 @@ where
         context: &AppstoreRequestContext,
         request: CategoriesListRequest,
     ) -> AppstoreServiceResult<CategoriesListResult> {
-        let limit = request.page_size.unwrap_or(20).min(200);
+        let limit = request.page_size.unwrap_or(20).clamp(1, 200);
         let categories = self
             .repository
             .find_categories(context, request.cursor.as_deref(), limit + 1)
@@ -661,7 +661,7 @@ where
         context: &AppstoreRequestContext,
         request: CollectionsListRequest,
     ) -> AppstoreServiceResult<CollectionsListResult> {
-        let limit = request.page_size.unwrap_or(20).min(200);
+        let limit = request.page_size.unwrap_or(20).clamp(1, 200);
         let collections = self
             .repository
             .find_collections(context, request.cursor.as_deref(), limit + 1)
@@ -957,36 +957,33 @@ where
                 ))
             })?;
 
-        self.repository
-            .delete_collection_items(context, &collection_id)
-            .await?;
-
         let now = Utc::now();
-        let mut items = Vec::new();
+        let items: Vec<CatalogCollectionItem> = request
+            .items
+            .into_iter()
+            .enumerate()
+            .map(|(index, item_input)| {
+                let starts_at = item_input.starts_at.as_deref().and_then(|s| s.parse().ok());
+                let ends_at = item_input.ends_at.as_deref().and_then(|s| s.parse().ok());
+                CatalogCollectionItem {
+                    id: Uuid::new_v4().to_string(),
+                    tenant_id: context.tenant_id.clone(),
+                    collection_id: collection_id.clone(),
+                    listing_id: item_input.listing_id,
+                    sort_order: item_input.sort_order.unwrap_or(index as i32),
+                    highlight: item_input
+                        .highlight
+                        .unwrap_or(serde_json::Value::Object(serde_json::Map::new())),
+                    starts_at,
+                    ends_at,
+                    created_at: now,
+                }
+            })
+            .collect();
 
-        for (index, item_input) in request.items.into_iter().enumerate() {
-            let starts_at = item_input.starts_at.as_deref().and_then(|s| s.parse().ok());
-            let ends_at = item_input.ends_at.as_deref().and_then(|s| s.parse().ok());
-
-            let item = CatalogCollectionItem {
-                id: Uuid::new_v4().to_string(),
-                tenant_id: context.tenant_id.clone(),
-                collection_id: collection_id.clone(),
-                listing_id: item_input.listing_id,
-                sort_order: item_input.sort_order.unwrap_or(index as i32),
-                highlight: item_input
-                    .highlight
-                    .unwrap_or(serde_json::Value::Object(serde_json::Map::new())),
-                starts_at,
-                ends_at,
-                created_at: now,
-            };
-
-            self.repository
-                .insert_collection_item(context, &item)
-                .await?;
-            items.push(item);
-        }
+        self.repository
+            .replace_collection_items(context, &collection_id, &items)
+            .await?;
 
         Ok(CollectionItemsUpsertResult::upserted(
             "appstore.catalog.collections.items.update",
@@ -1114,7 +1111,14 @@ where
         context: &AppstoreRequestContext,
         request: ListingsSearchRequest,
     ) -> AppstoreServiceResult<ListingsSearchResult> {
-        let limit = request.page_size.unwrap_or(20).min(200);
+        let limit = request.page_size.unwrap_or(20).clamp(1, 200);
+        if let Some(ids) = request.ids.as_deref() {
+            if ids.len() > 100 {
+                return Err(AppstoreServiceError::ValidationFailed(
+                    "ids filter exceeds the maximum of 100 entries".to_string(),
+                ));
+            }
+        }
 
         let mut listings = if let (Some(port), Some(query)) =
             (&self.search_federation, request.query.as_deref())
@@ -1264,7 +1268,7 @@ where
             })
             .collect();
 
-        let limit = request.page_size.unwrap_or(20).min(200) as usize;
+        let limit = request.page_size.unwrap_or(20).clamp(1, 200) as usize;
         let slots: Vec<CatalogFeaturedSlot> = filtered.into_iter().take(limit).collect();
 
         Ok(PublicFeaturedListResult::new(
@@ -1285,7 +1289,7 @@ where
             .as_deref()
             .and_then(PlatformScope::from_str)
             .unwrap_or(PlatformScope::All);
-        let limit = request.page_size.unwrap_or(20).min(200);
+        let limit = request.page_size.unwrap_or(20).clamp(1, 200);
 
         let chart = self
             .repository
@@ -1339,7 +1343,7 @@ where
         request: RecentlyUpdatedListRequest,
     ) -> AppstoreServiceResult<RecentlyUpdatedListResult> {
         require_scope(context, "appstore.catalog.read")?;
-        let limit = request.page_size.unwrap_or(20).min(200);
+        let limit = request.page_size.unwrap_or(20).clamp(1, 200);
         let listings = self
             .repository
             .find_recently_updated_listings(
@@ -1372,7 +1376,7 @@ where
         request: EventsListRequest,
     ) -> AppstoreServiceResult<EventsListResult> {
         require_scope(context, "appstore.catalog.read")?;
-        let limit = request.page_size.unwrap_or(20).min(200);
+        let limit = request.page_size.unwrap_or(20).clamp(1, 200);
         let collections = self
             .repository
             .find_event_collections(
@@ -1497,7 +1501,7 @@ where
         request: SearchTrendingListRequest,
     ) -> AppstoreServiceResult<SearchTrendingListResult> {
         require_scope(context, "appstore.catalog.read")?;
-        let limit = request.page_size.unwrap_or(20).min(200);
+        let limit = request.page_size.unwrap_or(20).clamp(1, 200);
         let terms = self
             .repository
             .find_trending_terms(context, request.locale.as_deref(), limit)
@@ -1516,7 +1520,7 @@ where
     ) -> AppstoreServiceResult<SearchHistoryListResult> {
         require_scope(context, "appstore.catalog.read")?;
         let user_id = require_user_id(context)?;
-        let limit = request.page_size.unwrap_or(20).min(200);
+        let limit = request.page_size.unwrap_or(20).clamp(1, 200);
         let entries = self
             .repository
             .find_search_history(context, &user_id, request.cursor.as_deref(), limit + 1)
@@ -1733,7 +1737,7 @@ where
         context: &AppstoreRequestContext,
         request: TemplatesListRequest,
     ) -> AppstoreServiceResult<TemplatesListResult> {
-        let limit = request.page_size.unwrap_or(20).min(200);
+        let limit = request.page_size.unwrap_or(20).clamp(1, 200);
         let templates = self
             .repository
             .find_templates(

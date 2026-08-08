@@ -206,6 +206,7 @@ impl DownloadGrantReason {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct UserLibraryItem {
     pub id: LibraryItemId,
     pub tenant_id: String,
@@ -227,6 +228,7 @@ pub struct UserLibraryItem {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct UserWishlistItem {
     pub id: String,
     pub tenant_id: String,
@@ -238,6 +240,7 @@ pub struct UserWishlistItem {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct InstallEvent {
     pub id: String,
     pub tenant_id: String,
@@ -261,6 +264,7 @@ pub struct InstallEvent {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct DownloadGrant {
     pub id: String,
     pub tenant_id: String,
@@ -282,6 +286,7 @@ pub struct DownloadGrant {
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
+#[serde(deny_unknown_fields)]
 pub struct UpdateCheckItem {
     pub app_key: String,
     pub platform: String,
@@ -289,6 +294,7 @@ pub struct UpdateCheckItem {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct UpdateAvailable {
     pub app_key: String,
     pub platform: String,

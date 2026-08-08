@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 use super::models::{MarketChannel, MarketRelease};
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ListMarketChannelsResult {
     pub operation_id: &'static str,
     pub channels: Vec<MarketChannel>,
@@ -27,6 +28,7 @@ impl ListMarketChannelsResult {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct CreateMarketChannelResult {
     pub operation_id: &'static str,
     pub channel: MarketChannel,
@@ -42,6 +44,7 @@ impl CreateMarketChannelResult {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct UpdateMarketChannelResult {
     pub operation_id: &'static str,
     pub channel: MarketChannel,
@@ -57,6 +60,7 @@ impl UpdateMarketChannelResult {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ListMarketReleasesResult {
     pub operation_id: &'static str,
     pub releases: Vec<MarketRelease>,
@@ -81,6 +85,7 @@ impl ListMarketReleasesResult {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct SyncMarketReleaseResult {
     pub operation_id: &'static str,
     pub accepted: bool,

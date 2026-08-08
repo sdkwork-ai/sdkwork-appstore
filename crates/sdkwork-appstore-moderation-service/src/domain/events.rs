@@ -17,6 +17,7 @@ pub enum ModerationDomainEvent {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ReviewCreatedEvent {
     pub review_id: ModerationReviewId,
     pub tenant_id: String,
@@ -28,6 +29,7 @@ pub struct ReviewCreatedEvent {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ReviewAssignedEvent {
     pub review_id: ModerationReviewId,
     pub tenant_id: String,
@@ -36,6 +38,7 @@ pub struct ReviewAssignedEvent {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ReviewStartedEvent {
     pub review_id: ModerationReviewId,
     pub tenant_id: String,
@@ -44,6 +47,7 @@ pub struct ReviewStartedEvent {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct DecisionRecordedEvent {
     pub review_id: ModerationReviewId,
     pub tenant_id: String,
@@ -54,6 +58,7 @@ pub struct DecisionRecordedEvent {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ReviewApprovedEvent {
     pub review_id: ModerationReviewId,
     pub tenant_id: String,
@@ -63,6 +68,7 @@ pub struct ReviewApprovedEvent {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ReviewRejectedEvent {
     pub review_id: ModerationReviewId,
     pub tenant_id: String,
@@ -74,6 +80,7 @@ pub struct ReviewRejectedEvent {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ReviewChangesRequestedEvent {
     pub review_id: ModerationReviewId,
     pub tenant_id: String,
@@ -84,6 +91,7 @@ pub struct ReviewChangesRequestedEvent {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ReviewEscalatedEvent {
     pub review_id: ModerationReviewId,
     pub tenant_id: String,
@@ -92,6 +100,7 @@ pub struct ReviewEscalatedEvent {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ReviewCancelledEvent {
     pub review_id: ModerationReviewId,
     pub tenant_id: String,

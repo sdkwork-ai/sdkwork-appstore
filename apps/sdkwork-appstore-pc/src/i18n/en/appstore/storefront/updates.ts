@@ -19,11 +19,11 @@ export const updates = {
     freeSpace: 'Free Space Left',
     cleanCache: 'Clear Redundant Cache',
     cleanCacheSuccess: 'Cache cleared successfully',
-    usedSpace: 'Used Disk Storage',
+    installedCount: 'Used Disk Storage',
     securityEngine: 'Signature & Security Check',
     securityStatus: 'Verified Safe & Protected',
     downloadedCount: 'Installed Total',
-    appsDeployed: '{{count}} App(s) Active'
+    appsInstalled: '{{count}} App(s) Active'
   },
   queue: {
     title: 'Active Task Queue',

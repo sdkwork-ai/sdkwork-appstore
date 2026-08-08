@@ -1625,12 +1625,16 @@ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
 
 | 工作项 | 当前状态 | 下一步 |
 | --- | --- | --- |
-| 数据库 schema 全字段 | 0001 baseline + 0002 extensions migration | 落地 Postgres 方言 |
+| 数据库 schema | 权威基线 `database/ddl/baseline/postgres/0001_appstore_baseline.sql`（49 表，含索引/唯一约束）；SQLite fixture 对齐 49 表；废弃迁移文件已清理 | 上线后按 `database/migrations/{engine}/` 追加增量迁移 |
+| 服务鉴权 | listing/release/compliance 写操作 scope + publisher 成员/属主三重校验；admin 端点强制 `appstore.listings.admin`；申诉仅限被审 publisher | 无 |
+| 下载/发布链路 | 制品 Verified 流程 + 发布前置校验 + 付费下载强制 grant + 原子消费（防双花）；check_update 按 semver 排序且灰度真实生效（百分比分桶/region/paused） | 无 |
+| 网关安全 | `SecurityPolicy::production()` + 限流 + 幂等 store + 请求超时 30s + HSTS | 多副本部署时换共享 Redis store |
+| 分页 | 全仓 `page_size` clamp(1,200)、ids 上限 100、keyset 游标与 ORDER BY 对齐、LIKE 转义 + ESCAPE | 无 |
 | 后端 95+ 路由 | 服务层已实现，网关已接线 | OpenAPI/SDK 再生成校验 |
 | PC/H5 详情页 | 13 区块骨架 + 部分真实数据 | 全量区块 + 视觉对齐 |
 | PC/H5 首页 | Hero + 分类 + 榜单 | 编辑流 + 个性化数据 |
 | 发布者 Console | 骨架 | 包归属收敛 + 完整向导 |
-| 审核中心 | 后端就绪 | Backend Admin UI |
+| 审核中心 | 后端就绪（含申诉回滚） | Backend Admin UI |
 | 视觉系统 | 设计 token 草案 | 组件库 + 深色模式落地 |
 | 搜索联邦 | DB 兜底已实现 | Phase 2 接入 search 域 |
 | 推荐 | 规则引擎已实现 | Phase 2 深度学习推荐 |

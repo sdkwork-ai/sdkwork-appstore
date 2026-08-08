@@ -8,6 +8,7 @@ use super::models::{
 };
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ListingOperationResult {
     pub operation_id: &'static str,
     pub accepted: bool,
@@ -30,6 +31,7 @@ impl ListingOperationResult {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct RetrieveListingResult {
     pub operation_id: &'static str,
     pub listing: Option<Listing>,
@@ -52,6 +54,7 @@ impl RetrieveListingResult {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct CreateListingResult {
     pub operation_id: &'static str,
     pub listing: Listing,
@@ -67,6 +70,7 @@ impl CreateListingResult {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct UpdateListingResult {
     pub operation_id: &'static str,
     pub listing: Listing,
@@ -82,6 +86,7 @@ impl UpdateListingResult {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct UpsertListingLocalizationResult {
     pub operation_id: &'static str,
     pub localization: ListingLocalization,
@@ -97,6 +102,7 @@ impl UpsertListingLocalizationResult {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ListListingMediaResult {
     pub operation_id: &'static str,
     pub media: Vec<ListingMedia>,
@@ -112,6 +118,7 @@ impl ListListingMediaResult {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct AttachListingMediaResult {
     pub operation_id: &'static str,
     pub media: ListingMedia,
@@ -127,6 +134,7 @@ impl AttachListingMediaResult {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct RemoveListingMediaResult {
     pub operation_id: &'static str,
     pub removed: bool,
@@ -142,6 +150,7 @@ impl RemoveListingMediaResult {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct BindListingCategoriesResult {
     pub operation_id: &'static str,
     pub listing: Listing,
@@ -163,6 +172,7 @@ impl BindListingCategoriesResult {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct UpdateRegionalAvailabilityResult {
     pub operation_id: &'static str,
     pub availabilities: Vec<RegionalAvailability>,
@@ -178,6 +188,7 @@ impl UpdateRegionalAvailabilityResult {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ListPublisherListingsResult {
     pub operation_id: &'static str,
     pub listings: Vec<Listing>,
@@ -202,6 +213,7 @@ impl ListPublisherListingsResult {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ListListingReleasesResult {
     pub operation_id: &'static str,
     pub releases: Vec<serde_json::Value>,
@@ -226,6 +238,7 @@ impl ListListingReleasesResult {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct CreateListingSubmissionResult {
     pub operation_id: &'static str,
     pub submission: ListingSubmission,
@@ -241,6 +254,7 @@ impl CreateListingSubmissionResult {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ApplyModerationDecisionResult {
     pub operation_id: &'static str,
     pub listing: Listing,
@@ -262,6 +276,7 @@ impl ApplyModerationDecisionResult {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct AdminListListingsResult {
     pub operation_id: &'static str,
     pub listings: Vec<Listing>,
@@ -286,6 +301,7 @@ impl AdminListListingsResult {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct AdminRetrieveListingResult {
     pub operation_id: &'static str,
     pub listing: Option<Listing>,
@@ -308,6 +324,7 @@ impl AdminRetrieveListingResult {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct AdminUpdateListingVisibilityResult {
     pub operation_id: &'static str,
     pub listing: Listing,
@@ -323,6 +340,7 @@ impl AdminUpdateListingVisibilityResult {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct PublicRetrieveListingResult {
     pub operation_id: &'static str,
     pub listing: Option<Listing>,
@@ -345,6 +363,7 @@ impl PublicRetrieveListingResult {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct BootstrapPublisherAppResult {
     pub operation_id: &'static str,
     pub app: crate::domain::models::StoreApp,
@@ -366,6 +385,7 @@ impl BootstrapPublisherAppResult {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ListListingReleaseHistoryResult {
     pub operation_id: &'static str,
     pub releases: Vec<serde_json::Value>,
@@ -390,6 +410,7 @@ impl ListListingReleaseHistoryResult {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ListSimilarListingsResult {
     pub operation_id: &'static str,
     pub listings: Vec<Listing>,
@@ -414,6 +435,7 @@ impl ListSimilarListingsResult {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ListDeveloperOtherListingsResult {
     pub operation_id: &'static str,
     pub listings: Vec<Listing>,
@@ -438,12 +460,14 @@ impl ListDeveloperOtherListingsResult {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ListingEditorialContent {
     pub editorial_highlight: Option<String>,
     pub collection_editorial_note: Option<String>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct RetrieveListingEditorialResult {
     pub operation_id: &'static str,
     pub editorial: Option<ListingEditorialContent>,
@@ -466,6 +490,7 @@ impl RetrieveListingEditorialResult {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct RatingsListResult {
     pub operation_id: &'static str,
     pub ratings: Vec<crate::domain::models::ListingRating>,
@@ -490,6 +515,7 @@ impl RatingsListResult {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct RatingUpdateResult {
     pub operation_id: &'static str,
     pub rating: crate::domain::models::ListingRating,

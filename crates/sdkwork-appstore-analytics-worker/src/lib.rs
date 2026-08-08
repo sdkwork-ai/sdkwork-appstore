@@ -90,22 +90,67 @@ pub async fn run_worker(config: WorkerConfig) -> Result<(), String> {
 }
 
 async fn run_metrics_cycle(tenant_id: &str, job: &ListingMetricsJob) {
-    match job.execute(tenant_id).await {
-        Ok(count) => info!(tenant_id, count, "listing metrics projection completed"),
-        Err(error) => error!(tenant_id, error, "listing metrics projection failed"),
+    let mut delay_secs = 5u64;
+    for _ in 0..3 {
+        match job.execute(tenant_id).await {
+            Ok(count) => {
+                info!(tenant_id, count, "listing metrics projection completed");
+                return;
+            }
+            Err(error) => {
+                error!(
+                    tenant_id,
+                    retry_in_secs = delay_secs,
+                    error,
+                    "listing metrics projection failed, retrying"
+                );
+                tokio::time::sleep(Duration::from_secs(delay_secs)).await;
+                delay_secs *= 2;
+            }
+        }
     }
 }
 
 async fn run_chart_cycle(tenant_id: &str, job: &ChartProjectionJob) {
-    match job.execute(tenant_id).await {
-        Ok(()) => info!(tenant_id, "chart projection completed"),
-        Err(error) => error!(tenant_id, error, "chart projection failed"),
+    let mut delay_secs = 5u64;
+    for _ in 0..3 {
+        match job.execute(tenant_id).await {
+            Ok(()) => {
+                info!(tenant_id, "chart projection completed");
+                return;
+            }
+            Err(error) => {
+                error!(
+                    tenant_id,
+                    retry_in_secs = delay_secs,
+                    error,
+                    "chart projection failed, retrying"
+                );
+                tokio::time::sleep(Duration::from_secs(delay_secs)).await;
+                delay_secs *= 2;
+            }
+        }
     }
 }
 
 async fn run_trending_cycle(tenant_id: &str, job: &TrendingTermsJob) {
-    match job.execute(tenant_id).await {
-        Ok(count) => info!(tenant_id, count, "trending terms projection completed"),
-        Err(error) => error!(tenant_id, error, "trending terms projection failed"),
+    let mut delay_secs = 5u64;
+    for _ in 0..3 {
+        match job.execute(tenant_id).await {
+            Ok(count) => {
+                info!(tenant_id, count, "trending terms projection completed");
+                return;
+            }
+            Err(error) => {
+                error!(
+                    tenant_id,
+                    retry_in_secs = delay_secs,
+                    error,
+                    "trending terms projection failed, retrying"
+                );
+                tokio::time::sleep(Duration::from_secs(delay_secs)).await;
+                delay_secs *= 2;
+            }
+        }
     }
 }

@@ -35,9 +35,7 @@ use sdkwork_database_sqlx::DatabasePool;
 use self::decision_listing_projection::decision_listing_projection_port;
 use self::submission_moderation::submission_moderation_port;
 use crate::web_bootstrap::wrap_router_with_web_framework_from_env;
-use sdkwork_web_bootstrap::{
-    ApiAssemblyContribution, DatabasePoolReadinessCheck,
-};
+use sdkwork_web_bootstrap::{ApiAssemblyContribution, DatabasePoolReadinessCheck};
 
 pub struct ApiAssembly {
     pub router: Router,

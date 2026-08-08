@@ -15,8 +15,9 @@ use sdkwork_appstore_repository_sqlx::pool::AppstoreSqlxDb;
 use sdkwork_appstore_repository_sqlx::repository::publisher_repository::SqlxPublisherRepository;
 use sdkwork_appstore_repository_sqlx::repository::release_repository::SqlxReleaseRepository;
 
-const MIGRATION_SQL: &str =
-    include_str!("../../../specs/database/migrations/0001_appstore_foundation.sql");
+const MIGRATION_SQL: &str = include_str!(
+    "../../../tests/fixtures/database/sqlite/ddl/baseline/sqlite/0001_appstore_baseline.sql"
+);
 
 async fn setup_db() -> SqlitePool {
     let pool = SqlitePool::connect("sqlite::memory:").await.unwrap();

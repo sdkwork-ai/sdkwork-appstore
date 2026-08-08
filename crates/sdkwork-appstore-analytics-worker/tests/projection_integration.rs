@@ -4,19 +4,16 @@ use sqlx::SqlitePool;
 use sdkwork_appstore_analytics_worker::projection::AnalyticsProjectionRepository;
 use sdkwork_appstore_repository_sqlx::AppstoreSqlxDb;
 
-const FOUNDATION_SQL: &str =
-    include_str!("../../../specs/database/migrations/0001_appstore_foundation.sql");
-const EXTENSION_SQL: &str =
-    include_str!("../../../specs/database/migrations/0002_appstore_extensions.sql");
+const BASELINE_SQL: &str = include_str!(
+    "../../../tests/fixtures/database/sqlite/ddl/baseline/sqlite/0001_appstore_baseline.sql"
+);
 
 async fn setup_db() -> SqlitePool {
     let pool = SqlitePool::connect("sqlite::memory:").await.unwrap();
-    for migration in [FOUNDATION_SQL, EXTENSION_SQL] {
-        for stmt in migration.split(';') {
-            let stmt = stmt.trim();
-            if !stmt.is_empty() {
-                sqlx::query(stmt).execute(&pool).await.unwrap();
-            }
+    for stmt in BASELINE_SQL.split(';') {
+        let stmt = stmt.trim();
+        if !stmt.is_empty() {
+            sqlx::query(stmt).execute(&pool).await.unwrap();
         }
     }
     pool

@@ -38,12 +38,12 @@ export default function AppsPage() {
   const filteredApps = apps.filter(app => {
     if (selectedSubCategory === 'all') return true;
     if (selectedSubCategory === 'development' || selectedSubCategory === 'design') {
-      return app.category.includes('开发') || app.category.includes('设计') || app.id.includes('blender') || app.id.includes('obs');
+      return app.category.includes('开发') || app.category.includes('设计');
     }
     return app.category.includes(selectedSubCategory);
   });
 
-  const featuredApp = apps.find(a => a.id === 'app-wps') || apps[0];
+  const featuredApp = apps[0];
 
   return (
     <div className="p-5 md:p-6 space-y-6 w-full max-w-full select-none transition-colors duration-200">

@@ -1840,6 +1840,7 @@ version = "0.1.0"
 dependencies = [
  "async-trait",
  "chrono",
+ "sdkwork-appstore-authorization",
  "serde",
  "serde_json",
  "uuid",
@@ -1873,6 +1874,7 @@ version = "0.1.0"
 dependencies = [
  "async-trait",
  "chrono",
+ "sdkwork-appstore-authorization",
  "serde",
  "serde_json",
  "tracing",
@@ -1921,6 +1923,7 @@ version = "0.1.0"
 dependencies = [
  "async-trait",
  "chrono",
+ "sdkwork-appstore-authorization",
  "serde",
  "serde_json",
  "uuid",

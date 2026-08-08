@@ -123,7 +123,7 @@ where
         request: ListModerationQueueRequest,
     ) -> AppstoreServiceResult<ListModerationQueueResult> {
         require_scope(context, "appstore.moderation.read")?;
-        let limit = request.page_size.unwrap_or(20).min(200);
+        let limit = request.page_size.unwrap_or(20).clamp(1, 200);
         let reviews = self
             .repository
             .list_reviews(
@@ -422,6 +422,46 @@ where
                 AppstoreServiceError::PermissionDenied("Authenticated user is required".to_string())
             })?;
 
+        // Only the owning publisher (owner or accepted member) may appeal.
+        let review = self
+            .repository
+            .find_review_by_id(context, &decision.review_id)
+            .await?
+            .ok_or_else(|| {
+                AppstoreServiceError::NotFound(format!(
+                    "Review not found: {}",
+                    decision.review_id.as_str()
+                ))
+            })?;
+        if !review.submission_id.trim().is_empty() {
+            let listing_id = self
+                .repository
+                .find_submission_listing_id(context, &review.submission_id)
+                .await?
+                .ok_or_else(|| {
+                    AppstoreServiceError::NotFound(format!(
+                        "Submission not found: {}",
+                        review.submission_id
+                    ))
+                })?;
+            let publisher_id = self
+                .repository
+                .find_listing_publisher_id(context, &listing_id)
+                .await?
+                .ok_or_else(|| {
+                    AppstoreServiceError::NotFound(format!("Listing not found: {}", listing_id))
+                })?;
+            let role = self
+                .repository
+                .find_publisher_member_role(context, &publisher_id, &appellant_user_id)
+                .await?;
+            if role.is_none() {
+                return Err(AppstoreServiceError::PermissionDenied(
+                    "Only the listing publisher may appeal a moderation decision".to_string(),
+                ));
+            }
+        }
+
         let now = Utc::now();
         let appeal = ModerationAppeal {
             id: ModerationAppealId::new(Uuid::new_v4().to_string()),
@@ -555,7 +595,7 @@ where
         }
 
         let now = Utc::now();
-        appeal.appeal_status = appeal_status;
+        appeal.appeal_status = appeal_status.clone();
         appeal.decided_by = context
             .user_id
             .clone()
@@ -563,6 +603,35 @@ where
         appeal.decision_note = Some(request.note.trim().to_string());
         appeal.decided_at = Some(now);
         appeal.updated_at = now;
+
+        // An approved appeal reverses the rejected decision: re-apply an
+        // approve outcome onto the original submission so listing/release
+        // states converge with the appeal verdict.
+        if appeal_status == AppealStatus::Approved {
+            if let Some(port) = &self.listing_projection_port {
+                let review_id = ModerationReviewId::new(&appeal.review_id);
+                let review = self
+                    .repository
+                    .find_review_by_id(context, &review_id)
+                    .await?
+                    .ok_or_else(|| {
+                        AppstoreServiceError::NotFound(format!(
+                            "Review not found for appeal: {}",
+                            appeal.review_id
+                        ))
+                    })?;
+                if !review.submission_id.trim().is_empty() {
+                    port.apply_decision_outcome(
+                        context,
+                        &review.submission_id,
+                        DecisionType::Approve,
+                        &appeal.organization_id,
+                    )
+                    .await
+                    .map_err(|error| AppstoreServiceError::Internal(error.to_string()))?;
+                }
+            }
+        }
 
         self.repository.update_appeal(context, &appeal).await?;
 

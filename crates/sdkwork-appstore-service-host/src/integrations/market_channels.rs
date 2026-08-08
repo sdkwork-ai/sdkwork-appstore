@@ -16,6 +16,7 @@ pub const CAPABILITY: IntegrationCapability = IntegrationCapability {
 };
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct MarketSubmission {
     pub external_app_id: String,
     pub version_name: String,
@@ -26,6 +27,7 @@ pub struct MarketSubmission {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct MarketSubmissionResult {
     pub external_release_id: String,
     pub external_status: String,
@@ -33,6 +35,7 @@ pub struct MarketSubmissionResult {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct MarketStatusResult {
     pub external_release_id: String,
     pub external_status: String,

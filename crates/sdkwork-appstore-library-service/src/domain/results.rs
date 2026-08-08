@@ -5,6 +5,7 @@ use super::models::{
 };
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct LibraryOperationResult {
     pub operation_id: &'static str,
     pub accepted: bool,
@@ -27,6 +28,7 @@ impl LibraryOperationResult {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ListLibraryItemsResult {
     pub operation_id: &'static str,
     pub items: Vec<UserLibraryItem>,
@@ -51,6 +53,7 @@ impl ListLibraryItemsResult {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct RetrieveLibraryItemResult {
     pub operation_id: &'static str,
     pub item: UserLibraryItem,
@@ -63,6 +66,7 @@ impl RetrieveLibraryItemResult {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct LibraryInstallResult {
     pub operation_id: &'static str,
     pub library_item: UserLibraryItem,
@@ -84,6 +88,7 @@ impl LibraryInstallResult {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct LibraryUninstallResult {
     pub operation_id: &'static str,
 }
@@ -95,6 +100,7 @@ impl LibraryUninstallResult {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct LibraryUpdatesCheckResult {
     pub operation_id: &'static str,
     pub updates: Vec<UpdateAvailable>,
@@ -110,6 +116,7 @@ impl LibraryUpdatesCheckResult {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ListWishlistItemsResult {
     pub operation_id: &'static str,
     pub items: Vec<UserWishlistItem>,
@@ -134,6 +141,7 @@ impl ListWishlistItemsResult {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct AddWishlistItemResult {
     pub operation_id: &'static str,
     pub item: UserWishlistItem,
@@ -146,6 +154,7 @@ impl AddWishlistItemResult {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct RemoveWishlistItemResult {
     pub operation_id: &'static str,
 }
@@ -157,6 +166,7 @@ impl RemoveWishlistItemResult {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct CreateDownloadGrantResult {
     pub operation_id: &'static str,
     pub grant: DownloadGrant,
@@ -172,6 +182,7 @@ impl CreateDownloadGrantResult {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ConsumeDownloadGrantResult {
     pub operation_id: &'static str,
     pub grant: DownloadGrant,

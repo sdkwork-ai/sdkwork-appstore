@@ -16,6 +16,7 @@ pub const CAPABILITY: IntegrationCapability = IntegrationCapability {
 };
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct SearchDocument {
     pub listing_id: String,
     pub tenant_id: String,
@@ -31,6 +32,7 @@ pub struct SearchDocument {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct SearchRequest {
     pub query: String,
     pub category_id: Option<String>,
@@ -40,6 +42,7 @@ pub struct SearchRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct SearchResult {
     pub listing_id: String,
     pub score: f64,

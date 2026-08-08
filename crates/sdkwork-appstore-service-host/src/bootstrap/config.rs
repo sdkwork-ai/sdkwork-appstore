@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct AppstoreRuntimeConfig {
     pub app_api_port: u16,
     pub backend_api_port: u16,

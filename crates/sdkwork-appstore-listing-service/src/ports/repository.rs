@@ -28,6 +28,15 @@ pub trait ListingRepositoryPort: Send + Sync {
         app_id: &str,
     ) -> AppstoreServiceResult<Option<Listing>>;
 
+    /// Returns the caller's role for a publisher (owner or accepted member)
+    /// when the subject has publisher access; `None` otherwise.
+    async fn find_publisher_member_role(
+        &self,
+        context: &AppstoreRequestContext,
+        publisher_id: &str,
+        user_id: &str,
+    ) -> AppstoreServiceResult<Option<String>>;
+
     async fn find_listings_by_publisher(
         &self,
         context: &AppstoreRequestContext,

@@ -41,13 +41,6 @@ pub trait ReleaseProviderPort: Send + Sync {
         expires_in_seconds: i64,
     ) -> Result<String, String>;
 
-    async fn verify_artifact_signature(
-        &self,
-        tenant_id: &str,
-        artifact_id: &str,
-        signature: &str,
-    ) -> Result<bool, String>;
-
     async fn validate_drive_node(&self, tenant_id: &str, drive_node_id: &str)
         -> Result<(), String>;
 }

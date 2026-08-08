@@ -167,15 +167,6 @@ impl ReleaseProviderPort for DriveIntegrationAdapter {
         Ok(item.download_url)
     }
 
-    async fn verify_artifact_signature(
-        &self,
-        _tenant_id: &str,
-        _artifact_id: &str,
-        _signature: &str,
-    ) -> Result<bool, String> {
-        Ok(true)
-    }
-
     async fn validate_drive_node(
         &self,
         _tenant_id: &str,
@@ -244,15 +235,6 @@ impl ListingProviderPort for DriveIntegrationAdapter {
             content_type,
             file_size_bytes,
         })
-    }
-
-    async fn validate_publisher_access(
-        &self,
-        _tenant_id: &str,
-        _publisher_id: &str,
-        _user_id: &str,
-    ) -> Result<bool, String> {
-        Ok(true)
     }
 }
 

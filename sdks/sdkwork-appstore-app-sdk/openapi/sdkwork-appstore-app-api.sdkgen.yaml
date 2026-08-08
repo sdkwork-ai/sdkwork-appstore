@@ -1470,6 +1470,9 @@ paths:
       security:
       - AuthToken: []
         AccessToken: []
+      parameters:
+      - $ref: '#/components/parameters/Cursor'
+      - $ref: '#/components/parameters/PageSize'
       responses:
         '200':
           description: Success

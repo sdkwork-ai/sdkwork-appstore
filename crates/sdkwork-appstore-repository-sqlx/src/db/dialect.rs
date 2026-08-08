@@ -28,8 +28,9 @@ pub fn adapt_sql(template: &str, dialect: AppstoreSqlDialect) -> String {
 }
 
 fn adapt_sql_sqlite(template: &str) -> String {
-    let mut out = String::with_capacity(template.len());
-    let mut rest = template;
+    let adapted = adapt_sqlite_syntax(template);
+    let mut out = String::with_capacity(adapted.len());
+    let mut rest = adapted.as_str();
     while let Some(offset) = rest.find('?') {
         out.push_str(&rest[..offset]);
         rest = &rest[offset..];
@@ -43,6 +44,121 @@ fn adapt_sql_sqlite(template: &str) -> String {
     }
     out.push_str(rest);
     out
+}
+
+/// Translates PostgreSQL-only syntax used by repository templates into
+/// SQLite-compatible SQL:
+/// - `expr::text` → `CAST(expr AS TEXT)`
+/// - `expr->>'key'` → `json_extract(expr, '$.key')`
+/// - `expr::numeric` → `expr` (SQLite aggregates already return REAL)
+fn adapt_sqlite_syntax(template: &str) -> String {
+    // First strip `::numeric` casts (keep the inner expression), then rewrite
+    // `::text` and `->>` so expressions containing stripped casts stay intact.
+    let stripped = strip_numeric_casts(template);
+    rewrite_sqlite_syntax(&stripped)
+}
+
+fn strip_numeric_casts(template: &str) -> String {
+    let chars: Vec<char> = template.chars().collect();
+    let mut out = String::with_capacity(template.len());
+    let mut i = 0usize;
+    while i < chars.len() {
+        if chars[i] == ':' && chars.get(i + 1) == Some(&':') {
+            let mut j = i + 2;
+            while j < chars.len() && chars[j].is_ascii_alphanumeric() {
+                j += 1;
+            }
+            let keyword: String = chars[i + 2..j].iter().collect();
+            if keyword == "numeric" {
+                i = j;
+                continue;
+            }
+        }
+        out.push(chars[i]);
+        i += 1;
+    }
+    out
+}
+
+fn rewrite_sqlite_syntax(template: &str) -> String {
+    let chars: Vec<char> = template.chars().collect();
+    let mut out = String::with_capacity(template.len() * 2);
+    let mut i = 0usize;
+    while i < chars.len() {
+        if i + 2 < chars.len() && chars[i] == '-' && chars[i + 1] == '>' && chars[i + 2] == '>' {
+            if let Some(quote) = chars.get(i + 3).copied() {
+                if quote == '\'' {
+                    let mut j = i + 4;
+                    while j < chars.len() && chars[j] != quote {
+                        j += 1;
+                    }
+                    if j < chars.len() {
+                        let key: String = chars[i + 4..j].iter().collect();
+                        let start = expression_start(&chars, i);
+                        let expr: String = chars[start..i].iter().collect();
+                        // remove the already-emitted expression characters
+                        out.truncate(out.len() - expr.len());
+                        out.push_str(&format!("json_extract({}, '$.{}')", expr, key));
+                        i = j + 1;
+                        continue;
+                    }
+                }
+            }
+        }
+        if chars[i] == ':' && chars.get(i + 1) == Some(&':') {
+            let mut j = i + 2;
+            while j < chars.len() && chars[j].is_ascii_alphanumeric() {
+                j += 1;
+            }
+            let keyword: String = chars[i + 2..j].iter().collect();
+            match keyword.as_str() {
+                "text" => {
+                    let start = expression_start(&chars, i);
+                    let expr: String = chars[start..i].iter().collect();
+                    out.truncate(out.len() - expr.len());
+                    out.push_str(&format!("CAST({} AS TEXT)", expr));
+                    i = j;
+                    continue;
+                }
+                _ => {}
+            }
+        }
+        out.push(chars[i]);
+        i += 1;
+    }
+    out
+}
+
+fn expression_start(chars: &[char], end: usize) -> usize {
+    let mut start = end;
+    let mut depth = 0i32;
+    while start > 0 {
+        let previous = chars[start - 1];
+        if previous == ')' {
+            depth += 1;
+        } else if previous == '(' {
+            if depth > 0 {
+                depth -= 1;
+            } else {
+                break;
+            }
+        } else if depth == 0
+            && (previous == ' '
+                || previous == '\t'
+                || previous == '\n'
+                || previous == ','
+                || previous == '\''
+                || previous == '"'
+                || previous == '='
+                || previous == '<'
+                || previous == '>'
+                || previous == '!')
+        {
+            break;
+        }
+        start -= 1;
+    }
+    start
 }
 
 fn adapt_sql_postgres(template: &str) -> String {
@@ -132,6 +248,50 @@ mod tests {
         assert_eq!(
             AppstoreSqlDialect::from_database_url("sqlite://./appstore.db"),
             AppstoreSqlDialect::Sqlite,
+        );
+    }
+
+    #[test]
+    fn sqlite_translates_pg_type_casts() {
+        assert_eq!(
+            adapt_sql(
+                "SELECT t.tenant_id::text, COALESCE(t.metadata::text, '{}') FROM appstore_app_template t",
+                AppstoreSqlDialect::Sqlite,
+            ),
+            "SELECT CAST(t.tenant_id AS TEXT), COALESCE(CAST(t.metadata AS TEXT), '{}') FROM appstore_app_template t",
+        );
+    }
+
+    #[test]
+    fn sqlite_translates_json_operator() {
+        assert_eq!(
+            adapt_sql(
+                "WHERE usage_type = 1 AND metadata->>'action' IS DISTINCT FROM 'unstar'",
+                AppstoreSqlDialect::Sqlite,
+            ),
+            "WHERE usage_type = 1 AND json_extract(metadata, '$.action') IS DISTINCT FROM 'unstar'",
+        );
+    }
+
+    #[test]
+    fn sqlite_translates_numeric_rounding() {
+        assert_eq!(
+            adapt_sql(
+                "SELECT ROUND(AVG(rating)::numeric, 1)::text FROM appstore_listing_rating",
+                AppstoreSqlDialect::Sqlite,
+            ),
+            "SELECT CAST(ROUND(AVG(rating), 1) AS TEXT) FROM appstore_listing_rating",
+        );
+    }
+
+    #[test]
+    fn sqlite_keeps_plain_placeholders() {
+        assert_eq!(
+            adapt_sql(
+                "SELECT id FROM appstore_listing WHERE tenant_id = ? AND id = ?",
+                AppstoreSqlDialect::Sqlite,
+            ),
+            "SELECT id FROM appstore_listing WHERE tenant_id = ? AND id = ?",
         );
     }
 }

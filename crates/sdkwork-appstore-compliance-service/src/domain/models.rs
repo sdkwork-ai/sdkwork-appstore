@@ -73,6 +73,7 @@ impl DisclosureStatus {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ComplianceProfile {
     pub id: ComplianceProfileId,
     pub tenant_id: String,
@@ -107,6 +108,7 @@ impl ComplianceProfile {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct CompliancePermissionDisclosure {
     pub id: String,
     pub tenant_id: String,
@@ -121,6 +123,7 @@ pub struct CompliancePermissionDisclosure {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ListingIapItem {
     pub id: String,
     pub tenant_id: String,

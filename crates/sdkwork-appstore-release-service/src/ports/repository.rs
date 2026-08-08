@@ -39,6 +39,15 @@ pub trait ReleaseRepositoryPort: Send + Sync {
         channel_code: &str,
     ) -> AppstoreServiceResult<Option<Release>>;
 
+    /// All releases of a listing/channel (bounded: one row per version per
+    /// channel, unique-constrained). Callers sort by release version in memory.
+    async fn find_releases_by_channel_code(
+        &self,
+        context: &AppstoreRequestContext,
+        listing_id: &str,
+        channel_code: &str,
+    ) -> AppstoreServiceResult<Vec<Release>>;
+
     async fn insert_release(
         &self,
         context: &AppstoreRequestContext,
@@ -75,6 +84,12 @@ pub trait ReleaseRepositoryPort: Send + Sync {
         context: &AppstoreRequestContext,
         artifact_id: &ArtifactId,
     ) -> AppstoreServiceResult<Option<ReleaseArtifact>>;
+
+    async fn find_artifacts_by_release(
+        &self,
+        context: &AppstoreRequestContext,
+        release_id: &ReleaseId,
+    ) -> AppstoreServiceResult<Vec<ReleaseArtifact>>;
 
     async fn find_artifact_by_composite(
         &self,
@@ -134,9 +149,41 @@ pub trait ReleaseRepositoryPort: Send + Sync {
         grant: &DownloadGrant,
     ) -> AppstoreServiceResult<()>;
 
+    /// Atomically consumes one download of a grant owned by `user_id`.
+    /// Returns `None` when the grant is missing, not owned, or not consumable.
+    async fn consume_grant_atomically(
+        &self,
+        context: &AppstoreRequestContext,
+        grant_id: &DownloadGrantId,
+        user_id: &str,
+    ) -> AppstoreServiceResult<Option<DownloadGrant>>;
+
     async fn find_listing_by_app_key(
         &self,
         context: &AppstoreRequestContext,
         app_key: &str,
+    ) -> AppstoreServiceResult<Option<String>>;
+
+    /// Resolves the owning publisher of a listing.
+    async fn find_listing_publisher_id(
+        &self,
+        context: &AppstoreRequestContext,
+        listing_id: &str,
+    ) -> AppstoreServiceResult<Option<String>>;
+
+    /// Resolves the pricing model of a listing (`free`, `paid`, ...).
+    async fn find_listing_pricing_model(
+        &self,
+        context: &AppstoreRequestContext,
+        listing_id: &str,
+    ) -> AppstoreServiceResult<Option<String>>;
+
+    /// Returns the caller's role for a publisher (owner or accepted member)
+    /// when the subject has publisher access; `None` otherwise.
+    async fn find_publisher_member_role(
+        &self,
+        context: &AppstoreRequestContext,
+        publisher_id: &str,
+        user_id: &str,
     ) -> AppstoreServiceResult<Option<String>>;
 }

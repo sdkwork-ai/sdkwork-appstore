@@ -20,6 +20,7 @@ pub enum ReleaseDomainEvent {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ReleaseCreatedEvent {
     pub release_id: ReleaseId,
     pub tenant_id: String,
@@ -32,6 +33,7 @@ pub struct ReleaseCreatedEvent {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ReleaseUpdatedEvent {
     pub release_id: ReleaseId,
     pub tenant_id: String,
@@ -40,6 +42,7 @@ pub struct ReleaseUpdatedEvent {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ReleaseSubmittedEvent {
     pub release_id: ReleaseId,
     pub tenant_id: String,
@@ -48,6 +51,7 @@ pub struct ReleaseSubmittedEvent {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ReleaseApprovedEvent {
     pub release_id: ReleaseId,
     pub tenant_id: String,
@@ -56,6 +60,7 @@ pub struct ReleaseApprovedEvent {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ReleasePublishedEvent {
     pub release_id: ReleaseId,
     pub tenant_id: String,
@@ -66,6 +71,7 @@ pub struct ReleasePublishedEvent {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ReleaseRetiredEvent {
     pub release_id: ReleaseId,
     pub tenant_id: String,
@@ -74,6 +80,7 @@ pub struct ReleaseRetiredEvent {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ReleaseNotesUpsertedEvent {
     pub release_id: ReleaseId,
     pub tenant_id: String,
@@ -82,6 +89,7 @@ pub struct ReleaseNotesUpsertedEvent {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ArtifactAttachedEvent {
     pub artifact_id: ArtifactId,
     pub release_id: ReleaseId,
@@ -92,6 +100,7 @@ pub struct ArtifactAttachedEvent {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct RolloutUpdatedEvent {
     pub release_id: ReleaseId,
     pub tenant_id: String,
@@ -101,6 +110,7 @@ pub struct RolloutUpdatedEvent {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct DownloadGrantCreatedEvent {
     pub grant_id: DownloadGrantId,
     pub release_id: ReleaseId,
@@ -110,6 +120,7 @@ pub struct DownloadGrantCreatedEvent {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct DownloadGrantConsumedEvent {
     pub grant_id: DownloadGrantId,
     pub release_id: ReleaseId,
@@ -119,6 +130,7 @@ pub struct DownloadGrantConsumedEvent {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct UpdateCheckPerformedEvent {
     pub tenant_id: String,
     pub app_key: String,

@@ -121,6 +121,7 @@ impl MarketStatus {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct MarketChannel {
     pub id: MarketChannelId,
     pub tenant_id: String,
@@ -143,6 +144,7 @@ impl MarketChannel {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct MarketRelease {
     pub id: MarketReleaseId,
     pub tenant_id: String,

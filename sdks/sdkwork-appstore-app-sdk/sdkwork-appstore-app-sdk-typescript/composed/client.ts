@@ -134,7 +134,8 @@ function createLibraryFacade(client: SdkworkAppstoreAppClient) {
 function createWishlistFacade(client: SdkworkAppstoreAppClient) {
   const api = client.wishlist.appstore.wishlist.items;
   return {
-    listItems: () => api.list(),
+    listItems: (p?: { cursor?: string; limit?: number }) =>
+      api.list({ cursor: p?.cursor, pageSize: p?.limit }),
     addItem: (listingId: string) => api.create({ listingId }),
     removeItem: (listingId: string) => api.delete(listingId),
   };

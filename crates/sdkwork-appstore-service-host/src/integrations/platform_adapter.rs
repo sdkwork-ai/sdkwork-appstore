@@ -71,13 +71,4 @@ impl ListingProviderPort for PlatformIntegrationAdapter {
             "platform media resolution is owned by sdkwork-drive; use drive adapter for {media_resource_id}"
         ))
     }
-
-    async fn validate_publisher_access(
-        &self,
-        _tenant_id: &str,
-        _publisher_id: &str,
-        _user_id: &str,
-    ) -> Result<bool, String> {
-        Ok(true)
-    }
 }

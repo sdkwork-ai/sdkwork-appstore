@@ -1,5 +1,13 @@
 use crate::pool::AppstoreSqlxDb;
 
+/// Escapes LIKE wildcards so user input cannot widen the match (e.g. `%`/`_`).
+fn escape_like(input: &str) -> String {
+    input
+        .replace('\\', "\\\\")
+        .replace('%', "\\%")
+        .replace('_', "\\_")
+}
+
 use crate::db::columns::{
     columns_csv, APPSTORE_CATALOG_CHART_SNAPSHOT_COLUMNS, APPSTORE_CATALOG_COLLECTION_COLUMNS,
     APPSTORE_CATALOG_COLLECTION_ITEM_COLUMNS, APPSTORE_CATALOG_COLLECTION_LOCALIZATION_COLUMNS,
@@ -554,6 +562,63 @@ impl CatalogRepositoryPort for SqlxCatalogRepository {
         Ok(())
     }
 
+    async fn replace_collection_items(
+        &self,
+        context: &AppstoreRequestContext,
+        collection_id: &CollectionId,
+        items: &[CatalogCollectionItem],
+    ) -> Result<(), AppstoreServiceError> {
+        let mut tx = self
+            .db
+            .begin()
+            .await
+            .map_err(|e| AppstoreServiceError::Internal(format!("Database error: {}", e)))?;
+
+        self.db
+            .query(
+                r#"
+            DELETE FROM appstore_catalog_collection_item
+            WHERE collection_id = ? AND tenant_id = ?
+            "#,
+            )
+            .bind(collection_id.as_str())
+            .bind(&context.tenant_id)
+            .execute_tx(&mut tx)
+            .await
+            .map_err(|e| AppstoreServiceError::Internal(format!("Database error: {}", e)))?;
+
+        for item in items {
+            let highlight_json = map_collection_item_domain_to_row(item);
+            self.db
+                .query(
+                    r#"
+                INSERT INTO appstore_catalog_collection_item (
+                    id, tenant_id, collection_id, listing_id, sort_order,
+                    highlight_json, starts_at, ends_at, created_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                "#,
+                )
+                .bind(&item.id)
+                .bind(&context.tenant_id)
+                .bind(item.collection_id.as_str())
+                .bind(&item.listing_id)
+                .bind(item.sort_order)
+                .bind(&highlight_json)
+                .bind(item.starts_at)
+                .bind(item.ends_at)
+                .bind(item.created_at)
+                .execute_tx(&mut tx)
+                .await
+                .map_err(|e| AppstoreServiceError::Internal(format!("Database error: {}", e)))?;
+        }
+
+        tx.commit()
+            .await
+            .map_err(|e| AppstoreServiceError::Internal(format!("Database error: {}", e)))?;
+
+        Ok(())
+    }
+
     async fn insert_collection_item(
         &self,
         context: &AppstoreRequestContext,
@@ -780,7 +845,7 @@ impl CatalogRepositoryPort for SqlxCatalogRepository {
             LEFT JOIN appstore_release r
                 ON r.id = l.current_release_id
             LEFT JOIN appstore_release_artifact art
-                ON art.release_id = r.id AND art.artifact_status = 'active'
+                ON art.release_id = r.id AND art.artifact_status = 'verified'
             WHERE l.tenant_id = ?
               AND l.listing_status = 'active'
               AND l.storefront_visibility = 'visible'
@@ -789,7 +854,9 @@ impl CatalogRepositoryPort for SqlxCatalogRepository {
         );
 
         if query.is_some() {
-            sql.push_str("  AND (ll.display_name LIKE ? OR ll.subtitle LIKE ?)\n");
+            sql.push_str(
+                "  AND (ll.display_name LIKE ? ESCAPE '\' OR ll.subtitle LIKE ? ESCAPE '\')\n",
+            );
         }
         if category_id.is_some() {
             sql.push_str("  AND l.primary_category_id = ?\n");
@@ -804,7 +871,10 @@ impl CatalogRepositoryPort for SqlxCatalogRepository {
         if cursor.is_some() {
             sql.push_str("  AND l.listing_no > ?\n");
         }
-        sql.push_str("ORDER BY l.featured_score DESC, l.rating_count DESC, l.listing_no ASC\n");
+        // Stable sort aligned with the keyset cursor: featured/rating ordering
+        // is provided by the search federation (Phase 2); the SQL fallback
+        // stays deterministic so cursor pages never skip or repeat rows.
+        sql.push_str("ORDER BY l.listing_no ASC\n");
         sql.push_str("LIMIT ?\n");
 
         let __adapted_sql = self.db.adapt_sql(&sql);
@@ -814,7 +884,7 @@ impl CatalogRepositoryPort for SqlxCatalogRepository {
             .bind(&context.tenant_id);
 
         if let Some(qs) = query {
-            let pattern = format!("%{}%", qs);
+            let pattern = format!("%{}%", escape_like(qs));
             q = q.bind(pattern.clone()).bind(pattern);
         }
         if let Some(cid) = category_id {
@@ -929,7 +999,7 @@ impl CatalogRepositoryPort for SqlxCatalogRepository {
             LEFT JOIN appstore_release r
                 ON r.id = l.current_release_id
             LEFT JOIN appstore_release_artifact art
-                ON art.release_id = r.id AND art.artifact_status = 'active'
+                ON art.release_id = r.id AND art.artifact_status = 'verified'
             WHERE l.tenant_id = ?
               AND l.id IN ({placeholders})
               AND l.listing_status = 'active'
@@ -1111,7 +1181,7 @@ impl CatalogRepositoryPort for SqlxCatalogRepository {
         limit: i32,
     ) -> Result<Vec<SearchSuggestion>, AppstoreServiceError> {
         let locale_filter = locale.unwrap_or("en-US");
-        let pattern = format!("{}%", prefix);
+        let pattern = format!("{}%", escape_like(prefix));
 
         let rows = self
             .db
@@ -1127,7 +1197,7 @@ impl CatalogRepositoryPort for SqlxCatalogRepository {
               AND l.listing_status = 'active'
               AND l.storefront_visibility = 'visible'
               AND l.deleted_at IS NULL
-              AND ll.display_name LIKE ?
+              AND ll.display_name LIKE ? ESCAPE '\'
             ORDER BY l.featured_score DESC, ll.display_name ASC
             LIMIT ?
             "#,
@@ -1158,7 +1228,7 @@ impl CatalogRepositoryPort for SqlxCatalogRepository {
         limit: i32,
     ) -> Result<Vec<SearchSuggestion>, AppstoreServiceError> {
         let locale_filter = locale.unwrap_or("en-US");
-        let pattern = format!("{}%", prefix);
+        let pattern = format!("{}%", escape_like(prefix));
 
         let rows = self
             .db
@@ -1173,7 +1243,7 @@ impl CatalogRepositoryPort for SqlxCatalogRepository {
                 FROM appstore_catalog_trending_term
                 WHERE tenant_id = ? AND locale = ?
               )
-              AND term LIKE ?
+              AND term LIKE ? ESCAPE '\'
             ORDER BY rank ASC
             LIMIT ?
             "#,
@@ -1615,7 +1685,7 @@ impl CatalogRepositoryPort for SqlxCatalogRepository {
         );
 
         if query.is_some() {
-            sql.push_str(" AND query_text LIKE ?\n");
+            sql.push_str(" AND query_text LIKE ? ESCAPE '\'\n");
         }
         if date_from.is_some() {
             sql.push_str(" AND created_at >= ?\n");
@@ -1719,12 +1789,15 @@ impl CatalogRepositoryPort for SqlxCatalogRepository {
             sql.push_str("  AND t.category_code = ?\n");
         }
         if query.is_some() {
-            sql.push_str("  AND (t.template_name LIKE ? OR t.description LIKE ?)\n");
+            sql.push_str(
+                "  AND (t.template_name LIKE ? ESCAPE '\' OR t.description LIKE ? ESCAPE '\')\n",
+            );
         }
         if cursor.is_some() {
             sql.push_str("  AND t.id > ?\n");
         }
-        sql.push_str("ORDER BY t.updated_at DESC, t.id DESC\n");
+        // Stable sort aligned with the keyset cursor.
+        sql.push_str("ORDER BY t.id ASC\n");
         sql.push_str("LIMIT ?\n");
 
         let adapted = self.db.adapt_sql(&sql);
@@ -1744,7 +1817,7 @@ impl CatalogRepositoryPort for SqlxCatalogRepository {
             q = q.bind(cc);
         }
         if let Some(qs) = query {
-            let pattern = format!("%{}%", qs);
+            let pattern = format!("%{}%", escape_like(qs));
             q = q.bind(pattern.clone()).bind(pattern);
         }
         if let Some(cursor_id) = cursor {
@@ -1897,6 +1970,9 @@ impl CatalogRepositoryPort for SqlxCatalogRepository {
                     id, uuid, tenant_id, organization_id, user_id, status,
                     created_at, metadata, template_id, usage_type
                 ) VALUES (?, ?, ?, ?, ?, 1, ?, ?jsonb, ?, ?)
+                ON CONFLICT (tenant_id, user_id, template_id, usage_type) DO UPDATE SET
+                    metadata = EXCLUDED.metadata,
+                    created_at = EXCLUDED.created_at
                 "#,
             ))
             .bind(template_bigint_id(&usage.id))
@@ -2004,7 +2080,7 @@ impl CatalogRepositoryPort for SqlxCatalogRepository {
                 "#,
             ))
             .bind(&feedback.id)
-            .bind(&feedback.tenant_id)
+            .bind(&context.tenant_id)
             .bind(
                 context
                     .organization_id

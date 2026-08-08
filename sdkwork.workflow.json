@@ -1,0 +1,192 @@
+{
+  "$schema": "../sdkwork-github-workflow/schemas/sdkwork-workflow.schema.json",
+  "schemaVersion": "2026-06-06.sdkwork.workflow.v1",
+  "app": {
+    "id": "sdkwork-appstore",
+    "name": "SDKWork App Store",
+    "repository": "Sdkwork-Cloud/sdkwork-appstore",
+    "sourcePath": ".",
+    "configPath": "sdkwork.app.config.json"
+  },
+  "release": {
+    "artifactPrefix": "sdkwork-appstore",
+    "defaultVersion": "0.1.0",
+    "changelog": {
+      "source": "app-manifest",
+      "maxCommitSubjects": 50
+    }
+  },
+  "dependencies": [
+    {
+      "id": "sdkwork-web-framework",
+      "repository": "Sdkwork-Cloud/sdkwork-web-framework",
+      "refInput": "SDKWORK_WEB_FRAMEWORK_REF",
+      "tokenSecret": "SDKWORK_RELEASE_TOKEN"
+    },
+    {
+      "id": "sdkwork-database",
+      "repository": "Sdkwork-Cloud/sdkwork-database",
+      "refInput": "SDKWORK_DATABASE_REF",
+      "tokenSecret": "SDKWORK_RELEASE_TOKEN"
+    },
+    {
+      "id": "sdkwork-iam",
+      "repository": "Sdkwork-Cloud/sdkwork-iam",
+      "refInput": "SDKWORK_IAM_REF",
+      "tokenSecret": "SDKWORK_RELEASE_TOKEN"
+    },
+    {
+      "id": "sdkwork-utils",
+      "repository": "Sdkwork-Cloud/sdkwork-utils",
+      "refInput": "SDKWORK_UTILS_REF",
+      "tokenSecret": "SDKWORK_RELEASE_TOKEN"
+    },
+    {
+      "id": "sdkwork-drive",
+      "repository": "Sdkwork-Cloud/sdkwork-drive",
+      "refInput": "SDKWORK_DRIVE_REF",
+      "tokenSecret": "SDKWORK_RELEASE_TOKEN"
+    },
+    {
+      "id": "sdkwork-comments",
+      "repository": "Sdkwork-Cloud/sdkwork-comments",
+      "refInput": "SDKWORK_COMMENTS_REF",
+      "tokenSecret": "SDKWORK_RELEASE_TOKEN"
+    },
+    {
+      "id": "sdkwork-cloudrouter",
+      "repository": "Sdkwork-Cloud/sdkwork-cloudrouter",
+      "refInput": "SDKWORK_CLOUDROUTER_REF",
+      "tokenSecret": "SDKWORK_RELEASE_TOKEN"
+    },
+    {
+      "id": "sdkwork-search",
+      "repository": "Sdkwork-Cloud/sdkwork-search",
+      "refInput": "SDKWORK_SEARCH_REF",
+      "tokenSecret": "SDKWORK_RELEASE_TOKEN"
+    },
+    {
+      "id": "sdkwork-platform",
+      "repository": "Sdkwork-Cloud/sdkwork-platform",
+      "refInput": "SDKWORK_PLATFORM_REF",
+      "tokenSecret": "SDKWORK_RELEASE_TOKEN"
+    }
+  ],
+  "toolchains": {
+    "node": "22",
+    "pnpm": "10.30.2",
+    "rust": "stable"
+  },
+  "lifecycle": {
+    "install": [
+      {
+        "name": "Install workspace dependencies",
+        "shell": "pwsh",
+        "run": "pnpm install --frozen-lockfile"
+      }
+    ],
+    "preflight": [
+      {
+        "name": "Validate application lifecycle contracts",
+        "shell": "pwsh",
+        "run": "pnpm exec sdkwork-app doctor"
+      }
+    ],
+    "build": [
+      {
+        "name": "Build Rust workspace",
+        "shell": "pwsh",
+        "run": "cargo build --workspace --release"
+      },
+      {
+        "name": "Build PC and H5 applications",
+        "shell": "pwsh",
+        "run": "pnpm run build"
+      }
+    ],
+    "package": [
+      {
+        "name": "Build gateway and worker artifacts",
+        "shell": "pwsh",
+        "run": "cargo build --locked --release -p sdkwork-api-appstore-standalone-gateway -p sdkwork-appstore-analytics-worker"
+      }
+    ],
+    "sign": [
+      {
+        "name": "Sign appstore artifact",
+        "shell": "pwsh",
+        "run": "$ErrorActionPreference = \"Stop\"\nnode scripts/release/workflow-supply-chain-evidence.mjs sign"
+      }
+    ],
+    "sbom": [
+      {
+        "name": "Generate appstore SBOM and provenance",
+        "shell": "pwsh",
+        "run": "$ErrorActionPreference = \"Stop\"\nnode scripts/release/workflow-supply-chain-evidence.mjs attest"
+      }
+    ],
+    "validate": [
+      {
+        "name": "Validate appstore workspace",
+        "shell": "pwsh",
+        "run": "pnpm verify"
+      },
+      {
+        "name": "Run Rust workspace tests",
+        "shell": "pwsh",
+        "run": "cargo test --workspace"
+      }
+    ]
+  },
+  "targets": [
+    {
+      "id": "linux-x64-standalone-server-tar-gz",
+      "profileBinding": "fixed",
+      "deploymentProfile": "standalone",
+      "runtimeTarget": "server",
+      "profile": "server",
+      "platform": "linux",
+      "architecture": "x64",
+      "formats": ["tar.gz"],
+      "runner": "ubuntu-24.04",
+      "outputGlobs": [
+        "dist/release-packages/sdkwork-appstore-linux-x64-standalone-server-tar-gz-0.1.0.tar.gz",
+        "dist/release-evidence/linux-x64-standalone-server-tar-gz/*",
+        "target/release/sdkwork-api-appstore-standalone-gateway*",
+        "target/release/sdkwork-appstore-analytics-worker*",
+        "database/**",
+        "etc/topology/*.production.env",
+        "deployments/**",
+        "sdkwork.app.config.json"
+      ],
+      "artifactPath": "dist/release-packages/sdkwork-appstore-linux-x64-standalone-server-tar-gz-0.1.0.tar.gz"
+    },
+    {
+      "id": "container-x64-cloud-container-kubernetes-tar-gz",
+      "profileBinding": "fixed",
+      "deploymentProfile": "cloud",
+      "runtimeTarget": "container",
+      "profile": "container",
+      "platform": "container",
+      "architecture": "x64",
+      "variant": "kubernetes",
+      "formats": ["tar.gz"],
+      "runner": "ubuntu-24.04",
+      "outputGlobs": [
+        "dist/release-packages/sdkwork-appstore-container-x64-cloud-container-kubernetes-tar-gz-0.1.0.tar.gz",
+        "dist/release-evidence/container-x64-cloud-container-kubernetes-tar-gz/*"
+      ],
+      "artifactPath": "dist/release-packages/sdkwork-appstore-container-x64-cloud-container-kubernetes-tar-gz-0.1.0.tar.gz"
+    }
+  ],
+  "security": {
+    "artifactAttestations": true,
+    "sbomRequired": true,
+    "signingRequired": true
+  },
+  "publish": {
+    "workflowArtifact": true,
+    "githubRelease": false,
+    "retentionDays": 30
+  }
+}

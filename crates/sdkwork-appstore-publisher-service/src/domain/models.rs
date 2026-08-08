@@ -101,6 +101,7 @@ impl PublisherType {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Default)]
+#[serde(deny_unknown_fields)]
 pub struct ContactSnapshot {
     pub email: Option<String>,
     pub phone: Option<String>,
@@ -108,6 +109,7 @@ pub struct ContactSnapshot {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Default)]
+#[serde(deny_unknown_fields)]
 pub struct ProfileSnapshot {
     pub bio: Option<String>,
     pub website_url: Option<String>,
@@ -115,6 +117,7 @@ pub struct ProfileSnapshot {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct Publisher {
     pub id: PublisherId,
     pub tenant_id: String,
@@ -159,6 +162,7 @@ impl Publisher {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct PublisherMember {
     pub id: String,
     pub tenant_id: String,
@@ -229,6 +233,7 @@ impl MemberStatus {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct PublisherVerification {
     pub id: String,
     pub tenant_id: String,

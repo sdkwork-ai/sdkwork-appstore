@@ -2,10 +2,22 @@ import { createTokenManager, type AuthTokenManager } from '@sdkwork/sdk-common';
 
 import type { AppstorePcSessionStore } from './sessionStore';
 
+/**
+ * Session-backed token manager. Token lifecycle events (expired/invalid)
+ * clear the persisted session so the AuthGate redirects to the login flow
+ * instead of silently failing every authenticated request.
+ */
 export function createAppstorePcSessionTokenManager(
   session: AppstorePcSessionStore,
 ): AuthTokenManager {
-  const tokenManager = createTokenManager();
+  const handleExpired = () => {
+    session.clearSession();
+  };
+
+  const tokenManager = createTokenManager(undefined, {
+    onTokenExpired: handleExpired,
+    onTokenInvalid: handleExpired,
+  });
 
   const hydrate = () => {
     const snapshot = session.getSnapshot();

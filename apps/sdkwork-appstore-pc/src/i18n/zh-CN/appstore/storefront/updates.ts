@@ -19,11 +19,11 @@ export const updates = {
     freeSpace: '可用存储余量',
     cleanCache: '清理冗余缓存',
     cleanCacheSuccess: '已释放冗余缓存空间',
-    usedSpace: '已占用存储空间',
+    installedCount: '已安装应用数',
     securityEngine: '数字签名与合规检测',
     securityStatus: '绿标安全·已加密保护',
     downloadedCount: '已部署安装总数',
-    appsDeployed: '{{count}} 款应用在运行'
+    appsInstalled: '{{count}} 款应用已安装'
   },
   queue: {
     title: '正在进行中的下载任务',

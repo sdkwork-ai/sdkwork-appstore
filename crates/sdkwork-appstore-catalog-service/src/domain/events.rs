@@ -20,6 +20,7 @@ pub enum CatalogDomainEvent {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct CategoryCreatedEvent {
     pub category_id: CategoryId,
     pub tenant_id: String,
@@ -28,6 +29,7 @@ pub struct CategoryCreatedEvent {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct CategoryUpdatedEvent {
     pub category_id: CategoryId,
     pub tenant_id: String,
@@ -36,6 +38,7 @@ pub struct CategoryUpdatedEvent {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct CategoryDeletedEvent {
     pub category_id: CategoryId,
     pub tenant_id: String,
@@ -43,6 +46,7 @@ pub struct CategoryDeletedEvent {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct CollectionCreatedEvent {
     pub collection_id: CollectionId,
     pub tenant_id: String,
@@ -51,6 +55,7 @@ pub struct CollectionCreatedEvent {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct CollectionUpdatedEvent {
     pub collection_id: CollectionId,
     pub tenant_id: String,
@@ -59,6 +64,7 @@ pub struct CollectionUpdatedEvent {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct CollectionDeletedEvent {
     pub collection_id: CollectionId,
     pub tenant_id: String,
@@ -66,6 +72,7 @@ pub struct CollectionDeletedEvent {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct CollectionItemsUpsertedEvent {
     pub collection_id: CollectionId,
     pub tenant_id: String,
@@ -74,6 +81,7 @@ pub struct CollectionItemsUpsertedEvent {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct FeaturedSlotUpsertedEvent {
     pub slot_id: FeaturedSlotId,
     pub tenant_id: String,
@@ -83,6 +91,7 @@ pub struct FeaturedSlotUpsertedEvent {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct FeaturedSlotRemovedEvent {
     pub slot_id: FeaturedSlotId,
     pub tenant_id: String,
@@ -91,6 +100,7 @@ pub struct FeaturedSlotRemovedEvent {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ChartSnapshotGeneratedEvent {
     pub chart_code: String,
     pub tenant_id: String,

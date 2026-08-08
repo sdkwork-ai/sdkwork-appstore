@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ListMarketChannelsRequest {
     pub channel_status: Option<String>,
     pub cursor: Option<String>,
@@ -40,6 +41,7 @@ impl ListMarketChannelsRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct CreateMarketChannelRequest {
     pub channel_code: String,
     pub channel_type: String,
@@ -89,6 +91,7 @@ impl CreateMarketChannelRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct UpdateMarketChannelRequest {
     pub market_channel_id: String,
     pub channel_status: Option<String>,
@@ -137,6 +140,7 @@ impl UpdateMarketChannelRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ListMarketReleasesRequest {
     pub release_id: Option<String>,
     pub channel_id: Option<String>,
@@ -190,6 +194,7 @@ impl ListMarketReleasesRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct SyncMarketReleaseRequest {
     pub market_release_id: String,
     pub sync_mode: String,

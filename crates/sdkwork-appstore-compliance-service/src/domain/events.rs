@@ -14,6 +14,7 @@ pub enum ComplianceDomainEvent {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ComplianceProfileCreatedEvent {
     pub profile_id: ComplianceProfileId,
     pub tenant_id: String,
@@ -24,6 +25,7 @@ pub struct ComplianceProfileCreatedEvent {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ComplianceProfileUpdatedEvent {
     pub profile_id: ComplianceProfileId,
     pub tenant_id: String,
@@ -33,6 +35,7 @@ pub struct ComplianceProfileUpdatedEvent {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ComplianceProfileSubmittedEvent {
     pub profile_id: ComplianceProfileId,
     pub tenant_id: String,
@@ -41,6 +44,7 @@ pub struct ComplianceProfileSubmittedEvent {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ComplianceProfileApprovedEvent {
     pub profile_id: ComplianceProfileId,
     pub tenant_id: String,
@@ -50,6 +54,7 @@ pub struct ComplianceProfileApprovedEvent {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ComplianceProfileRejectedEvent {
     pub profile_id: ComplianceProfileId,
     pub tenant_id: String,
@@ -60,6 +65,7 @@ pub struct ComplianceProfileRejectedEvent {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct PermissionDisclosuresUpsertedEvent {
     pub tenant_id: String,
     pub listing_id: String,

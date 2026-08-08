@@ -21,6 +21,7 @@ pub enum PublisherDomainEvent {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct PublisherCreatedEvent {
     pub publisher_id: PublisherId,
     pub tenant_id: String,
@@ -31,6 +32,7 @@ pub struct PublisherCreatedEvent {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct PublisherUpdatedEvent {
     pub publisher_id: PublisherId,
     pub tenant_id: String,
@@ -39,6 +41,7 @@ pub struct PublisherUpdatedEvent {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct PublisherSuspendedEvent {
     pub publisher_id: PublisherId,
     pub tenant_id: String,
@@ -47,6 +50,7 @@ pub struct PublisherSuspendedEvent {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct PublisherReactivatedEvent {
     pub publisher_id: PublisherId,
     pub tenant_id: String,
@@ -54,6 +58,7 @@ pub struct PublisherReactivatedEvent {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct PublisherDeletedEvent {
     pub publisher_id: PublisherId,
     pub tenant_id: String,
@@ -61,6 +66,7 @@ pub struct PublisherDeletedEvent {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct MemberInvitedEvent {
     pub publisher_id: PublisherId,
     pub tenant_id: String,
@@ -71,6 +77,7 @@ pub struct MemberInvitedEvent {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct MemberJoinedEvent {
     pub publisher_id: PublisherId,
     pub tenant_id: String,
@@ -79,6 +86,7 @@ pub struct MemberJoinedEvent {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct MemberRemovedEvent {
     pub publisher_id: PublisherId,
     pub tenant_id: String,
@@ -87,6 +95,7 @@ pub struct MemberRemovedEvent {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct VerificationSubmittedEvent {
     pub publisher_id: PublisherId,
     pub tenant_id: String,
@@ -95,6 +104,7 @@ pub struct VerificationSubmittedEvent {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct VerificationApprovedEvent {
     pub publisher_id: PublisherId,
     pub tenant_id: String,
@@ -104,6 +114,7 @@ pub struct VerificationApprovedEvent {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct VerificationRejectedEvent {
     pub publisher_id: PublisherId,
     pub tenant_id: String,

@@ -47,9 +47,8 @@ async fn main() {
 fn cors_layer_from_env() -> sdkwork_web_axum::CanonicalCorsLayer {
     let environment =
         sdkwork_web_bootstrap::web_environment_from_env(&["SDKWORK_APPSTORE_ENVIRONMENT"]);
-    let origins = sdkwork_web_bootstrap::cors_allowed_origins_from_env(&[
-        "APPSTORE_CORS_ALLOWED_ORIGINS",
-    ]);
+    let origins =
+        sdkwork_web_bootstrap::cors_allowed_origins_from_env(&["APPSTORE_CORS_ALLOWED_ORIGINS"]);
     let policy = sdkwork_web_bootstrap::security_policy_for_environment(&environment, origins);
     sdkwork_web_axum::cors_layer_from_policy(policy.cors)
 }

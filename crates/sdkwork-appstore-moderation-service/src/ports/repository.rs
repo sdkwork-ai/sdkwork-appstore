@@ -82,4 +82,27 @@ pub trait ModerationRepositoryPort: Send + Sync {
         context: &AppstoreRequestContext,
         appeal: &ModerationAppeal,
     ) -> AppstoreServiceResult<()>;
+
+    /// Resolves the owning listing of a submission.
+    async fn find_submission_listing_id(
+        &self,
+        context: &AppstoreRequestContext,
+        submission_id: &str,
+    ) -> AppstoreServiceResult<Option<String>>;
+
+    /// Resolves the owning publisher of a listing.
+    async fn find_listing_publisher_id(
+        &self,
+        context: &AppstoreRequestContext,
+        listing_id: &str,
+    ) -> AppstoreServiceResult<Option<String>>;
+
+    /// Returns the caller's role for a publisher (owner or accepted member)
+    /// when the subject has publisher access; `None` otherwise.
+    async fn find_publisher_member_role(
+        &self,
+        context: &AppstoreRequestContext,
+        publisher_id: &str,
+        user_id: &str,
+    ) -> AppstoreServiceResult<Option<String>>;
 }

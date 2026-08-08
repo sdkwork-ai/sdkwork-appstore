@@ -350,6 +350,78 @@ where
             && listing.published_at.is_some()
             && listing.storefront_visibility != StorefrontVisibility::Hidden
     }
+
+    fn require_scope(
+        context: &AppstoreRequestContext,
+        required: &str,
+    ) -> AppstoreServiceResult<()> {
+        if sdkwork_appstore_authorization::scope_granted(&context.permission_scopes, required) {
+            Ok(())
+        } else {
+            Err(AppstoreServiceError::PermissionDenied(
+                sdkwork_appstore_authorization::missing_scope_message(required),
+            ))
+        }
+    }
+
+    fn require_user_id(context: &AppstoreRequestContext) -> AppstoreServiceResult<String> {
+        let user_id = context.user_id.trim();
+        if user_id.is_empty() || user_id == "system" {
+            return Err(AppstoreServiceError::PermissionDenied(
+                "Authenticated user is required".to_string(),
+            ));
+        }
+        Ok(user_id.to_string())
+    }
+
+    fn listing_is_visible_to_public(listing: &Listing) -> bool {
+        listing.is_visible()
+    }
+
+    /// Requires the caller to be the publisher owner or an accepted member.
+    async fn ensure_publisher_access(
+        &self,
+        context: &AppstoreRequestContext,
+        publisher_id: &str,
+    ) -> AppstoreServiceResult<()> {
+        let user_id = Self::require_user_id(context)?;
+        let role = self
+            .repository
+            .find_publisher_member_role(context, publisher_id, &user_id)
+            .await?;
+        if role.is_none() {
+            return Err(AppstoreServiceError::PermissionDenied(
+                "Publisher membership is required".to_string(),
+            ));
+        }
+        Ok(())
+    }
+
+    /// Requires the caller to own the listing's publisher or hold an admin scope.
+    async fn ensure_listing_publisher_access(
+        &self,
+        context: &AppstoreRequestContext,
+        listing: &Listing,
+    ) -> AppstoreServiceResult<()> {
+        if Self::require_scope(context, "appstore.listings.admin").is_ok() {
+            return Ok(());
+        }
+        self.ensure_publisher_access(context, &listing.publisher_id)
+            .await
+    }
+
+    /// Listing detail read gate: public listings are readable by everyone;
+    /// non-public listings only by the owning publisher or admins.
+    async fn ensure_listing_read_access(
+        &self,
+        context: &AppstoreRequestContext,
+        listing: &Listing,
+    ) -> AppstoreServiceResult<()> {
+        if Self::listing_is_visible_to_public(listing) {
+            return Ok(());
+        }
+        self.ensure_listing_publisher_access(context, listing).await
+    }
 }
 
 #[async_trait::async_trait]
@@ -370,10 +442,13 @@ where
             .await?;
 
         match listing {
-            Some(listing) => Ok(RetrieveListingResult::found(
-                "appstore.listings.retrieve",
-                listing,
-            )),
+            Some(listing) => {
+                self.ensure_listing_read_access(context, &listing).await?;
+                Ok(RetrieveListingResult::found(
+                    "appstore.listings.retrieve",
+                    listing,
+                ))
+            }
             None => Ok(RetrieveListingResult::not_found(
                 "appstore.listings.retrieve",
             )),
@@ -385,6 +460,14 @@ where
         context: &AppstoreRequestContext,
         request: CreateListingRequest,
     ) -> AppstoreServiceResult<CreateListingResult> {
+        Self::require_scope(context, "appstore.listings.write")?;
+        if request.publisher_id.trim().is_empty() {
+            return Err(AppstoreServiceError::ValidationFailed(
+                "publisher_id is required".to_string(),
+            ));
+        }
+        self.ensure_publisher_access(context, &request.publisher_id)
+            .await?;
         if request.app_id.trim().is_empty() {
             return Err(AppstoreServiceError::ValidationFailed(
                 "app_id is required".to_string(),
@@ -492,6 +575,7 @@ where
         context: &AppstoreRequestContext,
         request: BootstrapPublisherAppRequest,
     ) -> AppstoreServiceResult<BootstrapPublisherAppResult> {
+        Self::require_scope(context, "appstore.listings.write")?;
         let app_key = request.app_key.trim();
         let display_name = request.display_name.trim();
         let default_locale = request.default_locale.trim();
@@ -502,6 +586,7 @@ where
                 "publisher_id is required".to_string(),
             ));
         }
+        self.ensure_publisher_access(context, publisher_id).await?;
         if !is_valid_app_key(app_key) {
             return Err(AppstoreServiceError::ValidationFailed(
                 "app_key must be lower-kebab-case".to_string(),
@@ -627,6 +712,7 @@ where
         context: &AppstoreRequestContext,
         request: UpdateListingRequest,
     ) -> AppstoreServiceResult<UpdateListingResult> {
+        Self::require_scope(context, "appstore.listings.write")?;
         let listing_id = ListingId::new(&request.listing_id);
 
         let mut listing = self
@@ -636,6 +722,8 @@ where
             .ok_or_else(|| {
                 AppstoreServiceError::NotFound(format!("Listing not found: {}", request.listing_id))
             })?;
+        self.ensure_listing_publisher_access(context, &listing)
+            .await?;
 
         if !listing.can_update() {
             return Err(AppstoreServiceError::InvalidState(
@@ -694,6 +782,7 @@ where
         context: &AppstoreRequestContext,
         request: UpsertListingLocalizationRequest,
     ) -> AppstoreServiceResult<UpsertListingLocalizationResult> {
+        Self::require_scope(context, "appstore.listings.write")?;
         let listing_id = ListingId::new(&request.listing_id);
 
         let listing = self
@@ -703,6 +792,8 @@ where
             .ok_or_else(|| {
                 AppstoreServiceError::NotFound(format!("Listing not found: {}", request.listing_id))
             })?;
+        self.ensure_listing_publisher_access(context, &listing)
+            .await?;
 
         if !listing.can_update() {
             return Err(AppstoreServiceError::InvalidState(
@@ -773,13 +864,14 @@ where
     ) -> AppstoreServiceResult<ListListingMediaResult> {
         let listing_id = ListingId::new(&request.listing_id);
 
-        let _listing = self
+        let listing = self
             .repository
             .find_listing_by_id(context, &listing_id)
             .await?
             .ok_or_else(|| {
                 AppstoreServiceError::NotFound(format!("Listing not found: {}", request.listing_id))
             })?;
+        self.ensure_listing_read_access(context, &listing).await?;
 
         let media = self
             .repository
@@ -797,6 +889,7 @@ where
         context: &AppstoreRequestContext,
         request: AttachListingMediaRequest,
     ) -> AppstoreServiceResult<AttachListingMediaResult> {
+        Self::require_scope(context, "appstore.listings.write")?;
         let listing_id = ListingId::new(&request.listing_id);
 
         let listing = self
@@ -806,6 +899,8 @@ where
             .ok_or_else(|| {
                 AppstoreServiceError::NotFound(format!("Listing not found: {}", request.listing_id))
             })?;
+        self.ensure_listing_publisher_access(context, &listing)
+            .await?;
 
         if !listing.can_update() {
             return Err(AppstoreServiceError::InvalidState(
@@ -868,6 +963,7 @@ where
         context: &AppstoreRequestContext,
         request: RemoveListingMediaRequest,
     ) -> AppstoreServiceResult<RemoveListingMediaResult> {
+        Self::require_scope(context, "appstore.listings.write")?;
         let listing_id = ListingId::new(&request.listing_id);
 
         let listing = self
@@ -877,6 +973,8 @@ where
             .ok_or_else(|| {
                 AppstoreServiceError::NotFound(format!("Listing not found: {}", request.listing_id))
             })?;
+        self.ensure_listing_publisher_access(context, &listing)
+            .await?;
 
         if !listing.can_update() {
             return Err(AppstoreServiceError::InvalidState(
@@ -912,6 +1010,7 @@ where
         context: &AppstoreRequestContext,
         request: BindListingCategoriesRequest,
     ) -> AppstoreServiceResult<BindListingCategoriesResult> {
+        Self::require_scope(context, "appstore.listings.write")?;
         let listing_id = ListingId::new(&request.listing_id);
 
         let mut listing = self
@@ -921,6 +1020,8 @@ where
             .ok_or_else(|| {
                 AppstoreServiceError::NotFound(format!("Listing not found: {}", request.listing_id))
             })?;
+        self.ensure_listing_publisher_access(context, &listing)
+            .await?;
 
         if !listing.can_update() {
             return Err(AppstoreServiceError::InvalidState(
@@ -972,15 +1073,18 @@ where
         context: &AppstoreRequestContext,
         request: UpdateRegionalAvailabilityRequest,
     ) -> AppstoreServiceResult<UpdateRegionalAvailabilityResult> {
+        Self::require_scope(context, "appstore.listings.write")?;
         let listing_id = ListingId::new(&request.listing_id);
 
-        let _listing = self
+        let listing = self
             .repository
             .find_listing_by_id(context, &listing_id)
             .await?
             .ok_or_else(|| {
                 AppstoreServiceError::NotFound(format!("Listing not found: {}", request.listing_id))
             })?;
+        self.ensure_listing_publisher_access(context, &listing)
+            .await?;
 
         if request.regions.is_empty() {
             return Err(AppstoreServiceError::ValidationFailed(
@@ -1023,15 +1127,16 @@ where
     ) -> AppstoreServiceResult<ListListingReleasesResult> {
         let listing_id = ListingId::new(&request.listing_id);
 
-        let _listing = self
+        let listing = self
             .repository
             .find_listing_by_id(context, &listing_id)
             .await?
             .ok_or_else(|| {
                 AppstoreServiceError::NotFound(format!("Listing not found: {}", request.listing_id))
             })?;
+        self.ensure_listing_read_access(context, &listing).await?;
 
-        let limit = request.page_size.unwrap_or(20).min(200);
+        let limit = request.page_size.unwrap_or(20).clamp(1, 200);
         let releases = self
             .repository
             .find_releases_by_listing(context, &listing_id, request.cursor.as_deref(), limit + 1)
@@ -1064,6 +1169,10 @@ where
             return Err(AppstoreServiceError::ValidationFailed(
                 "publisher_id is required".to_string(),
             ));
+        }
+        if Self::require_scope(context, "appstore.listings.admin").is_err() {
+            self.ensure_publisher_access(context, request.publisher_id.trim())
+                .await?;
         }
 
         let limit = request.page_size.unwrap_or(20).clamp(1, 200);
@@ -1100,6 +1209,7 @@ where
         context: &AppstoreRequestContext,
         request: CreateListingSubmissionRequest,
     ) -> AppstoreServiceResult<CreateListingSubmissionResult> {
+        Self::require_scope(context, "appstore.listings.write")?;
         let listing_id = ListingId::new(&request.listing_id);
 
         let listing = self
@@ -1109,6 +1219,8 @@ where
             .ok_or_else(|| {
                 AppstoreServiceError::NotFound(format!("Listing not found: {}", request.listing_id))
             })?;
+        self.ensure_listing_publisher_access(context, &listing)
+            .await?;
 
         if !listing.can_submit() {
             return Err(AppstoreServiceError::InvalidState(
@@ -1199,6 +1311,16 @@ where
         context: &AppstoreRequestContext,
         request: ApplyModerationDecisionRequest,
     ) -> AppstoreServiceResult<ApplyModerationDecisionResult> {
+        // Internal decision projection: only moderation-decide scopes or the
+        // trusted system caller may apply a decision onto the listing aggregate.
+        if context.user_id != "system"
+            && Self::require_scope(context, "appstore.moderation.decide").is_err()
+            && Self::require_scope(context, "appstore.listings.admin").is_err()
+        {
+            return Err(AppstoreServiceError::PermissionDenied(
+                "Moderation decision scope is required".to_string(),
+            ));
+        }
         let mut submission = self
             .repository
             .find_submission_by_id(context, &request.submission_id)
@@ -1275,7 +1397,8 @@ where
         context: &AppstoreRequestContext,
         request: AdminListListingsRequest,
     ) -> AppstoreServiceResult<AdminListListingsResult> {
-        let limit = request.page_size.unwrap_or(20).min(200);
+        Self::require_scope(context, "appstore.listings.admin")?;
+        let limit = request.page_size.unwrap_or(20).clamp(1, 200);
         let listings = self
             .repository
             .admin_list_listings(
@@ -1309,6 +1432,7 @@ where
         context: &AppstoreRequestContext,
         request: AdminRetrieveListingRequest,
     ) -> AppstoreServiceResult<AdminRetrieveListingResult> {
+        Self::require_scope(context, "appstore.listings.admin")?;
         let listing_id = ListingId::new(&request.listing_id);
 
         let listing = self
@@ -1332,6 +1456,7 @@ where
         context: &AppstoreRequestContext,
         request: AdminUpdateListingVisibilityRequest,
     ) -> AppstoreServiceResult<AdminUpdateListingVisibilityResult> {
+        Self::require_scope(context, "appstore.listings.admin")?;
         let listing_id = ListingId::new(&request.listing_id);
 
         let mut listing = self
@@ -1401,13 +1526,14 @@ where
     ) -> AppstoreServiceResult<ListListingReleaseHistoryResult> {
         let listing_id = ListingId::new(&request.listing_id);
 
-        let _listing = self
+        let listing = self
             .repository
             .find_listing_by_id(context, &listing_id)
             .await?
             .ok_or_else(|| {
                 AppstoreServiceError::NotFound(format!("Listing not found: {}", request.listing_id))
             })?;
+        self.ensure_listing_read_access(context, &listing).await?;
 
         let limit = request.page_size.unwrap_or(20).clamp(1, 200);
         let releases = self
@@ -1569,7 +1695,7 @@ where
         request: RatingsListRequest,
     ) -> AppstoreServiceResult<RatingsListResult> {
         let listing_id = ListingId::new(&request.listing_id);
-        let limit = request.page_size.unwrap_or(20).min(200);
+        let limit = request.page_size.unwrap_or(20).clamp(1, 200);
         let ratings = self
             .repository
             .find_ratings(context, &listing_id, request.cursor.as_deref(), limit + 1)

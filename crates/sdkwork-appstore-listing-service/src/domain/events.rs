@@ -23,6 +23,7 @@ pub enum ListingDomainEvent {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ListingCreatedEvent {
     pub listing_id: ListingId,
     pub tenant_id: String,
@@ -33,6 +34,7 @@ pub struct ListingCreatedEvent {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ListingUpdatedEvent {
     pub listing_id: ListingId,
     pub tenant_id: String,
@@ -41,6 +43,7 @@ pub struct ListingUpdatedEvent {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ListingActivatedEvent {
     pub listing_id: ListingId,
     pub tenant_id: String,
@@ -48,6 +51,7 @@ pub struct ListingActivatedEvent {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ListingDelistedEvent {
     pub listing_id: ListingId,
     pub tenant_id: String,
@@ -55,6 +59,7 @@ pub struct ListingDelistedEvent {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ListingSuspendedEvent {
     pub listing_id: ListingId,
     pub tenant_id: String,
@@ -63,6 +68,7 @@ pub struct ListingSuspendedEvent {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ListingDeletedEvent {
     pub listing_id: ListingId,
     pub tenant_id: String,
@@ -70,6 +76,7 @@ pub struct ListingDeletedEvent {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct LocalizationUpsertedEvent {
     pub listing_id: ListingId,
     pub tenant_id: String,
@@ -78,6 +85,7 @@ pub struct LocalizationUpsertedEvent {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct MediaAttachedEvent {
     pub listing_id: ListingId,
     pub tenant_id: String,
@@ -87,6 +95,7 @@ pub struct MediaAttachedEvent {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct MediaRemovedEvent {
     pub listing_id: ListingId,
     pub tenant_id: String,
@@ -95,6 +104,7 @@ pub struct MediaRemovedEvent {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct CategoriesBoundEvent {
     pub listing_id: ListingId,
     pub tenant_id: String,
@@ -103,6 +113,7 @@ pub struct CategoriesBoundEvent {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct RegionalAvailabilityUpdatedEvent {
     pub listing_id: ListingId,
     pub tenant_id: String,
@@ -111,6 +122,7 @@ pub struct RegionalAvailabilityUpdatedEvent {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct SubmissionCreatedEvent {
     pub listing_id: ListingId,
     pub tenant_id: String,
@@ -120,6 +132,7 @@ pub struct SubmissionCreatedEvent {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct VisibilityChangedEvent {
     pub listing_id: ListingId,
     pub tenant_id: String,

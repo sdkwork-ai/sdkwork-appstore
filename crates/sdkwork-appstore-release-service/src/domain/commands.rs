@@ -21,6 +21,7 @@ impl ReleaseOperationRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct CreateReleaseRequest {
     pub listing_id: String,
     pub channel_code: String,
@@ -66,6 +67,7 @@ impl CreateReleaseRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct RetrieveReleaseRequest {
     pub release_id: String,
 }
@@ -79,6 +81,7 @@ impl RetrieveReleaseRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct UpdateReleaseRequest {
     pub release_id: String,
     pub minimum_os_version: Option<String>,
@@ -113,6 +116,7 @@ impl UpdateReleaseRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct UpsertReleaseNotesRequest {
     pub release_id: String,
     pub locale: String,
@@ -141,6 +145,7 @@ impl UpsertReleaseNotesRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct AttachArtifactRequest {
     pub release_id: String,
     pub platform: String,
@@ -202,6 +207,7 @@ impl AttachArtifactRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct UpdateRolloutRequest {
     pub release_id: String,
     pub rollout_strategy: String,
@@ -244,6 +250,7 @@ impl UpdateRolloutRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct RetireReleaseRequest {
     pub release_id: String,
     pub idempotency_key: Option<String>,
@@ -264,6 +271,7 @@ impl RetireReleaseRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct CheckUpdateRequest {
     pub app_key: String,
     pub platform: String,
@@ -309,6 +317,7 @@ impl CheckUpdateRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ResolveDownloadRequest {
     pub artifact_id: String,
     pub grant_id: Option<String>,
@@ -336,6 +345,7 @@ impl ResolveDownloadRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct RetrievePublicReleaseRequest {
     pub release_id: String,
 }
@@ -349,6 +359,7 @@ impl RetrievePublicReleaseRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct CreateDownloadGrantRequest {
     pub listing_id: String,
     pub release_id: String,
@@ -384,6 +395,7 @@ impl CreateDownloadGrantRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ConsumeDownloadGrantRequest {
     pub grant_id: String,
 }
@@ -397,6 +409,7 @@ impl ConsumeDownloadGrantRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct AutomationSubmissionCreateRequest {
     pub app_key: String,
     pub submission_type: String,
@@ -438,6 +451,7 @@ impl AutomationSubmissionCreateRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct AutomationArtifactSpec {
     pub platform: String,
     pub architecture: String,

@@ -55,6 +55,87 @@ impl<R> ComplianceService<R> {
     }
 }
 
+impl<R> ComplianceService<R>
+where
+    R: ComplianceRepositoryPort,
+{
+    fn require_scope(
+        context: &AppstoreRequestContext,
+        required: &str,
+    ) -> AppstoreServiceResult<()> {
+        if sdkwork_appstore_authorization::scope_granted(&context.permission_scopes, required) {
+            Ok(())
+        } else {
+            Err(AppstoreServiceError::PermissionDenied(
+                sdkwork_appstore_authorization::missing_scope_message(required),
+            ))
+        }
+    }
+
+    fn require_user_id(context: &AppstoreRequestContext) -> AppstoreServiceResult<String> {
+        let user_id = context.user_id.as_deref().unwrap_or("").trim();
+        if user_id.is_empty() || user_id == "system" {
+            return Err(AppstoreServiceError::PermissionDenied(
+                "Authenticated user is required".to_string(),
+            ));
+        }
+        Ok(user_id.to_string())
+    }
+
+    /// Requires the caller to own the listing's publisher or hold an admin scope.
+    async fn ensure_listing_publisher_access(
+        &self,
+        context: &AppstoreRequestContext,
+        listing_id: &str,
+    ) -> AppstoreServiceResult<()> {
+        if Self::require_scope(context, "appstore.listings.admin").is_ok() {
+            return Ok(());
+        }
+        let user_id = Self::require_user_id(context)?;
+        let publisher_id = self
+            .repository
+            .find_listing_publisher_id(context, listing_id)
+            .await?
+            .ok_or_else(|| {
+                AppstoreServiceError::NotFound(format!("Listing not found: {}", listing_id))
+            })?;
+        let role = self
+            .repository
+            .find_publisher_member_role(context, &publisher_id, &user_id)
+            .await?;
+        if role.is_none() {
+            return Err(AppstoreServiceError::PermissionDenied(
+                "Publisher membership is required".to_string(),
+            ));
+        }
+        Ok(())
+    }
+
+    /// Read gate: public listings are readable by everyone; non-public only
+    /// by the owning publisher or admins.
+    async fn ensure_listing_read_access(
+        &self,
+        context: &AppstoreRequestContext,
+        listing_id: &str,
+    ) -> AppstoreServiceResult<()> {
+        let visible = self
+            .repository
+            .find_listing_visibility(context, listing_id)
+            .await?;
+        match visible {
+            Some(true) => Ok(()),
+            Some(false) => {
+                self.ensure_listing_publisher_access(context, listing_id)
+                    .await
+            }
+            None => Err(AppstoreServiceError::NotFound(format!(
+                "Listing not found: {}",
+                listing_id
+            ))),
+        }
+    }
+}
+
 #[async_trait::async_trait]
 impl<R> ComplianceOperations for ComplianceService<R>
 where
@@ -70,6 +151,8 @@ where
                 "Listing ID is required".to_string(),
             ));
         }
+        self.ensure_listing_read_access(context, &request.listing_id)
+            .await?;
 
         let profile = self
             .repository
@@ -92,11 +175,14 @@ where
         context: &AppstoreRequestContext,
         request: UpdateComplianceProfileRequest,
     ) -> AppstoreServiceResult<UpdateComplianceProfileResult> {
+        Self::require_scope(context, "appstore.listings.write")?;
         if request.listing_id.trim().is_empty() {
             return Err(AppstoreServiceError::ValidationFailed(
                 "Listing ID is required".to_string(),
             ));
         }
+        self.ensure_listing_publisher_access(context, &request.listing_id)
+            .await?;
 
         let existing = self
             .repository
@@ -195,11 +281,14 @@ where
         context: &AppstoreRequestContext,
         request: UpsertPermissionDisclosuresRequest,
     ) -> AppstoreServiceResult<UpsertPermissionDisclosuresResult> {
+        Self::require_scope(context, "appstore.listings.write")?;
         if request.listing_id.trim().is_empty() {
             return Err(AppstoreServiceError::ValidationFailed(
                 "Listing ID is required".to_string(),
             ));
         }
+        self.ensure_listing_publisher_access(context, &request.listing_id)
+            .await?;
 
         if request.permissions.is_empty() {
             return Err(AppstoreServiceError::ValidationFailed(
@@ -281,6 +370,8 @@ where
                 "Listing ID is required".to_string(),
             ));
         }
+        self.ensure_listing_read_access(context, &request.listing_id)
+            .await?;
 
         let limit = request.page_size.unwrap_or(20).clamp(1, 200);
         let items = self

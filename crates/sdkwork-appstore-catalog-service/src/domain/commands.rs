@@ -23,6 +23,7 @@ impl CatalogOperationRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct HomeRetrieveRequest {
     pub locale: Option<String>,
     pub platform: Option<String>,
@@ -48,6 +49,7 @@ impl HomeRetrieveRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct CategoriesListRequest {
     pub locale: Option<String>,
     pub cursor: Option<String>,
@@ -80,6 +82,7 @@ impl CategoriesListRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct CategoryRetrieveRequest {
     pub category_id: String,
     pub locale: Option<String>,
@@ -100,6 +103,7 @@ impl CategoryRetrieveRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct CategoryCreateRequest {
     pub category_code: String,
     pub parent_category_id: Option<String>,
@@ -148,6 +152,7 @@ impl CategoryCreateRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct CategoryLocalizationInput {
     pub locale: String,
     pub display_name: String,
@@ -155,6 +160,7 @@ pub struct CategoryLocalizationInput {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct CategoryUpdateRequest {
     pub category_id: String,
     pub parent_category_id: Option<String>,
@@ -210,6 +216,7 @@ impl CategoryUpdateRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct CollectionsListRequest {
     pub cursor: Option<String>,
     pub page_size: Option<i32>,
@@ -242,6 +249,7 @@ impl CollectionsListRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct CollectionRetrieveRequest {
     pub collection_id: String,
     pub locale: Option<String>,
@@ -262,6 +270,7 @@ impl CollectionRetrieveRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct CollectionCreateRequest {
     pub collection_code: String,
     pub collection_type: String,
@@ -318,6 +327,7 @@ impl CollectionCreateRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct CollectionLocalizationInput {
     pub locale: String,
     pub display_name: String,
@@ -325,6 +335,7 @@ pub struct CollectionLocalizationInput {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct CollectionUpdateRequest {
     pub collection_id: String,
     pub collection_type: Option<String>,
@@ -394,6 +405,7 @@ impl CollectionUpdateRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct CollectionItemInput {
     pub listing_id: String,
     pub sort_order: Option<i32>,
@@ -403,6 +415,7 @@ pub struct CollectionItemInput {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct CollectionItemsUpsertRequest {
     pub collection_id: String,
     pub items: Vec<CollectionItemInput>,
@@ -418,6 +431,7 @@ impl CollectionItemsUpsertRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct FeaturedListRequest {
     pub audience_scope: Option<String>,
     pub platform_scope: Option<String>,
@@ -443,6 +457,7 @@ impl FeaturedListRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct FeaturedUpsertRequest {
     pub slot_code: String,
     pub listing_id: String,
@@ -484,6 +499,7 @@ impl FeaturedUpsertRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ChartsRetrieveRequest {
     pub chart_code: String,
     pub locale: Option<String>,
@@ -518,6 +534,7 @@ impl ChartsRetrieveRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ListingsSearchRequest {
     pub query: Option<String>,
     pub category_id: Option<String>,
@@ -559,6 +576,7 @@ impl ListingsSearchRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct MetricsRetrieveRequest {
     pub listing_id: String,
     pub start_date: Option<String>,
@@ -586,6 +604,7 @@ impl MetricsRetrieveRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct PublicFeaturedListRequest {
     pub locale: Option<String>,
     pub platform: Option<String>,
@@ -618,6 +637,7 @@ impl PublicFeaturedListRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct RecommendationsListRequest {
     pub locale: Option<String>,
     pub platform: Option<String>,
@@ -657,6 +677,7 @@ impl RecommendationsListRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct RecentlyUpdatedListRequest {
     pub locale: Option<String>,
     pub cursor: Option<String>,
@@ -689,6 +710,7 @@ impl RecentlyUpdatedListRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct EventsListRequest {
     pub cursor: Option<String>,
     pub page_size: Option<i32>,
@@ -721,6 +743,7 @@ impl EventsListRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct EventRetrieveRequest {
     pub event_id: String,
     pub locale: Option<String>,
@@ -741,6 +764,7 @@ impl EventRetrieveRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct SearchSuggestionsListRequest {
     pub query: String,
     pub locale: Option<String>,
@@ -761,6 +785,7 @@ impl SearchSuggestionsListRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct SearchTrendingListRequest {
     pub locale: Option<String>,
     pub page_size: Option<i32>,
@@ -786,6 +811,7 @@ impl SearchTrendingListRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct SearchHistoryListRequest {
     pub cursor: Option<String>,
     pub page_size: Option<i32>,
@@ -811,6 +837,7 @@ impl SearchHistoryListRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct SearchHistoryUpsertRequest {
     pub query_text: String,
     pub filters_json: Option<String>,
@@ -847,6 +874,7 @@ impl SearchHistoryClearRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct AnalyticsPublisherOverviewRequest {
     pub date_from: Option<String>,
     pub date_to: Option<String>,
@@ -862,6 +890,7 @@ impl AnalyticsPublisherOverviewRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct AnalyticsPublisherListingsListRequest {
     pub date_from: Option<String>,
     pub date_to: Option<String>,
@@ -881,6 +910,7 @@ impl AnalyticsPublisherListingsListRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct AnalyticsPublisherListingRetrieveRequest {
     pub listing_id: String,
     pub date_from: Option<String>,
@@ -898,6 +928,7 @@ impl AnalyticsPublisherListingRetrieveRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct AnalyticsOperatorDashboardRequest {
     pub date_from: Option<String>,
     pub date_to: Option<String>,
@@ -913,6 +944,7 @@ impl AnalyticsOperatorDashboardRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct AnalyticsOperatorSearchRequest {
     pub query: Option<String>,
     pub date_from: Option<String>,
@@ -930,6 +962,7 @@ impl AnalyticsOperatorSearchRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct TemplatesListRequest {
     pub query: Option<String>,
     pub category_code: Option<String>,
@@ -976,6 +1009,7 @@ impl TemplatesListRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct TemplateRetrieveRequest {
     pub template_id: String,
 }
@@ -989,6 +1023,7 @@ impl TemplateRetrieveRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct TemplateCreateRequest {
     pub template_code: Option<String>,
     pub template_name: String,
@@ -1022,6 +1057,7 @@ impl TemplateCreateRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct TemplateUsageCreateRequest {
     pub template_id: String,
     pub usage_type: String,
@@ -1039,6 +1075,7 @@ impl TemplateUsageCreateRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct FeedbackCreateRequest {
     pub feedback_type: String,
     pub content: String,

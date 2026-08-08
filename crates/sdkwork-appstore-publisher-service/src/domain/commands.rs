@@ -23,6 +23,7 @@ impl PublisherOperationRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct RetrieveCurrentPublisherRequest {
     pub idempotency_key: Option<String>,
 }
@@ -36,6 +37,7 @@ impl RetrieveCurrentPublisherRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct CreatePublisherRequest {
     pub display_name: String,
     pub legal_name: Option<String>,
@@ -84,6 +86,7 @@ impl CreatePublisherRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct UpdatePublisherRequest {
     pub publisher_id: String,
     pub display_name: Option<String>,
@@ -125,6 +128,7 @@ impl UpdatePublisherRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ListPublisherMembersRequest {
     pub publisher_id: String,
     pub cursor: Option<String>,
@@ -159,6 +163,7 @@ impl ListPublisherMembersRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct InvitePublisherMemberRequest {
     pub publisher_id: String,
     pub user_id: String,
@@ -187,6 +192,7 @@ impl InvitePublisherMemberRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct SubmitPublisherVerificationRequest {
     pub publisher_id: String,
     pub verification_type: String,
@@ -223,6 +229,7 @@ impl SubmitPublisherVerificationRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct AdminVerifyPublisherRequest {
     pub publisher_id: String,
     pub verification_type: String,

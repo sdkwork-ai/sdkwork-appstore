@@ -27,7 +27,13 @@ Use dynamic progressive loading before implementation files: read this file, `..
 
 ## Required Specs By Task Type
 
-TypeScript or React changes load `CODE_STYLE_SPEC.md`, `NAMING_SPEC.md`, and, on demand only, `TYPESCRIPT_CODE_SPEC.md`, `FRONTEND_CODE_SPEC.md`, and the applicable PC/UI specification. SDK integration loads `APP_SDK_INTEGRATION_SPEC.md`; IAM work loads `IAM_SPEC.md`, `IAM_LOGIN_INTEGRATION_SPEC.md`, `SECURITY_SPEC.md`, and `PRIVACY_SPEC.md`; composition work loads `COMPONENT_SPEC.md`, `COMPOSABLE_ARCHITECTURE_SPEC.md`, and `APP_COMPOSITION_SPEC.md`. Package command work loads `PNPM_SCRIPT_SPEC.md`; packaging workflow changes load `GITHUB_WORKFLOW_SPEC.md`.
+- TypeScript: `TYPESCRIPT_CODE_SPEC.md`, `CODE_STYLE_SPEC.md`, `NAMING_SPEC.md` (language specs load on-demand only).
+- Frontend/package boundaries: `FRONTEND_CODE_SPEC.md`, `FRONTEND_SPEC.md`, `UI_ARCHITECTURE_SPEC.md`, `APP_PC_ARCHITECTURE_SPEC.md`, `APP_PC_REACT_UI_SPEC.md`, `COMPOSABLE_ARCHITECTURE_SPEC.md`.
+- SDK consumption: `APP_SDK_INTEGRATION_SPEC.md`, `SDK_SPEC.md`, `TEST_SPEC.md`.
+- List/search: `PAGINATION_SPEC.md`.
+- IAM work: `IAM_SPEC.md`, `IAM_LOGIN_INTEGRATION_SPEC.md`, `SECURITY_SPEC.md`, `PRIVACY_SPEC.md`.
+- Source config: `SOURCE_CONFIG_SPEC.md`, `CONFIG_SPEC.md`, `ENVIRONMENT_SPEC.md`, `DEPLOYMENT_SPEC.md`.
+- Commands/workflows: `PNPM_SCRIPT_SPEC.md`, `GITHUB_WORKFLOW_SPEC.md`.
 
 ## Code Style Rules
 

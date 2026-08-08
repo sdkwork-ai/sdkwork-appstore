@@ -235,17 +235,20 @@ pub fn created(
 }
 
 #[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct CursorPageSizeQuery {
     pub cursor: Option<String>,
     pub page_size: Option<i32>,
 }
 
 #[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct LocaleQuery {
     pub locale: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct SearchQuery {
     #[serde(rename = "q")]
     pub q: Option<String>,

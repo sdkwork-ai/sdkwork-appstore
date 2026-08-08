@@ -18,15 +18,12 @@ interface InstallContextType {
 
 const InstallContext = createContext<InstallContextType | undefined>(undefined);
 
-/** Local fallback seed used before the server-backed library responds. */
-const DEFAULT_INSTALLED_APPS = ['app-wechat', 'app-wps'];
-
 function readLocalInstalledApps(): Set<string> {
   try {
     const saved = localStorage.getItem('sdkwork_installed_apps');
-    return saved ? new Set(JSON.parse(saved)) : new Set(DEFAULT_INSTALLED_APPS);
+    return saved ? new Set(JSON.parse(saved)) : new Set<string>();
   } catch {
-    return new Set(DEFAULT_INSTALLED_APPS);
+    return new Set<string>();
   }
 }
 
@@ -34,21 +31,22 @@ export function InstallProvider({ children }: { children: React.ReactNode }) {
   const [appToInstall, setAppToInstall] = useState<AppItem | null>(null);
   const [installState, setInstallState] = useState<'confirm' | 'downloading' | 'success'>('confirm');
   const [progress, setProgress] = useState(0);
+  const [installError, setInstallError] = useState<string | null>(null);
   const [installedAppIds, setInstalledAppIds] = useState<Set<string>>(readLocalInstalledApps);
 
-  // Hydrate the installed set from the server-backed library when possible.
-  // Anonymous/offline sessions fall back to the local seed without erroring.
+  // Hydrate the installed set from the server-backed library. The server
+  // response is authoritative — an empty library renders an empty state, no
+  // demo apps are ever injected.
   useEffect(() => {
     let cancelled = false;
     InstallService.getInstalledAppIds()
       .then((ids) => {
-        if (cancelled) {
-          return;
+        if (!cancelled) {
+          setInstalledAppIds(new Set(ids));
         }
-        setInstalledAppIds(new Set(ids.length > 0 ? ids : DEFAULT_INSTALLED_APPS));
       })
       .catch(() => {
-        // keep the local seed when the library endpoint is unavailable
+        // keep the local cache when the library endpoint is unavailable
       });
     return () => {
       cancelled = true;
@@ -98,6 +96,32 @@ export function InstallProvider({ children }: { children: React.ReactNode }) {
 
   const confirmInstall = () => {
     setInstallState('downloading');
+    setInstallError(null);
+    const target = appToInstall;
+    if (!target) {
+      return;
+    }
+    // Drive the flow from the server-backed library record; the progress ring
+    // reflects the real request instead of a simulated download.
+    InstallService.installApp(target.id)
+      .then(() => {
+        setProgress(100);
+        setInstallState('success');
+        setInstalledAppIds((prev) => {
+          const next = new Set(prev);
+          next.add(target.id);
+          persistLocal(next);
+          return next;
+        });
+        setTimeout(() => {
+          setAppToInstall(null);
+          setProgress(0);
+        }, 1200);
+      })
+      .catch((error) => {
+        setInstallError(error instanceof Error ? error.message : '安装失败，请稍后重试');
+        setInstallState('confirm');
+      });
   };
 
   const cancelInstall = () => {
@@ -105,46 +129,6 @@ export function InstallProvider({ children }: { children: React.ReactNode }) {
       setAppToInstall(null);
     }
   };
-
-  useEffect(() => {
-    if (installState === 'downloading' && appToInstall) {
-      const duration = 1500 + Math.random() * 1000;
-      const intervalTime = 40;
-      const steps = duration / intervalTime;
-      let currentStep = 0;
-
-      const interval = setInterval(() => {
-        currentStep++;
-        const newProgress = Math.min(100, (currentStep / steps) * 100);
-        setProgress(newProgress);
-
-        if (currentStep >= steps) {
-          clearInterval(interval);
-          setInstallState('success');
-
-          const installedId = appToInstall.id;
-          setInstalledAppIds((prev) => {
-            const next = new Set(prev);
-            next.add(installedId);
-            persistLocal(next);
-            return next;
-          });
-
-          // Record the install on the server-backed library; the simulated
-          // progress ring completes regardless so the flow never blocks.
-          InstallService.installApp(installedId).catch(() => {
-            // ignore: anonymous sessions have no library row to create
-          });
-
-          setTimeout(() => {
-            setAppToInstall(null);
-          }, 1200);
-        }
-      }, intervalTime);
-
-      return () => clearInterval(interval);
-    }
-  }, [installState, appToInstall]);
 
   return (
     <InstallContext.Provider
@@ -173,6 +157,7 @@ export function InstallProvider({ children }: { children: React.ReactNode }) {
             app={appToInstall}
             installState={installState}
             progress={progress}
+            error={installError}
             onConfirm={confirmInstall}
             onCancel={cancelInstall}
           />

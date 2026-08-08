@@ -318,6 +318,7 @@ impl GrantReason {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct SignatureSnapshot {
     pub algorithm: Option<String>,
     pub public_key_ref: Option<String>,
@@ -325,6 +326,7 @@ pub struct SignatureSnapshot {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ReleaseChannel {
     pub id: ReleaseChannelId,
     pub tenant_id: String,
@@ -337,6 +339,7 @@ pub struct ReleaseChannel {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct Release {
     pub id: ReleaseId,
     pub tenant_id: String,
@@ -387,6 +390,7 @@ impl Release {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ReleaseNoteLocalization {
     pub id: String,
     pub tenant_id: String,
@@ -399,6 +403,7 @@ pub struct ReleaseNoteLocalization {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ReleaseArtifact {
     pub id: ArtifactId,
     pub tenant_id: String,
@@ -423,6 +428,7 @@ pub struct ReleaseArtifact {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ReleaseRollout {
     pub id: String,
     pub tenant_id: String,
@@ -451,6 +457,7 @@ impl ReleaseRollout {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct DownloadGrant {
     pub id: DownloadGrantId,
     pub tenant_id: String,

@@ -15,6 +15,7 @@ pub enum LibraryDomainEvent {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct LibraryItemInstalledEvent {
     pub library_item_id: LibraryItemId,
     pub tenant_id: String,
@@ -27,6 +28,7 @@ pub struct LibraryItemInstalledEvent {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct LibraryItemUninstalledEvent {
     pub library_item_id: LibraryItemId,
     pub tenant_id: String,
@@ -38,6 +40,7 @@ pub struct LibraryItemUninstalledEvent {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct WishlistItemAddedEvent {
     pub tenant_id: String,
     pub user_id: String,
@@ -46,6 +49,7 @@ pub struct WishlistItemAddedEvent {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct WishlistItemRemovedEvent {
     pub tenant_id: String,
     pub user_id: String,
@@ -54,6 +58,7 @@ pub struct WishlistItemRemovedEvent {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct InstallEventRecordedEvent {
     pub event_id: String,
     pub tenant_id: String,
@@ -65,6 +70,7 @@ pub struct InstallEventRecordedEvent {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct DownloadGrantCreatedEvent {
     pub grant_id: String,
     pub tenant_id: String,
@@ -74,6 +80,7 @@ pub struct DownloadGrantCreatedEvent {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct DownloadGrantConsumedEvent {
     pub grant_id: String,
     pub tenant_id: String,

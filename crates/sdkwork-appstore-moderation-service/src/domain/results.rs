@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 use super::models::{ModerationDecision, ModerationReview};
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ModerationOperationResult {
     pub operation_id: &'static str,
     pub accepted: bool,
@@ -25,6 +26,7 @@ impl ModerationOperationResult {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ListModerationQueueResult {
     pub operation_id: &'static str,
     pub reviews: Vec<ModerationReview>,
@@ -49,6 +51,7 @@ impl ListModerationQueueResult {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct RetrieveModerationReviewResult {
     pub operation_id: &'static str,
     pub review: ModerationReview,
@@ -64,6 +67,7 @@ impl RetrieveModerationReviewResult {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct AssignModerationReviewResult {
     pub operation_id: &'static str,
     pub review: ModerationReview,
@@ -79,6 +83,7 @@ impl AssignModerationReviewResult {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct EnqueueSubmissionReviewResult {
     pub operation_id: &'static str,
     pub review: ModerationReview,
@@ -101,6 +106,7 @@ impl EnqueueSubmissionReviewResult {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct CreateModerationDecisionResult {
     pub operation_id: &'static str,
     pub decision: ModerationDecision,
@@ -122,6 +128,7 @@ impl CreateModerationDecisionResult {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct CreateModerationAppealResult {
     pub operation_id: &'static str,
     pub appeal: super::models::ModerationAppeal,
@@ -137,6 +144,7 @@ impl CreateModerationAppealResult {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ListModerationAppealsResult {
     pub operation_id: &'static str,
     pub appeals: Vec<super::models::ModerationAppeal>,
@@ -161,6 +169,7 @@ impl ListModerationAppealsResult {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct RetrieveModerationAppealResult {
     pub operation_id: &'static str,
     pub appeal: super::models::ModerationAppeal,
@@ -176,6 +185,7 @@ impl RetrieveModerationAppealResult {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct DecideModerationAppealResult {
     pub operation_id: &'static str,
     pub appeal: super::models::ModerationAppeal,

@@ -869,7 +869,7 @@ ${sections.join("\n")}
 async function main() {
   const operationCatalog = await readFile(join(root, "docs/api/operation-catalog.md"), "utf8");
   const registry = await readFile(join(root, "specs/database/schema-registry.yaml"), "utf8");
-  const migration = await readFile(join(root, "specs/database/migrations/0001_appstore_foundation.sql"), "utf8");
+  const migration = await readFile(join(root, "database/ddl/baseline/postgres/0001_appstore_baseline.sql"), "utf8");
 
   const operations = parseOperationCatalog(operationCatalog);
   const registryEntries = parseRegistryEntries(registry);
