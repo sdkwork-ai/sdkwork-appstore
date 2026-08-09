@@ -19,7 +19,7 @@
 CREATE TABLE IF NOT EXISTS appstore_idempotency_key (
   id TEXT PRIMARY KEY,
   tenant_id TEXT NOT NULL,
-  organization_id TEXT,
+  organization_id TEXT NOT NULL DEFAULT '0',
   scope TEXT NOT NULL,
   idempotency_key TEXT NOT NULL,
   request_hash TEXT NOT NULL,
@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS appstore_idempotency_key (
 CREATE TABLE IF NOT EXISTS appstore_publisher (
   id TEXT PRIMARY KEY,
   tenant_id TEXT NOT NULL,
-  organization_id TEXT NOT NULL,
+  organization_id TEXT NOT NULL DEFAULT '0',
   publisher_no TEXT NOT NULL,
   publisher_type TEXT NOT NULL,
   display_name TEXT NOT NULL,
@@ -61,7 +61,7 @@ CREATE TABLE IF NOT EXISTS appstore_publisher (
 CREATE TABLE IF NOT EXISTS appstore_publisher_member (
   id TEXT PRIMARY KEY,
   tenant_id TEXT NOT NULL,
-  organization_id TEXT NOT NULL,
+  organization_id TEXT NOT NULL DEFAULT '0',
   publisher_id TEXT NOT NULL,
   user_id TEXT NOT NULL,
   member_role TEXT NOT NULL,
@@ -76,7 +76,7 @@ CREATE TABLE IF NOT EXISTS appstore_publisher_member (
 CREATE TABLE IF NOT EXISTS appstore_publisher_verification (
   id TEXT PRIMARY KEY,
   tenant_id TEXT NOT NULL,
-  organization_id TEXT NOT NULL,
+  organization_id TEXT NOT NULL DEFAULT '0',
   publisher_id TEXT NOT NULL,
   verification_type TEXT NOT NULL,
   verification_status TEXT NOT NULL,
@@ -93,7 +93,7 @@ CREATE TABLE IF NOT EXISTS appstore_publisher_verification (
 CREATE TABLE IF NOT EXISTS appstore_app (
   id TEXT PRIMARY KEY,
   tenant_id TEXT NOT NULL,
-  organization_id TEXT NOT NULL,
+  organization_id TEXT NOT NULL DEFAULT '0',
   publisher_id TEXT NOT NULL,
   app_no TEXT NOT NULL,
   app_key TEXT NOT NULL,
@@ -159,7 +159,7 @@ CREATE TABLE IF NOT EXISTS appstore_app (
 CREATE TABLE IF NOT EXISTS appstore_app_dependency (
   id TEXT PRIMARY KEY,
   tenant_id TEXT NOT NULL,
-  organization_id TEXT NOT NULL,
+  organization_id TEXT NOT NULL DEFAULT '0',
   app_id TEXT NOT NULL,
   dependency_app_id TEXT,
   dependency_key TEXT NOT NULL,
@@ -223,7 +223,7 @@ CREATE TABLE IF NOT EXISTS appstore_tag_localization (
 CREATE TABLE IF NOT EXISTS appstore_listing (
   id TEXT PRIMARY KEY,
   tenant_id TEXT NOT NULL,
-  organization_id TEXT NOT NULL,
+  organization_id TEXT NOT NULL DEFAULT '0',
   publisher_id TEXT NOT NULL,
   listing_no TEXT NOT NULL,
   app_id TEXT NOT NULL,
@@ -263,7 +263,7 @@ CREATE TABLE IF NOT EXISTS appstore_listing (
 CREATE TABLE IF NOT EXISTS appstore_listing_localization (
   id TEXT PRIMARY KEY,
   tenant_id TEXT NOT NULL,
-  organization_id TEXT NOT NULL,
+  organization_id TEXT NOT NULL DEFAULT '0',
   listing_id TEXT NOT NULL,
   locale TEXT NOT NULL,
   display_name TEXT NOT NULL,
@@ -280,7 +280,7 @@ CREATE TABLE IF NOT EXISTS appstore_listing_localization (
 CREATE TABLE IF NOT EXISTS appstore_listing_media (
   id TEXT PRIMARY KEY,
   tenant_id TEXT NOT NULL,
-  organization_id TEXT NOT NULL,
+  organization_id TEXT NOT NULL DEFAULT '0',
   listing_id TEXT NOT NULL,
   media_role TEXT NOT NULL,
   media_resource_id TEXT NOT NULL,
@@ -315,7 +315,7 @@ CREATE TABLE IF NOT EXISTS appstore_listing_tag_binding (
 CREATE TABLE IF NOT EXISTS appstore_regional_availability (
   id TEXT PRIMARY KEY,
   tenant_id TEXT NOT NULL,
-  organization_id TEXT NOT NULL,
+  organization_id TEXT NOT NULL DEFAULT '0',
   listing_id TEXT NOT NULL,
   region_code TEXT NOT NULL,
   availability_status TEXT NOT NULL,
@@ -329,7 +329,7 @@ CREATE TABLE IF NOT EXISTS appstore_regional_availability (
 CREATE TABLE IF NOT EXISTS appstore_compliance_profile (
   id TEXT PRIMARY KEY,
   tenant_id TEXT NOT NULL,
-  organization_id TEXT NOT NULL,
+  organization_id TEXT NOT NULL DEFAULT '0',
   listing_id TEXT NOT NULL,
   compliance_version INTEGER NOT NULL DEFAULT 1,
   privacy_nutrition_json TEXT NOT NULL DEFAULT '{}',
@@ -347,7 +347,7 @@ CREATE TABLE IF NOT EXISTS appstore_compliance_profile (
 CREATE TABLE IF NOT EXISTS appstore_compliance_permission_disclosure (
   id TEXT PRIMARY KEY,
   tenant_id TEXT NOT NULL,
-  organization_id TEXT NOT NULL,
+  organization_id TEXT NOT NULL DEFAULT '0',
   listing_id TEXT NOT NULL,
   permission_code TEXT NOT NULL,
   usage_purpose TEXT NOT NULL,
@@ -373,7 +373,7 @@ CREATE TABLE IF NOT EXISTS appstore_release_channel (
 CREATE TABLE IF NOT EXISTS appstore_release (
   id TEXT PRIMARY KEY,
   tenant_id TEXT NOT NULL,
-  organization_id TEXT NOT NULL,
+  organization_id TEXT NOT NULL DEFAULT '0',
   listing_id TEXT NOT NULL,
   release_no TEXT NOT NULL,
   channel_id TEXT NOT NULL,
@@ -398,7 +398,7 @@ CREATE TABLE IF NOT EXISTS appstore_release (
 CREATE TABLE IF NOT EXISTS appstore_release_note_localization (
   id TEXT PRIMARY KEY,
   tenant_id TEXT NOT NULL,
-  organization_id TEXT NOT NULL,
+  organization_id TEXT NOT NULL DEFAULT '0',
   release_id TEXT NOT NULL,
   locale TEXT NOT NULL,
   release_notes TEXT NOT NULL,
@@ -410,7 +410,7 @@ CREATE TABLE IF NOT EXISTS appstore_release_note_localization (
 CREATE TABLE IF NOT EXISTS appstore_release_artifact (
   id TEXT PRIMARY KEY,
   tenant_id TEXT NOT NULL,
-  organization_id TEXT NOT NULL,
+  organization_id TEXT NOT NULL DEFAULT '0',
   release_id TEXT NOT NULL,
   artifact_no TEXT NOT NULL,
   platform TEXT NOT NULL,
@@ -435,7 +435,7 @@ CREATE TABLE IF NOT EXISTS appstore_release_artifact (
 CREATE TABLE IF NOT EXISTS appstore_release_rollout (
   id TEXT PRIMARY KEY,
   tenant_id TEXT NOT NULL,
-  organization_id TEXT NOT NULL,
+  organization_id TEXT NOT NULL DEFAULT '0',
   release_id TEXT NOT NULL,
   rollout_strategy TEXT NOT NULL,
   rollout_status TEXT NOT NULL,
@@ -454,7 +454,7 @@ CREATE TABLE IF NOT EXISTS appstore_release_rollout (
 CREATE TABLE IF NOT EXISTS appstore_market_channel (
   id TEXT PRIMARY KEY,
   tenant_id TEXT NOT NULL,
-  organization_id TEXT,
+  organization_id TEXT NOT NULL DEFAULT '0',
   channel_code TEXT NOT NULL,
   channel_type TEXT NOT NULL,
   provider TEXT NOT NULL,
@@ -470,7 +470,7 @@ CREATE TABLE IF NOT EXISTS appstore_market_channel (
 CREATE TABLE IF NOT EXISTS appstore_market_release (
   id TEXT PRIMARY KEY,
   tenant_id TEXT NOT NULL,
-  organization_id TEXT NOT NULL,
+  organization_id TEXT NOT NULL DEFAULT '0',
   app_id TEXT NOT NULL,
   listing_id TEXT NOT NULL,
   release_id TEXT NOT NULL,
@@ -498,7 +498,7 @@ CREATE TABLE IF NOT EXISTS appstore_market_release (
 CREATE TABLE IF NOT EXISTS appstore_listing_submission (
   id TEXT PRIMARY KEY,
   tenant_id TEXT NOT NULL,
-  organization_id TEXT NOT NULL,
+  organization_id TEXT NOT NULL DEFAULT '0',
   listing_id TEXT NOT NULL,
   release_id TEXT,
   submission_no TEXT NOT NULL,
@@ -517,7 +517,7 @@ CREATE TABLE IF NOT EXISTS appstore_listing_submission (
 CREATE TABLE IF NOT EXISTS appstore_moderation_review (
   id TEXT PRIMARY KEY,
   tenant_id TEXT NOT NULL,
-  organization_id TEXT NOT NULL,
+  organization_id TEXT NOT NULL DEFAULT '0',
   submission_id TEXT NOT NULL,
   review_no TEXT NOT NULL,
   review_status TEXT NOT NULL,
@@ -536,7 +536,7 @@ CREATE TABLE IF NOT EXISTS appstore_moderation_review (
 CREATE TABLE IF NOT EXISTS appstore_moderation_decision (
   id TEXT PRIMARY KEY,
   tenant_id TEXT NOT NULL,
-  organization_id TEXT NOT NULL,
+  organization_id TEXT NOT NULL DEFAULT '0',
   review_id TEXT NOT NULL,
   decision_no TEXT NOT NULL,
   decision_type TEXT NOT NULL,
@@ -656,7 +656,7 @@ CREATE TABLE IF NOT EXISTS appstore_user_wishlist_item (
 CREATE TABLE IF NOT EXISTS appstore_entitlement (
   id TEXT PRIMARY KEY,
   tenant_id TEXT NOT NULL,
-  organization_id TEXT NOT NULL,
+  organization_id TEXT NOT NULL DEFAULT '0',
   app_id TEXT NOT NULL,
   listing_id TEXT,
   subject_type TEXT NOT NULL,
@@ -676,7 +676,7 @@ CREATE TABLE IF NOT EXISTS appstore_entitlement (
 CREATE TABLE IF NOT EXISTS appstore_download_grant (
   id TEXT PRIMARY KEY,
   tenant_id TEXT NOT NULL,
-  organization_id TEXT NOT NULL,
+  organization_id TEXT NOT NULL DEFAULT '0',
   grant_no TEXT NOT NULL,
   listing_id TEXT NOT NULL,
   release_id TEXT NOT NULL,
@@ -696,7 +696,7 @@ CREATE TABLE IF NOT EXISTS appstore_download_grant (
 CREATE TABLE IF NOT EXISTS appstore_install_event (
   id TEXT PRIMARY KEY,
   tenant_id TEXT NOT NULL,
-  organization_id TEXT NOT NULL,
+  organization_id TEXT NOT NULL DEFAULT '0',
   event_no TEXT NOT NULL,
   listing_id TEXT NOT NULL,
   release_id TEXT,
@@ -883,7 +883,7 @@ CREATE INDEX IF NOT EXISTS idx_appstore_app_template_usage_user ON appstore_app_
 CREATE TABLE IF NOT EXISTS appstore_listing_iap_item (
   id TEXT PRIMARY KEY,
   tenant_id TEXT NOT NULL,
-  organization_id TEXT NOT NULL,
+  organization_id TEXT NOT NULL DEFAULT '0',
   listing_id TEXT NOT NULL,
   iap_no TEXT NOT NULL,
   iap_type TEXT NOT NULL,
@@ -934,7 +934,7 @@ CREATE INDEX IF NOT EXISTS idx_appstore_catalog_trending_term_snapshot
 CREATE TABLE IF NOT EXISTS appstore_moderation_appeal (
   id TEXT PRIMARY KEY,
   tenant_id TEXT NOT NULL,
-  organization_id TEXT NOT NULL,
+  organization_id TEXT NOT NULL DEFAULT '0',
   decision_id TEXT NOT NULL,
   review_id TEXT NOT NULL,
   appeal_no TEXT NOT NULL,
@@ -959,7 +959,7 @@ CREATE INDEX IF NOT EXISTS idx_appstore_moderation_appeal_decision
 CREATE TABLE IF NOT EXISTS appstore_release_beta_invite (
   id TEXT PRIMARY KEY,
   tenant_id TEXT NOT NULL,
-  organization_id TEXT NOT NULL,
+  organization_id TEXT NOT NULL DEFAULT '0',
   release_id TEXT NOT NULL,
   invitee_user_id TEXT,
   invitee_email TEXT,

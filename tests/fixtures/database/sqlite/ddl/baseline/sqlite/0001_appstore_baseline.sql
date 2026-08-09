@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS appstore_idempotency_key (
   id TEXT PRIMARY KEY,
   tenant_id TEXT NOT NULL,
-  organization_id TEXT,
+  organization_id TEXT NOT NULL DEFAULT '0',
   scope TEXT NOT NULL,
   idempotency_key TEXT NOT NULL,
   request_hash TEXT NOT NULL,
@@ -436,7 +436,7 @@ CREATE TABLE IF NOT EXISTS appstore_release_rollout (
 CREATE TABLE IF NOT EXISTS appstore_market_channel (
   id TEXT PRIMARY KEY,
   tenant_id TEXT NOT NULL,
-  organization_id TEXT,
+  organization_id TEXT NOT NULL DEFAULT '0',
   channel_code TEXT NOT NULL,
   channel_type TEXT NOT NULL,
   provider TEXT NOT NULL,
