@@ -4,7 +4,7 @@
   "appId": "sdkwork-appstore",
   "applicationCode": "appstore",
   "archetype": "application-http-gateway",
-  "profileRoot": "configs/topology",
+  "profileRoot": "etc/topology",
   "profilePattern": "{deploymentProfile}.{environment}.env",
   "vocabulary": {
     "deploymentProfile": {
@@ -16,6 +16,8 @@
     "environment": {
       "allowed": [
         "development",
+        "test",
+        "staging",
         "production"
       ]
     }
@@ -24,13 +26,17 @@
     "developmentProfileId": "standalone.development",
     "productionProfileId": "cloud.production",
     "desktopBuildProfileId": "standalone.production",
-    "gatewayBind": "127.0.0.1:8080"
+    "gatewayBind": "127.0.0.1:3900"
   },
   "profileFiles": {
-    "standalone.development": "configs/topology/standalone.development.env",
-    "standalone.production": "configs/topology/standalone.production.env",
-    "cloud.development": "configs/topology/cloud.development.env",
-    "cloud.production": "configs/topology/cloud.production.env"
+    "standalone.development": "etc/topology/standalone.development.env",
+    "standalone.test": "etc/topology/standalone.test.env",
+    "standalone.staging": "etc/topology/standalone.staging.env",
+    "standalone.production": "etc/topology/standalone.production.env",
+    "cloud.development": "etc/topology/cloud.development.env",
+    "cloud.test": "etc/topology/cloud.test.env",
+    "cloud.staging": "etc/topology/cloud.staging.env",
+    "cloud.production": "etc/topology/cloud.production.env"
   },
   "envKeys": {
     "deploymentProfile": "SDKWORK_APPSTORE_DEPLOYMENT_PROFILE",
@@ -62,10 +68,20 @@
   },
   "cloudPublicHosts": {
     "application.public-ingress": {
-      "httpHost": "appstore.sdkwork.com"
+      "httpHost": "appstore.sdkwork.com",
+      "environments": {
+        "development": { "httpHost": "appstore-dev.sdkwork.com" },
+        "test": { "httpHost": "appstore-test.sdkwork.com" },
+        "staging": { "httpHost": "appstore-staging.sdkwork.com" }
+      }
     },
     "platform.api-gateway": {
-      "httpHost": "api.sdkwork.com"
+      "httpHost": "api.sdkwork.com",
+      "environments": {
+        "development": { "httpHost": "api-dev.sdkwork.com" },
+        "test": { "httpHost": "api-test.sdkwork.com" },
+        "staging": { "httpHost": "api-staging.sdkwork.com" }
+      }
     }
   },
   "components": {

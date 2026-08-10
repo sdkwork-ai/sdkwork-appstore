@@ -46,6 +46,7 @@
     "topology:validate": "node scripts/sdkwork-command.mjs topology:validate",
     "topology:plan": "node scripts/sdkwork-command.mjs topology:plan",
     "deploy:validate": "node scripts/sdkwork-command.mjs deploy:validate",
+    "test:web-domain-routing-standard": "node scripts/dev/sdkwork-appstore-web-domain-routing-standard.test.mjs",
     "check:app-composition": "node ../sdkwork-specs/tools/verify-repo.mjs --root .",
     "api:assembly:materialize": "node ../sdkwork-specs/tools/materialize-api-assembly.mjs --root .",
     "api:assembly:validate": "node ../sdkwork-specs/tools/validate-api-assembly.mjs --root .",

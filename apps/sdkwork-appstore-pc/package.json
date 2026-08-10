@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "tsx server.ts",
     "start": "node dist/server.cjs",
-    "dev:client": "vite --port=3000 --host=0.0.0.0",
+    "dev:browser": "vite --port=3000 --host=0.0.0.0",
     "dev:server": "tsx server.ts",
     "dev:desktop": "vite --port=3000 --host=0.0.0.0",
     "dev:tablet-ipados": "vite --port=3000 --host=0.0.0.0",
