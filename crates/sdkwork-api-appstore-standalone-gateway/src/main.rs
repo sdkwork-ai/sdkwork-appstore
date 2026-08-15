@@ -1,12 +1,8 @@
-use std::sync::Arc;
-
 use sdkwork_web_bootstrap::{service_router, ServiceRouterConfig};
 use tracing_subscriber::EnvFilter;
 
 mod bootstrap;
-mod health;
 mod preflight;
-mod readiness;
 mod server;
 
 use bootstrap::config::AppstoreGatewayConfig;
@@ -32,9 +28,7 @@ async fn main() {
     );
 
     let assembly = bootstrap::routers::assemble_router().await;
-    let readiness = Arc::new(health::AppstoreDatabaseReadinessCheck::new(
-        assembly.database_pool.clone(),
-    ));
+    let readiness = assembly.readiness_check.clone();
     let business = assembly.router.layer(cors_layer_from_env());
     let app = service_router(
         business,

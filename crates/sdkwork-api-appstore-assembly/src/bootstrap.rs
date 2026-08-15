@@ -35,12 +35,11 @@ use sdkwork_database_sqlx::DatabasePool;
 use self::decision_listing_projection::decision_listing_projection_port;
 use self::submission_moderation::submission_moderation_port;
 use crate::web_bootstrap::wrap_router_with_web_framework_from_env;
-use sdkwork_web_bootstrap::{ApiAssemblyContribution, DatabasePoolReadinessCheck};
+pub use sdkwork_web_bootstrap::ApiAssemblyContribution;
+use sdkwork_web_bootstrap::{DatabasePoolReadinessCheck, HttpRouteManifest};
 
-pub struct ApiAssembly {
-    pub router: Router,
-    pub database_pool: DatabasePool,
-}
+/// Indivisible host-neutral API assembly contribution (web-bootstrap contract).
+pub type ApiAssembly = ApiAssemblyContribution;
 
 /// Assemble the appstore application router from environment variables.
 ///
@@ -172,23 +171,41 @@ pub async fn assemble_api_router_with_pool(pool: DatabasePool) -> Result<ApiAsse
     )
     .await;
 
-    Ok(ApiAssembly {
-        router: business,
-        database_pool: pool,
-    })
+    let routes = [
+        sdkwork_routes_appstore_catalog_app_api::app_route_manifest(),
+        sdkwork_routes_appstore_catalog_backend_api::backend_route_manifest(),
+        sdkwork_routes_listing_app_api::app_route_manifest(),
+        sdkwork_routes_listing_backend_api::backend_route_manifest(),
+        sdkwork_routes_publisher_app_api::app_route_manifest(),
+        sdkwork_routes_publisher_backend_api::backend_route_manifest(),
+        sdkwork_routes_release_app_api::app_route_manifest(),
+        sdkwork_routes_library_app_api::app_route_manifest(),
+        sdkwork_routes_moderation_backend_api::backend_route_manifest(),
+        sdkwork_routes_compliance_app_api::app_route_manifest(),
+        sdkwork_routes_market_backend_api::backend_route_manifest(),
+        sdkwork_routes_metrics_backend_api::backend_route_manifest(),
+        sdkwork_routes_appstore_catalog_open_api::open_route_manifest(),
+        sdkwork_routes_listing_open_api::open_route_manifest(),
+        sdkwork_routes_release_open_api::open_route_manifest(),
+        sdkwork_routes_automation_open_api::open_route_manifest(),
+    ]
+    .into_iter()
+    .flat_map(|manifest| manifest.routes().to_vec())
+    .collect();
+
+    ApiAssemblyContribution::from_manifest(
+        "sdkwork-appstore",
+        "SDKWork Appstore API",
+        business,
+        HttpRouteManifest::from_owned_routes(routes),
+        Vec::new(),
+        Arc::new(DatabasePoolReadinessCheck::new(pool)),
+    )
 }
 
 /// Build the complete host-neutral appstore contribution for gateway embedding.
 pub async fn assemble_contribution_with_pool(
     pool: DatabasePool,
 ) -> Result<ApiAssemblyContribution, String> {
-    let assembly = assemble_api_router_with_pool(pool).await?;
-    ApiAssemblyContribution::from_manifest(
-        "sdkwork-appstore",
-        "SDKWork Appstore API",
-        assembly.router,
-        crate::http_route_manifest::appstore_route_manifest(),
-        Vec::new(),
-        Arc::new(DatabasePoolReadinessCheck::new(assembly.database_pool)),
-    )
+    assemble_api_router_with_pool(pool).await
 }
