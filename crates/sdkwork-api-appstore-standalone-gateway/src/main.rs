@@ -1,4 +1,13 @@
-use sdkwork_web_bootstrap::{service_router, ServiceRouterConfig};
+use std::time::Duration;
+
+use sdkwork_api_appstore_assembly::http_route_manifest::{
+    appstore_open_api_prefixes, appstore_public_path_prefixes,
+};
+use sdkwork_iam_web_adapter::{
+    build_web_framework_builder_with_open_api_prefixes, iam_web_request_context_resolver_from_env,
+};
+use sdkwork_web_bootstrap::{infra_public_path_prefixes, ComposedApiAssembly};
+use sdkwork_web_core::{memory_idempotency_store, memory_rate_limit_store};
 use tracing_subscriber::EnvFilter;
 
 mod bootstrap;
@@ -28,12 +37,21 @@ async fn main() {
     );
 
     let assembly = bootstrap::routers::assemble_router().await;
-    let readiness = assembly.readiness_check.clone();
-    let business = assembly.router.layer(cors_layer_from_env());
-    let app = service_router(
-        business,
-        ServiceRouterConfig::default().with_readiness_check(readiness),
-    );
+    let mut public_path_prefixes = infra_public_path_prefixes();
+    public_path_prefixes.extend(appstore_public_path_prefixes());
+    let framework = build_web_framework_builder_with_open_api_prefixes(
+        iam_web_request_context_resolver_from_env().await,
+        assembly.route_manifest.clone(),
+        public_path_prefixes,
+        appstore_open_api_prefixes(),
+    )
+    .rate_limit_store(memory_rate_limit_store())
+    .idempotency_store(memory_idempotency_store());
+    let hosted = ComposedApiAssembly::try_compose("SDKWork AppStore API", vec![assembly])
+        .expect("appstore gateway composition failed")
+        .into_hosted(framework);
+    let app = sdkwork_web_axum::with_request_timeout(hosted.router, Duration::from_secs(30))
+        .layer(cors_layer_from_env());
 
     server::serve(config.addr(), app).await;
 }

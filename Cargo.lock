@@ -1790,6 +1790,7 @@ dependencies = [
  "sdkwork-api-appstore-assembly",
  "sdkwork-appstore-routes-common",
  "sdkwork-database-sqlx",
+ "sdkwork-iam-web-adapter",
  "sdkwork-web-axum",
  "sdkwork-web-bootstrap",
  "sdkwork-web-core",

@@ -34,7 +34,6 @@ use sdkwork_database_sqlx::DatabasePool;
 
 use self::decision_listing_projection::decision_listing_projection_port;
 use self::submission_moderation::submission_moderation_port;
-use crate::web_bootstrap::wrap_router_with_web_framework_from_env;
 pub use sdkwork_web_bootstrap::ApiAssemblyContribution;
 use sdkwork_web_bootstrap::{DatabasePoolReadinessCheck, HttpRouteManifest};
 
@@ -44,8 +43,8 @@ pub type ApiAssembly = ApiAssemblyContribution;
 /// Assemble the appstore application router from environment variables.
 ///
 /// This function bootstraps the appstore database from environment variables,
-/// creates all repositories and services, builds the router with all route
-/// modules, and wraps it with the web framework layer.
+/// creates all repositories and services, and builds the router with all route
+/// modules. The selected gateway host applies the process web framework once.
 pub async fn assemble_api_router() -> Result<ApiAssembly, String> {
     let database_host = bootstrap_appstore_database_from_env().await?;
     assemble_api_router_with_pool(database_host.pool().clone()).await
@@ -126,50 +125,47 @@ pub async fn assemble_api_router_with_pool(pool: DatabasePool) -> Result<ApiAsse
         market_service,
     };
 
-    let business = wrap_router_with_web_framework_from_env(
-        Router::new()
-            .merge(sdkwork_routes_appstore_catalog_app_api::gateway_mount(
-                state.clone(),
-            ))
-            .merge(sdkwork_routes_appstore_catalog_backend_api::gateway_mount(
-                state.clone(),
-            ))
-            .merge(sdkwork_routes_listing_app_api::gateway_mount(state.clone()))
-            .merge(sdkwork_routes_listing_backend_api::gateway_mount(
-                state.clone(),
-            ))
-            .merge(sdkwork_routes_publisher_app_api::gateway_mount(
-                state.clone(),
-            ))
-            .merge(sdkwork_routes_publisher_backend_api::gateway_mount(
-                state.clone(),
-            ))
-            .merge(sdkwork_routes_release_app_api::gateway_mount(state.clone()))
-            .merge(sdkwork_routes_library_app_api::gateway_mount(state.clone()))
-            .merge(sdkwork_routes_moderation_backend_api::gateway_mount(
-                state.clone(),
-            ))
-            .merge(sdkwork_routes_compliance_app_api::gateway_mount(
-                state.clone(),
-            ))
-            .merge(sdkwork_routes_market_backend_api::gateway_mount(
-                state.clone(),
-            ))
-            .merge(sdkwork_routes_metrics_backend_api::gateway_mount(
-                state.clone(),
-            ))
-            .merge(sdkwork_routes_appstore_catalog_open_api::gateway_mount(
-                state.clone(),
-            ))
-            .merge(sdkwork_routes_listing_open_api::gateway_mount(
-                state.clone(),
-            ))
-            .merge(sdkwork_routes_release_open_api::gateway_mount(
-                state.clone(),
-            ))
-            .merge(sdkwork_routes_automation_open_api::gateway_mount(state)),
-    )
-    .await;
+    let business = Router::new()
+        .merge(sdkwork_routes_appstore_catalog_app_api::gateway_mount(
+            state.clone(),
+        ))
+        .merge(sdkwork_routes_appstore_catalog_backend_api::gateway_mount(
+            state.clone(),
+        ))
+        .merge(sdkwork_routes_listing_app_api::gateway_mount(state.clone()))
+        .merge(sdkwork_routes_listing_backend_api::gateway_mount(
+            state.clone(),
+        ))
+        .merge(sdkwork_routes_publisher_app_api::gateway_mount(
+            state.clone(),
+        ))
+        .merge(sdkwork_routes_publisher_backend_api::gateway_mount(
+            state.clone(),
+        ))
+        .merge(sdkwork_routes_release_app_api::gateway_mount(state.clone()))
+        .merge(sdkwork_routes_library_app_api::gateway_mount(state.clone()))
+        .merge(sdkwork_routes_moderation_backend_api::gateway_mount(
+            state.clone(),
+        ))
+        .merge(sdkwork_routes_compliance_app_api::gateway_mount(
+            state.clone(),
+        ))
+        .merge(sdkwork_routes_market_backend_api::gateway_mount(
+            state.clone(),
+        ))
+        .merge(sdkwork_routes_metrics_backend_api::gateway_mount(
+            state.clone(),
+        ))
+        .merge(sdkwork_routes_appstore_catalog_open_api::gateway_mount(
+            state.clone(),
+        ))
+        .merge(sdkwork_routes_listing_open_api::gateway_mount(
+            state.clone(),
+        ))
+        .merge(sdkwork_routes_release_open_api::gateway_mount(
+            state.clone(),
+        ))
+        .merge(sdkwork_routes_automation_open_api::gateway_mount(state));
 
     let routes = [
         sdkwork_routes_appstore_catalog_app_api::app_route_manifest(),

@@ -32,6 +32,13 @@
     "runtimeEntrypoints": [
       "Cargo.toml#lib"
     ],
+    "requiredPorts": [
+      {
+        "name": "applicationApiAssembly",
+        "export": "sdkwork_api_appstore_assembly::assemble_api_router",
+        "provider": "sdkwork-api-appstore-assembly"
+      }
+    ],
     "routeManifest": null,
     "sdkClients": [],
     "sdkDependencies": [],
