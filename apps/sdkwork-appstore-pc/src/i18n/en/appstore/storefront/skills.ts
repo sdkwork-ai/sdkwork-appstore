@@ -41,7 +41,14 @@ export const skills = {
     outputResult: 'Execution Result',
     activeUses: 'Active Uses',
     loadSkill: 'Load Skill',
-    loadedSkill: 'Loaded'
+    loadedSkill: 'Loaded',
+    footerNote: 'Automatically injected into Agent context after loading',
+    author: 'Author',
+    category: 'Category',
+    version: 'Version',
+    promptTitle: 'Core Prompt Preview',
+    specTitle: 'SKILL.md Specification',
+    triggersTitle: 'Trigger Commands (@Triggers)'
   },
   form: {
     skillName: 'Skill Name',

@@ -49,7 +49,9 @@ export const appDetail = {
     submitReview: '发表评价',
     ratingLabel: '我的评分',
     averageRating: '综合评分',
-    basedOn: '基于 {{count}} 位用户打分'
+    basedOn: '基于 {{count}} 位用户打分',
+    missingAppId: '无法提交评价：缺少应用 ID',
+    submitFailed: '提交失败，请稍后重试'
   },
   info: {
     title: '信息',

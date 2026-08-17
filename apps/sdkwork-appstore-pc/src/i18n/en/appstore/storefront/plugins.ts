@@ -59,7 +59,22 @@ export const plugins = {
     enabled: 'Enabled',
     disabled: 'Disabled',
     coreCapabilities: 'Core API Capabilities',
-    developer: 'Developer'
+    developer: 'Developer',
+    descriptionLabel: 'Description',
+    selectCapability: 'Select Target API Capability',
+    executing: 'Proxying Request...',
+    payloadLabel: 'Request Payload',
+    responseResult: 'Response Body',
+    latency: 'Latency',
+    schemaStd: 'Schema Structure',
+    copiedSchema: 'Schema Copied'
+  },
+  status: {
+    enabled: 'Enabled',
+    disabled: 'Disabled'
+  },
+  registerModal: {
+    title: 'Register Custom Extension Plugin'
   },
   form: {
     pluginName: 'Plugin Name',

@@ -16,5 +16,7 @@ export const apps = {
   stats: {
     totalApps: '{{count}} Software Included',
     filteredApps: 'Showing {{count}} Applications'
-  }
+  },
+  noMatchingApps: 'No matching apps found',
+  featuredApps: 'Featured Desktop Apps ({{count}})'
 };

@@ -31,7 +31,7 @@ export APPSTORE_PLATFORM_SERVICE_AUTH_TOKEN="<service-auth-token>"
 cargo run -p sdkwork-api-appstore-standalone-gateway
 ```
 
-Default listen port: `18090` (`PORT` env override).
+Default listen address: `127.0.0.1:3900` (`SDKWORK_APPSTORE_APPLICATION_PUBLIC_INGRESS_BIND` override).
 
 ### sdkwork-drive (server adapter)
 

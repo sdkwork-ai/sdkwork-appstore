@@ -15,3 +15,50 @@ VALUES
     (506311182233564727, 'plugocrreader0000000000000000000', 100001, 0, 0, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, '{"authorName": "SDKWork Plugins", "category": "图像与识别", "apiSchemaType": "REST", "capabilities": ["OCR 识别", "表格还原", "多语言"], "docUrl": "https://docs.sdkwork.com/plugins/ocr", "downloadsCount": 2800, "rating": 4.4, "version": "1.1.3"}', 'plug-ocr-reader', 'plug-ocr-reader', 'OCR 文字识别', '图片 OCR 文字识别插件，支持中英文混合识别与表格还原。', '图像与识别', 'PLUGIN', '', 'TypeScript', '', 1, 1, FALSE, 10, 1, 'https://github.com/sdkwork/plugin-ocr', '{"templateType": "PLUGIN", "capabilities": ["OCR 识别", "表格还原", "多语言"]}', CURRENT_TIMESTAMP),
     (506311182233581383, 'plugstripepay0000000000000000000', 100001, 0, 0, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, '{"authorName": "SDKWork Plugins", "category": "支付与电商", "apiSchemaType": "OpenAPI", "capabilities": ["支付收款", "订阅管理", "退款处理"], "docUrl": "https://docs.sdkwork.com/plugins/stripe", "downloadsCount": 1900, "rating": 4.6, "version": "1.0.8"}', 'plug-stripe-pay', 'plug-stripe-pay', 'Stripe 支付网关', '集成 Stripe 的支付网关插件，支持订阅、退款与对账。', '支付与电商', 'PLUGIN', '', 'TypeScript', '', 1, 1, FALSE, 11, 1, 'https://github.com/sdkwork/plugin-stripe', '{"templateType": "PLUGIN", "capabilities": ["支付收款", "订阅管理", "退款处理"]}', CURRENT_TIMESTAMP)
 ON CONFLICT (id) DO NOTHING;
+
+UPDATE appstore_app_template
+SET icon_media_resource_id = 'mr-' || template_code || '-icon'
+WHERE tenant_id = 100001
+  AND (icon_media_resource_id IS NULL OR icon_media_resource_id = '');
+
+UPDATE appstore_app_template
+SET metadata = jsonb_set(
+    metadata,
+    '{previewImage}',
+    to_jsonb('mr-' || COALESCE(metadata->>'relatedAppId', template_code) || '-shot1'),
+    true
+)
+WHERE tenant_id = 100001
+  AND COALESCE(metadata->>'previewImage', '') = '';
+
+UPDATE appstore_app_template
+SET metadata = jsonb_set(
+    metadata,
+    '{screenshots}',
+    to_jsonb(ARRAY[
+      'mr-' || COALESCE(metadata->>'relatedAppId', template_code) || '-shot1',
+      'mr-' || COALESCE(metadata->>'relatedAppId', template_code) || '-shot2'
+    ]),
+    true
+)
+WHERE tenant_id = 100001
+  AND (
+    metadata->'screenshots' IS NULL
+    OR jsonb_typeof(metadata->'screenshots') <> 'array'
+    OR jsonb_array_length(metadata->'screenshots') = 0
+  );
+
+UPDATE appstore_app_template
+SET capability_manifest = jsonb_set(
+    capability_manifest,
+    '{capabilities}',
+    '["发布部署","版本管理","监控告警"]'::jsonb,
+    true
+)
+WHERE tenant_id = 100001
+  AND template_type = 'APP'
+  AND (
+    capability_manifest->'capabilities' IS NULL
+    OR jsonb_typeof(capability_manifest->'capabilities') <> 'array'
+    OR jsonb_array_length(capability_manifest->'capabilities') = 0
+  );

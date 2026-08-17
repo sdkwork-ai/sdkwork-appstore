@@ -15,25 +15,27 @@ interface AIExpertsRosterProps {
   selectedScenario: string | null;
 }
 
-const FILTER_TAGS = [
-  '全部',
-  'OPC:一人公司',
-  '腾讯专家',
-  '产品设计',
-  '技术工程',
-  '金融投资',
-  '全球发展',
-  '教育学习',
-  '游戏空间',
-  '数据智能',
-  '营销增长',
-  '内容创作',
-  '销售商务',
-  '运营人力',
-  '项目质量',
-  '法务安全',
-  '行业顾问'
+const FILTER_TAG_KEYS: Array<{ value: string; key: string }> = [
+  { value: '全部', key: 'aihub.experts.filterTags.all' },
+  { value: 'OPC:一人公司', key: 'aihub.experts.filterTags.opc' },
+  { value: '腾讯专家', key: 'aihub.experts.filterTags.tencent' },
+  { value: '产品设计', key: 'aihub.experts.filterTags.productDesign' },
+  { value: '技术工程', key: 'aihub.experts.filterTags.engineering' },
+  { value: '金融投资', key: 'aihub.experts.filterTags.finance' },
+  { value: '全球发展', key: 'aihub.experts.filterTags.globalDev' },
+  { value: '教育学习', key: 'aihub.experts.filterTags.education' },
+  { value: '游戏空间', key: 'aihub.experts.filterTags.gaming' },
+  { value: '数据智能', key: 'aihub.experts.filterTags.dataIntelligence' },
+  { value: '营销增长', key: 'aihub.experts.filterTags.marketing' },
+  { value: '内容创作', key: 'aihub.experts.filterTags.contentCreation' },
+  { value: '销售商务', key: 'aihub.experts.filterTags.salesBiz' },
+  { value: '运营人力', key: 'aihub.experts.filterTags.operations' },
+  { value: '项目质量', key: 'aihub.experts.filterTags.quality' },
+  { value: '法务安全', key: 'aihub.experts.filterTags.legalSecurity' },
+  { value: '行业顾问', key: 'aihub.experts.filterTags.consultant' },
 ];
+
+const ALL_TAG_VALUE = '全部';
 
 type SortType = 'comprehensive' | 'hottest' | 'newest';
 
@@ -48,27 +50,23 @@ export const AIExpertsRoster: React.FC<AIExpertsRosterProps> = ({
   selectedScenario
 }) => {
   const { t } = useI18n();
-  const [selectedTag, setSelectedTag] = useState<string>('全部');
+  const [selectedTag, setSelectedTag] = useState<string>(ALL_TAG_VALUE);
   const [sortType, setSortType] = useState<SortType>('comprehensive');
 
   const filteredExperts = useMemo(() => {
     return experts.filter((exp) => {
-      // Show only mine filter
       if (showOnlyMine && !myExpertIds.includes(exp.id)) {
         return false;
       }
 
-      // Scenario filter
       if (selectedScenario && exp.scenarioCategory !== selectedScenario) {
         return false;
       }
 
-      // Filter tag filter
-      if (selectedTag !== '全部' && exp.filterTag !== selectedTag && !exp.tags.includes(selectedTag)) {
+      if (selectedTag !== ALL_TAG_VALUE && exp.filterTag !== selectedTag && !exp.tags.includes(selectedTag)) {
         return false;
       }
 
-      // Search query filter
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
         const matchName = exp.name.toLowerCase().includes(q);
@@ -88,7 +86,6 @@ export const AIExpertsRoster: React.FC<AIExpertsRosterProps> = ({
       if (sortType === 'newest') {
         return b.rating - a.rating;
       }
-      // Comprehensive default sort (featured first, then popularity)
       if (a.isFeatured && !b.isFeatured) return -1;
       if (!a.isFeatured && b.isFeatured) return 1;
       return b.popularity - a.popularity;
@@ -97,19 +94,16 @@ export const AIExpertsRoster: React.FC<AIExpertsRosterProps> = ({
 
   return (
     <div className="space-y-4 pt-2">
-      {/* Header Row for Experts Grid */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-2">
           <h3 className="text-xl font-bold text-slate-100 flex items-center gap-2">
-            <span>{t('aihub.experts.rosterTitle', '专家')}</span>
-            <span className="text-sm font-semibold text-slate-400">专家团</span>
+            <span>{t('aihub.experts.rosterTitle')}</span>
           </h3>
           <span className="text-xs px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-400 font-medium">
-            {filteredExperts.length} 位
+            {t('aihub.experts.rosterCount', { count: filteredExperts.length })}
           </span>
         </div>
 
-        {/* Sort Controls */}
         <div className="flex items-center gap-1.5 bg-slate-900/90 p-1 rounded-xl border border-slate-800 shrink-0">
           <button
             type="button"
@@ -120,7 +114,7 @@ export const AIExpertsRoster: React.FC<AIExpertsRosterProps> = ({
                 : 'text-slate-400 hover:text-slate-200'
             }`}
           >
-            {t('aihub.experts.sort.comprehensive', '综合')}
+            {t('aihub.experts.sort.comprehensive')}
           </button>
           <button
             type="button"
@@ -131,7 +125,7 @@ export const AIExpertsRoster: React.FC<AIExpertsRosterProps> = ({
                 : 'text-slate-400 hover:text-slate-200'
             }`}
           >
-            {t('aihub.experts.sort.hottest', '最热')}
+            {t('aihub.experts.sort.hottest')}
           </button>
           <button
             type="button"
@@ -142,46 +136,42 @@ export const AIExpertsRoster: React.FC<AIExpertsRosterProps> = ({
                 : 'text-slate-400 hover:text-slate-200'
             }`}
           >
-            {t('aihub.experts.sort.newest', '最新')}
+            {t('aihub.experts.sort.newest')}
           </button>
         </div>
       </div>
 
-      {/* Filter Tag Bar */}
       <div className="flex items-center gap-1.5 overflow-x-auto pb-2 scrollbar-none text-xs font-medium border-b border-slate-800/80">
-        {FILTER_TAGS.map((tag) => {
-          const active = selectedTag === tag;
+        {FILTER_TAG_KEYS.map(({ value, key }) => {
+          const active = selectedTag === value;
           return (
             <button
-              key={tag}
+              key={value}
               type="button"
-              onClick={() => setSelectedTag(tag)}
+              onClick={() => setSelectedTag(value)}
               className={`px-3 py-1.5 rounded-xl whitespace-nowrap transition-all border shrink-0 ${
                 active
                   ? 'bg-slate-100 text-slate-900 border-white font-bold shadow-sm'
                   : 'bg-slate-900/80 text-slate-400 border-slate-800 hover:bg-slate-800 hover:text-slate-200'
               }`}
             >
-              {tag}
+              {t(key)}
             </button>
           );
         })}
       </div>
 
-      {/* Expert Cards Grid */}
       {filteredExperts.length === 0 ? (
         <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-10 text-center space-y-3">
-          <p className="text-slate-400 text-sm">
-            {t('common.noData', '暂无符合条件的专家')}
-          </p>
+          <p className="text-slate-400 text-sm">{t('common.noData')}</p>
           <button
             type="button"
             onClick={() => {
-              setSelectedTag('全部');
+              setSelectedTag(ALL_TAG_VALUE);
             }}
             className="text-xs text-indigo-400 hover:underline"
           >
-            重置筛选条件
+            {t('aihub.experts.resetFilters')}
           </button>
         </div>
       ) : (

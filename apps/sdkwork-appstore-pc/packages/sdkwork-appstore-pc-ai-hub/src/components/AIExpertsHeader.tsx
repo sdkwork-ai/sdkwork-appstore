@@ -32,17 +32,17 @@ export const AIExpertsHeader: React.FC<AIExpertsHeaderProps> = ({
           <div className="flex items-center gap-2 mb-1.5">
             <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 flex items-center gap-1">
               <Sparkles className="w-3 h-3 text-indigo-400" />
-              {t('aihub.experts.rosterTitle', '专家团')}
+              {t('aihub.experts.rosterTitle')}
             </span>
             <span className="text-xs text-slate-400">
-              {t('aihub.experts.scenarioCount', { count: totalCount, defaultValue: `包含 ${totalCount} 位专家` })}
+              {t('aihub.experts.scenarioCount', { count: totalCount })}
             </span>
           </div>
           <h2 className="text-xl md:text-2xl font-bold tracking-tight text-white flex items-center gap-2">
-            {t('aihub.experts.rosterTitle', 'AI 专家团 Marketplace')}
+            {t('aihub.experts.rosterTitle')}
           </h2>
           <p className="text-sm text-slate-400 mt-1">
-            {t('aihub.experts.rosterSubtitle', '精选行业领域 AI 专家，内置专业 Prompt 与系统指令，即刻协同解决复杂问题')}
+            {t('aihub.experts.rosterSubtitle')}
           </p>
         </div>
 
@@ -55,7 +55,7 @@ export const AIExpertsHeader: React.FC<AIExpertsHeaderProps> = ({
               type="text"
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
-              placeholder={t('aihub.experts.searchPlaceholder', '搜索专家职称或描述...')}
+              placeholder={t('aihub.experts.searchPlaceholder')}
               className="w-full bg-slate-800/90 text-sm text-slate-100 placeholder-slate-400 pl-9 pr-4 py-2 rounded-xl border border-slate-700/70 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all"
             />
           </div>
@@ -71,7 +71,7 @@ export const AIExpertsHeader: React.FC<AIExpertsHeaderProps> = ({
             }`}
           >
             <UserCheck className="w-3.5 h-3.5" />
-            <span>{t('aihub.experts.myExperts', '我的专家')}</span>
+            <span>{t('aihub.experts.myExperts')}</span>
           </button>
 
           {/* Custom Expert button */}
@@ -81,7 +81,7 @@ export const AIExpertsHeader: React.FC<AIExpertsHeaderProps> = ({
             className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white shadow-md shadow-indigo-500/20 transition-all border border-indigo-400/30"
           >
             <Plus className="w-3.5 h-3.5" />
-            <span>{t('aihub.experts.customExpert', '自定义专家')}</span>
+            <span>{t('aihub.experts.customExpert')}</span>
           </button>
         </div>
       </div>

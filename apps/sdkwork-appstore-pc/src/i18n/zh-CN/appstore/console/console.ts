@@ -85,7 +85,11 @@ export const consoleLocales = {
     ipDesc: '限制仅允许预设的安全 IP 地址网段发起高权限后台 API 管理调用。',
     mfaTitle: '开发者双因素认证 (MFA Protection)',
     mfaDesc: '在进行敏感 API 密钥重新生成、作废或版本下架时强制二次验证。',
-    enabledStatus: '已开启保护'
+    enabledStatus: '已开启保护',
+    unavailable: '安全策略能力暂未由 App Store 后端提供，当前保持安全默认配置。',
+    mfaSubtitle: 'MFA Protection',
+    ipSubtitle: 'IP Whitelist',
+    complianceBadge: 'DJCP Level 3 Compliant'
   },
   loading: '加载开发者控制台数据中...'
 };

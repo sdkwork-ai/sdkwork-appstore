@@ -1,5 +1,6 @@
 import React from 'react';
 import { ExternalLink, Layers, Sparkles, Image as ImageIcon } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface TemplateScreenPreviewProps {
   previewImage?: string;
@@ -16,8 +17,9 @@ export const TemplateScreenPreview: React.FC<TemplateScreenPreviewProps> = ({
   title,
   category,
   framework,
-  isOfficial,
 }) => {
+  const { t } = useTranslation();
+
   const defaultFallbackImage =
     'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1000&q=80';
 
@@ -26,7 +28,6 @@ export const TemplateScreenPreview: React.FC<TemplateScreenPreviewProps> = ({
 
   return (
     <div className="relative group/screen rounded-xl overflow-hidden border border-gray-200/80 dark:border-[#2a2d39] bg-slate-900 shadow-sm transition-all duration-300 my-3">
-      {/* Window Chrome / Browser Address Bar */}
       <div className="h-6 px-3 bg-gray-100 dark:bg-[#20232c] border-b border-gray-200 dark:border-[#2a2d39] flex items-center justify-between text-[10px] text-gray-500">
         <div className="flex items-center gap-1.5">
           <span className="w-2 h-2 rounded-full bg-rose-500/80 inline-block" />
@@ -38,11 +39,10 @@ export const TemplateScreenPreview: React.FC<TemplateScreenPreviewProps> = ({
         </div>
         <div className="flex items-center gap-1 text-[9px] text-indigo-500 font-semibold">
           <Layers className="w-2.5 h-2.5" />
-          <span>UI 预览</span>
+          <span>{t('templates.detail.screenPreview.uiPreview')}</span>
         </div>
       </div>
 
-      {/* Screen Preview Container */}
       <div className="relative h-36 w-full overflow-hidden bg-slate-950">
         <img
           src={imageSrc}
@@ -51,25 +51,21 @@ export const TemplateScreenPreview: React.FC<TemplateScreenPreviewProps> = ({
           className="w-full h-full object-cover object-top transition-transform duration-500 group-hover/screen:scale-105 group-hover/screen:brightness-105"
         />
 
-        {/* Top Right Screenshot Count Badge */}
         <div className="absolute top-2 right-2 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] text-white/90 font-medium flex items-center gap-1 border border-white/10 shadow-sm">
           <ImageIcon className="w-3 h-3 text-indigo-400" />
-          <span>{count} 张效果图</span>
+          <span>{t('templates.detail.screenPreview.screenshotCount', { count })}</span>
         </div>
 
-        {/* Gradient Overlay for Text Legibility */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80 group-hover/screen:opacity-90 transition-opacity" />
 
-        {/* Hover Action Badge */}
         <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover/screen:opacity-100 transition-all duration-300 bg-black/40 backdrop-blur-[2px]">
           <span className="px-3 py-1.5 rounded-lg bg-indigo-600 text-white font-bold text-xs shadow-lg flex items-center gap-1.5 scale-90 group-hover/screen:scale-100 transition-transform">
             <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-            <span>进入应用详情页</span>
+            <span>{t('templates.detail.screenPreview.enterDetail')}</span>
             <ExternalLink className="w-3 h-3" />
           </span>
         </div>
 
-        {/* Category & Framework Overlay Badge */}
         <div className="absolute bottom-2 left-2 right-2 flex items-center justify-between text-[10px] text-white/90">
           <span className="px-2 py-0.5 rounded-md bg-black/60 backdrop-blur-md border border-white/10 font-medium">
             {category}

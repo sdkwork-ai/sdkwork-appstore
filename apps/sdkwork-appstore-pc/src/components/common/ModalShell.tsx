@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface ModalShellProps {
   isOpen?: boolean;
@@ -20,6 +21,8 @@ export const ModalShell: React.FC<ModalShellProps> = ({
   maxWidthClass = 'max-w-xl',
   children,
 }) => {
+  const { t } = useTranslation();
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
@@ -38,7 +41,7 @@ export const ModalShell: React.FC<ModalShellProps> = ({
         {/* Close Button */}
         <button
           onClick={onClose}
-          aria-label="关闭弹窗"
+          aria-label={t('common.accessibility.closeModal')}
           className="absolute top-5 right-5 p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 bg-gray-100 dark:bg-[#222530] rounded-full transition-colors cursor-pointer"
         >
           <X className="w-5 h-5" />

@@ -1,49 +1,125 @@
 {
-  "schemaVersion": 1,
-  "appId": "sdkwork-appstore-h5",
-  "appName": "SDKWork App Store",
-  "appType": "h5-mobile",
-  "owner": "sdkwork-appstore",
-  "domain": "appstore",
-  "sdkFamily": "sdkwork-appstore-app-sdk",
-  "apiAuthority": "sdkwork-appstore-app-api",
-  "apiPrefix": "/app/v3/api",
-  "runtime": {
-    "framework": "react",
-    "buildTool": "vite",
-    "typescript": true,
-    "supportedDeploymentProfiles": [
-      "cloud",
-      "standalone"
-    ],
-    "defaultDeploymentProfile": "cloud"
-  },
-  "surfaces": {
-    "browser": {
-      "enabled": true,
-      "port": 3001
-    },
-    "capacitor": {
-      "enabled": false,
-      "ios": true,
-      "android": true
-    }
-  },
-  "sdkDependencies": [
-    {
-      "sdkFamily": "sdkwork-appstore-app-sdk",
-      "purpose": "Store catalog, listings, library"
-    },
-    {
-      "sdkFamily": "sdkwork-iam-app-sdk",
-      "purpose": "IAM session context"
-    },
-    {
-      "sdkFamily": "sdkwork-drive-app-sdk",
-      "purpose": "Listing media and release artifact uploads"
-    }
-  ],
+  "schemaVersion": 3,
+  "kind": "sdkwork.app",
   "app": {
-    "key": "sdkwork-appstore"
+    "key": "sdkwork-appstore",
+    "name": "SDKWork App Store",
+    "displayName": "SDKWork App Store",
+    "description": "SDKWork marketplace domain APIs, SDKs, clients, and PostgreSQL-backed store runtime.",
+    "officialWebsiteUrl": "https://sdkwork.com/apps/sdkwork-appstore",
+    "appType": "SDK",
+    "identifiers": {
+      "containerImage": "registry.sdkwork.com/apps/sdkwork-appstore"
+    }
+  },
+  "backend": {
+    "primaryLanguage": "rust",
+    "framework": "axum",
+    "appId": "sdkwork-appstore-pc",
+    "serviceId": "sdkwork-appstore",
+    "owner": "sdkwork-appstore",
+    "domain": "appstore",
+    "capability": "store",
+    "apiAuthorities": [
+      "sdkwork-appstore-open-api",
+      "sdkwork-appstore-app-api",
+      "sdkwork-appstore-backend-api"
+    ],
+    "profileKey": "backend-root-admin",
+    "tenantId": "100001",
+    "organizationId": "0",
+    "accessTokenPermissionScope": [
+      "iam:self"
+    ]
+  },
+  "runtime": {
+    "family": "server",
+    "framework": "rust-axum",
+    "defaultPlatform": "API",
+    "defaultArchitecture": "x64",
+    "supportedDeploymentProfiles": [
+      "standalone",
+      "cloud"
+    ],
+    "defaultDeploymentProfile": "standalone"
+  },
+  "media": {
+    "icons": {
+      "primary": {
+        "id": "sdkwork-appstore-primary-icon",
+        "type": "ICON",
+        "purpose": "PRIMARY",
+        "platform": "APP",
+        "format": "PNG",
+        "width": 1024,
+        "height": 1024,
+        "enabled": true,
+        "url": "https://cdn.sdkwork.com/apps/sdkwork-appstore/assets/icon-1024.png",
+        "metadata": {
+          "generatedPlaceholder": true
+        }
+      },
+      "platform": []
+    },
+    "screenshots": [],
+    "previews": []
+  },
+  "publish": {
+    "status": "DRAFT",
+    "platforms": [
+      "API",
+      "WEB",
+      "H5",
+      "DESKTOP"
+    ],
+    "installPlatforms": [
+      "API",
+      "WEB",
+      "H5",
+      "DESKTOP"
+    ],
+    "installSkill": false
+  },
+  "artifacts": {
+    "installConfig": {
+      "packages": []
+    }
+  },
+  "release": {
+    "currentVersion": "0.1.0",
+    "defaultChannel": "BETA",
+    "latest": {
+      "BETA": "0.1.0"
+    },
+    "notes": [
+      {
+        "version": "0.1.0",
+        "channel": "BETA",
+        "current": true,
+        "packageIds": []
+      }
+    ]
+  },
+  "security": {
+    "checksumRequired": true,
+    "signatureRequired": true,
+    "sbomRequired": true
+  },
+  "devApp": {
+    "sourceRoot": "apps/sdkwork-appstore-pc",
+    "build": {
+      "targets": [
+        "browser",
+        "desktop"
+      ]
+    }
+  },
+  "metadata": {
+    "domain": "appstore",
+    "capability": "store",
+    "standardOwner": "sdkwork-appstore",
+    "deploymentConfig": "etc/sdkwork.deployment.config.json",
+    "topologySpec": "specs/topology.spec.json",
+    "workflowManifest": "sdkwork.workflow.json"
   }
 }

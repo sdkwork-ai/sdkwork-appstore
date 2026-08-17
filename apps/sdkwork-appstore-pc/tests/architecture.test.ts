@@ -12,6 +12,8 @@ describe('PC architecture contracts', () => {
     const sdkClients = readSource('src/bootstrap/sdkClients.ts');
 
     expect(iamRuntime).toContain('createSdkworkAppbasePcAuthRuntime');
+    expect(iamRuntime).toContain('credentialEntry');
+    expect(iamRuntime).toContain('prepareAppstorePcCredentialEntryTokens');
     expect(iamRuntime).not.toContain('guest_token');
     expect(sdkClients).toContain("from '@sdkwork/appstore-app-sdk'");
     expect(sdkClients).toContain("from '@sdkwork/agents-app-sdk'");

@@ -27,7 +27,7 @@ export const SkillModalFooter: React.FC<SkillModalFooterProps> = ({
           onClick={onClose}
           className="px-4 py-2 rounded-xl text-xs font-semibold text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#222530] cursor-pointer transition-colors"
         >
-          {t('common.close')}
+          {t('common.actions.close')}
         </button>
         <button
           onClick={() => {

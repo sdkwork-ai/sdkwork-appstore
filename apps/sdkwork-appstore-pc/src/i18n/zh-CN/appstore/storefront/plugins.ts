@@ -56,10 +56,25 @@ export const plugins = {
     disable: '禁用插件',
     enablePlugin: '启用插件',
     disablePlugin: '禁用插件',
+    descriptionLabel: '插件描述',
+    selectCapability: '选择目标 API 能力',
+    executing: '沙盒代理发送中...',
+    payloadLabel: '请求有效载荷',
+    responseResult: '响应主体',
+    latency: '延迟',
+    schemaStd: 'Schema 结构定义',
+    copiedSchema: '已复制 Schema',
     enabled: '已启用',
     disabled: '已禁用',
     coreCapabilities: '核心 API 能力接口',
     developer: '开发者'
+  },
+  status: {
+    enabled: '已启用',
+    disabled: '已禁用'
+  },
+  registerModal: {
+    title: '注册自定义扩展插件'
   },
   form: {
     pluginName: '插件名称',

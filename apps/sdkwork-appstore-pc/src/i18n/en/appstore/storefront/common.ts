@@ -72,5 +72,30 @@ export const common = {
     license: 'License',
     architecture: 'Architecture',
     framework: 'Framework'
+  },
+  categories: {
+    all: 'All'
+  },
+  time: {
+    recently: 'Recently'
+  },
+  description: 'Description',
+  tags: 'Tags',
+  noData: 'No matching data found',
+  accessibility: {
+    closeModal: 'Close dialog',
+    previousSlide: 'Previous slide',
+    nextSlide: 'Next slide',
+    toggleTheme: 'Toggle theme',
+    clearSearch: 'Clear search',
+    rankFirst: 'Rank 1',
+    rankSecond: 'Rank 2',
+    rankThird: 'Rank 3'
+  },
+  language: {
+    switchToEn: 'Switch to English',
+    switchToZh: 'Switch to Simplified Chinese',
+    labelZh: '中文',
+    labelEn: 'EN'
   }
 };

@@ -1,20 +1,35 @@
 //! Gateway runtime configuration resolved from the process environment.
 
+const DEFAULT_BIND_ADDRESS: &str = "0.0.0.0:18090";
+
 #[derive(Debug, Clone)]
 pub struct AppstoreGatewayConfig {
-    pub port: u16,
+    pub bind_address: String,
 }
 
 impl AppstoreGatewayConfig {
     pub fn from_env() -> Self {
-        let port = std::env::var("PORT")
+        let bind_address = std::env::var("SDKWORK_APPSTORE_APPLICATION_PUBLIC_INGRESS_BIND")
             .ok()
-            .and_then(|value| value.parse::<u16>().ok())
-            .unwrap_or(18090);
-        Self { port }
+            .map(|value| value.trim().to_owned())
+            .filter(|value| !value.is_empty())
+            .or_else(|| {
+                std::env::var("PORT")
+                    .ok()
+                    .map(|port| format!("127.0.0.1:{port}"))
+            })
+            .unwrap_or_else(|| DEFAULT_BIND_ADDRESS.to_owned());
+        Self { bind_address }
     }
 
     pub fn addr(&self) -> std::net::SocketAddr {
-        std::net::SocketAddr::from(([0, 0, 0, 0], self.port))
+        self.bind_address
+            .parse()
+            .unwrap_or_else(|error| {
+                panic!(
+                    "invalid SDKWORK_APPSTORE_APPLICATION_PUBLIC_INGRESS_BIND `{}`: {error}",
+                    self.bind_address
+                )
+            })
     }
 }

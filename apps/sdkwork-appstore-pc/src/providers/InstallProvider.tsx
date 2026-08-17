@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { AppItem } from '../types';
 import { AnimatePresence } from 'motion/react';
 import { InstallModal } from '../components/install/InstallModal';
@@ -28,6 +29,7 @@ function readLocalInstalledApps(): Set<string> {
 }
 
 export function InstallProvider({ children }: { children: React.ReactNode }) {
+  const { t } = useTranslation();
   const [appToInstall, setAppToInstall] = useState<AppItem | null>(null);
   const [installState, setInstallState] = useState<'confirm' | 'downloading' | 'success'>('confirm');
   const [progress, setProgress] = useState(0);
@@ -70,7 +72,7 @@ export function InstallProvider({ children }: { children: React.ReactNode }) {
   const [runningAppNotice, setRunningAppNotice] = useState<string | null>(null);
 
   const openApp = (app: AppItem) => {
-    setRunningAppNotice(`应用【${app.name}】正在本地桌面沙盒环境运行中...`);
+    setRunningAppNotice(t('install.modal.runningNotice', { name: app.name }));
     setTimeout(() => {
       setRunningAppNotice(null);
     }, 3000);
@@ -119,7 +121,7 @@ export function InstallProvider({ children }: { children: React.ReactNode }) {
         }, 1200);
       })
       .catch((error) => {
-        setInstallError(error instanceof Error ? error.message : '安装失败，请稍后重试');
+        setInstallError(error instanceof Error ? error.message : t('install.modal.installFailed'));
         setInstallState('confirm');
       });
   };

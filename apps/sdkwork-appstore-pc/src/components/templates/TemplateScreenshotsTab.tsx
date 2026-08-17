@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Monitor, Smartphone, ZoomIn, Image as ImageIcon } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface TemplateScreenshotsTabProps {
   screenshots?: string[];
@@ -10,6 +11,7 @@ export const TemplateScreenshotsTab: React.FC<TemplateScreenshotsTabProps> = ({
   screenshots = [],
   title,
 }) => {
+  const { t } = useTranslation();
   const [selectedIdx, setSelectedIdx] = useState(0);
   const [deviceMode, setDeviceMode] = useState<'desktop' | 'mobile'>('desktop');
   const [lightboxOpen, setLightboxOpen] = useState(false);
@@ -26,11 +28,15 @@ export const TemplateScreenshotsTab: React.FC<TemplateScreenshotsTabProps> = ({
 
   return (
     <div className="space-y-3 animate-fade-in text-xs">
-      {/* Device Mode Switcher */}
       <div className="flex items-center justify-between bg-gray-50 dark:bg-[#20232d] p-2 rounded-xl border border-gray-200/60 dark:border-[#2a2d39]">
         <div className="flex items-center gap-1.5 text-gray-500 font-medium">
           <ImageIcon className="w-3.5 h-3.5 text-indigo-500" />
-          <span>界面效果图预览 ({selectedIdx + 1} / {list.length})</span>
+          <span>
+            {t('templates.detail.screenshots.previewTitle', {
+              current: selectedIdx + 1,
+              total: list.length,
+            })}
+          </span>
         </div>
 
         <div className="flex items-center gap-1 bg-white dark:bg-[#181a21] p-0.5 rounded-lg border border-gray-200 dark:border-[#2a2d39]">
@@ -43,7 +49,7 @@ export const TemplateScreenshotsTab: React.FC<TemplateScreenshotsTabProps> = ({
             }`}
           >
             <Monitor className="w-3 h-3" />
-            <span>PC 桌面</span>
+            <span>{t('templates.detail.screenshots.desktop')}</span>
           </button>
           <button
             onClick={() => setDeviceMode('mobile')}
@@ -54,19 +60,17 @@ export const TemplateScreenshotsTab: React.FC<TemplateScreenshotsTabProps> = ({
             }`}
           >
             <Smartphone className="w-3 h-3" />
-            <span>移动端</span>
+            <span>{t('templates.detail.screenshots.mobile')}</span>
           </button>
         </div>
       </div>
 
-      {/* Main Preview Screen */}
       <div className="flex justify-center items-center py-2 bg-slate-950 rounded-2xl p-3 border border-slate-800 shadow-inner overflow-hidden">
         <div
           className={`relative transition-all duration-300 rounded-xl overflow-hidden border border-slate-700 shadow-2xl bg-slate-900 group ${
             deviceMode === 'mobile' ? 'w-[280px] h-[480px]' : 'w-full max-w-3xl h-[340px]'
           }`}
         >
-          {/* Top Browser Bar */}
           <div className="h-6 px-3 bg-slate-900 border-b border-slate-800 flex items-center justify-between text-[10px] text-gray-400">
             <div className="flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full bg-rose-500 inline-block" />
@@ -81,7 +85,7 @@ export const TemplateScreenshotsTab: React.FC<TemplateScreenshotsTabProps> = ({
               className="hover:text-white transition-colors cursor-pointer flex items-center gap-1 text-[9px]"
             >
               <ZoomIn className="w-3 h-3 text-indigo-400" />
-              <span>放大</span>
+              <span>{t('templates.detail.screenshots.zoom')}</span>
             </button>
           </div>
 
@@ -94,7 +98,6 @@ export const TemplateScreenshotsTab: React.FC<TemplateScreenshotsTabProps> = ({
         </div>
       </div>
 
-      {/* Thumbnails Strip */}
       <div className="grid grid-cols-4 sm:grid-cols-6 gap-2 pt-1">
         {list.map((src, i) => (
           <button
@@ -111,7 +114,6 @@ export const TemplateScreenshotsTab: React.FC<TemplateScreenshotsTabProps> = ({
         ))}
       </div>
 
-      {/* Lightbox Modal */}
       {lightboxOpen && (
         <div
           onClick={() => setLightboxOpen(false)}
@@ -125,7 +127,7 @@ export const TemplateScreenshotsTab: React.FC<TemplateScreenshotsTabProps> = ({
               className="rounded-2xl shadow-2xl border border-white/20 max-h-[85vh] object-contain"
             />
             <div className="text-center text-white/80 text-xs font-medium mt-2">
-              点击任意位置退出大图预览
+              {t('templates.detail.screenshots.lightboxHint')}
             </div>
           </div>
         </div>

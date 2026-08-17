@@ -15,7 +15,7 @@ export function HandheldGamesGrid({ apps }: HandheldGamesGridProps) {
     <div className="flex flex-col">
       <div className="flex items-center justify-between mb-3">
         <Link 
-          to="/search?category=AI 生产力与知识库" 
+          to="/search?category=productivity" 
           className="flex items-center gap-1.5 group text-sm font-bold text-gray-900 dark:text-gray-100 hover:text-blue-500 transition-colors"
         >
           <span>{t('discover.sections.productivityApps')}</span>

@@ -132,7 +132,7 @@ export const ExpertCard: React.FC<ExpertCardProps> = ({
           {/* Add to My Experts Button */}
           <button
             type="button"
-            title={isMyExpert ? t('aihub.experts.card.addedToMine', '已加入我的专家') : t('aihub.experts.card.addToMine', '加入我的专家')}
+            title={isMyExpert ? t('aihub.experts.card.addedToMine') : t('aihub.experts.card.addToMine')}
             onClick={(e) => onToggleMyExpert(expert.id, e)}
             className={`p-1.5 rounded-xl border transition-all shrink-0 ${
               isMyExpert
@@ -167,7 +167,10 @@ export const ExpertCard: React.FC<ExpertCardProps> = ({
         {/* Action Button */}
         <div className="flex items-center justify-between pt-1">
           <span className="text-[11px] text-slate-500 font-mono">
-            ★ {expert.rating.toFixed(1)} · {(expert.popularity / 1000).toFixed(1)}k 次调用
+            {t('aihub.experts.card.callsCount', {
+              rating: expert.rating.toFixed(1),
+              calls: (expert.popularity / 1000).toFixed(1),
+            })}
           </span>
           <button
             type="button"
@@ -182,7 +185,7 @@ export const ExpertCard: React.FC<ExpertCardProps> = ({
             className="flex items-center gap-1 text-xs font-semibold text-indigo-400 hover:text-indigo-300 transition-colors group-hover:translate-x-0.5 duration-200"
           >
             <MessageCircle className="w-3.5 h-3.5" />
-            <span>{t('aihub.experts.card.chatWithExpert', '与专家对话')}</span>
+            <span>{t('aihub.experts.card.chatWithExpert')}</span>
           </button>
         </div>
       </div>

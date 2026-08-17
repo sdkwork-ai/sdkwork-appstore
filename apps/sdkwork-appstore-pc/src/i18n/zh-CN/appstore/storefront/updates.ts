@@ -3,14 +3,17 @@ export const updates = {
     title: '应用更新与已安装管理',
     subtitle: '管理本机已安装软件、离线缓存空间、安装队列与版本更新日志。',
     updateAll: '全部一键更新',
-    allUpdated: '全部为最新版'
+    allUpdated: '全部为最新版',
+    updatingAll: '正在更新全部...'
   },
   tabs: {
     updates: '可更新应用',
     library: '已安装应用库',
     queue: '下载与任务队列',
     notes: '版本更新日志',
-    storage: '存储与空间分析'
+    storage: '存储与空间分析',
+    downloads: '待更新应用',
+    whatsNew: '版本更新日志'
   },
   storage: {
     totalUsed: '磁盘已用空间',
@@ -23,7 +26,28 @@ export const updates = {
     securityEngine: '数字签名与合规检测',
     securityStatus: '绿标安全·已加密保护',
     downloadedCount: '已部署安装总数',
-    appsInstalled: '{{count}} 款应用已安装'
+    appsInstalled: '{{count}} 款应用已安装',
+    appsDeployed: '已部署 {{count}} 款应用'
+  },
+  downloadQueue: {
+    downloading: '正在下载 {{name}}',
+    installed: '{{name}} 安装完成',
+    preparing: '准备下载 {{name}}',
+    speedInfo: '下载进度 {{progress}}%',
+    readyInfo: '已就绪，等待安装',
+    runNow: '立即运行'
+  },
+  item: {
+    update: '更新',
+    recentUpdate: '最近更新',
+    version: '版本 {{version}}',
+    showMore: '展开更多'
+  },
+  emptyState: {
+    title: '所有应用均为最新版本',
+    subtitle: '当前没有待更新的应用，您可以探索更多优质软件。',
+    exploreApps: '探索精选',
+    browseMarket: '浏览软件大厅'
   },
   queue: {
     title: '正在进行中的下载任务',
@@ -42,10 +66,13 @@ export const updates = {
   },
   library: {
     title: '我的已安装应用库 ({{count}})',
+    subtitle: '管理本机已安装的应用，支持快速打开或卸载',
     emptyTitle: '暂未安装任何应用',
     emptySubtitle: '前往【探索发现】或【软件大厅】下载安装高效率应用',
     openApp: '打开应用',
-    uninstallApp: '卸载应用'
+    uninstallApp: '卸载应用',
+    open: '打开',
+    uninstallTooltip: '卸载应用'
   },
   releaseNotes: {
     title: '系统与应用更新日志',

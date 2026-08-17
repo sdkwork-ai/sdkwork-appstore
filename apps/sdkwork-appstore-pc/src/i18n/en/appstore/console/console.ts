@@ -85,7 +85,11 @@ export const consoleLocales = {
     ipDesc: 'Restrict high-privilege backend management API calls strictly to pre-configured safe IP ranges.',
     mfaTitle: 'Two-Factor Authentication (MFA Protection)',
     mfaDesc: 'Enforce two-factor authentication during sensitive key regeneration, revocation, or version unpublishing.',
-    enabledStatus: 'Protection Active'
+    enabledStatus: 'Protection Active',
+    unavailable: 'Security policy management is not yet available from the App Store backend. Safe defaults remain in effect.',
+    mfaSubtitle: 'MFA Protection',
+    ipSubtitle: 'IP Whitelist',
+    complianceBadge: 'DJCP Level 3 Compliant'
   },
   loading: 'Loading developer console data...'
 };

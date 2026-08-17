@@ -4,6 +4,7 @@
  */
 
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { SdkworkSessionAuthBrowserRoot } from '@sdkwork/auth-pc-react';
 import { Layout } from '@sdkwork/appstore-pc-shell';
 import { DiscoverPage } from '@sdkwork/appstore-pc-discover';
 import { AppsPage } from '@sdkwork/appstore-pc-apps';
@@ -39,7 +40,8 @@ export default function App() {
     <ThemeProvider>
       <InstallProvider>
         <Router>
-          <AuthGate runtime={runtime}>
+          <SdkworkSessionAuthBrowserRoot>
+            <AuthGate runtime={runtime}>
             <Routes>
               <Route path="/" element={<Layout />}>
                 <Route index element={<DiscoverPage />} />
@@ -77,7 +79,8 @@ export default function App() {
                 <Route path="admin" element={<Navigate to="/admin/monitor" replace />} />
               </Route>
             </Routes>
-          </AuthGate>
+            </AuthGate>
+          </SdkworkSessionAuthBrowserRoot>
         </Router>
       </InstallProvider>
     </ThemeProvider>

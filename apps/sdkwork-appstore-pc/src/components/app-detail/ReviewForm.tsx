@@ -57,7 +57,7 @@ export const ReviewForm: React.FC<ReviewFormProps> = ({
       }, 1500);
     } catch (err) {
       console.error('提交评价失败', err);
-      setSubmitError(err instanceof Error ? err.message : '提交失败，请稍后重试');
+      setSubmitError(err instanceof Error ? err.message : t('appDetail.reviews.submitFailed'));
     } finally {
       setIsSubmitting(false);
     }

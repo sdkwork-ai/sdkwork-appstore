@@ -32,7 +32,7 @@ export const AIHubTabNav: React.FC<AIHubTabNavProps> = ({
           }`}
         >
           <Users className="w-4 h-4 text-indigo-300" />
-          <span>{t('aihub.tabs.experts', 'AI 专家团')}</span>
+          <span>{t('aihub.tabs.experts')}</span>
           <span className="text-[10px] px-2 py-0.5 rounded-full bg-indigo-950 text-indigo-300 border border-indigo-700/50">
             {expertsCount}
           </span>
@@ -48,7 +48,7 @@ export const AIHubTabNav: React.FC<AIHubTabNavProps> = ({
           }`}
         >
           <Zap className="w-4 h-4 text-amber-400" />
-          <span>{t('aihub.tabs.sandbox', 'AI 智能体沙盒')}</span>
+          <span>{t('aihub.tabs.sandbox')}</span>
         </button>
 
         <button
@@ -61,7 +61,7 @@ export const AIHubTabNav: React.FC<AIHubTabNavProps> = ({
           }`}
         >
           <Grid className="w-4 h-4 text-emerald-400" />
-          <span>{t('aihub.tabs.tools', '精选 AI 工具')}</span>
+          <span>{t('aihub.tabs.tools')}</span>
           <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-400">
             {appsCount}
           </span>

@@ -4,15 +4,15 @@
 INSERT INTO appstore_category
     (id, tenant_id, category_code, parent_category_id, category_level, category_status, sort_order, icon_media_resource_id, created_at, updated_at)
 VALUES
-    ('cat-ai-assistants', '100001', 'ai-assistants', NULL, 1, 'active', 100, '', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-    ('cat-ai-coding', '100001', 'ai-coding', NULL, 1, 'active', 110, '', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-    ('cat-ai-creative', '100001', 'ai-creative', NULL, 1, 'active', 120, '', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-    ('cat-ai-productivity', '100001', 'ai-productivity', NULL, 1, 'active', 130, '', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-    ('cat-ai-games', '100001', 'ai-games', NULL, 1, 'active', 140, '', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-    ('cat-board-games', '100001', 'board-games', NULL, 1, 'active', 150, '', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-    ('cat-mini-games', '100001', 'mini-games', NULL, 1, 'active', 160, '', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-    ('cat-mobile-games', '100001', 'mobile-games', NULL, 1, 'active', 170, '', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-    ('cat-utilities', '100001', 'utilities', NULL, 1, 'active', 180, '', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+    ('cat-ai-assistants', '100001', 'ai-assistants', NULL, 1, 'active', 100, 'mr-cat-ai-assistants-icon', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('cat-ai-coding', '100001', 'ai-coding', NULL, 1, 'active', 110, 'mr-cat-ai-coding-icon', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('cat-ai-creative', '100001', 'ai-creative', NULL, 1, 'active', 120, 'mr-cat-ai-creative-icon', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('cat-ai-productivity', '100001', 'ai-productivity', NULL, 1, 'active', 130, 'mr-cat-ai-productivity-icon', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('cat-ai-games', '100001', 'ai-games', NULL, 1, 'active', 140, 'mr-cat-ai-games-icon', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('cat-board-games', '100001', 'board-games', NULL, 1, 'active', 150, 'mr-cat-board-games-icon', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('cat-mini-games', '100001', 'mini-games', NULL, 1, 'active', 160, 'mr-cat-mini-games-icon', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('cat-mobile-games', '100001', 'mobile-games', NULL, 1, 'active', 170, 'mr-cat-mobile-games-icon', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('cat-utilities', '100001', 'utilities', NULL, 1, 'active', 180, 'mr-cat-utilities-icon', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
 ON CONFLICT (id) DO UPDATE SET
     category_status = EXCLUDED.category_status,
     sort_order = EXCLUDED.sort_order,

@@ -20,7 +20,7 @@ export const AISandboxModelSelector: React.FC<AISandboxModelSelectorProps> = ({
     <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
       <span className="text-[11px] text-gray-500 dark:text-gray-400 font-medium flex items-center gap-1 shrink-0">
         <Cpu className="w-3.5 h-3.5 text-teal-500" />
-        {t('aihub.sandbox.testEngine', '测试引擎:')}
+        {t('aihub.sandbox.testEngine')}
       </span>
       <select
         value={selectedModelId}

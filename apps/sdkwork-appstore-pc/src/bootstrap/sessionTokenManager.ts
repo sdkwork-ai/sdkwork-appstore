@@ -1,3 +1,5 @@
+import { readBootstrapAccessTokenFromProcessEnv } from '@sdkwork/iam-credential-entry';
+import { resetTokenManagerToBootstrapAccessToken } from '@sdkwork/iam-runtime';
 import { createTokenManager, type AuthTokenManager } from '@sdkwork/sdk-common';
 
 import type { AppstorePcSessionStore } from './sessionStore';
@@ -21,11 +23,23 @@ export function createAppstorePcSessionTokenManager(
 
   const hydrate = () => {
     const snapshot = session.getSnapshot();
-    tokenManager.setTokens({
-      accessToken: snapshot.accessToken,
-      authToken: snapshot.authToken,
-      refreshToken: snapshot.refreshToken,
-    });
+    const hasSessionTokens = Boolean(
+      snapshot.accessToken || snapshot.authToken || snapshot.refreshToken,
+    );
+
+    if (hasSessionTokens) {
+      tokenManager.setTokens({
+        accessToken: snapshot.accessToken,
+        authToken: snapshot.authToken,
+        refreshToken: snapshot.refreshToken,
+      });
+      return;
+    }
+
+    resetTokenManagerToBootstrapAccessToken(
+      tokenManager,
+      readBootstrapAccessTokenFromProcessEnv(),
+    );
   };
 
   hydrate();

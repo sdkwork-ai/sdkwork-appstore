@@ -104,7 +104,7 @@ export const PublishSkillFormFields: React.FC<PublishSkillFormFieldsProps> = ({
           onClick={onCancel}
           className="px-4 py-2 rounded-xl bg-gray-100 dark:bg-[#22252e] text-gray-600 dark:text-gray-300 hover:bg-gray-200 cursor-pointer font-medium"
         >
-          {t('common.cancel')}
+          {t('common.actions.cancel')}
         </button>
         <button
           type="submit"

@@ -8,6 +8,7 @@ import type { IamAppContext, IamDeploymentMode, IamEnvironment } from '@sdkwork/
 import type { IamRuntime } from '@sdkwork/iam-runtime';
 import type { AuthTokenManager } from '@sdkwork/sdk-common';
 
+import { prepareAppstorePcCredentialEntryTokens } from './credentialEntry';
 import type { AppstorePcRuntimeConfig } from './environment';
 import { normalizeGeneratedSdkBaseUrl, type AppstorePcSdkClientInventory } from './sdkClients';
 import type { AppstorePcSessionSnapshot, AppstorePcSessionStore } from './sessionStore';
@@ -49,6 +50,10 @@ export function createAppstorePcIamRuntime(
       appbaseAppApiBaseUrl: options.config.iamAppApiBaseUrl,
     },
     createAppbaseAppClient: () => appbaseApp,
+    credentialEntry: {
+      prepareTokens: () =>
+        prepareAppstorePcCredentialEntryTokens(options.tokenManager, options.session),
+    },
     localeProvider: () => options.config.locale,
     sdkClients: [
       options.sdkClients.app.generated,

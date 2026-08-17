@@ -29,7 +29,7 @@ export function MiniGamesCarousel({ apps }: MiniGamesCarouselProps) {
     <div className="flex flex-col">
       <div className="flex items-center justify-between mb-3">
         <Link 
-          to="/search?category=AI 智能体游戏" 
+          to="/search?category=miniGames" 
           className="flex items-center gap-1.5 group text-sm font-bold text-gray-900 dark:text-gray-100 hover:text-blue-500 transition-colors"
         >
           <span>{t('discover.sections.miniGames')}</span>

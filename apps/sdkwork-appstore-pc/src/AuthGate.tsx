@@ -6,9 +6,12 @@ import {
   hasAuthenticatedAppstorePcSession,
 } from './bootstrap/sessionStore';
 import { resolveAppstorePcAuthRuntimeConfig } from './bootstrap/authConfig';
+import { prepareAppstorePcCredentialEntryTokens } from './bootstrap/credentialEntry';
 import type { AppstorePcRuntime } from './bootstrap/runtime';
 import { resolveAppstorePcAuthGateDecision } from './authGateLogic';
 import { LoadingSpinner } from './components/common/LoadingSpinner';
+import { AppstoreAuthShell } from './auth/AppstoreAuthShell';
+import { resolveAppstoreAuthAppearance } from './auth/appstoreAuthAppearance';
 
 interface AuthGateProps {
   children: ReactNode;
@@ -28,6 +31,7 @@ export function AuthGate({ children, runtime }: AuthGateProps) {
 
     const validateStoredSession = async () => {
       try {
+        prepareAppstorePcCredentialEntryTokens(runtime.iamRuntime.tokenManager, runtime.session);
         await runtime.iamRuntime.hydrateTokenManager();
         if (hasAuthenticatedAppstorePcSession(runtime.session.getSnapshot())) {
           await runtime.iamRuntime.service.auth.sessions.current.retrieve();
@@ -68,18 +72,19 @@ export function AuthGate({ children, runtime }: AuthGateProps) {
   }
 
   if (decision.kind === 'auth-route') {
-    const authProps = {
-      basePath: '/auth',
-      getRuntime: () => runtime.iamRuntime,
-      homePath: '/',
-      locale: runtime.config.locale,
-      runtimeConfig: resolveAppstorePcAuthRuntimeConfig(),
-      viewportMode: 'flow' as const,
-    };
     return (
-      <SdkworkIamAuthRoutes
-        {...(authProps as unknown as Parameters<typeof SdkworkIamAuthRoutes>[0])}
-      />
+      <AppstoreAuthShell>
+        <SdkworkIamAuthRoutes
+          appearance={resolveAppstoreAuthAppearance()}
+          basePath="/auth"
+          className="!bg-transparent"
+          getRuntime={() => runtime.iamRuntime}
+          homePath="/"
+          locale={runtime.config.locale}
+          runtimeConfig={resolveAppstorePcAuthRuntimeConfig()}
+          viewportMode="flow"
+        />
+      </AppstoreAuthShell>
     );
   }
 

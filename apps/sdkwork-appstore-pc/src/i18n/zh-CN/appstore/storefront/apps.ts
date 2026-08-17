@@ -16,5 +16,7 @@ export const apps = {
   stats: {
     totalApps: '已收录 {{count}} 款软件',
     filteredApps: '筛选出 {{count}} 款应用'
-  }
+  },
+  noMatchingApps: '暂无匹配的应用软件',
+  featuredApps: '精选桌面应用 ({{count}})'
 };

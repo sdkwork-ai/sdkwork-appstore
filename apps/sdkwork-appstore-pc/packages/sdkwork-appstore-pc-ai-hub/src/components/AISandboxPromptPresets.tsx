@@ -5,23 +5,16 @@ interface AISandboxPromptPresetsProps {
   onSelectPreset: (presetText: string) => void;
 }
 
-const PRESETS = [
-  '推荐一款适合写代码和重构 TypeScript 的 AI 工具',
-  '整理和总结 100 页 PDF 论文与深度报告',
-  '实时音视频多模态分析与桌面截屏助手',
-  '设计高性能云原生微服务架构与 Docker 配置'
-];
-
 export const AISandboxPromptPresets: React.FC<AISandboxPromptPresetsProps> = ({
   onSelectPreset
 }) => {
   const { t } = useTranslation();
 
   const presets = [
-    t('aihub.sandbox.presets.p1', '推荐一款适合写代码和重构 TypeScript 的 AI 工具'),
-    t('aihub.sandbox.presets.p2', '整理和总结 100 页 PDF 论文与深度报告'),
-    t('aihub.sandbox.presets.p3', '实时音视频多模态分析与桌面截屏助手'),
-    t('aihub.sandbox.presets.p4', '设计高性能云原生微服务架构与 Docker 配置')
+    t('aihub.sandbox.presets.p1'),
+    t('aihub.sandbox.presets.p2'),
+    t('aihub.sandbox.presets.p3'),
+    t('aihub.sandbox.presets.p4')
   ];
 
   return (

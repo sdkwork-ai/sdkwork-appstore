@@ -74,6 +74,7 @@ export const PublishAppForm: React.FC<PublishAppFormProps> = ({
           label={t('console.form.description')}
           value={description}
           onChange={onDescriptionChange}
+          placeholder={t('console.form.descriptionPlaceholder')}
         />
 
         <div className="flex justify-end pt-2">

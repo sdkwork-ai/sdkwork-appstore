@@ -21,19 +21,29 @@
     "zh-CN": {
       "version": "1.0.0",
       "required": true,
-      "checksum": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "files": []
+      "checksum": "sha256:280697bc3f6d0789954fbbe208c80a5c180d3addc45b44640c1464658a569e10",
+      "files": [
+        "locales/zh-CN/001_storefront_listings_zh.sql",
+        "locales/zh-CN/002_storefront_releases_zh.sql",
+        "locales/zh-CN/003_storefront_catalog_zh.sql"
+      ]
     },
     "en-US": {
       "version": "1.0.0",
       "required": false,
-      "checksum": "sha256:4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
-      "files": []
+      "checksum": "sha256:e9bf4ed7c865e39e234b800cb3ffacbdf78329fd7c4d7d438e67b328294414c6",
+      "files": [
+        "locales/en-US/001_storefront_listings_en.sql",
+        "locales/en-US/002_storefront_releases_en.sql",
+        "locales/en-US/003_storefront_catalog_en.sql"
+      ]
     }
   },
   "profiles": {
     "minimal": {
-      "common": [],
+      "common": [
+        "common/002_default_publisher.sql"
+      ],
       "locales": {
         "zh-CN": []
       }
@@ -48,10 +58,20 @@
         "common/007_storefront_catalog.sql",
         "common/008_app_templates.sql",
         "common/009_user_demo_data.sql",
+        "common/010_download_capabilities.sql",
         "001_bootstrap.sql"
       ],
       "locales": {
-        "zh-CN": []
+        "zh-CN": [
+          "locales/zh-CN/001_storefront_listings_zh.sql",
+          "locales/zh-CN/002_storefront_releases_zh.sql",
+          "locales/zh-CN/003_storefront_catalog_zh.sql"
+        ],
+        "en-US": [
+          "locales/en-US/001_storefront_listings_en.sql",
+          "locales/en-US/002_storefront_releases_en.sql",
+          "locales/en-US/003_storefront_catalog_en.sql"
+        ]
       }
     }
   }

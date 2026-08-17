@@ -26,7 +26,7 @@
     "developmentProfileId": "standalone.development",
     "productionProfileId": "cloud.production",
     "desktopBuildProfileId": "standalone.production",
-    "gatewayBind": "127.0.0.1:3900"
+    "gatewayBind": "0.0.0.0:18090"
   },
   "profileFiles": {
     "standalone.development": "etc/topology/standalone.development.env",
@@ -88,6 +88,10 @@
     "applicationServer": {
       "crate": "sdkwork-api-appstore-standalone-gateway",
       "binary": "sdkwork-api-appstore-standalone-gateway"
+    },
+    "storefrontRenderer": {
+      "package": "sdkwork-appstore-pc",
+      "script": "_sdkwork:client:browser"
     }
   },
   "orchestration": {
@@ -100,6 +104,224 @@
             "binary": "sdkwork-api-appstore-standalone-gateway",
             "required": true,
             "role": "api-standalone-gateway"
+          },
+          {
+            "id": "storefront-renderer",
+            "package": "sdkwork-appstore-pc",
+            "script": "_sdkwork:client:browser",
+            "required": true,
+            "role": "client",
+            "bindEnv": "SDKWORK_APPSTORE_INTERNAL_PC_RENDERER_BIND",
+            "runtimeTargets": [
+              "browser"
+            ],
+            "clientArchitectures": [
+              "pc-web"
+            ]
+          }
+        ],
+        "browserDeliveries": [
+          {
+            "id": "pc-web",
+            "applicationRoot": "apps/sdkwork-appstore-pc",
+            "clientArchitectures": [
+              "pc-web"
+            ],
+            "originMode": "same-origin",
+            "deliveryMode": "dev-server-proxy",
+            "apiSurfaceId": "application.public-ingress",
+            "clientProcessId": "storefront-renderer",
+            "preserveCanonicalPaths": true
+          }
+        ],
+        "accessEndpoints": [
+          {
+            "id": "application-ui",
+            "kind": "user-interface",
+            "source": {
+              "processId": "storefront-renderer"
+            },
+            "path": "/",
+            "primary": true,
+            "runtimeTargets": [
+              "browser"
+            ],
+            "clientArchitectures": [
+              "pc-web"
+            ]
+          },
+          {
+            "id": "application-api",
+            "kind": "service",
+            "source": {
+              "surfaceId": "application.public-ingress"
+            },
+            "path": "/",
+            "runtimeTargets": [
+              "browser"
+            ]
+          },
+          {
+            "id": "application-api-reference",
+            "kind": "api-reference",
+            "source": {
+              "surfaceId": "application.public-ingress"
+            },
+            "path": "/openapi.json",
+            "runtimeTargets": [
+              "browser"
+            ]
+          },
+          {
+            "id": "application-health",
+            "kind": "health",
+            "source": {
+              "surfaceId": "application.public-ingress"
+            },
+            "path": "/healthz",
+            "runtimeTargets": [
+              "browser"
+            ]
+          }
+        ],
+        "healthSurfaces": [
+          "application.public-ingress"
+        ]
+      },
+      "standalone.test": {
+        "processes": [
+          {
+            "id": "application.public-ingress",
+            "crate": "sdkwork-api-appstore-standalone-gateway",
+            "binary": "sdkwork-api-appstore-standalone-gateway",
+            "required": true,
+            "role": "api-standalone-gateway"
+          },
+          {
+            "id": "storefront-renderer",
+            "package": "sdkwork-appstore-pc",
+            "script": "_sdkwork:client:browser",
+            "required": true,
+            "role": "client",
+            "bindEnv": "SDKWORK_APPSTORE_INTERNAL_PC_RENDERER_BIND",
+            "runtimeTargets": [
+              "browser"
+            ],
+            "clientArchitectures": [
+              "pc-web"
+            ]
+          }
+        ],
+        "browserDeliveries": [
+          {
+            "id": "pc-web",
+            "applicationRoot": "apps/sdkwork-appstore-pc",
+            "clientArchitectures": [
+              "pc-web"
+            ],
+            "originMode": "same-origin",
+            "deliveryMode": "dev-server-proxy",
+            "apiSurfaceId": "application.public-ingress",
+            "clientProcessId": "storefront-renderer",
+            "preserveCanonicalPaths": true
+          }
+        ],
+        "accessEndpoints": [
+          {
+            "id": "application-ui",
+            "kind": "user-interface",
+            "source": {
+              "processId": "storefront-renderer"
+            },
+            "path": "/",
+            "primary": true,
+            "runtimeTargets": [
+              "browser"
+            ],
+            "clientArchitectures": [
+              "pc-web"
+            ]
+          },
+          {
+            "id": "application-api-reference",
+            "kind": "api-reference",
+            "source": {
+              "surfaceId": "application.public-ingress"
+            },
+            "path": "/openapi.json",
+            "runtimeTargets": [
+              "browser"
+            ]
+          }
+        ],
+        "healthSurfaces": [
+          "application.public-ingress"
+        ]
+      },
+      "standalone.staging": {
+        "processes": [
+          {
+            "id": "application.public-ingress",
+            "crate": "sdkwork-api-appstore-standalone-gateway",
+            "binary": "sdkwork-api-appstore-standalone-gateway",
+            "required": true,
+            "role": "api-standalone-gateway"
+          },
+          {
+            "id": "storefront-renderer",
+            "package": "sdkwork-appstore-pc",
+            "script": "_sdkwork:client:browser",
+            "required": true,
+            "role": "client",
+            "bindEnv": "SDKWORK_APPSTORE_INTERNAL_PC_RENDERER_BIND",
+            "runtimeTargets": [
+              "browser"
+            ],
+            "clientArchitectures": [
+              "pc-web"
+            ]
+          }
+        ],
+        "browserDeliveries": [
+          {
+            "id": "pc-web",
+            "applicationRoot": "apps/sdkwork-appstore-pc",
+            "clientArchitectures": [
+              "pc-web"
+            ],
+            "originMode": "same-origin",
+            "deliveryMode": "dev-server-proxy",
+            "apiSurfaceId": "application.public-ingress",
+            "clientProcessId": "storefront-renderer",
+            "preserveCanonicalPaths": true
+          }
+        ],
+        "accessEndpoints": [
+          {
+            "id": "application-ui",
+            "kind": "user-interface",
+            "source": {
+              "processId": "storefront-renderer"
+            },
+            "path": "/",
+            "primary": true,
+            "runtimeTargets": [
+              "browser"
+            ],
+            "clientArchitectures": [
+              "pc-web"
+            ]
+          },
+          {
+            "id": "application-api-reference",
+            "kind": "api-reference",
+            "source": {
+              "surfaceId": "application.public-ingress"
+            },
+            "path": "/openapi.json",
+            "runtimeTargets": [
+              "browser"
+            ]
           }
         ],
         "healthSurfaces": [

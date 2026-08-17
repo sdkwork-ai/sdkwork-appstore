@@ -131,7 +131,7 @@ export const PublishTemplateFormFields: React.FC<PublishTemplateFormFieldsProps>
           onClick={onCancel}
           className="px-4 py-2 rounded-xl text-xs font-semibold text-gray-500 hover:bg-gray-100 dark:hover:bg-[#222530] cursor-pointer"
         >
-          {t('common.cancel')}
+          {t('common.actions.cancel')}
         </button>
         <button
           type="submit"

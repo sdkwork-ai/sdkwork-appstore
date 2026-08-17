@@ -1,4 +1,8 @@
 export const templates = {
+  title: '应用模板库',
+  official: '官方推荐',
+  searchPlaceholder: '搜索应用模板、技术栈或标签...',
+  publishBtn: '发布应用为模板',
   header: {
     badge: '应用工程模板',
     title: '全栈开箱即用脚手架与模版中心',
@@ -89,12 +93,51 @@ export const templates = {
     workflowTitle: '本地工程化运行三步曲',
     step1Title: '拉取模板工程',
     step2Title: '配置环境变量',
-    step3Title: '启动本地热更新服务器'
+    step3Title: '启动本地热更新服务器',
+    nav: {
+      overview: '模板概览',
+      screenshots: '界面效果图',
+      techstack: '技术栈 & 架构',
+      cli: 'CLI 脚手架',
+      demo: '交互沙盒体验'
+    },
+    metrics: {
+      devLanguage: '开发语言',
+      uiFramework: 'UI 框架',
+      buildTool: '构建工具',
+      license: '开源协议',
+      stars: '社区 Stars',
+      forks: '克隆次数'
+    },
+    screenPreview: {
+      uiPreview: 'UI 预览',
+      screenshotCount: '{{count}} 张效果图',
+      enterDetail: '进入应用详情页'
+    },
+    screenshots: {
+      previewTitle: '界面效果图预览 ({{current}} / {{total}})',
+      desktop: 'PC 桌面',
+      mobile: '移动端',
+      zoom: '放大',
+      lightboxHint: '点击任意位置退出大图预览'
+    }
   },
   empty: {
     title: '未找到匹配的应用模板',
     subtitle: '请尝试更换搜索关键字或分类'
   },
-  loading: '加载应用模板库中...'
+  loading: '加载应用模板库中...',
+  success: {
+    title: '模板发布成功',
+    subtitle: '您的模板已提交至社区模板库'
+  },
+  modal: {
+    cliTitle: '终端一键初始化命令',
+    createdSuccess: '已成功基于「{{title}}」创建应用',
+    initSuccess: '已初始化',
+    createAppBtn: '基于此模板创建应用',
+    author: '作者',
+    goToAppDetail: '进入应用详情页'
+  }
 };
 

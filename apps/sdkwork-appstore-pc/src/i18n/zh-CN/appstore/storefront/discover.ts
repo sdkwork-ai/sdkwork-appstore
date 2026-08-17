@@ -23,5 +23,9 @@ export const discover = {
   },
   miniGamesBanner: {
     playInClient: '无需下载 · 即点即玩'
+  },
+  categories: {
+    browseTitle: '浏览分类',
+    seeAll: '查看全部'
   }
 };

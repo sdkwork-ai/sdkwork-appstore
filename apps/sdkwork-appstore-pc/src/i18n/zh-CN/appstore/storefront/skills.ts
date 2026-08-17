@@ -41,7 +41,14 @@ export const skills = {
     outputResult: '执行结果',
     activeUses: '次激活调用',
     loadSkill: '装载技能',
-    loadedSkill: '已加载'
+    loadedSkill: '已加载',
+    footerNote: '装载后自动注入 Agent 上下文模型',
+    author: '作者',
+    category: '类别',
+    version: '版本',
+    promptTitle: '核心 Prompt 指令预览',
+    specTitle: 'SKILL.md 标准结构规范',
+    triggersTitle: '激活指令 (@Triggers)'
   },
   form: {
     skillName: '技能名称',

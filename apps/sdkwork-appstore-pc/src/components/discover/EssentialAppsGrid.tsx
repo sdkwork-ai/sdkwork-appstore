@@ -15,7 +15,7 @@ export function EssentialAppsGrid({ apps }: EssentialAppsGridProps) {
     <div className="flex flex-col h-full">
       <div className="flex items-center justify-between mb-3">
         <Link 
-          to="/search?category=热门 AI 应用" 
+          to="/search?category=utilities" 
           className="flex items-center gap-1 group text-sm font-bold text-gray-900 dark:text-gray-100 hover:text-blue-500 transition-colors"
         >
           <span>{t('discover.sections.essentialApps')}</span>

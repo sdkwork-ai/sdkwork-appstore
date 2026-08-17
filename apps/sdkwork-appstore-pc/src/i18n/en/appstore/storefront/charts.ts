@@ -10,5 +10,10 @@ export const charts = {
     topGrossing: 'Top Grossing',
     newReleases: 'New Releases',
     aiTools: 'Trending AI'
+  },
+  rank: {
+    first: 'Rank 1',
+    second: 'Rank 2',
+    third: 'Rank 3'
   }
 };

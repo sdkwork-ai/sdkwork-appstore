@@ -56,7 +56,9 @@ pub async fn bootstrap_appstore_database(
 }
 
 pub async fn bootstrap_appstore_database_from_env() -> Result<AppstoreDatabaseHost, String> {
+    let app_root = resolve_app_root();
     let _ = dotenvy::dotenv();
+    load_workspace_postgres_env(&app_root);
     if let Ok(pool) = create_pool_from_env("APPSTORE").await {
         if let Some(pool) = pool {
             return bootstrap_appstore_database(pool).await;
@@ -80,4 +82,16 @@ fn resolve_app_root() -> PathBuf {
                 .canonicalize()
                 .unwrap_or_else(|_| PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../.."))
         })
+}
+
+fn load_workspace_postgres_env(app_root: &PathBuf) {
+    let postgres_env = app_root.join(".env.postgres");
+    if postgres_env.is_file() {
+        dotenvy::from_filename(&postgres_env).map_err(|error| {
+            format!(
+                "load workspace postgres env {} failed: {error}",
+                postgres_env.display()
+            )
+        }).expect("workspace postgres env must be readable");
+    }
 }

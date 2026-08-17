@@ -72,5 +72,30 @@ export const common = {
     license: '开源协议',
     architecture: '架构支持',
     framework: '底层框架'
+  },
+  categories: {
+    all: '全部'
+  },
+  time: {
+    recently: '最近'
+  },
+  description: '简介',
+  tags: '能力标签',
+  noData: '暂无符合条件的数据',
+  accessibility: {
+    closeModal: '关闭弹窗',
+    previousSlide: '上一张',
+    nextSlide: '下一张',
+    toggleTheme: '切换主题',
+    clearSearch: '清除搜索',
+    rankFirst: '第 1 名',
+    rankSecond: '第 2 名',
+    rankThird: '第 3 名'
+  },
+  language: {
+    switchToEn: '切换为 English',
+    switchToZh: '切换为简体中文',
+    labelZh: '中文',
+    labelEn: 'EN'
   }
 };

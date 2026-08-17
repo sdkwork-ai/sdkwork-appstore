@@ -4,7 +4,9 @@ export const aihub = {
     title: 'AI Assistants & Generative Toolkit',
     subtitle: 'Explore state-of-the-art AI agents, prompt presets, and test real-time AI responses directly in the client sandbox.',
     chatAssistant: 'AI Chat Assistant',
-    knowledgeCopilot: 'Personal Knowledge Copilot'
+    knowledgeCopilot: 'Personal Knowledge Copilot',
+    chatAssistantVendors: 'Qwen / Kimi / Doubao',
+    knowledgeCopilotVendor: 'ima.copilot'
   },
   sandbox: {
     title: 'AI Sandbox Assistant',
@@ -26,8 +28,13 @@ export const aihub = {
     latencyLabel: 'Latency',
     testEngine: 'Test Engine:',
     errorText: '[Error]: Model inference failed, please try again later.',
+    notConfigured: '[Notice]: AI preview agent is not configured (VITE_SDKWORK_APPSTORE_AI_PREVIEW_AGENT_ID). Configure it to try the inference sandbox.',
     testingWith: 'Testing in sandbox with {{name}}',
     resetContext: 'Reset Expert Context',
+    defaultCollaborateMsg: 'Please provide your collaboration request.',
+    prefillSystemInstruction: '[System Instruction - {{name}} ({{nickname}})]',
+    prefillNeeds: 'My request is:',
+    prefillUserQuestion: '[User Question]',
     presets: {
       p1: 'Recommend an AI coding tool for TypeScript development',
       p2: 'Summarize 100-page PDF research papers and reports',
@@ -49,6 +56,8 @@ export const aihub = {
     featuredScenarios: 'Featured Scenarios',
     rosterTitle: 'AI Expert Marketplace',
     rosterSubtitle: 'Select domain experts with built-in system prompts for instant task execution',
+    rosterCount: '{{count}} experts',
+    resetFilters: 'Reset filters',
     scenarioCount: '{{count}} Experts Available',
     sort: {
       comprehensive: 'Comprehensive',
@@ -80,12 +89,14 @@ export const aihub = {
       addedToMine: 'Added',
       addToMine: '+ My Experts',
       official: 'Official',
-      featured: 'Featured'
+      featured: 'Featured',
+      callsCount: '★ {{rating}} · {{calls}}k calls'
     },
     modal: {
       title: 'Expert Assistant Details',
       systemPrompt: 'System Instructions (Prompt)',
       testPromptPlaceholder: 'Ask this expert a question or give instructions...',
+      testPromptExample: 'e.g. Help me plan a microservices refactor for millions of users...',
       sendToExpert: 'Execute via Sandbox',
       copyPrompt: 'Copy System Prompt',
       promptCopied: 'Prompt Copied!',
@@ -106,7 +117,12 @@ export const aihub = {
       tagsLabel: 'Skill Tags (Comma separated)',
       tagsPlaceholder: 'e.g. High-frequency trading, Backtesting, Python',
       cancel: 'Cancel',
-      create: 'Create Expert'
+      create: 'Create Expert',
+      defaultNickname: 'Custom Expert',
+      defaultTag1: 'Custom',
+      defaultTag2: 'AI Assistant',
+      defaultSystemPrompt: 'You are {{name}}. Please help the user solve professional problems.',
+      myCreation: 'My Creation'
     },
     scenarios: {
       content: 'Content Creation',
@@ -118,7 +134,8 @@ export const aihub = {
       doc: 'Professional Docs',
       design: 'Product Design',
       dev: 'Engineering Dev'
-    }
+    },
+    scenarioExpertCount: '{{count}} specialists'
   }
 };
 

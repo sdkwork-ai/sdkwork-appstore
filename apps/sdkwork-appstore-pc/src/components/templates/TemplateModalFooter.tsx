@@ -80,10 +80,10 @@ export const TemplateModalFooter: React.FC<TemplateModalFooterProps> = ({
         <button
           onClick={handleGoToAppDetail}
           className="px-4 py-2.5 rounded-xl bg-slate-900 dark:bg-slate-800 hover:bg-slate-800 dark:hover:bg-slate-700 text-white text-xs font-bold border border-slate-700/60 shadow-sm transition-all flex items-center justify-center gap-1.5 cursor-pointer group"
-          title="跳转进入对应应用详情页"
+          title={t('templates.modal.goToAppDetail')}
         >
           <LayoutGrid className="w-3.5 h-3.5 text-indigo-400" />
-          <span>进入应用详情页</span>
+          <span>{t('templates.modal.goToAppDetail')}</span>
           <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:translate-x-0.5 transition-transform" />
         </button>
 

@@ -35,7 +35,7 @@ export const TemplateCliTab: React.FC<TemplateCliTabProps> = ({ templateId, titl
             {copied ? (
               <>
                 <Check className="w-3.5 h-3.5 text-emerald-400" />
-                <span className="text-emerald-400">{t('plugins.modal.copiedSchema')}</span>
+                <span className="text-emerald-400">{t('templates.detail.copiedCli')}</span>
               </>
             ) : (
               <>

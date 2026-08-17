@@ -21,28 +21,28 @@ export const TemplateDetailNav: React.FC<TemplateDetailNavProps> = ({
   const tabs: { id: TemplateTabType; label: string; icon: React.ReactNode; badge?: number }[] = [
     {
       id: 'overview',
-      label: '模板概览',
+      label: t('templates.detail.nav.overview'),
       icon: <Layers className="w-3.5 h-3.5" />,
     },
     {
       id: 'screenshots',
-      label: '界面效果图',
+      label: t('templates.detail.nav.screenshots'),
       icon: <Image className="w-3.5 h-3.5" />,
       badge: screenshotsCount,
     },
     {
       id: 'techstack',
-      label: '技术栈与架构',
+      label: t('templates.detail.nav.techstack'),
       icon: <Cpu className="w-3.5 h-3.5" />,
     },
     {
       id: 'cli',
-      label: 'CLI 极速部署',
+      label: t('templates.detail.nav.cli'),
       icon: <Terminal className="w-3.5 h-3.5" />,
     },
     {
       id: 'demo',
-      label: '交互式 Demo',
+      label: t('templates.detail.nav.demo'),
       icon: <Play className="w-3.5 h-3.5 text-emerald-500" />,
     },
   ];

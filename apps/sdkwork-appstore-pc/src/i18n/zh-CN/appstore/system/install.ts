@@ -10,6 +10,8 @@ export const install = {
     confirmInstall: '开始安装',
     installing: '正在向本地磁盘写入并配置安装包...',
     completed: '应用安装成功！',
-    launchNow: '立即运行应用'
+    launchNow: '立即运行应用',
+    runningNotice: '应用【{{name}}】正在本地桌面沙盒环境运行中...',
+    installFailed: '安装失败，请稍后重试'
   }
 };

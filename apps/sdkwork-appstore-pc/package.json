@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "tsx server.ts",
     "start": "node dist/server.cjs",
-    "dev:browser": "vite --port=3000 --host=0.0.0.0",
+    "dev:browser": "vite --configLoader native",
+    "_sdkwork:client:browser": "vite --configLoader native",
     "dev:server": "tsx server.ts",
     "dev:desktop": "vite --port=3000 --host=0.0.0.0",
     "dev:tablet-ipados": "vite --port=3000 --host=0.0.0.0",
@@ -56,6 +57,7 @@
     "@sdkwork/iam-app-sdk": "workspace:*",
     "@sdkwork/iam-contracts": "workspace:*",
     "@sdkwork/iam-credential-entry": "workspace:*",
+    "@sdkwork/iam-react": "workspace:*",
     "@sdkwork/iam-runtime": "workspace:*",
     "@sdkwork/mcp-app-sdk": "workspace:*",
     "@sdkwork/sdk-common": "workspace:*",
@@ -84,6 +86,7 @@
     "autoprefixer": "^10.4.21",
     "esbuild": "^0.25.0",
     "tailwindcss": "^4.1.14",
+    "tailwindcss-animate": "catalog:",
     "tsx": "^4.21.0",
     "typescript": "~5.8.2",
     "vitest": "catalog:"

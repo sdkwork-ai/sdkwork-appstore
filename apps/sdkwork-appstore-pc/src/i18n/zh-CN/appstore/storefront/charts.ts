@@ -10,5 +10,10 @@ export const charts = {
     topGrossing: '创收热度榜',
     newReleases: '飙升新品榜',
     aiTools: 'AI 爆款榜'
+  },
+  rank: {
+    first: '第 1 名',
+    second: '第 2 名',
+    third: '第 3 名'
   }
 };

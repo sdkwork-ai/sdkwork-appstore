@@ -1,51 +1,46 @@
--- 007_storefront_catalog.sql — editorial collections, featured slots, chart snapshots and trending terms (zh-CN).
+-- 007_storefront_catalog.sql — editorial collections, featured slots and chart snapshots (locale-neutral structure).
 
 INSERT INTO appstore_catalog_collection
     (id, tenant_id, collection_code, collection_type, collection_status, audience_scope, sort_order, cover_media_resource_id, starts_at, ends_at, created_at, updated_at)
 VALUES
-    ('col-1', '100001', 'weekly-ai-picks', 'editorial', 'published', 'public', 1, '', CURRENT_TIMESTAMP, NULL, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-    ('col-2', '100001', 'agent-coding', 'editorial', 'published', 'public', 2, '', CURRENT_TIMESTAMP, NULL, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-    ('col-3', '100001', 'creative-ai', 'editorial', 'published', 'public', 3, '', CURRENT_TIMESTAMP, NULL, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-    ('col-4', '100001', 'board-game-hall', 'thematic', 'published', 'public', 4, '', CURRENT_TIMESTAMP, NULL, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+    ('col-1', '100001', 'weekly-ai-picks', 'editorial', 'published', 'public', 1, 'mr-col-weekly-ai-picks-cover', CURRENT_TIMESTAMP, NULL, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('col-2', '100001', 'agent-coding', 'editorial', 'published', 'public', 2, 'mr-col-agent-coding-cover', CURRENT_TIMESTAMP, NULL, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('col-3', '100001', 'creative-ai', 'editorial', 'published', 'public', 3, 'mr-col-creative-ai-cover', CURRENT_TIMESTAMP, NULL, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('col-4', '100001', 'board-game-hall', 'thematic', 'published', 'public', 4, 'mr-col-board-game-hall-cover', CURRENT_TIMESTAMP, NULL, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
 ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO appstore_catalog_collection_localization
-    (id, tenant_id, collection_id, locale, display_name, description, created_at, updated_at)
-VALUES
-    ('loc-col-1', '100001', 'col-1', 'zh-CN', '本期精选 - AI 生产力革命', '编辑部精选的 AI 生产力应用', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-    ('loc-col-2', '100001', 'col-2', 'zh-CN', 'AI 编程与 Agent 神器 - 从编辑器到智能体', '全面提升研发效率的 AI 工具', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-    ('loc-col-3', '100001', 'col-3', 'zh-CN', 'AI 创意与多媒体重构 - 灵感无限', 'AI 图像、音乐与视频创作', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-    ('loc-col-4', '100001', 'col-4', 'zh-CN', '棋牌游戏大厅 - 经典棋牌一网打尽', '斗地主、麻将、象棋等经典棋牌', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-ON CONFLICT (id) DO NOTHING;
+-- zh-CN editorial catalog copy: locales/zh-CN/003_storefront_catalog_zh.sql
+
 
 INSERT INTO appstore_catalog_collection_item
     (id, tenant_id, collection_id, listing_id, sort_order, highlight_json, starts_at, ends_at, created_at)
 VALUES
-    ('ci-col-1-app-tencent-ima', '100001', 'col-1', 'app-tencent-ima', 1, '{}', CURRENT_TIMESTAMP, NULL, CURRENT_TIMESTAMP),
-    ('ci-col-1-app-notion-ai', '100001', 'col-1', 'app-notion-ai', 2, '{}', CURRENT_TIMESTAMP, NULL, CURRENT_TIMESTAMP),
-    ('ci-col-1-app-rag-knowledge', '100001', 'col-1', 'app-rag-knowledge', 3, '{}', CURRENT_TIMESTAMP, NULL, CURRENT_TIMESTAMP),
-    ('ci-col-1-app-qwen', '100001', 'col-1', 'app-qwen', 4, '{}', CURRENT_TIMESTAMP, NULL, CURRENT_TIMESTAMP),
-    ('ci-col-1-app-deepseek', '100001', 'col-1', 'app-deepseek', 5, '{}', CURRENT_TIMESTAMP, NULL, CURRENT_TIMESTAMP),
-    ('ci-col-1-app-wps', '100001', 'col-1', 'app-wps', 6, '{}', CURRENT_TIMESTAMP, NULL, CURRENT_TIMESTAMP),
-    ('ci-col-2-app-cursor', '100001', 'col-2', 'app-cursor', 1, '{}', CURRENT_TIMESTAMP, NULL, CURRENT_TIMESTAMP),
-    ('ci-col-2-app-v0', '100001', 'col-2', 'app-v0', 2, '{}', CURRENT_TIMESTAMP, NULL, CURRENT_TIMESTAMP),
-    ('ci-col-2-app-bolt', '100001', 'col-2', 'app-bolt', 3, '{}', CURRENT_TIMESTAMP, NULL, CURRENT_TIMESTAMP),
-    ('ci-col-2-app-manus', '100001', 'col-2', 'app-manus', 4, '{}', CURRENT_TIMESTAMP, NULL, CURRENT_TIMESTAMP),
-    ('ci-col-2-app-coze', '100001', 'col-2', 'app-coze', 5, '{}', CURRENT_TIMESTAMP, NULL, CURRENT_TIMESTAMP),
-    ('ci-col-2-app-code-playground', '100001', 'col-2', 'app-code-playground', 6, '{}', CURRENT_TIMESTAMP, NULL, CURRENT_TIMESTAMP),
-    ('ci-col-3-app-midjourney', '100001', 'col-3', 'app-midjourney', 1, '{}', CURRENT_TIMESTAMP, NULL, CURRENT_TIMESTAMP),
-    ('ci-col-3-app-suno', '100001', 'col-3', 'app-suno', 2, '{}', CURRENT_TIMESTAMP, NULL, CURRENT_TIMESTAMP),
-    ('ci-col-3-app-runway', '100001', 'col-3', 'app-runway', 3, '{}', CURRENT_TIMESTAMP, NULL, CURRENT_TIMESTAMP),
-    ('ci-col-3-app-elevenlabs', '100001', 'col-3', 'app-elevenlabs', 4, '{}', CURRENT_TIMESTAMP, NULL, CURRENT_TIMESTAMP),
-    ('ci-col-3-app-comfyui', '100001', 'col-3', 'app-comfyui', 5, '{}', CURRENT_TIMESTAMP, NULL, CURRENT_TIMESTAMP),
-    ('ci-col-3-app-flux', '100001', 'col-3', 'app-flux', 6, '{}', CURRENT_TIMESTAMP, NULL, CURRENT_TIMESTAMP),
-    ('ci-col-4-game-doudizhu', '100001', 'col-4', 'game-doudizhu', 1, '{}', CURRENT_TIMESTAMP, NULL, CURRENT_TIMESTAMP),
-    ('ci-col-4-game-mahjong', '100001', 'col-4', 'game-mahjong', 2, '{}', CURRENT_TIMESTAMP, NULL, CURRENT_TIMESTAMP),
-    ('ci-col-4-game-xiangqi', '100001', 'col-4', 'game-xiangqi', 3, '{}', CURRENT_TIMESTAMP, NULL, CURRENT_TIMESTAMP),
-    ('ci-col-4-game-guandan', '100001', 'col-4', 'game-guandan', 4, '{}', CURRENT_TIMESTAMP, NULL, CURRENT_TIMESTAMP),
-    ('ci-col-4-game-gomoku', '100001', 'col-4', 'game-gomoku', 5, '{}', CURRENT_TIMESTAMP, NULL, CURRENT_TIMESTAMP),
-    ('ci-col-4-game-junqi', '100001', 'col-4', 'game-junqi', 6, '{}', CURRENT_TIMESTAMP, NULL, CURRENT_TIMESTAMP)
-ON CONFLICT (id) DO NOTHING;
+    ('ci-col-1-app-tencent-ima', '100001', 'col-1', 'app-tencent-ima', 1, '{"badge":"编辑推荐","reason":"腾讯 ima 个人知识库深度问答"}', CURRENT_TIMESTAMP, NULL, CURRENT_TIMESTAMP),
+    ('ci-col-1-app-notion-ai', '100001', 'col-1', 'app-notion-ai', 2, '{"badge":"办公协同","reason":"Notion AI 会议纪要总结与数据库问答"}', CURRENT_TIMESTAMP, NULL, CURRENT_TIMESTAMP),
+    ('ci-col-1-app-rag-knowledge', '100001', 'col-1', 'app-rag-knowledge', 3, '{"badge":"企业级","reason":"RAG 知识库混合检索与重排"}', CURRENT_TIMESTAMP, NULL, CURRENT_TIMESTAMP),
+    ('ci-col-1-app-qwen', '100001', 'col-1', 'app-qwen', 4, '{"badge":"热门下载","reason":"千问 AI 深度思考与长文档解析"}', CURRENT_TIMESTAMP, NULL, CURRENT_TIMESTAMP),
+    ('ci-col-1-app-deepseek', '100001', 'col-1', 'app-deepseek', 5, '{"badge":"推理榜首","reason":"DeepSeek R1 数学与代码推理"}', CURRENT_TIMESTAMP, NULL, CURRENT_TIMESTAMP),
+    ('ci-col-1-app-wps', '100001', 'col-1', 'app-wps', 6, '{"badge":"国民办公","reason":"WPS Office AI 文档助手"}', CURRENT_TIMESTAMP, NULL, CURRENT_TIMESTAMP),
+    ('ci-col-2-app-cursor', '100001', 'col-2', 'app-cursor', 1, '{"badge":"开发者首选","reason":"Cursor AI Agent 并行编程任务"}', CURRENT_TIMESTAMP, NULL, CURRENT_TIMESTAMP),
+    ('ci-col-2-app-v0', '100001', 'col-2', 'app-v0', 2, '{"badge":"前端生成","reason":"Vercel v0 React/Tailwind 界面生成"}', CURRENT_TIMESTAMP, NULL, CURRENT_TIMESTAMP),
+    ('ci-col-2-app-bolt', '100001', 'col-2', 'app-bolt', 3, '{"badge":"全栈构建","reason":"Bolt 从提示词到可部署应用"}', CURRENT_TIMESTAMP, NULL, CURRENT_TIMESTAMP),
+    ('ci-col-2-app-manus', '100001', 'col-2', 'app-manus', 4, '{"badge":"通用 Agent","reason":"Manus Agent 多步骤任务沙箱"}', CURRENT_TIMESTAMP, NULL, CURRENT_TIMESTAMP),
+    ('ci-col-2-app-coze', '100001', 'col-2', 'app-coze', 5, '{"badge":"Bot 平台","reason":"Coze 扣子插件市场与工作流"}', CURRENT_TIMESTAMP, NULL, CURRENT_TIMESTAMP),
+    ('ci-col-2-app-code-playground', '100001', 'col-2', 'app-code-playground', 6, '{"badge":"代码沙箱","reason":"Code Playground 40+ 语言在线运行"}', CURRENT_TIMESTAMP, NULL, CURRENT_TIMESTAMP),
+    ('ci-col-3-app-midjourney', '100001', 'col-3', 'app-midjourney', 1, '{"badge":"付费精选","reason":"Midjourney 4K 风格化出图"}', CURRENT_TIMESTAMP, NULL, CURRENT_TIMESTAMP),
+    ('ci-col-3-app-suno', '100001', 'col-3', 'app-suno', 2, '{"badge":"AI 音乐","reason":"Suno AI 完整专辑与人声生成"}', CURRENT_TIMESTAMP, NULL, CURRENT_TIMESTAMP),
+    ('ci-col-3-app-runway', '100001', 'col-3', 'app-runway', 3, '{"badge":"视频生成","reason":"Runway Gen-3 文生视频"}', CURRENT_TIMESTAMP, NULL, CURRENT_TIMESTAMP),
+    ('ci-col-3-app-elevenlabs', '100001', 'col-3', 'app-elevenlabs', 4, '{"badge":"语音合成","reason":"ElevenLabs 32 语种 TTS"}', CURRENT_TIMESTAMP, NULL, CURRENT_TIMESTAMP),
+    ('ci-col-3-app-comfyui', '100001', 'col-3', 'app-comfyui', 5, '{"badge":"节点工作流","reason":"ComfyUI Stable Diffusion 模板库"}', CURRENT_TIMESTAMP, NULL, CURRENT_TIMESTAMP),
+    ('ci-col-3-app-flux', '100001', 'col-3', 'app-flux', 6, '{"badge":"新一代模型","reason":"FLUX.1 Pro 高真实感出图"}', CURRENT_TIMESTAMP, NULL, CURRENT_TIMESTAMP),
+    ('ci-col-4-game-doudizhu', '100001', 'col-4', 'game-doudizhu', 1, '{"badge":"棋牌热门","reason":"欢乐斗地主 AI 陪练模式"}', CURRENT_TIMESTAMP, NULL, CURRENT_TIMESTAMP),
+    ('ci-col-4-game-mahjong', '100001', 'col-4', 'game-mahjong', 2, '{"badge":"经典麻将","reason":"欢乐麻将血流成河模式"}', CURRENT_TIMESTAMP, NULL, CURRENT_TIMESTAMP),
+    ('ci-col-4-game-xiangqi', '100001', 'col-4', 'game-xiangqi', 3, '{"badge":"象棋大师","reason":"中国象棋残局挑战关卡"}', CURRENT_TIMESTAMP, NULL, CURRENT_TIMESTAMP),
+    ('ci-col-4-game-guandan', '100001', 'col-4', 'game-guandan', 4, '{"badge":"掼蛋搭档","reason":"欢乐掼蛋 AI 陪练搭档"}', CURRENT_TIMESTAMP, NULL, CURRENT_TIMESTAMP),
+    ('ci-col-4-game-gomoku', '100001', 'col-4', 'game-gomoku', 5, '{"badge":"五子棋","reason":"五子棋悔棋复盘与联机"}', CURRENT_TIMESTAMP, NULL, CURRENT_TIMESTAMP),
+    ('ci-col-4-game-junqi', '100001', 'col-4', 'game-junqi', 6, '{"badge":"军棋对战","reason":"军棋排位赛季与好友约战"}', CURRENT_TIMESTAMP, NULL, CURRENT_TIMESTAMP)
+ON CONFLICT (id) DO UPDATE SET
+    highlight_json = EXCLUDED.highlight_json;
 
 INSERT INTO appstore_catalog_featured_slot
     (id, tenant_id, slot_code, listing_id, slot_status, audience_scope, platform_scope, region_scope_json, starts_at, ends_at, created_at, updated_at)
@@ -60,7 +55,7 @@ INSERT INTO appstore_catalog_chart_snapshot
 VALUES
     ('chart-top-20260803', '100001', 'top', '2026-08-03', 'zh-CN', 'ALL', '[{"rank": 1, "listingId": "app-deepseek", "metricKind": "installs", "metricValue": 100000}, {"rank": 2, "listingId": "app-qwen", "metricKind": "installs", "metricValue": 97000}, {"rank": 3, "listingId": "app-wechat", "metricKind": "installs", "metricValue": 94000}, {"rank": 4, "listingId": "app-wps", "metricKind": "installs", "metricValue": 91000}, {"rank": 5, "listingId": "app-kimi", "metricKind": "installs", "metricValue": 88000}, {"rank": 6, "listingId": "app-cursor", "metricKind": "installs", "metricValue": 85000}, {"rank": 7, "listingId": "app-doubao", "metricKind": "installs", "metricValue": 82000}, {"rank": 8, "listingId": "app-tencent-ima", "metricKind": "installs", "metricValue": 79000}, {"rank": 9, "listingId": "app-claude", "metricKind": "installs", "metricValue": 76000}, {"rank": 10, "listingId": "app-midjourney", "metricKind": "installs", "metricValue": 73000}, {"rank": 11, "listingId": "app-perplexity", "metricKind": "installs", "metricValue": 70000}, {"rank": 12, "listingId": "app-notion-ai", "metricKind": "installs", "metricValue": 67000}, {"rank": 13, "listingId": "app-suno", "metricKind": "installs", "metricValue": 64000}, {"rank": 14, "listingId": "app-douyin", "metricKind": "installs", "metricValue": 61000}, {"rank": 15, "listingId": "app-baidunetdisk", "metricKind": "installs", "metricValue": 58000}, {"rank": 16, "listingId": "app-manus", "metricKind": "installs", "metricValue": 55000}, {"rank": 17, "listingId": "app-v0", "metricKind": "installs", "metricValue": 52000}, {"rank": 18, "listingId": "app-coze", "metricKind": "installs", "metricValue": 49000}, {"rank": 19, "listingId": "app-bolt", "metricKind": "installs", "metricValue": 46000}, {"rank": 20, "listingId": "app-agent-workspace", "metricKind": "installs", "metricValue": 43000}]', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
     ('chart-free-20260803', '100001', 'free', '2026-08-03', 'zh-CN', 'ALL', '[{"rank": 1, "listingId": "app-wechat", "metricKind": "installs", "metricValue": 100000}, {"rank": 2, "listingId": "app-wps", "metricKind": "installs", "metricValue": 97000}, {"rank": 3, "listingId": "app-douyin", "metricKind": "installs", "metricValue": 94000}, {"rank": 4, "listingId": "app-qwen", "metricKind": "installs", "metricValue": 91000}, {"rank": 5, "listingId": "app-deepseek", "metricKind": "installs", "metricValue": 88000}, {"rank": 6, "listingId": "app-kimi", "metricKind": "installs", "metricValue": 85000}, {"rank": 7, "listingId": "app-doubao", "metricKind": "installs", "metricValue": 82000}, {"rank": 8, "listingId": "app-tencent-ima", "metricKind": "installs", "metricValue": 79000}, {"rank": 9, "listingId": "app-baidunetdisk", "metricKind": "installs", "metricValue": 76000}, {"rank": 10, "listingId": "app-perplexity", "metricKind": "installs", "metricValue": 73000}, {"rank": 11, "listingId": "app-claude", "metricKind": "installs", "metricValue": 70000}, {"rank": 12, "listingId": "app-notion-ai", "metricKind": "installs", "metricValue": 67000}, {"rank": 13, "listingId": "app-code-playground", "metricKind": "installs", "metricValue": 64000}, {"rank": 14, "listingId": "app-comfyui", "metricKind": "installs", "metricValue": 61000}, {"rank": 15, "listingId": "app-saas-starter", "metricKind": "installs", "metricValue": 58000}, {"rank": 16, "listingId": "app-agent-workspace", "metricKind": "installs", "metricValue": 55000}, {"rank": 17, "listingId": "app-bolt", "metricKind": "installs", "metricValue": 52000}, {"rank": 18, "listingId": "app-v0", "metricKind": "installs", "metricValue": 49000}, {"rank": 19, "listingId": "app-coze", "metricKind": "installs", "metricValue": 46000}, {"rank": 20, "listingId": "app-manus", "metricKind": "installs", "metricValue": 43000}]', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-    ('chart-paid-20260803', '100001', 'paid', '2026-08-03', 'zh-CN', 'ALL', '[{"rank": 1, "listingId": "app-midjourney", "metricKind": "installs", "metricValue": 100000}, {"rank": 2, "listingId": "app-runway", "metricKind": "installs", "metricValue": 97000}, {"rank": 3, "listingId": "app-rag-knowledge", "metricKind": "installs", "metricValue": 94000}, {"rank": 4, "listingId": "game-mobile-mc", "metricKind": "installs", "metricValue": 91000}, {"rank": 5, "listingId": "app-suno", "metricKind": "installs", "metricValue": 88000}]', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+    ('chart-paid-20260803', '100001', 'paid', '2026-08-03', 'zh-CN', 'ALL', '[{"rank": 1, "listingId": "app-midjourney", "metricKind": "installs", "metricValue": 100000}, {"rank": 2, "listingId": "app-runway", "metricKind": "installs", "metricValue": 97000}, {"rank": 3, "listingId": "app-rag-knowledge", "metricKind": "installs", "metricValue": 94000}, {"rank": 4, "listingId": "game-mobile-mc", "metricKind": "installs", "metricValue": 91000}]', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO appstore_catalog_chart_snapshot
@@ -68,20 +63,8 @@ INSERT INTO appstore_catalog_chart_snapshot
 VALUES
     ('chart-top-20260803-en', '100001', 'top', '2026-08-03', 'en-US', 'ALL', '[{"rank": 1, "listingId": "app-deepseek", "metricKind": "installs", "metricValue": 100000}, {"rank": 2, "listingId": "app-qwen", "metricKind": "installs", "metricValue": 97000}, {"rank": 3, "listingId": "app-wechat", "metricKind": "installs", "metricValue": 94000}, {"rank": 4, "listingId": "app-wps", "metricKind": "installs", "metricValue": 91000}, {"rank": 5, "listingId": "app-kimi", "metricKind": "installs", "metricValue": 88000}, {"rank": 6, "listingId": "app-cursor", "metricKind": "installs", "metricValue": 85000}, {"rank": 7, "listingId": "app-doubao", "metricKind": "installs", "metricValue": 82000}, {"rank": 8, "listingId": "app-tencent-ima", "metricKind": "installs", "metricValue": 79000}, {"rank": 9, "listingId": "app-claude", "metricKind": "installs", "metricValue": 76000}, {"rank": 10, "listingId": "app-midjourney", "metricKind": "installs", "metricValue": 73000}, {"rank": 11, "listingId": "app-perplexity", "metricKind": "installs", "metricValue": 70000}, {"rank": 12, "listingId": "app-notion-ai", "metricKind": "installs", "metricValue": 67000}, {"rank": 13, "listingId": "app-suno", "metricKind": "installs", "metricValue": 64000}, {"rank": 14, "listingId": "app-douyin", "metricKind": "installs", "metricValue": 61000}, {"rank": 15, "listingId": "app-baidunetdisk", "metricKind": "installs", "metricValue": 58000}, {"rank": 16, "listingId": "app-manus", "metricKind": "installs", "metricValue": 55000}, {"rank": 17, "listingId": "app-v0", "metricKind": "installs", "metricValue": 52000}, {"rank": 18, "listingId": "app-coze", "metricKind": "installs", "metricValue": 49000}, {"rank": 19, "listingId": "app-bolt", "metricKind": "installs", "metricValue": 46000}, {"rank": 20, "listingId": "app-agent-workspace", "metricKind": "installs", "metricValue": 43000}]', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
     ('chart-free-20260803-en', '100001', 'free', '2026-08-03', 'en-US', 'ALL', '[{"rank": 1, "listingId": "app-wechat", "metricKind": "installs", "metricValue": 100000}, {"rank": 2, "listingId": "app-wps", "metricKind": "installs", "metricValue": 97000}, {"rank": 3, "listingId": "app-douyin", "metricKind": "installs", "metricValue": 94000}, {"rank": 4, "listingId": "app-qwen", "metricKind": "installs", "metricValue": 91000}, {"rank": 5, "listingId": "app-deepseek", "metricKind": "installs", "metricValue": 88000}, {"rank": 6, "listingId": "app-kimi", "metricKind": "installs", "metricValue": 85000}, {"rank": 7, "listingId": "app-doubao", "metricKind": "installs", "metricValue": 82000}, {"rank": 8, "listingId": "app-tencent-ima", "metricKind": "installs", "metricValue": 79000}, {"rank": 9, "listingId": "app-baidunetdisk", "metricKind": "installs", "metricValue": 76000}, {"rank": 10, "listingId": "app-perplexity", "metricKind": "installs", "metricValue": 73000}, {"rank": 11, "listingId": "app-claude", "metricKind": "installs", "metricValue": 70000}, {"rank": 12, "listingId": "app-notion-ai", "metricKind": "installs", "metricValue": 67000}, {"rank": 13, "listingId": "app-code-playground", "metricKind": "installs", "metricValue": 64000}, {"rank": 14, "listingId": "app-comfyui", "metricKind": "installs", "metricValue": 61000}, {"rank": 15, "listingId": "app-saas-starter", "metricKind": "installs", "metricValue": 58000}, {"rank": 16, "listingId": "app-agent-workspace", "metricKind": "installs", "metricValue": 55000}, {"rank": 17, "listingId": "app-bolt", "metricKind": "installs", "metricValue": 52000}, {"rank": 18, "listingId": "app-v0", "metricKind": "installs", "metricValue": 49000}, {"rank": 19, "listingId": "app-coze", "metricKind": "installs", "metricValue": 46000}, {"rank": 20, "listingId": "app-manus", "metricKind": "installs", "metricValue": 43000}]', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-    ('chart-paid-20260803-en', '100001', 'paid', '2026-08-03', 'en-US', 'ALL', '[{"rank": 1, "listingId": "app-midjourney", "metricKind": "installs", "metricValue": 100000}, {"rank": 2, "listingId": "app-runway", "metricKind": "installs", "metricValue": 97000}, {"rank": 3, "listingId": "app-rag-knowledge", "metricKind": "installs", "metricValue": 94000}, {"rank": 4, "listingId": "game-mobile-mc", "metricKind": "installs", "metricValue": 91000}, {"rank": 5, "listingId": "app-suno", "metricKind": "installs", "metricValue": 88000}]', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+    ('chart-paid-20260803-en', '100001', 'paid', '2026-08-03', 'en-US', 'ALL', '[{"rank": 1, "listingId": "app-midjourney", "metricKind": "installs", "metricValue": 100000}, {"rank": 2, "listingId": "app-runway", "metricKind": "installs", "metricValue": 97000}, {"rank": 3, "listingId": "app-rag-knowledge", "metricKind": "installs", "metricValue": 94000}, {"rank": 4, "listingId": "game-mobile-mc", "metricKind": "installs", "metricValue": 91000}]', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
 ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO appstore_catalog_trending_term
-    (id, tenant_id, term, locale, rank, score, snapshot_date, created_at, updated_at)
-VALUES
-    ('trend-1', '100001', 'DeepSeek R1', 'zh-CN', 1, 100.0, '2026-08-03', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-    ('trend-2', '100001', '千问 AI', 'zh-CN', 2, 94.5, '2026-08-03', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-    ('trend-3', '100001', 'Cursor AI', 'zh-CN', 3, 89.0, '2026-08-03', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-    ('trend-4', '100001', 'Kimi 智能助手', 'zh-CN', 4, 83.5, '2026-08-03', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-    ('trend-5', '100001', 'Midjourney', 'zh-CN', 5, 78.0, '2026-08-03', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-    ('trend-6', '100001', 'Suno AI', 'zh-CN', 6, 72.5, '2026-08-03', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-    ('trend-7', '100001', 'Manus Agent', 'zh-CN', 7, 67.0, '2026-08-03', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-    ('trend-8', '100001', '腾讯 ima', 'zh-CN', 8, 61.5, '2026-08-03', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-    ('trend-9', '100001', 'Notion AI', 'zh-CN', 9, 56.0, '2026-08-03', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-    ('trend-10', '100001', 'ComfyUI', 'zh-CN', 10, 50.5, '2026-08-03', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-ON CONFLICT (id) DO NOTHING;
+-- zh-CN trending terms: locales/zh-CN/003_storefront_catalog_zh.sql
+

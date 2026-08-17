@@ -98,15 +98,21 @@ export default function AIHubPage() {
   const handleOpenSandboxChat = (expert: ExpertItem, e: React.MouseEvent) => {
     e.stopPropagation();
     setActiveExpertName(expert.name);
-    const prefill = `【系统调优指令 - ${expert.name} (${expert.nickname})】\n${expert.systemPrompt || expert.description}\n\n我的具体需求是：`;
+    const prefill = `${t('aihub.sandbox.prefillSystemInstruction', {
+      name: expert.name,
+      nickname: expert.nickname,
+    })}\n${expert.systemPrompt || expert.description}\n\n${t('aihub.sandbox.prefillNeeds')}`;
     setSandboxPrompt(prefill);
     setActiveTab('sandbox');
   };
 
   const handleTestInSandboxFromModal = (expert: ExpertItem, userMessage?: string) => {
     setActiveExpertName(expert.name);
-    const msg = userMessage && userMessage.trim() ? userMessage : '请开始提供协同建议。';
-    const prefill = `【系统调优指令 - ${expert.name} (${expert.nickname})】\n${expert.systemPrompt || expert.description}\n\n【用户询问】\n${msg}`;
+    const msg = userMessage && userMessage.trim() ? userMessage : t('aihub.sandbox.defaultCollaborateMsg');
+    const prefill = `${t('aihub.sandbox.prefillSystemInstruction', {
+      name: expert.name,
+      nickname: expert.nickname,
+    })}\n${expert.systemPrompt || expert.description}\n\n${t('aihub.sandbox.prefillUserQuestion')}\n${msg}`;
     setSandboxPrompt(prefill);
     setActiveTab('sandbox');
   };
@@ -128,12 +134,12 @@ export default function AIHubPage() {
       scenarioCategory: data.category,
       filterTag: 'OPC:一人公司',
       description: data.description,
-      systemPrompt: data.systemPrompt || `你是一名${data.name}，请帮助用户解决专业问题。`,
+      systemPrompt: data.systemPrompt || t('aihub.experts.customModal.defaultSystemPrompt', { name: data.name }),
       tags: data.tags,
       popularity: 1000,
       rating: 5.0,
       isOfficial: false,
-      badge: '我的创想'
+      badge: t('aihub.experts.customModal.myCreation')
     };
 
     setExpertsList(prev => [newExp, ...prev]);

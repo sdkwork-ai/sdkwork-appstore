@@ -79,10 +79,25 @@ export function createAppStoreServicePort(
   }
 
   async function resolveCategoryIdByName(name: string): Promise<string | undefined> {
-    if (!name || name === 'All' || name === '全部') {
+    if (!name || name === 'All' || name === '全部' || name === 'all') {
       return undefined;
     }
     const categories = await getCategories();
+    const filterCodeAliases: Record<string, string[]> = {
+      apps: ['apps'],
+      games: ['games'],
+      productivity: ['productivity', 'ai-productivity'],
+      miniGames: ['mini-games'],
+      utilities: ['utilities', 'tools'],
+      ai: ['ai-assistants', 'ai-coding', 'ai-creative', 'ai-productivity', 'ai-games'],
+    };
+    const aliasCodes = filterCodeAliases[name];
+    if (aliasCodes?.length) {
+      const byCode = categories.find((category) => aliasCodes.includes(category.code));
+      if (byCode) {
+        return byCode.id;
+      }
+    }
     const exact = categories.find((category) => category.displayName === name);
     if (exact) {
       return exact.id;

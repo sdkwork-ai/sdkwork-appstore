@@ -1,4 +1,8 @@
 export const templates = {
+  title: 'App Template Library',
+  official: 'Official Choice',
+  searchPlaceholder: 'Search templates, tech stacks, or tags...',
+  publishBtn: 'Publish as Template',
   header: {
     badge: 'Application Scaffolds',
     title: 'Full-Stack Project Templates & Starters',
@@ -89,12 +93,51 @@ export const templates = {
     workflowTitle: '3-Step Local Setup Guide',
     step1Title: 'Clone Template Project',
     step2Title: 'Configure Environment Variables',
-    step3Title: 'Start Local Dev Server'
+    step3Title: 'Start Local Dev Server',
+    nav: {
+      overview: 'Overview',
+      screenshots: 'Screenshots',
+      techstack: 'Tech Stack & Architecture',
+      cli: 'CLI Scaffold',
+      demo: 'Interactive Demo'
+    },
+    metrics: {
+      devLanguage: 'Language',
+      uiFramework: 'UI Framework',
+      buildTool: 'Build Tool',
+      license: 'License',
+      stars: 'Stars',
+      forks: 'Forks'
+    },
+    screenPreview: {
+      uiPreview: 'UI Preview',
+      screenshotCount: '{{count}} screenshots',
+      enterDetail: 'View App Details'
+    },
+    screenshots: {
+      previewTitle: 'Screenshot Preview ({{current}} / {{total}})',
+      desktop: 'Desktop',
+      mobile: 'Mobile',
+      zoom: 'Zoom',
+      lightboxHint: 'Click anywhere to close full preview'
+    }
   },
   empty: {
     title: 'No matching templates found',
     subtitle: 'Try changing search keywords or category filters'
   },
-  loading: 'Loading app template library...'
+  loading: 'Loading app template library...',
+  success: {
+    title: 'Template Published Successfully',
+    subtitle: 'Your template has been submitted to the community library'
+  },
+  modal: {
+    cliTitle: 'One-Click Terminal Initialization',
+    createdSuccess: 'Successfully created app from "{{title}}"',
+    initSuccess: 'Initialized',
+    createAppBtn: 'Create App from Template',
+    author: 'Author',
+    goToAppDetail: 'View App Details'
+  }
 };
 

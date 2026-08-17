@@ -24,7 +24,7 @@ export const CreateCustomExpertModal: React.FC<CreateCustomExpertModalProps> = (
 
   const [customName, setCustomName] = useState('');
   const [customNickname, setCustomNickname] = useState('');
-  const [customCategory, setCustomCategory] = useState('工程开发');
+  const [customCategory, setCustomCategory] = useState(t('aihub.experts.scenarios.dev'));
   const [customDesc, setCustomDesc] = useState('');
   const [customPrompt, setCustomPrompt] = useState('');
   const [customTags, setCustomTags] = useState('');
@@ -37,11 +37,11 @@ export const CreateCustomExpertModal: React.FC<CreateCustomExpertModalProps> = (
 
     onCreateExpert({
       name: customName.trim(),
-      nickname: customNickname.trim() || '自定义专家',
+      nickname: customNickname.trim() || t('aihub.experts.customModal.defaultNickname'),
       category: customCategory,
       description: customDesc.trim(),
       systemPrompt: customPrompt.trim(),
-      tags: customTags ? customTags.split(',').map((t) => t.trim()) : ['自定义', 'AI助手'],
+      tags: customTags ? customTags.split(',').map((tag) => tag.trim()) : [t('aihub.experts.customModal.defaultTag1'), t('aihub.experts.customModal.defaultTag2')],
     });
 
     // Reset Form
@@ -66,97 +66,97 @@ export const CreateCustomExpertModal: React.FC<CreateCustomExpertModalProps> = (
 
         <h3 className="text-lg font-bold text-white mb-1 flex items-center gap-2">
           <Plus className="w-5 h-5 text-indigo-400" />
-          <span>{t('aihub.customModal.title', '创建自定义 AI 专家')}</span>
+          <span>{t('aihub.experts.customModal.title')}</span>
         </h3>
         <p className="text-xs text-slate-400 mb-5">
-          {t('aihub.customModal.subtitle', '设定专属专家职称、系统提示词 (System Prompt) 与专业技能标签')}
+          {t('aihub.experts.customModal.subtitle')}
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-4 text-xs">
           <div>
             <label className="block text-slate-300 font-semibold mb-1">
-              {t('aihub.customModal.nameLabel', '专家职称 / 名称 *')}
+              {t('aihub.experts.customModal.nameLabel')}
             </label>
             <input
               type="text"
               required
               value={customName}
               onChange={(e) => setCustomName(e.target.value)}
-              placeholder={t('aihub.customModal.namePlaceholder', '例如：量化高频交易专家 / React 重构大师')}
+              placeholder={t('aihub.experts.customModal.namePlaceholder')}
               className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-slate-100 focus:outline-none focus:border-indigo-500"
             />
           </div>
 
           <div>
             <label className="block text-slate-300 font-semibold mb-1">
-              {t('aihub.customModal.nicknameLabel', '作者 / 昵称')}
+              {t('aihub.experts.customModal.nicknameLabel')}
             </label>
             <input
               type="text"
               value={customNickname}
               onChange={(e) => setCustomNickname(e.target.value)}
-              placeholder={t('aihub.customModal.nicknamePlaceholder', '例如：极客小王')}
+              placeholder={t('aihub.experts.customModal.nicknamePlaceholder')}
               className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-slate-100 focus:outline-none focus:border-indigo-500"
             />
           </div>
 
           <div>
             <label className="block text-slate-300 font-semibold mb-1">
-              {t('aihub.customModal.categoryLabel', '所属场景分类')}
+              {t('aihub.experts.customModal.categoryLabel')}
             </label>
             <select
               value={customCategory}
               onChange={(e) => setCustomCategory(e.target.value)}
               className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-slate-100 focus:outline-none focus:border-indigo-500"
             >
-              <option value="工程开发">{t('aihub.experts.scenarios.dev', '工程开发')}</option>
-              <option value="内容创作">{t('aihub.experts.scenarios.content', '内容创作')}</option>
-              <option value="投资分析">{t('aihub.experts.scenarios.invest', '投资分析')}</option>
-              <option value="法律咨询">{t('aihub.experts.scenarios.legal', '法律咨询')}</option>
-              <option value="小微企业">{t('aihub.experts.scenarios.business', '小微企业')}</option>
-              <option value="电商运营">{t('aihub.experts.scenarios.ecom', '电商运营')}</option>
-              <option value="数据分析">{t('aihub.experts.scenarios.data', '数据分析')}</option>
-              <option value="专业文档">{t('aihub.experts.scenarios.doc', '专业文档')}</option>
-              <option value="产品设计">{t('aihub.experts.scenarios.design', '产品设计')}</option>
+              <option value={t('aihub.experts.scenarios.dev')}>{t('aihub.experts.scenarios.dev')}</option>
+              <option value={t('aihub.experts.scenarios.content')}>{t('aihub.experts.scenarios.content')}</option>
+              <option value={t('aihub.experts.scenarios.invest')}>{t('aihub.experts.scenarios.invest')}</option>
+              <option value={t('aihub.experts.scenarios.legal')}>{t('aihub.experts.scenarios.legal')}</option>
+              <option value={t('aihub.experts.scenarios.business')}>{t('aihub.experts.scenarios.business')}</option>
+              <option value={t('aihub.experts.scenarios.ecom')}>{t('aihub.experts.scenarios.ecom')}</option>
+              <option value={t('aihub.experts.scenarios.data')}>{t('aihub.experts.scenarios.data')}</option>
+              <option value={t('aihub.experts.scenarios.doc')}>{t('aihub.experts.scenarios.doc')}</option>
+              <option value={t('aihub.experts.scenarios.design')}>{t('aihub.experts.scenarios.design')}</option>
             </select>
           </div>
 
           <div>
             <label className="block text-slate-300 font-semibold mb-1">
-              {t('aihub.customModal.descLabel', '专家职责描述 *')}
+              {t('aihub.experts.customModal.descLabel')}
             </label>
             <textarea
               required
               rows={2}
               value={customDesc}
               onChange={(e) => setCustomDesc(e.target.value)}
-              placeholder={t('aihub.customModal.descPlaceholder', '精通某项技术的专家，擅长解决什么核心痛点...')}
+              placeholder={t('aihub.experts.customModal.descPlaceholder')}
               className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-slate-100 focus:outline-none focus:border-indigo-500"
             />
           </div>
 
           <div>
             <label className="block text-slate-300 font-semibold mb-1">
-              {t('aihub.customModal.promptLabel', '系统提示词 (System Prompt)')}
+              {t('aihub.experts.customModal.promptLabel')}
             </label>
             <textarea
               rows={3}
               value={customPrompt}
               onChange={(e) => setCustomPrompt(e.target.value)}
-              placeholder={t('aihub.customModal.promptPlaceholder', '你是一名资深专家，请按照以下标准为用户服务...')}
+              placeholder={t('aihub.experts.customModal.promptPlaceholder')}
               className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-slate-100 font-mono focus:outline-none focus:border-indigo-500"
             />
           </div>
 
           <div>
             <label className="block text-slate-300 font-semibold mb-1">
-              {t('aihub.customModal.tagsLabel', '能力标签 (逗号分隔)')}
+              {t('aihub.experts.customModal.tagsLabel')}
             </label>
             <input
               type="text"
               value={customTags}
               onChange={(e) => setCustomTags(e.target.value)}
-              placeholder={t('aihub.customModal.tagsPlaceholder', '例如：高频交易, 回测, Python')}
+              placeholder={t('aihub.experts.customModal.tagsPlaceholder')}
               className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-slate-100 focus:outline-none focus:border-indigo-500"
             />
           </div>
@@ -167,13 +167,13 @@ export const CreateCustomExpertModal: React.FC<CreateCustomExpertModalProps> = (
               onClick={onClose}
               className="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 hover:text-white cursor-pointer"
             >
-              {t('aihub.customModal.cancel', '取消')}
+              {t('aihub.experts.customModal.cancel')}
             </button>
             <button
               type="submit"
               className="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold shadow-md shadow-indigo-600/20 cursor-pointer"
             >
-              {t('aihub.customModal.create', '确认创建')}
+              {t('aihub.experts.customModal.create')}
             </button>
           </div>
         </form>

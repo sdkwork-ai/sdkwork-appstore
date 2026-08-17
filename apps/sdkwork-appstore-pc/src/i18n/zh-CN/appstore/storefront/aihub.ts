@@ -4,7 +4,9 @@ export const aihub = {
     title: '智能体助手与生成式 AI 工具库',
     subtitle: '探索最新的 AI 助手、提示词预设与智能协同工具，实时在本地沙盒验证 Prompt 效能。',
     chatAssistant: '智能对话助手',
-    knowledgeCopilot: '个人知识库 Copilot'
+    knowledgeCopilot: '个人知识库 Copilot',
+    chatAssistantVendors: 'Qwen / Kimi / Doubao',
+    knowledgeCopilotVendor: 'ima.copilot'
   },
   sandbox: {
     title: 'AI 智能交互沙盒',
@@ -26,8 +28,13 @@ export const aihub = {
     latencyLabel: '耗时',
     testEngine: '测试引擎:',
     errorText: '【错误】：模型推理过程异常，请稍后重试。',
+    notConfigured: '【提示】：AI 预览 Agent 尚未配置（VITE_SDKWORK_APPSTORE_AI_PREVIEW_AGENT_ID）。配置后可体验模型推理沙盒。',
     testingWith: '正在与 {{name}} 进行沙盒测试',
     resetContext: '重置专家上下文',
+    defaultCollaborateMsg: '请开始提供协同建议。',
+    prefillSystemInstruction: '【系统调优指令 - {{name}} ({{nickname}})】',
+    prefillNeeds: '我的具体需求是：',
+    prefillUserQuestion: '【用户询问】',
     presets: {
       p1: '推荐一款适合写代码和重构 TypeScript 的 AI 工具',
       p2: '整理和总结 100 页 PDF 论文与深度报告',
@@ -49,6 +56,8 @@ export const aihub = {
     featuredScenarios: '精选场景',
     rosterTitle: '专家团',
     rosterSubtitle: '精选行业领域 AI 专家，内置专业 Prompt 与系统指令，即刻协同解决复杂问题',
+    rosterCount: '{{count}} 位',
+    resetFilters: '重置筛选条件',
     scenarioCount: '包含 {{count}} 位专家',
     sort: {
       comprehensive: '综合',
@@ -80,12 +89,14 @@ export const aihub = {
       addedToMine: '已加入我的专家',
       addToMine: '+ 加入我的专家',
       official: '官方',
-      featured: '精选'
+      featured: '精选',
+      callsCount: '★ {{rating}} · {{calls}}k 次调用'
     },
     modal: {
       title: '专家助手详情',
       systemPrompt: '专家系统提示词 (System Prompt)',
       testPromptPlaceholder: '向该专家提出具体问题或下达指令...',
+      testPromptExample: '例如：请帮我规划一个面向百万用户的微服务重构方案...',
       sendToExpert: '在沙盒中测试',
       copyPrompt: '复制系统提示词',
       promptCopied: '提示词已复制！',
@@ -106,7 +117,12 @@ export const aihub = {
       tagsLabel: '能力标签 (逗号分隔)',
       tagsPlaceholder: '例如：高频交易, 回测, Python',
       cancel: '取消',
-      create: '确认创建'
+      create: '确认创建',
+      defaultNickname: '自定义专家',
+      defaultTag1: '自定义',
+      defaultTag2: 'AI助手',
+      defaultSystemPrompt: '你是一名{{name}}，请帮助用户解决专业问题。',
+      myCreation: '我的创想'
     },
     scenarios: {
       content: '内容创作',
@@ -118,7 +134,8 @@ export const aihub = {
       doc: '专业文档',
       design: '产品设计',
       dev: '工程开发'
-    }
+    },
+    scenarioExpertCount: '{{count}} 位专员协同'
   }
 };
 

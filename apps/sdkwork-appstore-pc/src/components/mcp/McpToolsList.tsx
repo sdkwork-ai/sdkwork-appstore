@@ -11,7 +11,7 @@ export const McpToolsList: React.FC<McpToolsListProps> = ({ toolsProvided }) => 
   return (
     <div className="mt-3">
       <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1.5">
-        {t('mcp.modal.toolsProvided', { count: toolsProvided.length, defaultValue: `提供 Tool API (${toolsProvided.length})` })}
+        {t('mcp.modal.toolsProvided', { count: toolsProvided.length })}
       </span>
       <div className="flex flex-wrap gap-1.5">
         {toolsProvided.map((tool, idx) => (

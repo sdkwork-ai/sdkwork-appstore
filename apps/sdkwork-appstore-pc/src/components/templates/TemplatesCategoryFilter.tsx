@@ -17,7 +17,7 @@ export const TemplatesCategoryFilter: React.FC<TemplatesCategoryFilterProps> = (
   const getCategoryLabel = (cat: string) => {
     switch (cat) {
       case '全部':
-        return t('common.all');
+        return t('common.actions.all');
       case 'SaaS 全栈':
         return t('templates.categories.saasFullstack');
       case '知识库系统':

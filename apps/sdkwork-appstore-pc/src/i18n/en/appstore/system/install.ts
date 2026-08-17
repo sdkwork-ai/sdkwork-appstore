@@ -10,6 +10,8 @@ export const install = {
     confirmInstall: 'Start Installation',
     installing: 'Writing package files to disk...',
     completed: 'Application Installed Successfully!',
-    launchNow: 'Launch App Now'
+    launchNow: 'Launch App Now',
+    runningNotice: 'App "{{name}}" is running in the local desktop sandbox...',
+    installFailed: 'Installation failed, please try again later'
   }
 };

@@ -49,7 +49,9 @@ export const appDetail = {
     submitReview: 'Submit Review',
     ratingLabel: 'Your Rating',
     averageRating: 'Average Rating',
-    basedOn: 'Based on {{count}} ratings'
+    basedOn: 'Based on {{count}} ratings',
+    missingAppId: 'Cannot submit review: missing app ID',
+    submitFailed: 'Submission failed, please try again later'
   },
   info: {
     title: 'Information',

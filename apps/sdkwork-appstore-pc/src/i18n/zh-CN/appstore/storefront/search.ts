@@ -1,8 +1,12 @@
 export const search = {
   trendingTitle: '热门搜索推荐',
   filtersTitle: '筛选',
+  historyTitle: '搜索历史',
+  clearHistory: '清除历史',
+  inputPlaceholder: '搜索应用、游戏与更多内容...',
   header: {
     title: '搜索应用与游戏',
+    subtitle: '全站搜索 AI 智能体、游戏与应用软件',
     resultsCount: '找到 {{count}} 个匹配结果，检索关键词: "{{query}}"'
   },
   trending: {

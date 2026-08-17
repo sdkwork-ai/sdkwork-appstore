@@ -1,8 +1,12 @@
 export const search = {
   trendingTitle: 'Trending Searches',
   filtersTitle: 'Filters',
+  historyTitle: 'Search History',
+  clearHistory: 'Clear History',
+  inputPlaceholder: 'Apps, games, stories and more...',
   header: {
     title: 'Search Apps & Games',
+    subtitle: 'Search AI agents, games, and apps across the store',
     resultsCount: 'Found {{count}} result(s) for "{{query}}"'
   },
   trending: {

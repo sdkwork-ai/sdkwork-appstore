@@ -34,6 +34,18 @@ const scenarioIcons: Record<string, React.ElementType> = {
   Code2
 };
 
+const scenarioTitleKeyMap: Record<string, string> = {
+  '内容创作': 'aihub.experts.scenarios.content',
+  '投资分析': 'aihub.experts.scenarios.invest',
+  '法律咨询': 'aihub.experts.scenarios.legal',
+  '小微企业': 'aihub.experts.scenarios.business',
+  '电商运营': 'aihub.experts.scenarios.ecom',
+  '数据分析': 'aihub.experts.scenarios.data',
+  '专业文档': 'aihub.experts.scenarios.doc',
+  '产品设计': 'aihub.experts.scenarios.design',
+  '工程开发': 'aihub.experts.scenarios.dev',
+};
+
 export const FeaturedScenariosSection: React.FC<FeaturedScenariosSectionProps> = ({
   selectedScenario,
   onSelectScenario,
@@ -46,7 +58,7 @@ export const FeaturedScenariosSection: React.FC<FeaturedScenariosSectionProps> =
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-bold text-slate-100 flex items-center gap-2">
           <Sparkles className="w-4 h-4 text-amber-400" />
-          <span>{t('aihub.experts.featuredScenarios', '精选场景')}</span>
+          <span>{t('aihub.experts.featuredScenarios')}</span>
         </h3>
         {selectedScenario && (
           <button
@@ -54,7 +66,7 @@ export const FeaturedScenariosSection: React.FC<FeaturedScenariosSectionProps> =
             onClick={() => onSelectScenario(null)}
             className="text-xs text-indigo-400 hover:text-indigo-300 font-medium transition-colors"
           >
-            {t('common.clear', '清除筛选')}
+            {t('common.actions.clear')}
           </button>
         )}
       </div>
@@ -64,6 +76,7 @@ export const FeaturedScenariosSection: React.FC<FeaturedScenariosSectionProps> =
         {expertScenarios.map((scen) => {
           const IconComp = scenarioIcons[scen.icon] || Sparkles;
           const isSelected = selectedScenario === scen.title;
+          const scenarioTitle = t(scenarioTitleKeyMap[scen.title] ?? '', scen.title);
 
           return (
             <div
@@ -83,10 +96,10 @@ export const FeaturedScenariosSection: React.FC<FeaturedScenariosSectionProps> =
                   </div>
                   <div>
                     <h4 className="text-sm font-bold text-slate-100 group-hover:text-indigo-300 transition-colors">
-                      {scen.title}
+                      {scenarioTitle}
                     </h4>
                     <span className="text-[11px] text-slate-400">
-                      {scen.expertCount} 位专员协同
+                      {t('aihub.experts.scenarioExpertCount', { count: scen.expertCount })}
                     </span>
                   </div>
                 </div>

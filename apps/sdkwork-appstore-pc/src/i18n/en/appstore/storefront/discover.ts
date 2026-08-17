@@ -23,5 +23,9 @@ export const discover = {
   },
   miniGamesBanner: {
     playInClient: 'No Download Needed · Instant Play'
+  },
+  categories: {
+    browseTitle: 'Browse Categories',
+    seeAll: 'See All'
   }
 };

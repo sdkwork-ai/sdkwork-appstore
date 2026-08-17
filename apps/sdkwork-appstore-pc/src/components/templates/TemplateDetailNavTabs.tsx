@@ -1,5 +1,6 @@
 import React from 'react';
 import { BookOpen, Layers, Code2, Terminal, Zap } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export type TemplateTabType = 'overview' | 'screenshots' | 'techstack' | 'cli' | 'demo';
 
@@ -14,6 +15,8 @@ export const TemplateDetailNavTabs: React.FC<TemplateDetailNavTabsProps> = ({
   screenshotsCount,
   onTabChange,
 }) => {
+  const { t } = useTranslation();
+
   return (
     <div className="bg-white dark:bg-[#181a20] rounded-2xl p-2 border border-gray-200/80 dark:border-[#262933] shadow-sm">
       <div className="flex items-center gap-1 overflow-x-auto scrollbar-hide">
@@ -26,7 +29,7 @@ export const TemplateDetailNavTabs: React.FC<TemplateDetailNavTabsProps> = ({
           }`}
         >
           <BookOpen className="w-3.5 h-3.5" />
-          <span>模板概览</span>
+          <span>{t('templates.detail.nav.overview')}</span>
         </button>
 
         <button
@@ -38,7 +41,9 @@ export const TemplateDetailNavTabs: React.FC<TemplateDetailNavTabsProps> = ({
           }`}
         >
           <Layers className="w-3.5 h-3.5" />
-          <span>界面效果图 ({screenshotsCount})</span>
+          <span>
+            {t('templates.detail.nav.screenshots')} ({screenshotsCount})
+          </span>
         </button>
 
         <button
@@ -50,7 +55,7 @@ export const TemplateDetailNavTabs: React.FC<TemplateDetailNavTabsProps> = ({
           }`}
         >
           <Code2 className="w-3.5 h-3.5" />
-          <span>技术栈 & 架构</span>
+          <span>{t('templates.detail.nav.techstack')}</span>
         </button>
 
         <button
@@ -62,7 +67,7 @@ export const TemplateDetailNavTabs: React.FC<TemplateDetailNavTabsProps> = ({
           }`}
         >
           <Terminal className="w-3.5 h-3.5" />
-          <span>CLI 脚手架</span>
+          <span>{t('templates.detail.nav.cli')}</span>
         </button>
 
         <button
@@ -74,7 +79,7 @@ export const TemplateDetailNavTabs: React.FC<TemplateDetailNavTabsProps> = ({
           }`}
         >
           <Zap className="w-3.5 h-3.5 text-amber-300" />
-          <span>交互沙盒体验</span>
+          <span>{t('templates.detail.nav.demo')}</span>
         </button>
       </div>
     </div>

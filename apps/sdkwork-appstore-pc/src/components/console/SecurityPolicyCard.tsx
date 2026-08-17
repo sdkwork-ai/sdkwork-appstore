@@ -66,7 +66,7 @@ export const SecurityPolicyCard: React.FC = () => {
         <div className="flex items-center justify-between p-2.5 bg-white dark:bg-[#20232b] rounded-xl border border-gray-200 dark:border-[#2d313c]">
           <div>
             <div className="font-bold text-gray-800 dark:text-gray-200">{t('console.security.mfa')}</div>
-            <div className="text-[10px] text-gray-400">MFA Protection</div>
+            <div className="text-[10px] text-gray-400">{t('console.security.mfaSubtitle')}</div>
           </div>
           <button
             onClick={() => handleToggle('mfaRequired')}
@@ -81,7 +81,7 @@ export const SecurityPolicyCard: React.FC = () => {
         <div className="flex items-center justify-between p-2.5 bg-white dark:bg-[#20232b] rounded-xl border border-gray-200 dark:border-[#2d313c]">
           <div>
             <div className="font-bold text-gray-800 dark:text-gray-200">{t('console.security.ipWhitelist')}</div>
-            <div className="text-[10px] text-gray-400">IP Whitelist</div>
+            <div className="text-[10px] text-gray-400">{t('console.security.ipSubtitle')}</div>
           </div>
           <button
             onClick={() => handleToggle('ipWhitelistEnabled')}
@@ -106,7 +106,7 @@ export const SecurityPolicyCard: React.FC = () => {
 
       <div className="text-[10px] text-emerald-500 font-semibold flex items-center gap-1 pt-1">
         <Lock className="w-3 h-3" />
-        <span>DJCP Level 3 Compliant</span>
+        <span>{t('console.security.complianceBadge')}</span>
       </div>
     </div>
   );

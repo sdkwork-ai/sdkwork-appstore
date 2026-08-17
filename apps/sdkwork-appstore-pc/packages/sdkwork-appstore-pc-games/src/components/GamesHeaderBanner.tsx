@@ -46,7 +46,7 @@ export const GamesHeaderBanner: React.FC<GamesHeaderBannerProps> = ({
             activeTab === 'board' ? 'bg-amber-600 text-white shadow-sm' : 'text-slate-300 hover:text-white'
           }`}
         >
-          {t('games.sections.boardHall', '棋牌大厅')}
+          {t('games.sections.boardGamesHall')}
         </button>
         <button
           onClick={() => onTabChange('mini')}

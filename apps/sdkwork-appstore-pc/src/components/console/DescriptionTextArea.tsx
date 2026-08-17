@@ -12,7 +12,7 @@ export const DescriptionTextArea: React.FC<DescriptionTextAreaProps> = ({
   label,
   value,
   onChange,
-  placeholder = '详细描述您的应用功能与使用场景...',
+  placeholder,
   rows = 3,
 }) => {
   return (

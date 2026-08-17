@@ -12,21 +12,33 @@ import {
   SearchHistory,
 } from '../components/search';
 
+const SEARCH_FILTER_KEYS = {
+  all: 'all',
+  apps: 'apps',
+  games: 'games',
+  productivity: 'productivity',
+  miniGames: 'miniGames',
+  utilities: 'utilities',
+  ai: 'ai',
+} as const;
+
 export default function Search() {
   const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const urlQuery = searchParams.get('q') || '';
-  const urlCategory = searchParams.get('category') || 'All';
+  const urlCategory = searchParams.get('category') || SEARCH_FILTER_KEYS.all;
 
   const filterCategories = [
-    'All',
-    t('search.filters.apps'),
-    t('search.filters.games'),
-    t('search.filters.productivity'),
-    t('search.filters.miniGames'),
-    t('search.filters.utilities'),
-    t('search.filters.ai')
+    { key: SEARCH_FILTER_KEYS.all, label: t('search.filters.allTypes') },
+    { key: SEARCH_FILTER_KEYS.apps, label: t('search.filters.apps') },
+    { key: SEARCH_FILTER_KEYS.games, label: t('search.filters.games') },
+    { key: SEARCH_FILTER_KEYS.productivity, label: t('search.filters.productivity') },
+    { key: SEARCH_FILTER_KEYS.miniGames, label: t('search.filters.miniGames') },
+    { key: SEARCH_FILTER_KEYS.utilities, label: t('search.filters.utilities') },
+    { key: SEARCH_FILTER_KEYS.ai, label: t('search.filters.ai') },
   ];
+  const activeFilterLabel =
+    filterCategories.find((item) => item.key === activeFilter)?.label ?? activeFilter;
 
   const [query, setQuery] = useState(urlQuery);
   const [activeFilter, setActiveFilter] = useState(urlCategory);
@@ -86,7 +98,7 @@ export default function Search() {
       }
     };
 
-    if (query.trim() || activeFilter !== 'All') {
+    if (query.trim() || activeFilter !== SEARCH_FILTER_KEYS.all) {
       const timer = setTimeout(doSearch, 200);
       return () => clearTimeout(timer);
     } else {
@@ -107,7 +119,7 @@ export default function Search() {
 
   const handleClear = () => {
     setQuery('');
-    setActiveFilter('All');
+    setActiveFilter(SEARCH_FILTER_KEYS.all);
     setResults([]);
   };
 
@@ -138,8 +150,8 @@ export default function Search() {
         onSelectFilter={setActiveFilter}
       />
 
-      {query.trim() || activeFilter !== 'All' ? (
-        <SearchResults query={query || activeFilter} results={results} loading={loading} />
+      {query.trim() || activeFilter !== SEARCH_FILTER_KEYS.all ? (
+        <SearchResults query={query || activeFilterLabel} results={results} loading={loading} />
       ) : (
         <>
           <SearchHistory
