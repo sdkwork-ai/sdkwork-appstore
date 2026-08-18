@@ -3,6 +3,8 @@ export * from './environment';
 export * from './iamRuntime';
 export * from './sdkClients';
 export * from './sessionStore';
+export * from './hostSessionSync';
+export * from './accessTokenContextClaims';
 export * from './sessionTokenManager';
 export * from './credentialEntry';
 export * from './adminMonitor';

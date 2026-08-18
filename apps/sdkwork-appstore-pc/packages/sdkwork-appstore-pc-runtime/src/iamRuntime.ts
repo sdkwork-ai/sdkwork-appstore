@@ -12,6 +12,7 @@ import { prepareAppstorePcCredentialEntryTokens } from './credentialEntry';
 import type { AppstorePcRuntimeConfig } from './environment';
 import { normalizeGeneratedSdkBaseUrl, type AppstorePcSdkClientInventory } from './sdkClients';
 import type { AppstorePcSessionSnapshot, AppstorePcSessionStore } from './sessionStore';
+import { sessionSnapshotsEqual } from './sessionStore';
 
 export type AppstorePcIamRuntime = IamRuntime & {
   composition: SdkworkAppbasePcAuthRuntimeComposition;
@@ -106,6 +107,9 @@ function commitIamSession(
 
   if (!snapshot.context) {
     delete snapshot.context;
+  }
+  if (sessionSnapshotsEqual(store.getSnapshot(), snapshot)) {
+    return toIamBridgeSession(store.getSnapshot()) ?? undefined;
   }
   store.setSession(snapshot);
   return toIamBridgeSession(store.getSnapshot()) ?? undefined;

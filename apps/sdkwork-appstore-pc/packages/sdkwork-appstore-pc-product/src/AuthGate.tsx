@@ -1,4 +1,4 @@
-import { type ReactNode, useEffect, useMemo, useState } from 'react';
+import { type ReactNode, useEffect, useMemo, useState, useSyncExternalStore } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { SdkworkIamAuthRoutes } from '@sdkwork/auth-pc-react';
 
@@ -22,9 +22,11 @@ export function AuthGate({ children, runtime }: AuthGateProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const [hydrating, setHydrating] = useState(true);
-  const [snapshot, setSnapshot] = useState(() => runtime.session.getSnapshot());
-
-  useEffect(() => runtime.session.subscribe(setSnapshot), [runtime.session]);
+  const snapshot = useSyncExternalStore(
+    (listener) => runtime.session.subscribe(listener),
+    () => runtime.session.getSnapshot(),
+    () => runtime.session.getSnapshot(),
+  );
 
   useEffect(() => {
     let active = true;
@@ -40,7 +42,7 @@ export function AuthGate({ children, runtime }: AuthGateProps) {
         await runtime.iamRuntime.clearSession();
       } finally {
         if (active) {
-          setSnapshot(runtime.session.refreshSession());
+          runtime.session.refreshSession();
           setHydrating(false);
         }
       }

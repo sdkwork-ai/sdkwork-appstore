@@ -36,6 +36,11 @@ import {
   i18n,
 } from '@sdkwork/appstore-pc-product'
 import {
+  buildAppstorePcHostSessionCandidate,
+  createAppstorePcHostSessionSyncState,
+  fingerprintAppstorePcHostSessionInput,
+  onAppstorePcRuntimeSessionChanged,
+  shouldApplyAppstorePcHostSession,
   createAppstorePcRuntime,
   resolveAppstorePcAuthRuntimeConfig,
   resolveAppstorePcRuntimeConfig,
@@ -132,15 +137,81 @@ function resolveHostConfig(props: AppstorePcHostProps): AppstorePcRuntimeConfig 
   })
 }
 
-function resolveSession(
-  session: AppstorePcHostSession | null | undefined,
-  accessToken: string | undefined,
-): AppstorePcHostSession | undefined {
-  const token = accessToken?.trim()
-  if (!token) {
-    return session === null ? {} : session
-  }
-  return { ...(session ?? {}), accessToken: token }
+function useHostSessionSync(
+  runtime: AppstorePcRuntime,
+  props: AppstorePcHostProps,
+): void {
+  const syncStateRef = useRef(createAppstorePcHostSessionSyncState());
+
+  useEffect(() => {
+    return runtime.session.subscribe(() => {
+      const hostFingerprint = fingerprintAppstorePcHostSessionInput(
+        props.session,
+        props.accessToken,
+      );
+      syncStateRef.current = onAppstorePcRuntimeSessionChanged(
+        syncStateRef.current,
+        runtime.session.getSnapshot(),
+        hostFingerprint,
+      );
+    });
+  }, [
+    props.accessToken,
+    props.session,
+    props.session?.accessToken,
+    props.session?.authToken,
+    props.session?.refreshToken,
+    props.session?.sessionId,
+    runtime.session,
+  ]);
+
+  useEffect(() => {
+    const hostFingerprint = fingerprintAppstorePcHostSessionInput(
+      props.session,
+      props.accessToken,
+    );
+    const nextSession = buildAppstorePcHostSessionCandidate(
+      props.session,
+      props.accessToken,
+    );
+    if (!nextSession) {
+      return;
+    }
+
+    const storeSnapshot = runtime.session.getSnapshot();
+    if (
+      !shouldApplyAppstorePcHostSession(
+        syncStateRef.current,
+        storeSnapshot,
+        hostFingerprint,
+        nextSession,
+      )
+    ) {
+      if (hostFingerprint) {
+        syncStateRef.current = {
+          ...syncStateRef.current,
+          lastAppliedHostFingerprint: hostFingerprint,
+        };
+      }
+      return;
+    }
+
+    syncStateRef.current = {
+      ...syncStateRef.current,
+      lastAppliedHostFingerprint: hostFingerprint,
+      suppressedHostFingerprint: null,
+    };
+    runtime.session.setSession(nextSession);
+  }, [
+    props.accessToken,
+    props.session?.accessToken,
+    props.session?.authToken,
+    props.session?.refreshToken,
+    props.session?.sessionId,
+    props.session === null,
+    props.session === undefined,
+    runtime,
+  ]);
 }
 
 /**
@@ -155,18 +226,11 @@ export function AppstorePcHost(props: AppstorePcHostProps = {}) {
   )
   const runtimeRef = useRef<AppstorePcRuntime | undefined>(undefined)
   const runtime = props.runtime ?? runtimeRef.current ?? (runtimeRef.current = createAppstorePcRuntime(config))
-  const session = useMemo(
-    () => resolveSession(props.session, props.accessToken),
-    [props.accessToken, props.session],
-  )
   const locale = props.locale?.trim() || config.locale
 
   initializeAppstorePcI18n(locale)
 
-  useEffect(() => {
-    if (props.session === undefined && !props.accessToken?.trim()) return
-    runtime.session.setSession(session ?? {})
-  }, [props.accessToken, props.session, runtime, session])
+  useHostSessionSync(runtime, props)
 
   return (
     <I18nextProvider i18n={i18n}>

@@ -12,7 +12,9 @@
     },
     "./environment": "./src/environment.ts",
     "./runtime": "./src/runtime.ts",
-    "./session": "./src/sessionStore.ts"
+    "./session": "./src/sessionStore.ts",
+    "./authConfig": "./src/authConfig.ts",
+    "./credentialEntry": "./src/credentialEntry.ts"
   },
   "dependencies": {
     "@sdkwork/agents-app-sdk": "workspace:*",

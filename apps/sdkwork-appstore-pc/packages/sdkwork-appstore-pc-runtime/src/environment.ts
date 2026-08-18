@@ -1,4 +1,4 @@
-import manifest from '../../sdkwork.app.config.json';
+import manifest from '../../../sdkwork.app.config.json';
 
 export type AppstorePcEnvironment = 'development' | 'test' | 'staging' | 'production';
 export type AppstorePcDeploymentProfile = 'cloud' | 'standalone';

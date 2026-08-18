@@ -29,6 +29,29 @@ export interface AppstorePcSessionStore {
 
 export const APPSTORE_PC_SESSION_STORAGE_KEY = 'sdkwork-appstore-pc-session';
 
+function stableJson(value: unknown): string {
+  return value === undefined ? '' : JSON.stringify(value);
+}
+
+/**
+ * Compare session snapshots while ignoring store-managed metadata such as `updatedAt`.
+ * @param left - first session snapshot.
+ * @param right - second session snapshot.
+ * @returns `true` when both snapshots carry the same credential and identity fields.
+ */
+export function sessionSnapshotsEqual(
+  left: AppstorePcSessionSnapshot,
+  right: AppstorePcSessionSnapshot,
+): boolean {
+  return left.accessToken === right.accessToken
+    && left.authToken === right.authToken
+    && left.refreshToken === right.refreshToken
+    && left.sessionId === right.sessionId
+    && left.expiresAt === right.expiresAt
+    && stableJson(left.context) === stableJson(right.context)
+    && stableJson(left.user) === stableJson(right.user);
+}
+
 function readSession(
   storage: AppstorePcSessionStorage | undefined,
   storageKey: string,
@@ -79,11 +102,18 @@ export function createAppstorePcSessionStore(
       return snapshot;
     },
     refreshSession() {
-      snapshot = readSession(storage, storageKey);
+      const next = readSession(storage, storageKey);
+      if (sessionSnapshotsEqual(snapshot, next)) {
+        return snapshot;
+      }
+      snapshot = next;
       emit();
       return snapshot;
     },
     setSession(nextSession) {
+      if (sessionSnapshotsEqual(snapshot, nextSession)) {
+        return;
+      }
       snapshot = {
         ...nextSession,
         updatedAt: new Date().toISOString(),

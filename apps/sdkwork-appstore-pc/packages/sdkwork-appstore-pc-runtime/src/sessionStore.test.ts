@@ -62,4 +62,26 @@ describe('appstore PC session store', () => {
     store.clearSession();
     expect(storage.getItem(APPSTORE_PC_SESSION_STORAGE_KEY)).toBeNull();
   });
+
+  it('skips emit when setSession receives an equivalent snapshot', () => {
+    const storage = createMemoryStorage();
+    const store = createAppstorePcSessionStore(storage);
+    const listener = vi.fn();
+    store.subscribe(listener);
+
+    const session = {
+      accessToken: 'access',
+      authToken: 'auth',
+      context: {
+        appId: 'sdkwork-appstore-pc',
+        tenantId: 'tenant',
+        userId: 'user',
+      },
+    };
+    store.setSession(session);
+    store.setSession({ ...session });
+    store.setSession({ ...session, updatedAt: '2026-08-01T00:00:00.000Z' });
+
+    expect(listener).toHaveBeenCalledOnce();
+  });
 });
