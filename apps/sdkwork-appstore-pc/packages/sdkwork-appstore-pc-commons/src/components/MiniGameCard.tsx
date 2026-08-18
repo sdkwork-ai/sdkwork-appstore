@@ -1,20 +1,20 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { Flame } from 'lucide-react';
-import { AppItem } from '../../types';
-import { DynamicIcon } from '../DynamicIcon';
-import { useInstall } from '../../providers/InstallProvider';
-import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom'
+import { Flame } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
+import type { AppItem } from '@sdkwork/appstore-pc-core'
+import { DynamicIcon } from './DynamicIcon'
+import { useInstall } from '../install'
 
 interface MiniGameCardProps {
-  game: AppItem;
+  game: AppItem
 }
 
-export const MiniGameCard: React.FC<MiniGameCardProps> = ({ game }) => {
-  const { t } = useTranslation();
-  const { installApp, openApp, isInstalled, isDownloading } = useInstall();
-  const installed = isInstalled(game.id);
-  const downloading = isDownloading(game.id);
+/** Compact mini-game card with install/open action. */
+export function MiniGameCard({ game }: MiniGameCardProps) {
+  const { t } = useTranslation()
+  const { installApp, openApp, isInstalled, isDownloading } = useInstall()
+  const installed = isInstalled(game.id)
+  const downloading = isDownloading(game.id)
 
   return (
     <Link
@@ -38,22 +38,22 @@ export const MiniGameCard: React.FC<MiniGameCardProps> = ({ game }) => {
       </span>
 
       <button
-        onClick={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          if (installed) openApp(game);
-          else installApp(game);
+        onClick={(event) => {
+          event.preventDefault()
+          event.stopPropagation()
+          if (installed) openApp(game)
+          else installApp(game)
         }}
         className={`w-full py-1 rounded-full text-[10px] font-bold transition-all ${
           installed
-            ? "bg-blue-600/15 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400"
+            ? 'bg-blue-600/15 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400'
             : downloading
-            ? "bg-amber-500/20 text-amber-500"
-            : "bg-gray-200 dark:bg-[#2e3240] text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-[#383d4e]"
+              ? 'bg-amber-500/20 text-amber-500'
+              : 'bg-gray-200 dark:bg-[#2e3240] text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-[#383d4e]'
         }`}
       >
         {downloading ? t('common.actions.downloading') : installed ? t('common.actions.open') : t('common.actions.downloadFree')}
       </button>
     </Link>
-  );
-};
+  )
+}

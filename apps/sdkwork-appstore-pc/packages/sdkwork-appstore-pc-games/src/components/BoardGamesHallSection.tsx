@@ -1,8 +1,8 @@
 import React from 'react';
 import { Club } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { AppItem } from '@/src/types';
-import { AppRow } from '@/src/components/AppRow';
+import { AppItem } from '@sdkwork/appstore-pc-core';
+import { AppRow } from '@sdkwork/appstore-pc-commons';
 import { BoardGameFilterBar, FilterOption } from './BoardGameFilterBar';
 
 interface BoardGamesHallSectionProps {

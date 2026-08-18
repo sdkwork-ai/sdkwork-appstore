@@ -26,8 +26,9 @@ export interface AppstorePcRuntime {
   session: AppstorePcSessionStore;
 }
 
-export function createAppstorePcRuntime(): AppstorePcRuntime {
-  const config = resolveAppstorePcRuntimeConfig();
+export function createAppstorePcRuntime(
+  config = resolveAppstorePcRuntimeConfig(),
+): AppstorePcRuntime {
   const session = createAppstorePcSessionStore(
     typeof window === 'undefined' ? undefined : window.sessionStorage,
   );

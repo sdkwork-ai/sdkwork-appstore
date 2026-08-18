@@ -39,9 +39,27 @@ function resolveEnvironment(mode: string): AppstorePcEnvironment {
   return environmentAliases[mode] ?? 'development';
 }
 
+export interface AppstorePcRuntimeConfigOverrides {
+  agentsAppApiBaseUrl?: string
+  commentsAppApiBaseUrl?: string
+  appApiBaseUrl?: string
+  backendApiBaseUrl?: string
+  iamAppApiBaseUrl?: string
+  mcpAppApiBaseUrl?: string
+  skillsAppApiBaseUrl?: string
+  locale?: string
+  deploymentProfile?: AppstorePcDeploymentProfile
+  runtimeTarget?: AppstorePcRuntimeTarget
+  appKey?: string
+  appDisplayName?: string
+  aiPreviewAgentId?: string
+}
+
 export function resolveAppstorePcRuntimeConfig(
-  mode = import.meta.env.MODE,
+  modeOrOverrides: string | AppstorePcRuntimeConfigOverrides = import.meta.env.MODE,
 ): AppstorePcRuntimeConfig {
+  const mode = typeof modeOrOverrides === 'string' ? modeOrOverrides : import.meta.env.MODE
+  const overrides = typeof modeOrOverrides === 'string' ? {} : modeOrOverrides
   const environment = resolveEnvironment(readEnv('VITE_SDKWORK_ENVIRONMENT') ?? mode);
   const deploymentProfile =
     readEnv('VITE_SDKWORK_DEPLOYMENT_PROFILE') === 'cloud' ? 'cloud' : 'standalone';
@@ -58,24 +76,24 @@ export function resolveAppstorePcRuntimeConfig(
 
   return {
     agentsAppApiBaseUrl:
-      readEnv('VITE_SDKWORK_AGENTS_APP_API_BASE_URL') ?? platformApiGatewayUrl,
-    aiPreviewAgentId: readEnv('VITE_SDKWORK_APPSTORE_AI_PREVIEW_AGENT_ID'),
+      overrides.agentsAppApiBaseUrl ?? readEnv('VITE_SDKWORK_AGENTS_APP_API_BASE_URL') ?? platformApiGatewayUrl,
+    aiPreviewAgentId: overrides.aiPreviewAgentId ?? readEnv('VITE_SDKWORK_APPSTORE_AI_PREVIEW_AGENT_ID'),
     commentsAppApiBaseUrl:
-      readEnv('VITE_SDKWORK_COMMENTS_APP_API_BASE_URL') ?? platformApiGatewayUrl,
-    appApiBaseUrl: applicationPublicUrl,
-    appDisplayName: manifest.app.displayName,
-    appKey: manifest.app.key,
+      overrides.commentsAppApiBaseUrl ?? readEnv('VITE_SDKWORK_COMMENTS_APP_API_BASE_URL') ?? platformApiGatewayUrl,
+    appApiBaseUrl: overrides.appApiBaseUrl ?? applicationPublicUrl,
+    appDisplayName: overrides.appDisplayName ?? manifest.app.displayName,
+    appKey: overrides.appKey ?? manifest.app.key,
     backendApiBaseUrl:
-      readEnv('VITE_SDKWORK_APPSTORE_BACKEND_API_BASE_URL') ?? applicationPublicUrl,
-    deploymentProfile,
+      overrides.backendApiBaseUrl ?? readEnv('VITE_SDKWORK_APPSTORE_BACKEND_API_BASE_URL') ?? applicationPublicUrl,
+    deploymentProfile: overrides.deploymentProfile ?? deploymentProfile,
     environment,
-    iamAppApiBaseUrl: platformApiGatewayUrl,
-    locale: readEnv('VITE_SDKWORK_APPSTORE_DEFAULT_LOCALE') ?? 'zh-CN',
+    iamAppApiBaseUrl: overrides.iamAppApiBaseUrl ?? platformApiGatewayUrl,
+    locale: overrides.locale ?? readEnv('VITE_SDKWORK_APPSTORE_DEFAULT_LOCALE') ?? 'zh-CN',
     mcpAppApiBaseUrl:
-      readEnv('VITE_SDKWORK_MCP_APP_API_BASE_URL') ?? platformApiGatewayUrl,
-    runtimeTarget,
+      overrides.mcpAppApiBaseUrl ?? readEnv('VITE_SDKWORK_MCP_APP_API_BASE_URL') ?? platformApiGatewayUrl,
+    runtimeTarget: overrides.runtimeTarget ?? runtimeTarget,
     skillsAppApiBaseUrl:
-      readEnv('VITE_SDKWORK_SKILLS_APP_API_BASE_URL') ?? platformApiGatewayUrl,
+      overrides.skillsAppApiBaseUrl ?? readEnv('VITE_SDKWORK_SKILLS_APP_API_BASE_URL') ?? platformApiGatewayUrl,
   };
 }
 

@@ -1,23 +1,12 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { AppstoreInstallContext, useInstall } from '@sdkwork/appstore-pc-commons';
 import { AppItem } from '../types';
 import { AnimatePresence } from 'motion/react';
 import { InstallModal } from '../components/install/InstallModal';
 import { InstallService } from '../services/api';
 
-interface InstallContextType {
-  installApp: (app: AppItem) => void;
-  openApp: (app: AppItem) => void;
-  uninstallApp: (appId: string) => void;
-  isInstalled: (appId: string) => boolean;
-  isDownloading: (appId: string) => boolean;
-  downloadProgress: (appId: string) => number;
-  installedAppIds: Set<string>;
-  activeDownloadApp: AppItem | null;
-  downloadState: 'confirm' | 'downloading' | 'success' | null;
-}
-
-const InstallContext = createContext<InstallContextType | undefined>(undefined);
+export { useInstall };
 
 function readLocalInstalledApps(): Set<string> {
   try {
@@ -133,7 +122,7 @@ export function InstallProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <InstallContext.Provider
+    <AppstoreInstallContext.Provider
       value={{
         installApp,
         openApp,
@@ -165,14 +154,6 @@ export function InstallProvider({ children }: { children: React.ReactNode }) {
           />
         )}
       </AnimatePresence>
-    </InstallContext.Provider>
+    </AppstoreInstallContext.Provider>
   );
-}
-
-export function useInstall() {
-  const context = useContext(InstallContext);
-  if (context === undefined) {
-    throw new Error('useInstall must be used within an InstallProvider');
-  }
-  return context;
 }

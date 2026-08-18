@@ -1,15 +1,16 @@
 interface Option<T extends string> {
-  value: T;
-  label: string;
+  value: T
+  label: string
 }
 
 interface SegmentedControlProps<T extends string> {
-  options: Option<T>[];
-  value: T;
-  onChange: (value: T) => void;
-  className?: string;
+  options: Option<T>[]
+  value: T
+  onChange: (value: T) => void
+  className?: string
 }
 
+/** Compact exclusive option control used by storefront filters. */
 export function SegmentedControl<T extends string>({
   options,
   value,
@@ -32,5 +33,5 @@ export function SegmentedControl<T extends string>({
         </button>
       ))}
     </div>
-  );
+  )
 }

@@ -123,4 +123,18 @@ export const changeLanguage = (lang: 'zh-CN' | 'en') => {
   i18n.changeLanguage(lang);
 };
 
+/**
+ * Ensure i18n is initialized and optionally switch to a host locale.
+ * @param locale - BCP 47 tag such as `zh-CN` or `en-US`.
+ * @returns the shared i18n instance.
+ */
+export function initializeAppstorePcI18n(locale?: string) {
+  const raw = locale?.trim() || i18n.language || initialLang
+  const lang: 'zh-CN' | 'en' = raw.startsWith('zh') ? 'zh-CN' : 'en'
+  if (i18n.language !== lang) {
+    i18n.changeLanguage(lang)
+  }
+  return i18n
+}
+
 export default i18n;

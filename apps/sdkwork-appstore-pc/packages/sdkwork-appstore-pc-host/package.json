@@ -1,0 +1,43 @@
+{
+  "name": "@sdkwork/appstore-pc-host",
+  "version": "1.0.0",
+  "private": false,
+  "type": "module",
+  "main": "src/index.tsx",
+  "exports": {
+    ".": {
+      "types": "./src/index.tsx",
+      "import": "./src/index.tsx",
+      "default": "./src/index.tsx"
+    },
+    "./styles.css": "./src/styles.css"
+  },
+  "peerDependencies": {
+    "@sdkwork/auth-pc-react": "workspace:*",
+    "react": ">=18.2.0 <20",
+    "react-dom": ">=18.2.0 <20",
+    "react-router-dom": ">=6.0.0 <8"
+  },
+  "dependencies": {
+    "@sdkwork/appstore-pc-admin-monitor": "workspace:*",
+    "@sdkwork/appstore-pc-ai-hub": "workspace:*",
+    "@sdkwork/appstore-pc-app-detail": "workspace:*",
+    "@sdkwork/appstore-pc-apps": "workspace:*",
+    "@sdkwork/appstore-pc-category": "workspace:*",
+    "@sdkwork/appstore-pc-charts": "workspace:*",
+    "@sdkwork/appstore-pc-collection": "workspace:*",
+    "@sdkwork/appstore-pc-console-settings": "workspace:*",
+    "@sdkwork/appstore-pc-discover": "workspace:*",
+    "@sdkwork/appstore-pc-events": "workspace:*",
+    "@sdkwork/appstore-pc-games": "workspace:*",
+    "@sdkwork/appstore-pc-library": "workspace:*",
+    "@sdkwork/appstore-pc-publisher": "workspace:*",
+    "@sdkwork/appstore-pc-product": "workspace:*",
+    "@sdkwork/appstore-pc-search": "workspace:*",
+    "@sdkwork/appstore-pc-shell": "workspace:*",
+    "@sdkwork/appstore-pc-updates": "workspace:*",
+    "@sdkwork/appstore-pc-wishlist": "workspace:*",
+    "i18next": "^26.3.6",
+    "react-i18next": "^17.0.11"
+  }
+}

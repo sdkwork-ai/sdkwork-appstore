@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Grid, Sparkles } from 'lucide-react';
-import { AppItem } from '@/src/types';
+import { AppItem } from '@sdkwork/appstore-pc-core';
 
 interface AppsHeaderBannerProps {
   featuredApp?: AppItem;

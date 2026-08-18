@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "kind": "sdkwork.component.spec",
+  "component": {
+    "name": "@sdkwork/appstore-pc-product",
+    "displayName": "SDKWork App Store PC Product",
+    "version": "1.0.0",
+    "type": "frontend-product",
+    "root": "apps/sdkwork-appstore-pc/packages/sdkwork-appstore-pc-product",
+    "domain": "appstore",
+    "capability": "storefront",
+    "surface": "app",
+    "languages": ["typescript", "css"],
+    "generated": false,
+    "status": "active",
+    "manifests": ["package.json", "specs/component.spec.json"]
+  },
+  "canonicalSpecs": [],
+  "contracts": {
+    "layerRole": "frontend-product",
+    "publicExports": [".", "./i18n"],
+    "providedPorts": [
+      { "name": "appstorePcProduct", "export": "." },
+      { "name": "appstorePcI18n", "export": "./i18n" }
+    ],
+    "requiredPorts": [],
+    "sdkDependencies": [],
+    "dependencyApiExports": [],
+    "dependencyApiSurfaces": []
+  },
+  "verification": {
+    "commands": ["pnpm --filter @sdkwork/appstore-pc-product typecheck"]
+  }
+}

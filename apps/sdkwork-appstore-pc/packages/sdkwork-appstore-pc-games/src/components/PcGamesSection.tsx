@@ -1,8 +1,8 @@
 import React from 'react';
 import { Sparkles } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { AppItem } from '@/src/types';
-import { AppRow } from '@/src/components/AppRow';
+import { AppItem } from '@sdkwork/appstore-pc-core';
+import { AppRow } from '@sdkwork/appstore-pc-commons';
 
 interface PcGamesSectionProps {
   games: AppItem[];

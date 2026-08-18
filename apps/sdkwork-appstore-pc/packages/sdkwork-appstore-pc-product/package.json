@@ -1,0 +1,40 @@
+{
+  "name": "@sdkwork/appstore-pc-product",
+  "version": "1.0.0",
+  "private": false,
+  "type": "module",
+  "main": "src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./i18n": {
+      "types": "./src/i18n/index.ts",
+      "import": "./src/i18n/index.ts",
+      "default": "./src/i18n/index.ts"
+    }
+  },
+  "peerDependencies": {
+    "react": ">=18.2.0 <20",
+    "react-dom": ">=18.2.0 <20",
+    "react-router-dom": ">=6.0.0 <8",
+    "i18next": ">=23.0.0 <27",
+    "react-i18next": ">=14.0.0 <18"
+  },
+  "dependencies": {
+    "@sdkwork/appstore-pc-admin-core": "workspace:*",
+    "@sdkwork/appstore-pc-ai-hub": "workspace:*",
+    "@sdkwork/appstore-pc-apps": "workspace:*",
+    "@sdkwork/appstore-pc-commons": "workspace:*",
+    "@sdkwork/appstore-pc-core": "workspace:*",
+    "@sdkwork/appstore-pc-games": "workspace:*",
+    "@sdkwork/appstore-pc-runtime": "workspace:*",
+    "@sdkwork/auth-pc-react": "workspace:*",
+    "@sdkwork/auth-runtime-pc-react": "workspace:*",
+    "@sdkwork/iam-contracts": "workspace:*",
+    "lucide-react": "^0.546.0",
+    "motion": "^12.23.24"
+  }
+}

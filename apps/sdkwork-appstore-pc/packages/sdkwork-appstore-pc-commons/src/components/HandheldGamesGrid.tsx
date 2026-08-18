@@ -1,21 +1,22 @@
-import { ChevronRight } from 'lucide-react';
-import { AppItem } from '../../types';
-import { Link } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
-import { HandheldGameCard } from './HandheldGameCard';
+import { ChevronRight } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
+import type { AppItem } from '@sdkwork/appstore-pc-core'
+import { HandheldGameCard } from './HandheldGameCard'
 
 interface HandheldGamesGridProps {
-  apps: AppItem[];
+  apps: AppItem[]
 }
 
+/** Grid of handheld-game cards used by Discover and Games. */
 export function HandheldGamesGrid({ apps }: HandheldGamesGridProps) {
-  const { t } = useTranslation();
+  const { t } = useTranslation()
 
   return (
     <div className="flex flex-col">
       <div className="flex items-center justify-between mb-3">
-        <Link 
-          to="/search?category=productivity" 
+        <Link
+          to="/search?category=productivity"
           className="flex items-center gap-1.5 group text-sm font-bold text-gray-900 dark:text-gray-100 hover:text-blue-500 transition-colors"
         >
           <span>{t('discover.sections.productivityApps')}</span>
@@ -29,6 +30,5 @@ export function HandheldGamesGrid({ apps }: HandheldGamesGridProps) {
         ))}
       </div>
     </div>
-  );
+  )
 }
-

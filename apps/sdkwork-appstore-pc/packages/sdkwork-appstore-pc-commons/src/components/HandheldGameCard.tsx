@@ -1,20 +1,20 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { Star } from 'lucide-react';
-import { AppItem } from '../../types';
-import { useInstall } from '../../providers/InstallProvider';
-import { useTranslation } from 'react-i18next';
-import { DynamicIcon } from '../DynamicIcon';
+import { Link } from 'react-router-dom'
+import { Star } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
+import type { AppItem } from '@sdkwork/appstore-pc-core'
+import { DynamicIcon } from './DynamicIcon'
+import { useInstall } from '../install'
 
 interface HandheldGameCardProps {
-  game: AppItem;
+  game: AppItem
 }
 
-export const HandheldGameCard: React.FC<HandheldGameCardProps> = ({ game }) => {
-  const { t } = useTranslation();
-  const { installApp, openApp, isInstalled, isDownloading } = useInstall();
-  const installed = isInstalled(game.id);
-  const downloading = isDownloading(game.id);
+/** Handheld-game catalog card with install/open action. */
+export function HandheldGameCard({ game }: HandheldGameCardProps) {
+  const { t } = useTranslation()
+  const { installApp, openApp, isInstalled, isDownloading } = useInstall()
+  const installed = isInstalled(game.id)
+  const downloading = isDownloading(game.id)
 
   return (
     <Link
@@ -43,23 +43,23 @@ export const HandheldGameCard: React.FC<HandheldGameCardProps> = ({ game }) => {
       <div className="flex items-center justify-between mt-4 pt-3 border-t border-gray-200/50 dark:border-[#262934]">
         <span className="text-xs text-gray-400 font-medium">{game.size}</span>
         <button
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            if (installed) openApp(game);
-            else installApp(game);
+          onClick={(event) => {
+            event.preventDefault()
+            event.stopPropagation()
+            if (installed) openApp(game)
+            else installApp(game)
           }}
           className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${
             installed
-              ? "bg-blue-600/15 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400"
+              ? 'bg-blue-600/15 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400'
               : downloading
-              ? "bg-amber-500/20 text-amber-500"
-              : "bg-blue-600 text-white hover:bg-blue-700 shadow-sm"
+                ? 'bg-amber-500/20 text-amber-500'
+                : 'bg-blue-600 text-white hover:bg-blue-700 shadow-sm'
           }`}
         >
           {downloading ? t('common.actions.downloading') : installed ? t('common.actions.open') : t('common.actions.downloadFree')}
         </button>
       </div>
     </Link>
-  );
-};
+  )
+}

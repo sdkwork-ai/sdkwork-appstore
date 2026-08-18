@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "kind": "sdkwork.component.spec",
+  "component": {
+    "name": "@sdkwork/appstore-pc-runtime",
+    "displayName": "SDKWork App Store PC Runtime",
+    "version": "1.0.0",
+    "type": "typescript-package",
+    "root": "apps/sdkwork-appstore-pc/packages/sdkwork-appstore-pc-runtime",
+    "domain": "appstore",
+    "capability": "runtime",
+    "surface": "app",
+    "languages": ["typescript"],
+    "generated": false,
+    "status": "active",
+    "manifests": ["package.json", "specs/component.spec.json"]
+  },
+  "canonicalSpecs": [],
+  "contracts": {
+    "layerRole": "runtime",
+    "publicExports": [".", "./environment", "./runtime", "./session"],
+    "providedPorts": [
+      { "name": "appstorePcRuntime", "export": "." },
+      { "name": "appstorePcSession", "export": "./session" }
+    ],
+    "requiredPorts": [],
+    "sdkDependencies": [
+      { "workspace": "sdkwork-appstore-app-sdk", "surface": "app-api", "credentialMode": "authenticated-app-api" },
+      { "workspace": "sdkwork-iam-app-sdk", "surface": "app-api", "credentialMode": "authenticated-app-api" }
+    ],
+    "dependencyApiExports": [],
+    "dependencyApiSurfaces": []
+  },
+  "verification": {
+    "commands": ["pnpm --filter @sdkwork/appstore-pc-runtime typecheck"]
+  }
+}
