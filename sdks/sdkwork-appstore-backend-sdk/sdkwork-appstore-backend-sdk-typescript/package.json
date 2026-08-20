@@ -1,6 +1,6 @@
 {
   "name": "@sdkwork/appstore-backend-sdk",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "SDKWork Appstore backend SDK composed consumer facade.",
   "type": "module",
   "private": false,
