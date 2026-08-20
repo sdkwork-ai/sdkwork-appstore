@@ -23,49 +23,41 @@ export class CatalogAppstoreCatalogPublicFeaturedApi {
       { name: 'platform', value: params?.platform, style: 'form', explode: true, allowReserved: false },
       { name: 'locale', value: params?.locale, style: 'form', explode: true, allowReserved: false },
     ]);
-    return this.client.request<{ items: PublicFeaturedSlot[]; pageInfo: PageInfo; }>(appendQueryString(customApiPath(`/catalog/featured`), query), { signal: requestOptions?.signal, timeout: requestOptions?.timeout, method: 'GET' as any, skipAuth: true, sdkworkUnwrapKind: 'page' });
+    return this.client.request<{ items: PublicFeaturedSlot[]; pageInfo: PageInfo; }>(appendQueryString(customApiPath(`/catalog/featured`), query), { ...(requestOptions?.signal !== undefined ? { signal: requestOptions.signal } : {}), ...(requestOptions?.timeout !== undefined ? { timeout: requestOptions.timeout } : {}), method: 'GET' as any, skipAuth: true, sdkworkUnwrapKind: 'page' });
   }
 }
 
 export class CatalogAppstoreCatalogPublicApi {
-  private client: HttpClient;
   public readonly featured: CatalogAppstoreCatalogPublicFeaturedApi;
 
   constructor(client: HttpClient) {
-    this.client = client;
     this.featured = new CatalogAppstoreCatalogPublicFeaturedApi(client);
   }
 
 }
 
 export class CatalogAppstoreCatalogApi {
-  private client: HttpClient;
   public readonly public: CatalogAppstoreCatalogPublicApi;
 
   constructor(client: HttpClient) {
-    this.client = client;
     this.public = new CatalogAppstoreCatalogPublicApi(client);
   }
 
 }
 
 export class CatalogAppstoreApi {
-  private client: HttpClient;
   public readonly catalog: CatalogAppstoreCatalogApi;
 
   constructor(client: HttpClient) {
-    this.client = client;
     this.catalog = new CatalogAppstoreCatalogApi(client);
   }
 
 }
 
 export class CatalogApi {
-  private client: HttpClient;
   public readonly appstore: CatalogAppstoreApi;
 
   constructor(client: HttpClient) {
-    this.client = client;
     this.appstore = new CatalogAppstoreApi(client);
   }
 

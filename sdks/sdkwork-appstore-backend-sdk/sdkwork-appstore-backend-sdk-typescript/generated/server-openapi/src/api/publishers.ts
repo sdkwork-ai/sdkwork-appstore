@@ -14,38 +14,32 @@ export class PublishersAppstorePublishersAdminApi {
 
 /** Approve publisher verification */
   async verify(publisherId: string, body: AppstorePublishersAdminVerifyRequest, requestOptions?: ApiRequestOptions): Promise<SdkWorkCommandData> {
-    return this.client.request<SdkWorkCommandData>(backendApiPath(`/publishers/${serializePathParameter(publisherId, { name: 'publisherId', style: 'simple', explode: false })}/verify`), { signal: requestOptions?.signal, timeout: requestOptions?.timeout, method: 'POST' as any, body, contentType: 'application/json', sdkworkUnwrapKind: 'command' });
+    return this.client.request<SdkWorkCommandData>(backendApiPath(`/publishers/${serializePathParameter(publisherId, { name: 'publisherId', style: 'simple', explode: false })}/verify`), { ...(requestOptions?.signal !== undefined ? { signal: requestOptions.signal } : {}), ...(requestOptions?.timeout !== undefined ? { timeout: requestOptions.timeout } : {}), method: 'POST' as any, body, contentType: 'application/json', sdkworkUnwrapKind: 'command' });
   }
 }
 
 export class PublishersAppstorePublishersApi {
-  private client: HttpClient;
   public readonly admin: PublishersAppstorePublishersAdminApi;
 
   constructor(client: HttpClient) {
-    this.client = client;
     this.admin = new PublishersAppstorePublishersAdminApi(client);
   }
 
 }
 
 export class PublishersAppstoreApi {
-  private client: HttpClient;
   public readonly publishers: PublishersAppstorePublishersApi;
 
   constructor(client: HttpClient) {
-    this.client = client;
     this.publishers = new PublishersAppstorePublishersApi(client);
   }
 
 }
 
 export class PublishersApi {
-  private client: HttpClient;
   public readonly appstore: PublishersAppstoreApi;
 
   constructor(client: HttpClient) {
-    this.client = client;
     this.appstore = new PublishersAppstoreApi(client);
   }
 
@@ -55,13 +49,7 @@ export function createPublishersApi(client: HttpClient): PublishersApi {
   return new PublishersApi(client);
 }
 
-function appendQueryString(path: string, rawQueryString: string): string {
-  const query = rawQueryString.replace(/^\?+/, '');
-  if (!query) {
-    return path;
-  }
-  return path.includes('?') ? `${path}&${query}` : `${path}?${query}`;
-}
+
 
 interface PathParameterSpec {
   name: string;

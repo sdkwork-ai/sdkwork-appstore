@@ -14,7 +14,7 @@ export class LibraryAppstoreLibraryUpdatesApi {
 
 /** Check library updates */
   async check(body: LibraryUpdatesCheckRequest, requestOptions?: ApiRequestOptions): Promise<{ items: UpdateAvailable[]; pageInfo: PageInfo; }> {
-    return this.client.request<{ items: UpdateAvailable[]; pageInfo: PageInfo; }>(appApiPath(`/library/updates/check`), { signal: requestOptions?.signal, timeout: requestOptions?.timeout, method: 'POST' as any, body, contentType: 'application/json', sdkworkUnwrapKind: 'page' });
+    return this.client.request<{ items: UpdateAvailable[]; pageInfo: PageInfo; }>(appApiPath(`/library/updates/check`), { ...(requestOptions?.signal !== undefined ? { signal: requestOptions.signal } : {}), ...(requestOptions?.timeout !== undefined ? { timeout: requestOptions.timeout } : {}), method: 'POST' as any, body, contentType: 'application/json', sdkworkUnwrapKind: 'page' });
   }
 }
 
@@ -37,12 +37,12 @@ export class LibraryAppstoreLibraryItemsApi {
       { name: 'cursor', value: params?.cursor, style: 'form', explode: true, allowReserved: false },
       { name: 'page_size', value: params?.pageSize, style: 'form', explode: true, allowReserved: false },
     ]);
-    return this.client.request<{ items: UserLibraryItem[]; pageInfo: PageInfo; }>(appendQueryString(appApiPath(`/library/items`), query), { signal: requestOptions?.signal, timeout: requestOptions?.timeout, method: 'GET' as any, sdkworkUnwrapKind: 'page' });
+    return this.client.request<{ items: UserLibraryItem[]; pageInfo: PageInfo; }>(appendQueryString(appApiPath(`/library/items`), query), { ...(requestOptions?.signal !== undefined ? { signal: requestOptions.signal } : {}), ...(requestOptions?.timeout !== undefined ? { timeout: requestOptions.timeout } : {}), method: 'GET' as any, sdkworkUnwrapKind: 'page' });
   }
 
 /** Retrieve library item */
   async retrieve(libraryItemId: string, requestOptions?: ApiRequestOptions): Promise<UserLibraryItem> {
-    return this.client.request<UserLibraryItem>(appApiPath(`/library/items/${serializePathParameter(libraryItemId, { name: 'libraryItemId', style: 'simple', explode: false })}`), { signal: requestOptions?.signal, timeout: requestOptions?.timeout, method: 'GET' as any, sdkworkUnwrapKind: 'item' });
+    return this.client.request<UserLibraryItem>(appApiPath(`/library/items/${serializePathParameter(libraryItemId, { name: 'libraryItemId', style: 'simple', explode: false })}`), { ...(requestOptions?.signal !== undefined ? { signal: requestOptions.signal } : {}), ...(requestOptions?.timeout !== undefined ? { timeout: requestOptions.timeout } : {}), method: 'GET' as any, sdkworkUnwrapKind: 'item' });
   }
 }
 
@@ -70,32 +70,28 @@ export class LibraryAppstoreLibraryApi {
       },
       {}
     );
-    return this.client.request<LibraryInstallResult>(appApiPath(`/library/install`), { signal: requestOptions?.signal, timeout: requestOptions?.timeout, method: 'POST' as any, body, headers: requestHeaders, contentType: 'application/json', sdkworkUnwrapKind: 'item' });
+    return this.client.request<LibraryInstallResult>(appApiPath(`/library/install`), { ...(requestOptions?.signal !== undefined ? { signal: requestOptions.signal } : {}), ...(requestOptions?.timeout !== undefined ? { timeout: requestOptions.timeout } : {}), method: 'POST' as any, body, contentType: 'application/json', ...(requestHeaders !== undefined ? { headers: requestHeaders } : {}), sdkworkUnwrapKind: 'item' });
   }
 
 /** Record uninstall */
   async uninstall(body: LibraryUninstallRequest, requestOptions?: ApiRequestOptions): Promise<Record<string, unknown>> {
-    return this.client.request<Record<string, unknown>>(appApiPath(`/library/uninstall`), { signal: requestOptions?.signal, timeout: requestOptions?.timeout, method: 'POST' as any, body, contentType: 'application/json', sdkworkUnwrapKind: 'item' });
+    return this.client.request<Record<string, unknown>>(appApiPath(`/library/uninstall`), { ...(requestOptions?.signal !== undefined ? { signal: requestOptions.signal } : {}), ...(requestOptions?.timeout !== undefined ? { timeout: requestOptions.timeout } : {}), method: 'POST' as any, body, contentType: 'application/json', sdkworkUnwrapKind: 'item' });
   }
 }
 
 export class LibraryAppstoreApi {
-  private client: HttpClient;
   public readonly library: LibraryAppstoreLibraryApi;
 
   constructor(client: HttpClient) {
-    this.client = client;
     this.library = new LibraryAppstoreLibraryApi(client);
   }
 
 }
 
 export class LibraryApi {
-  private client: HttpClient;
   public readonly appstore: LibraryAppstoreApi;
 
   constructor(client: HttpClient) {
-    this.client = client;
     this.appstore = new LibraryAppstoreApi(client);
   }
 

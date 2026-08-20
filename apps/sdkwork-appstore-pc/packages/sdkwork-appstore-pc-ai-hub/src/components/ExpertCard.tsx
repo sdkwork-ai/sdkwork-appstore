@@ -96,7 +96,7 @@ export const ExpertCard: React.FC<ExpertCardProps> = ({
   return (
     <div
       onClick={() => onClickCard(expert)}
-      className="group relative flex flex-col justify-between bg-slate-900/90 hover:bg-slate-850/90 border border-slate-800/90 hover:border-slate-700/90 rounded-2xl p-4 md:p-5 transition-all duration-200 cursor-pointer shadow-md hover:shadow-xl hover:shadow-indigo-500/5 hover:-translate-y-0.5 select-none"
+      className="group relative flex flex-col justify-between bg-white hover:bg-slate-50 border border-slate-200 hover:border-slate-300 rounded-2xl p-4 md:p-5 transition-all duration-200 cursor-pointer shadow-md hover:shadow-xl hover:shadow-indigo-500/5 hover:-translate-y-0.5 select-none dark:bg-slate-900/90 dark:hover:bg-slate-850/90 dark:border-slate-800/90 dark:hover:border-slate-700/90"
     >
       <div>
         {/* Top Header Row */}
@@ -114,7 +114,7 @@ export const ExpertCard: React.FC<ExpertCardProps> = ({
             {/* Title & Nickname */}
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2 flex-wrap">
-                <h4 className="text-base font-bold text-slate-100 group-hover:text-indigo-300 transition-colors truncate">
+                <h4 className="text-base font-bold text-slate-900 group-hover:text-indigo-600 transition-colors truncate dark:text-slate-100 dark:group-hover:text-indigo-300">
                   {expert.name}
                 </h4>
                 {expert.badge && (
@@ -123,7 +123,7 @@ export const ExpertCard: React.FC<ExpertCardProps> = ({
                   </span>
                 )}
               </div>
-              <p className="text-xs text-slate-400 font-medium truncate mt-0.5">
+              <p className="text-xs text-slate-500 dark:text-slate-400 font-medium truncate mt-0.5">
                 {expert.nickname}
               </p>
             </div>
@@ -137,7 +137,7 @@ export const ExpertCard: React.FC<ExpertCardProps> = ({
             className={`p-1.5 rounded-xl border transition-all shrink-0 ${
               isMyExpert
                 ? 'bg-indigo-600/30 border-indigo-500 text-indigo-300 hover:bg-indigo-600/40'
-                : 'bg-slate-800/80 border-slate-700/80 text-slate-400 hover:text-white hover:bg-slate-700/80'
+                : 'bg-slate-100 border-slate-200 text-slate-500 hover:text-slate-900 hover:bg-slate-200 dark:bg-slate-800/80 dark:border-slate-700/80 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-700/80'
             }`}
           >
             {isMyExpert ? <Check className="w-4 h-4 text-indigo-400" /> : <Plus className="w-4 h-4" />}
@@ -145,13 +145,13 @@ export const ExpertCard: React.FC<ExpertCardProps> = ({
         </div>
 
         {/* Description Body */}
-        <p className="text-xs text-slate-300 leading-relaxed line-clamp-2 min-h-[2.25rem] mb-3.5">
+        <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed line-clamp-2 min-h-[2.25rem] mb-3.5">
           {expert.description}
         </p>
       </div>
 
       {/* Footer Tags & Actions */}
-      <div className="space-y-3 pt-2 border-t border-slate-800/60">
+      <div className="space-y-3 pt-2 border-t border-slate-200 dark:border-slate-800/60">
         {/* Chips */}
         <div className="flex flex-wrap items-center gap-1.5">
           {expert.tags.map((tag, idx) => (

@@ -14,7 +14,7 @@ export class ListingsAppstoreListingsAdminVisibilityApi {
 
 /** Update listing visibility */
   async update(listingId: string, body: AppstoreListingsAdminVisibilityUpdateRequest, requestOptions?: ApiRequestOptions): Promise<SdkWorkPageData> {
-    return this.client.request<SdkWorkPageData>(backendApiPath(`/listings/${serializePathParameter(listingId, { name: 'listingId', style: 'simple', explode: false })}/visibility`), { signal: requestOptions?.signal, timeout: requestOptions?.timeout, method: 'PATCH' as any, body, contentType: 'application/json', sdkworkUnwrapKind: 'page' });
+    return this.client.request<SdkWorkPageData>(backendApiPath(`/listings/${serializePathParameter(listingId, { name: 'listingId', style: 'simple', explode: false })}/visibility`), { ...(requestOptions?.signal !== undefined ? { signal: requestOptions.signal } : {}), ...(requestOptions?.timeout !== undefined ? { timeout: requestOptions.timeout } : {}), method: 'PATCH' as any, body, contentType: 'application/json', sdkworkUnwrapKind: 'page' });
   }
 }
 
@@ -41,43 +41,37 @@ export class ListingsAppstoreListingsAdminApi {
       { name: 'cursor', value: params?.cursor, style: 'form', explode: true, allowReserved: false },
       { name: 'page_size', value: params?.pageSize, style: 'form', explode: true, allowReserved: false },
     ]);
-    return this.client.request<SdkWorkPageData>(appendQueryString(backendApiPath(`/listings`), query), { signal: requestOptions?.signal, timeout: requestOptions?.timeout, method: 'GET' as any, sdkworkUnwrapKind: 'page' });
+    return this.client.request<SdkWorkPageData>(appendQueryString(backendApiPath(`/listings`), query), { ...(requestOptions?.signal !== undefined ? { signal: requestOptions.signal } : {}), ...(requestOptions?.timeout !== undefined ? { timeout: requestOptions.timeout } : {}), method: 'GET' as any, sdkworkUnwrapKind: 'page' });
   }
 
 /** Retrieve listing for operators */
   async retrieve(listingId: string, requestOptions?: ApiRequestOptions): Promise<SdkWorkPageData> {
-    return this.client.request<SdkWorkPageData>(backendApiPath(`/listings/${serializePathParameter(listingId, { name: 'listingId', style: 'simple', explode: false })}`), { signal: requestOptions?.signal, timeout: requestOptions?.timeout, method: 'GET' as any, sdkworkUnwrapKind: 'page' });
+    return this.client.request<SdkWorkPageData>(backendApiPath(`/listings/${serializePathParameter(listingId, { name: 'listingId', style: 'simple', explode: false })}`), { ...(requestOptions?.signal !== undefined ? { signal: requestOptions.signal } : {}), ...(requestOptions?.timeout !== undefined ? { timeout: requestOptions.timeout } : {}), method: 'GET' as any, sdkworkUnwrapKind: 'page' });
   }
 }
 
 export class ListingsAppstoreListingsApi {
-  private client: HttpClient;
   public readonly admin: ListingsAppstoreListingsAdminApi;
 
   constructor(client: HttpClient) {
-    this.client = client;
     this.admin = new ListingsAppstoreListingsAdminApi(client);
   }
 
 }
 
 export class ListingsAppstoreApi {
-  private client: HttpClient;
   public readonly listings: ListingsAppstoreListingsApi;
 
   constructor(client: HttpClient) {
-    this.client = client;
     this.listings = new ListingsAppstoreListingsApi(client);
   }
 
 }
 
 export class ListingsApi {
-  private client: HttpClient;
   public readonly appstore: ListingsAppstoreApi;
 
   constructor(client: HttpClient) {
-    this.client = client;
     this.appstore = new ListingsAppstoreApi(client);
   }
 

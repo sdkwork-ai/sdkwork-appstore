@@ -20,7 +20,7 @@ export const AIHubTabNav: React.FC<AIHubTabNavProps> = ({
   const { t } = useTranslation();
 
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-900/80 p-2 rounded-2xl border border-slate-800/80 backdrop-blur-md">
+    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white/95 dark:bg-slate-900/80 p-2 rounded-2xl border border-slate-200 dark:border-slate-800/80 backdrop-blur-md">
       <div className="flex items-center gap-2 overflow-x-auto">
         <button
           type="button"

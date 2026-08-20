@@ -27,7 +27,7 @@ export class AnalyticsAppstoreAnalyticsOperatorSearchApi {
       { name: 'date_to', value: params?.dateTo, style: 'form', explode: true, allowReserved: false },
       { name: 'page_size', value: params?.pageSize, style: 'form', explode: true, allowReserved: false },
     ]);
-    return this.client.request<SdkWorkPageData>(appendQueryString(backendApiPath(`/analytics/operator/search`), query), { signal: requestOptions?.signal, timeout: requestOptions?.timeout, method: 'GET' as any, sdkworkUnwrapKind: 'page' });
+    return this.client.request<SdkWorkPageData>(appendQueryString(backendApiPath(`/analytics/operator/search`), query), { ...(requestOptions?.signal !== undefined ? { signal: requestOptions.signal } : {}), ...(requestOptions?.timeout !== undefined ? { timeout: requestOptions.timeout } : {}), method: 'GET' as any, sdkworkUnwrapKind: 'page' });
   }
 }
 
@@ -50,17 +50,15 @@ export class AnalyticsAppstoreAnalyticsOperatorDashboardApi {
       { name: 'date_from', value: params?.dateFrom, style: 'form', explode: true, allowReserved: false },
       { name: 'date_to', value: params?.dateTo, style: 'form', explode: true, allowReserved: false },
     ]);
-    return this.client.request<Record<string, unknown>>(appendQueryString(backendApiPath(`/analytics/operator/dashboard`), query), { signal: requestOptions?.signal, timeout: requestOptions?.timeout, method: 'GET' as any, sdkworkUnwrapKind: 'item' });
+    return this.client.request<Record<string, unknown>>(appendQueryString(backendApiPath(`/analytics/operator/dashboard`), query), { ...(requestOptions?.signal !== undefined ? { signal: requestOptions.signal } : {}), ...(requestOptions?.timeout !== undefined ? { timeout: requestOptions.timeout } : {}), method: 'GET' as any, sdkworkUnwrapKind: 'item' });
   }
 }
 
 export class AnalyticsAppstoreAnalyticsOperatorApi {
-  private client: HttpClient;
   public readonly dashboard: AnalyticsAppstoreAnalyticsOperatorDashboardApi;
   public readonly search: AnalyticsAppstoreAnalyticsOperatorSearchApi;
 
   constructor(client: HttpClient) {
-    this.client = client;
     this.dashboard = new AnalyticsAppstoreAnalyticsOperatorDashboardApi(client);
     this.search = new AnalyticsAppstoreAnalyticsOperatorSearchApi(client);
   }
@@ -95,7 +93,7 @@ export class AnalyticsAppstoreAnalyticsPublisherListingsApi {
       { name: 'date_from', value: params?.dateFrom, style: 'form', explode: true, allowReserved: false },
       { name: 'date_to', value: params?.dateTo, style: 'form', explode: true, allowReserved: false },
     ]);
-    return this.client.request<SdkWorkPageData>(appendQueryString(backendApiPath(`/analytics/publisher/listings`), query), { signal: requestOptions?.signal, timeout: requestOptions?.timeout, method: 'GET' as any, sdkworkUnwrapKind: 'page' });
+    return this.client.request<SdkWorkPageData>(appendQueryString(backendApiPath(`/analytics/publisher/listings`), query), { ...(requestOptions?.signal !== undefined ? { signal: requestOptions.signal } : {}), ...(requestOptions?.timeout !== undefined ? { timeout: requestOptions.timeout } : {}), method: 'GET' as any, sdkworkUnwrapKind: 'page' });
   }
 
 /** Retrieve publisher analytics for a listing */
@@ -104,7 +102,7 @@ export class AnalyticsAppstoreAnalyticsPublisherListingsApi {
       { name: 'date_from', value: params?.dateFrom, style: 'form', explode: true, allowReserved: false },
       { name: 'date_to', value: params?.dateTo, style: 'form', explode: true, allowReserved: false },
     ]);
-    return this.client.request<Record<string, unknown>>(appendQueryString(backendApiPath(`/analytics/publisher/listings/${serializePathParameter(listingId, { name: 'listingId', style: 'simple', explode: false })}`), query), { signal: requestOptions?.signal, timeout: requestOptions?.timeout, method: 'GET' as any, sdkworkUnwrapKind: 'item' });
+    return this.client.request<Record<string, unknown>>(appendQueryString(backendApiPath(`/analytics/publisher/listings/${serializePathParameter(listingId, { name: 'listingId', style: 'simple', explode: false })}`), query), { ...(requestOptions?.signal !== undefined ? { signal: requestOptions.signal } : {}), ...(requestOptions?.timeout !== undefined ? { timeout: requestOptions.timeout } : {}), method: 'GET' as any, sdkworkUnwrapKind: 'item' });
   }
 }
 
@@ -127,17 +125,15 @@ export class AnalyticsAppstoreAnalyticsPublisherOverviewApi {
       { name: 'date_from', value: params?.dateFrom, style: 'form', explode: true, allowReserved: false },
       { name: 'date_to', value: params?.dateTo, style: 'form', explode: true, allowReserved: false },
     ]);
-    return this.client.request<Record<string, unknown>>(appendQueryString(backendApiPath(`/analytics/publisher/overview`), query), { signal: requestOptions?.signal, timeout: requestOptions?.timeout, method: 'GET' as any, sdkworkUnwrapKind: 'item' });
+    return this.client.request<Record<string, unknown>>(appendQueryString(backendApiPath(`/analytics/publisher/overview`), query), { ...(requestOptions?.signal !== undefined ? { signal: requestOptions.signal } : {}), ...(requestOptions?.timeout !== undefined ? { timeout: requestOptions.timeout } : {}), method: 'GET' as any, sdkworkUnwrapKind: 'item' });
   }
 }
 
 export class AnalyticsAppstoreAnalyticsPublisherApi {
-  private client: HttpClient;
   public readonly overview: AnalyticsAppstoreAnalyticsPublisherOverviewApi;
   public readonly listings: AnalyticsAppstoreAnalyticsPublisherListingsApi;
 
   constructor(client: HttpClient) {
-    this.client = client;
     this.overview = new AnalyticsAppstoreAnalyticsPublisherOverviewApi(client);
     this.listings = new AnalyticsAppstoreAnalyticsPublisherListingsApi(client);
   }
@@ -145,12 +141,10 @@ export class AnalyticsAppstoreAnalyticsPublisherApi {
 }
 
 export class AnalyticsAppstoreAnalyticsApi {
-  private client: HttpClient;
   public readonly publisher: AnalyticsAppstoreAnalyticsPublisherApi;
   public readonly operator: AnalyticsAppstoreAnalyticsOperatorApi;
 
   constructor(client: HttpClient) {
-    this.client = client;
     this.publisher = new AnalyticsAppstoreAnalyticsPublisherApi(client);
     this.operator = new AnalyticsAppstoreAnalyticsOperatorApi(client);
   }
@@ -158,22 +152,18 @@ export class AnalyticsAppstoreAnalyticsApi {
 }
 
 export class AnalyticsAppstoreApi {
-  private client: HttpClient;
   public readonly analytics: AnalyticsAppstoreAnalyticsApi;
 
   constructor(client: HttpClient) {
-    this.client = client;
     this.analytics = new AnalyticsAppstoreAnalyticsApi(client);
   }
 
 }
 
 export class AnalyticsApi {
-  private client: HttpClient;
   public readonly appstore: AnalyticsAppstoreApi;
 
   constructor(client: HttpClient) {
-    this.client = client;
     this.appstore = new AnalyticsAppstoreApi(client);
   }
 

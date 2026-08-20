@@ -33,7 +33,7 @@ export class MarketAppstoreMarketReleasesApi {
       { name: 'cursor', value: params?.cursor, style: 'form', explode: true, allowReserved: false },
       { name: 'page_size', value: params?.pageSize, style: 'form', explode: true, allowReserved: false },
     ]);
-    return this.client.request<SdkWorkPageData>(appendQueryString(backendApiPath(`/market_releases`), query), { signal: requestOptions?.signal, timeout: requestOptions?.timeout, method: 'GET' as any, sdkworkUnwrapKind: 'page' });
+    return this.client.request<SdkWorkPageData>(appendQueryString(backendApiPath(`/market_releases`), query), { ...(requestOptions?.signal !== undefined ? { signal: requestOptions.signal } : {}), ...(requestOptions?.timeout !== undefined ? { timeout: requestOptions.timeout } : {}), method: 'GET' as any, sdkworkUnwrapKind: 'page' });
   }
 
 /** Sync external market release state */
@@ -44,7 +44,7 @@ export class MarketAppstoreMarketReleasesApi {
       },
       {}
     );
-    return this.client.request<Record<string, unknown>>(backendApiPath(`/market_releases/${serializePathParameter(marketReleaseId, { name: 'marketReleaseId', style: 'simple', explode: false })}/sync`), { signal: requestOptions?.signal, timeout: requestOptions?.timeout, method: 'POST' as any, body, headers: requestHeaders, contentType: 'application/json', sdkworkUnwrapKind: 'item' });
+    return this.client.request<Record<string, unknown>>(backendApiPath(`/market_releases/${serializePathParameter(marketReleaseId, { name: 'marketReleaseId', style: 'simple', explode: false })}/sync`), { ...(requestOptions?.signal !== undefined ? { signal: requestOptions.signal } : {}), ...(requestOptions?.timeout !== undefined ? { timeout: requestOptions.timeout } : {}), method: 'POST' as any, body, contentType: 'application/json', ...(requestHeaders !== undefined ? { headers: requestHeaders } : {}), sdkworkUnwrapKind: 'item' });
   }
 }
 
@@ -69,27 +69,25 @@ export class MarketAppstoreMarketChannelsApi {
       { name: 'cursor', value: params?.cursor, style: 'form', explode: true, allowReserved: false },
       { name: 'page_size', value: params?.pageSize, style: 'form', explode: true, allowReserved: false },
     ]);
-    return this.client.request<SdkWorkPageData>(appendQueryString(backendApiPath(`/market_channels`), query), { signal: requestOptions?.signal, timeout: requestOptions?.timeout, method: 'GET' as any, sdkworkUnwrapKind: 'page' });
+    return this.client.request<SdkWorkPageData>(appendQueryString(backendApiPath(`/market_channels`), query), { ...(requestOptions?.signal !== undefined ? { signal: requestOptions.signal } : {}), ...(requestOptions?.timeout !== undefined ? { timeout: requestOptions.timeout } : {}), method: 'GET' as any, sdkworkUnwrapKind: 'page' });
   }
 
 /** Create external market channel */
   async create(body: MarketChannelCreateRequest, requestOptions?: ApiRequestOptions): Promise<Record<string, unknown>> {
-    return this.client.request<Record<string, unknown>>(backendApiPath(`/market_channels`), { signal: requestOptions?.signal, timeout: requestOptions?.timeout, method: 'POST' as any, body, contentType: 'application/json', sdkworkUnwrapKind: 'item' });
+    return this.client.request<Record<string, unknown>>(backendApiPath(`/market_channels`), { ...(requestOptions?.signal !== undefined ? { signal: requestOptions.signal } : {}), ...(requestOptions?.timeout !== undefined ? { timeout: requestOptions.timeout } : {}), method: 'POST' as any, body, contentType: 'application/json', sdkworkUnwrapKind: 'item' });
   }
 
 /** Update external market channel */
   async update(marketChannelId: string, body: MarketChannelUpdateRequest, requestOptions?: ApiRequestOptions): Promise<Record<string, unknown>> {
-    return this.client.request<Record<string, unknown>>(backendApiPath(`/market_channels/${serializePathParameter(marketChannelId, { name: 'marketChannelId', style: 'simple', explode: false })}`), { signal: requestOptions?.signal, timeout: requestOptions?.timeout, method: 'PATCH' as any, body, contentType: 'application/json', sdkworkUnwrapKind: 'item' });
+    return this.client.request<Record<string, unknown>>(backendApiPath(`/market_channels/${serializePathParameter(marketChannelId, { name: 'marketChannelId', style: 'simple', explode: false })}`), { ...(requestOptions?.signal !== undefined ? { signal: requestOptions.signal } : {}), ...(requestOptions?.timeout !== undefined ? { timeout: requestOptions.timeout } : {}), method: 'PATCH' as any, body, contentType: 'application/json', sdkworkUnwrapKind: 'item' });
   }
 }
 
 export class MarketAppstoreApi {
-  private client: HttpClient;
   public readonly marketChannels: MarketAppstoreMarketChannelsApi;
   public readonly marketReleases: MarketAppstoreMarketReleasesApi;
 
   constructor(client: HttpClient) {
-    this.client = client;
     this.marketChannels = new MarketAppstoreMarketChannelsApi(client);
     this.marketReleases = new MarketAppstoreMarketReleasesApi(client);
   }
@@ -97,11 +95,9 @@ export class MarketAppstoreApi {
 }
 
 export class MarketApi {
-  private client: HttpClient;
   public readonly appstore: MarketAppstoreApi;
 
   constructor(client: HttpClient) {
-    this.client = client;
     this.appstore = new MarketAppstoreApi(client);
   }
 

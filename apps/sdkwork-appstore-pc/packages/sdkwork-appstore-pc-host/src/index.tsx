@@ -61,6 +61,8 @@ export interface AppstorePcHostProps {
   session?: AppstorePcHostSession | null
   runtime?: AppstorePcRuntime
   onPathChange?: (path: string) => void
+  resolveHostColorScheme?: () => 'light' | 'dark'
+  subscribeHostColorScheme?: (listener: (scheme: 'light' | 'dark') => void) => () => void
 }
 
 /** Public route composition used by the PC app and embedded hosts. */
@@ -234,7 +236,10 @@ export function AppstorePcHost(props: AppstorePcHostProps = {}) {
 
   return (
     <I18nextProvider i18n={i18n}>
-      <ThemeProvider>
+      <ThemeProvider
+        resolveHostColorScheme={props.resolveHostColorScheme}
+        subscribeHostColorScheme={props.subscribeHostColorScheme}
+      >
         <InstallProvider>
           <MemoryRouter initialEntries={[props.initialPath ?? '/']}>
             <PathObserver onPathChange={props.onPathChange} />

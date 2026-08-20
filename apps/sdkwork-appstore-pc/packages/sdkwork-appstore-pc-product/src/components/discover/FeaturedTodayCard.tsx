@@ -36,7 +36,7 @@ export function FeaturedTodayCard({ app }: FeaturedTodayCardProps) {
 
       <Link 
         to={`/app/${app.id}`}
-        className="group relative flex-1 flex flex-col justify-between rounded-2xl overflow-hidden p-6 bg-slate-900 dark:bg-[#151821] border border-slate-800 shadow-lg hover:border-slate-700 transition-all cursor-pointer min-h-[260px]"
+        className="group relative flex-1 flex flex-col justify-between rounded-2xl overflow-hidden p-6 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-[#151821] border border-slate-200 dark:border-slate-800 shadow-lg hover:border-slate-300 dark:hover:border-slate-700 transition-all cursor-pointer min-h-[260px]"
       >
         {/* Top Badges */}
         <div className="flex items-center justify-between z-10">
@@ -44,7 +44,7 @@ export function FeaturedTodayCard({ app }: FeaturedTodayCardProps) {
             <Sparkles className="w-3.5 h-3.5" />
             <span>{t('discover.sections.aiSpotlight', 'AI 焦点')}</span>
           </div>
-          <div className="p-2 rounded-lg bg-slate-800 text-slate-300 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+          <div className="p-2 rounded-lg bg-slate-100 text-slate-600 group-hover:bg-blue-600 group-hover:text-white transition-colors dark:bg-slate-800 dark:text-slate-300">
             <ArrowUpRight className="w-4 h-4" />
           </div>
         </div>
@@ -55,21 +55,21 @@ export function FeaturedTodayCard({ app }: FeaturedTodayCardProps) {
             <Cpu className="w-8 h-8" />
           </div>
           <div>
-            <span className="text-[11px] text-slate-400 font-semibold uppercase tracking-wider">{app.developer}</span>
-            <h3 className="text-lg md:text-xl font-bold text-white group-hover:text-blue-300 transition-colors">
+            <span className="text-[11px] text-slate-500 dark:text-slate-400 font-semibold uppercase tracking-wider">{app.developer}</span>
+            <h3 className="text-lg md:text-xl font-bold text-slate-900 group-hover:text-blue-600 transition-colors dark:text-white dark:group-hover:text-blue-300">
               {app.name}
             </h3>
-            <p className="text-xs text-slate-300/80 mt-1 line-clamp-2 max-w-xs leading-relaxed">
+            <p className="text-xs text-slate-600/90 dark:text-slate-300/80 mt-1 line-clamp-2 max-w-xs leading-relaxed">
               {app.description}
             </p>
           </div>
         </div>
 
         {/* Bottom CTA Bar */}
-        <div className="flex items-center justify-between pt-4 border-t border-slate-800 z-10">
+        <div className="flex items-center justify-between pt-4 border-t border-slate-200 dark:border-slate-800 z-10">
           <div className="flex flex-col">
-            <span className="text-[11px] text-slate-400 font-medium">{t('common.labels.rating')}: {app.rating} ★</span>
-            <span className="text-xs font-semibold text-slate-200">{app.category}</span>
+            <span className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">{t('common.labels.rating')}: {app.rating} ★</span>
+            <span className="text-xs font-semibold text-slate-700 dark:text-slate-200">{app.category}</span>
           </div>
 
           <button

@@ -21,38 +21,32 @@ export class ListingsAppstoreListingsPublicApi {
     const query = buildQueryString([
       { name: 'locale', value: params?.locale, style: 'form', explode: true, allowReserved: false },
     ]);
-    return this.client.request<PublicListing>(appendQueryString(customApiPath(`/listings/${serializePathParameter(listingSlug, { name: 'listingSlug', style: 'simple', explode: false })}`), query), { signal: requestOptions?.signal, timeout: requestOptions?.timeout, method: 'GET' as any, skipAuth: true, sdkworkUnwrapKind: 'item' });
+    return this.client.request<PublicListing>(appendQueryString(customApiPath(`/listings/${serializePathParameter(listingSlug, { name: 'listingSlug', style: 'simple', explode: false })}`), query), { ...(requestOptions?.signal !== undefined ? { signal: requestOptions.signal } : {}), ...(requestOptions?.timeout !== undefined ? { timeout: requestOptions.timeout } : {}), method: 'GET' as any, skipAuth: true, sdkworkUnwrapKind: 'item' });
   }
 }
 
 export class ListingsAppstoreListingsApi {
-  private client: HttpClient;
   public readonly public: ListingsAppstoreListingsPublicApi;
 
   constructor(client: HttpClient) {
-    this.client = client;
     this.public = new ListingsAppstoreListingsPublicApi(client);
   }
 
 }
 
 export class ListingsAppstoreApi {
-  private client: HttpClient;
   public readonly listings: ListingsAppstoreListingsApi;
 
   constructor(client: HttpClient) {
-    this.client = client;
     this.listings = new ListingsAppstoreListingsApi(client);
   }
 
 }
 
 export class ListingsApi {
-  private client: HttpClient;
   public readonly appstore: ListingsAppstoreApi;
 
   constructor(client: HttpClient) {
-    this.client = client;
     this.appstore = new ListingsAppstoreApi(client);
   }
 

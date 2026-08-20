@@ -26,8 +26,8 @@ export const AIExpertsHeader: React.FC<AIExpertsHeaderProps> = ({
   const { t } = useI18n();
 
   return (
-    <div className="bg-slate-900/90 dark:bg-slate-900 border border-slate-800/80 rounded-2xl p-5 md:p-6 text-white shadow-xl backdrop-blur-md">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-5 border-b border-slate-800">
+    <div className="bg-white/95 dark:bg-slate-900 border border-slate-200 dark:border-slate-800/80 rounded-2xl p-5 md:p-6 text-slate-900 dark:text-white shadow-xl backdrop-blur-md">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-5 border-b border-slate-200 dark:border-slate-800">
         <div>
           <div className="flex items-center gap-2 mb-1.5">
             <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 flex items-center gap-1">

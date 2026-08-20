@@ -20,7 +20,7 @@ export class ModerationAppstoreModerationAppealsApi {
 
 /** Create moderation appeal */
   async create(body: ModerationAppealCreateRequest, requestOptions?: ApiRequestOptions): Promise<Record<string, unknown>> {
-    return this.client.request<Record<string, unknown>>(backendApiPath(`/moderation/appeals`), { signal: requestOptions?.signal, timeout: requestOptions?.timeout, method: 'POST' as any, body, contentType: 'application/json', sdkworkUnwrapKind: 'item' });
+    return this.client.request<Record<string, unknown>>(backendApiPath(`/moderation/appeals`), { ...(requestOptions?.signal !== undefined ? { signal: requestOptions.signal } : {}), ...(requestOptions?.timeout !== undefined ? { timeout: requestOptions.timeout } : {}), method: 'POST' as any, body, contentType: 'application/json', sdkworkUnwrapKind: 'item' });
   }
 
 /** List moderation appeals */
@@ -30,17 +30,17 @@ export class ModerationAppstoreModerationAppealsApi {
       { name: 'page_size', value: params?.pageSize, style: 'form', explode: true, allowReserved: false },
       { name: 'status', value: params?.status, style: 'form', explode: true, allowReserved: false },
     ]);
-    return this.client.request<SdkWorkPageData>(appendQueryString(backendApiPath(`/moderation/appeals`), query), { signal: requestOptions?.signal, timeout: requestOptions?.timeout, method: 'GET' as any, sdkworkUnwrapKind: 'page' });
+    return this.client.request<SdkWorkPageData>(appendQueryString(backendApiPath(`/moderation/appeals`), query), { ...(requestOptions?.signal !== undefined ? { signal: requestOptions.signal } : {}), ...(requestOptions?.timeout !== undefined ? { timeout: requestOptions.timeout } : {}), method: 'GET' as any, sdkworkUnwrapKind: 'page' });
   }
 
 /** Retrieve moderation appeal */
   async retrieve(appealId: string, requestOptions?: ApiRequestOptions): Promise<Record<string, unknown>> {
-    return this.client.request<Record<string, unknown>>(backendApiPath(`/moderation/appeals/${serializePathParameter(appealId, { name: 'appealId', style: 'simple', explode: false })}`), { signal: requestOptions?.signal, timeout: requestOptions?.timeout, method: 'GET' as any, sdkworkUnwrapKind: 'item' });
+    return this.client.request<Record<string, unknown>>(backendApiPath(`/moderation/appeals/${serializePathParameter(appealId, { name: 'appealId', style: 'simple', explode: false })}`), { ...(requestOptions?.signal !== undefined ? { signal: requestOptions.signal } : {}), ...(requestOptions?.timeout !== undefined ? { timeout: requestOptions.timeout } : {}), method: 'GET' as any, sdkworkUnwrapKind: 'item' });
   }
 
 /** Decide moderation appeal */
   async decide(appealId: string, body: ModerationAppealDecideRequest, requestOptions?: ApiRequestOptions): Promise<Record<string, unknown>> {
-    return this.client.request<Record<string, unknown>>(backendApiPath(`/moderation/appeals/${serializePathParameter(appealId, { name: 'appealId', style: 'simple', explode: false })}/decide`), { signal: requestOptions?.signal, timeout: requestOptions?.timeout, method: 'POST' as any, body, contentType: 'application/json', sdkworkUnwrapKind: 'item' });
+    return this.client.request<Record<string, unknown>>(backendApiPath(`/moderation/appeals/${serializePathParameter(appealId, { name: 'appealId', style: 'simple', explode: false })}/decide`), { ...(requestOptions?.signal !== undefined ? { signal: requestOptions.signal } : {}), ...(requestOptions?.timeout !== undefined ? { timeout: requestOptions.timeout } : {}), method: 'POST' as any, body, contentType: 'application/json', sdkworkUnwrapKind: 'item' });
   }
 }
 
@@ -64,7 +64,7 @@ export class ModerationAppstoreModerationDecisionsApi {
       },
       {}
     );
-    return this.client.request<Record<string, unknown>>(backendApiPath(`/moderation/reviews/${serializePathParameter(reviewId, { name: 'reviewId', style: 'simple', explode: false })}/decisions`), { signal: requestOptions?.signal, timeout: requestOptions?.timeout, method: 'POST' as any, body, headers: requestHeaders, contentType: 'application/json', sdkworkUnwrapKind: 'item' });
+    return this.client.request<Record<string, unknown>>(backendApiPath(`/moderation/reviews/${serializePathParameter(reviewId, { name: 'reviewId', style: 'simple', explode: false })}/decisions`), { ...(requestOptions?.signal !== undefined ? { signal: requestOptions.signal } : {}), ...(requestOptions?.timeout !== undefined ? { timeout: requestOptions.timeout } : {}), method: 'POST' as any, body, contentType: 'application/json', ...(requestHeaders !== undefined ? { headers: requestHeaders } : {}), sdkworkUnwrapKind: 'item' });
   }
 }
 
@@ -78,12 +78,12 @@ export class ModerationAppstoreModerationReviewsApi {
 
 /** Retrieve moderation review */
   async retrieve(reviewId: string, requestOptions?: ApiRequestOptions): Promise<Record<string, unknown>> {
-    return this.client.request<Record<string, unknown>>(backendApiPath(`/moderation/reviews/${serializePathParameter(reviewId, { name: 'reviewId', style: 'simple', explode: false })}`), { signal: requestOptions?.signal, timeout: requestOptions?.timeout, method: 'GET' as any, sdkworkUnwrapKind: 'item' });
+    return this.client.request<Record<string, unknown>>(backendApiPath(`/moderation/reviews/${serializePathParameter(reviewId, { name: 'reviewId', style: 'simple', explode: false })}`), { ...(requestOptions?.signal !== undefined ? { signal: requestOptions.signal } : {}), ...(requestOptions?.timeout !== undefined ? { timeout: requestOptions.timeout } : {}), method: 'GET' as any, sdkworkUnwrapKind: 'item' });
   }
 
 /** Assign moderation review */
   async assign(reviewId: string, body: AppstoreModerationReviewsAssignRequest, requestOptions?: ApiRequestOptions): Promise<Record<string, unknown>> {
-    return this.client.request<Record<string, unknown>>(backendApiPath(`/moderation/reviews/${serializePathParameter(reviewId, { name: 'reviewId', style: 'simple', explode: false })}/assign`), { signal: requestOptions?.signal, timeout: requestOptions?.timeout, method: 'POST' as any, body, contentType: 'application/json', sdkworkUnwrapKind: 'item' });
+    return this.client.request<Record<string, unknown>>(backendApiPath(`/moderation/reviews/${serializePathParameter(reviewId, { name: 'reviewId', style: 'simple', explode: false })}/assign`), { ...(requestOptions?.signal !== undefined ? { signal: requestOptions.signal } : {}), ...(requestOptions?.timeout !== undefined ? { timeout: requestOptions.timeout } : {}), method: 'POST' as any, body, contentType: 'application/json', sdkworkUnwrapKind: 'item' });
   }
 }
 
@@ -108,19 +108,17 @@ export class ModerationAppstoreModerationQueueApi {
       { name: 'cursor', value: params?.cursor, style: 'form', explode: true, allowReserved: false },
       { name: 'page_size', value: params?.pageSize, style: 'form', explode: true, allowReserved: false },
     ]);
-    return this.client.request<SdkWorkPageData>(appendQueryString(backendApiPath(`/moderation/queue`), query), { signal: requestOptions?.signal, timeout: requestOptions?.timeout, method: 'GET' as any, sdkworkUnwrapKind: 'page' });
+    return this.client.request<SdkWorkPageData>(appendQueryString(backendApiPath(`/moderation/queue`), query), { ...(requestOptions?.signal !== undefined ? { signal: requestOptions.signal } : {}), ...(requestOptions?.timeout !== undefined ? { timeout: requestOptions.timeout } : {}), method: 'GET' as any, sdkworkUnwrapKind: 'page' });
   }
 }
 
 export class ModerationAppstoreModerationApi {
-  private client: HttpClient;
   public readonly queue: ModerationAppstoreModerationQueueApi;
   public readonly reviews: ModerationAppstoreModerationReviewsApi;
   public readonly decisions: ModerationAppstoreModerationDecisionsApi;
   public readonly appeals: ModerationAppstoreModerationAppealsApi;
 
   constructor(client: HttpClient) {
-    this.client = client;
     this.queue = new ModerationAppstoreModerationQueueApi(client);
     this.reviews = new ModerationAppstoreModerationReviewsApi(client);
     this.decisions = new ModerationAppstoreModerationDecisionsApi(client);
@@ -130,22 +128,18 @@ export class ModerationAppstoreModerationApi {
 }
 
 export class ModerationAppstoreApi {
-  private client: HttpClient;
   public readonly moderation: ModerationAppstoreModerationApi;
 
   constructor(client: HttpClient) {
-    this.client = client;
     this.moderation = new ModerationAppstoreModerationApi(client);
   }
 
 }
 
 export class ModerationApi {
-  private client: HttpClient;
   public readonly appstore: ModerationAppstoreApi;
 
   constructor(client: HttpClient) {
-    this.client = client;
     this.appstore = new ModerationAppstoreApi(client);
   }
 

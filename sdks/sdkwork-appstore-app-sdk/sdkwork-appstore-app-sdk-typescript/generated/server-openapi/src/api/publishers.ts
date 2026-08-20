@@ -14,7 +14,7 @@ export class PublishersAppstorePublishersVerificationsApi {
 
 /** Submit publisher verification */
   async create(publisherId: string, body: PublisherVerificationSubmitRequest, requestOptions?: ApiRequestOptions): Promise<PublisherVerification> {
-    return this.client.request<PublisherVerification>(appApiPath(`/publishers/${serializePathParameter(publisherId, { name: 'publisherId', style: 'simple', explode: false })}/verifications`), { signal: requestOptions?.signal, timeout: requestOptions?.timeout, method: 'POST' as any, body, contentType: 'application/json', sdkworkUnwrapKind: 'item' });
+    return this.client.request<PublisherVerification>(appApiPath(`/publishers/${serializePathParameter(publisherId, { name: 'publisherId', style: 'simple', explode: false })}/verifications`), { ...(requestOptions?.signal !== undefined ? { signal: requestOptions.signal } : {}), ...(requestOptions?.timeout !== undefined ? { timeout: requestOptions.timeout } : {}), method: 'POST' as any, body, contentType: 'application/json', sdkworkUnwrapKind: 'item' });
   }
 }
 
@@ -28,12 +28,12 @@ export class PublishersAppstorePublishersMembersApi {
 
 /** List publisher members */
   async list(publisherId: string, requestOptions?: ApiRequestOptions): Promise<{ items: PublisherMember[]; pageInfo: PageInfo; }> {
-    return this.client.request<{ items: PublisherMember[]; pageInfo: PageInfo; }>(appApiPath(`/publishers/${serializePathParameter(publisherId, { name: 'publisherId', style: 'simple', explode: false })}/members`), { signal: requestOptions?.signal, timeout: requestOptions?.timeout, method: 'GET' as any, sdkworkUnwrapKind: 'page' });
+    return this.client.request<{ items: PublisherMember[]; pageInfo: PageInfo; }>(appApiPath(`/publishers/${serializePathParameter(publisherId, { name: 'publisherId', style: 'simple', explode: false })}/members`), { ...(requestOptions?.signal !== undefined ? { signal: requestOptions.signal } : {}), ...(requestOptions?.timeout !== undefined ? { timeout: requestOptions.timeout } : {}), method: 'GET' as any, sdkworkUnwrapKind: 'page' });
   }
 
 /** Invite publisher member */
   async create(publisherId: string, body: PublisherMemberInviteRequest, requestOptions?: ApiRequestOptions): Promise<PublisherMember> {
-    return this.client.request<PublisherMember>(appApiPath(`/publishers/${serializePathParameter(publisherId, { name: 'publisherId', style: 'simple', explode: false })}/members`), { signal: requestOptions?.signal, timeout: requestOptions?.timeout, method: 'POST' as any, body, contentType: 'application/json', sdkworkUnwrapKind: 'item' });
+    return this.client.request<PublisherMember>(appApiPath(`/publishers/${serializePathParameter(publisherId, { name: 'publisherId', style: 'simple', explode: false })}/members`), { ...(requestOptions?.signal !== undefined ? { signal: requestOptions.signal } : {}), ...(requestOptions?.timeout !== undefined ? { timeout: requestOptions.timeout } : {}), method: 'POST' as any, body, contentType: 'application/json', sdkworkUnwrapKind: 'item' });
   }
 }
 
@@ -57,7 +57,7 @@ export class PublishersAppstorePublishersMeAppsApi {
       },
       {}
     );
-    return this.client.request<PublisherAppBootstrapResponse>(appApiPath(`/publishers/me/apps`), { signal: requestOptions?.signal, timeout: requestOptions?.timeout, method: 'POST' as any, body, headers: requestHeaders, contentType: 'application/json', sdkworkUnwrapKind: 'item' });
+    return this.client.request<PublisherAppBootstrapResponse>(appApiPath(`/publishers/me/apps`), { ...(requestOptions?.signal !== undefined ? { signal: requestOptions.signal } : {}), ...(requestOptions?.timeout !== undefined ? { timeout: requestOptions.timeout } : {}), method: 'POST' as any, body, contentType: 'application/json', ...(requestHeaders !== undefined ? { headers: requestHeaders } : {}), sdkworkUnwrapKind: 'item' });
   }
 }
 
@@ -80,7 +80,7 @@ export class PublishersAppstorePublishersMeListingsApi {
       { name: 'cursor', value: params?.cursor, style: 'form', explode: true, allowReserved: false },
       { name: 'page_size', value: params?.pageSize, style: 'form', explode: true, allowReserved: false },
     ]);
-    return this.client.request<SdkWorkPageData>(appendQueryString(appApiPath(`/publishers/me/listings`), query), { signal: requestOptions?.signal, timeout: requestOptions?.timeout, method: 'GET' as any, sdkworkUnwrapKind: 'page' });
+    return this.client.request<SdkWorkPageData>(appendQueryString(appApiPath(`/publishers/me/listings`), query), { ...(requestOptions?.signal !== undefined ? { signal: requestOptions.signal } : {}), ...(requestOptions?.timeout !== undefined ? { timeout: requestOptions.timeout } : {}), method: 'GET' as any, sdkworkUnwrapKind: 'page' });
   }
 }
 
@@ -98,7 +98,7 @@ export class PublishersAppstorePublishersMeApi {
 
 /** Retrieve current publisher profile */
   async retrieve(requestOptions?: ApiRequestOptions): Promise<Publisher> {
-    return this.client.request<Publisher>(appApiPath(`/publishers/me`), { signal: requestOptions?.signal, timeout: requestOptions?.timeout, method: 'GET' as any, sdkworkUnwrapKind: 'item' });
+    return this.client.request<Publisher>(appApiPath(`/publishers/me`), { ...(requestOptions?.signal !== undefined ? { signal: requestOptions.signal } : {}), ...(requestOptions?.timeout !== undefined ? { timeout: requestOptions.timeout } : {}), method: 'GET' as any, sdkworkUnwrapKind: 'item' });
   }
 }
 
@@ -118,32 +118,28 @@ export class PublishersAppstorePublishersApi {
 
 /** Create publisher profile */
   async create(body: PublisherCreateRequest, requestOptions?: ApiRequestOptions): Promise<Publisher> {
-    return this.client.request<Publisher>(appApiPath(`/publishers`), { signal: requestOptions?.signal, timeout: requestOptions?.timeout, method: 'POST' as any, body, contentType: 'application/json', sdkworkUnwrapKind: 'item' });
+    return this.client.request<Publisher>(appApiPath(`/publishers`), { ...(requestOptions?.signal !== undefined ? { signal: requestOptions.signal } : {}), ...(requestOptions?.timeout !== undefined ? { timeout: requestOptions.timeout } : {}), method: 'POST' as any, body, contentType: 'application/json', sdkworkUnwrapKind: 'item' });
   }
 
 /** Update publisher profile */
   async update(publisherId: string, body: PublisherUpdateRequest, requestOptions?: ApiRequestOptions): Promise<Publisher> {
-    return this.client.request<Publisher>(appApiPath(`/publishers/${serializePathParameter(publisherId, { name: 'publisherId', style: 'simple', explode: false })}`), { signal: requestOptions?.signal, timeout: requestOptions?.timeout, method: 'PATCH' as any, body, contentType: 'application/json', sdkworkUnwrapKind: 'item' });
+    return this.client.request<Publisher>(appApiPath(`/publishers/${serializePathParameter(publisherId, { name: 'publisherId', style: 'simple', explode: false })}`), { ...(requestOptions?.signal !== undefined ? { signal: requestOptions.signal } : {}), ...(requestOptions?.timeout !== undefined ? { timeout: requestOptions.timeout } : {}), method: 'PATCH' as any, body, contentType: 'application/json', sdkworkUnwrapKind: 'item' });
   }
 }
 
 export class PublishersAppstoreApi {
-  private client: HttpClient;
   public readonly publishers: PublishersAppstorePublishersApi;
 
   constructor(client: HttpClient) {
-    this.client = client;
     this.publishers = new PublishersAppstorePublishersApi(client);
   }
 
 }
 
 export class PublishersApi {
-  private client: HttpClient;
   public readonly appstore: PublishersAppstoreApi;
 
   constructor(client: HttpClient) {
-    this.client = client;
     this.appstore = new PublishersAppstoreApi(client);
   }
 

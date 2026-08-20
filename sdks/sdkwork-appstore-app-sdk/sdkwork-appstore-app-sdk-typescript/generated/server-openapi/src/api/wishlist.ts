@@ -23,48 +23,42 @@ export class WishlistAppstoreWishlistItemsApi {
       { name: 'cursor', value: params?.cursor, style: 'form', explode: true, allowReserved: false },
       { name: 'page_size', value: params?.pageSize, style: 'form', explode: true, allowReserved: false },
     ]);
-    return this.client.request<{ items: WishlistItem[]; pageInfo: PageInfo; }>(appendQueryString(appApiPath(`/wishlist/items`), query), { signal: requestOptions?.signal, timeout: requestOptions?.timeout, method: 'GET' as any, sdkworkUnwrapKind: 'page' });
+    return this.client.request<{ items: WishlistItem[]; pageInfo: PageInfo; }>(appendQueryString(appApiPath(`/wishlist/items`), query), { ...(requestOptions?.signal !== undefined ? { signal: requestOptions.signal } : {}), ...(requestOptions?.timeout !== undefined ? { timeout: requestOptions.timeout } : {}), method: 'GET' as any, sdkworkUnwrapKind: 'page' });
   }
 
 /** Add wishlist item */
   async create(body: WishlistItemAddRequest, requestOptions?: ApiRequestOptions): Promise<WishlistItem> {
-    return this.client.request<WishlistItem>(appApiPath(`/wishlist/items`), { signal: requestOptions?.signal, timeout: requestOptions?.timeout, method: 'POST' as any, body, contentType: 'application/json', sdkworkUnwrapKind: 'item' });
+    return this.client.request<WishlistItem>(appApiPath(`/wishlist/items`), { ...(requestOptions?.signal !== undefined ? { signal: requestOptions.signal } : {}), ...(requestOptions?.timeout !== undefined ? { timeout: requestOptions.timeout } : {}), method: 'POST' as any, body, contentType: 'application/json', sdkworkUnwrapKind: 'item' });
   }
 
 /** Remove wishlist item */
   async delete(listingId: string, requestOptions?: ApiRequestOptions): Promise<void> {
-    return this.client.request<void>(appApiPath(`/wishlist/items/${serializePathParameter(listingId, { name: 'listingId', style: 'simple', explode: false })}`), { signal: requestOptions?.signal, timeout: requestOptions?.timeout, method: 'DELETE' as any });
+    return this.client.request<void>(appApiPath(`/wishlist/items/${serializePathParameter(listingId, { name: 'listingId', style: 'simple', explode: false })}`), { ...(requestOptions?.signal !== undefined ? { signal: requestOptions.signal } : {}), ...(requestOptions?.timeout !== undefined ? { timeout: requestOptions.timeout } : {}), method: 'DELETE' as any });
   }
 }
 
 export class WishlistAppstoreWishlistApi {
-  private client: HttpClient;
   public readonly items: WishlistAppstoreWishlistItemsApi;
 
   constructor(client: HttpClient) {
-    this.client = client;
     this.items = new WishlistAppstoreWishlistItemsApi(client);
   }
 
 }
 
 export class WishlistAppstoreApi {
-  private client: HttpClient;
   public readonly wishlist: WishlistAppstoreWishlistApi;
 
   constructor(client: HttpClient) {
-    this.client = client;
     this.wishlist = new WishlistAppstoreWishlistApi(client);
   }
 
 }
 
 export class WishlistApi {
-  private client: HttpClient;
   public readonly appstore: WishlistAppstoreApi;
 
   constructor(client: HttpClient) {
-    this.client = client;
     this.appstore = new WishlistAppstoreApi(client);
   }
 

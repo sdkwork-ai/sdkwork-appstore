@@ -98,7 +98,7 @@ export const TemplateDetailHeaderCard: React.FC<TemplateDetailHeaderCardProps> =
               </span>
             </div>
 
-            <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed pt-1 max-w-2xl">
+            <p className="text-sm text-slate-600 dark:text-slate-600 dark:text-slate-300 leading-relaxed pt-1 max-w-2xl">
               {template.description}
             </p>
           </div>
