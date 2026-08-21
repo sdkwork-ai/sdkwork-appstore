@@ -70,17 +70,29 @@
     "application.public-ingress": {
       "httpHost": "appstore.sdkwork.com",
       "environments": {
-        "development": { "httpHost": "appstore-dev.sdkwork.com" },
-        "test": { "httpHost": "appstore-test.sdkwork.com" },
-        "staging": { "httpHost": "appstore-staging.sdkwork.com" }
+        "development": {
+          "httpHost": "appstore-dev.sdkwork.com"
+        },
+        "test": {
+          "httpHost": "appstore-test.sdkwork.com"
+        },
+        "staging": {
+          "httpHost": "appstore-staging.sdkwork.com"
+        }
       }
     },
     "platform.api-gateway": {
       "httpHost": "api.sdkwork.com",
       "environments": {
-        "development": { "httpHost": "api-dev.sdkwork.com" },
-        "test": { "httpHost": "api-test.sdkwork.com" },
-        "staging": { "httpHost": "api-staging.sdkwork.com" }
+        "development": {
+          "httpHost": "api-dev.sdkwork.com"
+        },
+        "test": {
+          "httpHost": "api-test.sdkwork.com"
+        },
+        "staging": {
+          "httpHost": "api-staging.sdkwork.com"
+        }
       }
     }
   },
@@ -106,32 +118,50 @@
             "role": "api-standalone-gateway"
           },
           {
-            "id": "storefront-renderer",
-            "package": "sdkwork-appstore-pc",
-            "script": "_sdkwork:client:browser",
-            "required": true,
+            "id": "appstore-browser",
             "role": "client",
-            "bindEnv": "SDKWORK_APPSTORE_INTERNAL_PC_RENDERER_BIND",
+            "applicationRoot": "apps/sdkwork-appstore-pc",
+            "bindEnv": "SDKWORK_APPSTORE_WEB_DEV_INGRESS_BIND",
             "runtimeTargets": [
               "browser"
             ],
             "clientArchitectures": [
-              "pc-web"
-            ]
+              "pc-web",
+              "h5"
+            ],
+            "required": true
           }
         ],
         "browserDeliveries": [
           {
-            "id": "pc-web",
+            "id": "appstore-adaptive-web",
             "applicationRoot": "apps/sdkwork-appstore-pc",
             "clientArchitectures": [
-              "pc-web"
+              "pc-web",
+              "h5"
             ],
             "originMode": "same-origin",
             "deliveryMode": "dev-server-proxy",
+            "clientProcessId": "appstore-browser",
             "apiSurfaceId": "application.public-ingress",
-            "clientProcessId": "storefront-renderer",
-            "preserveCanonicalPaths": true
+            "preserveCanonicalPaths": true,
+            "tabletArchitecture": "pc-web",
+            "renderers": {
+              "pc-web": {
+                "applicationRoot": "apps/sdkwork-appstore-pc",
+                "script": "dev",
+                "defaultPort": 4210,
+                "portEnv": "SDKWORK_APPSTORE_PC_INTERNAL_DEV_PORT",
+                "env": {}
+              },
+              "h5": {
+                "applicationRoot": "apps/sdkwork-appstore-h5",
+                "script": "dev",
+                "defaultPort": 4211,
+                "portEnv": "SDKWORK_APPSTORE_H5_INTERNAL_DEV_PORT",
+                "env": {}
+              }
+            }
           }
         ],
         "accessEndpoints": [
@@ -198,32 +228,50 @@
             "role": "api-standalone-gateway"
           },
           {
-            "id": "storefront-renderer",
-            "package": "sdkwork-appstore-pc",
-            "script": "_sdkwork:client:browser",
-            "required": true,
+            "id": "appstore-browser",
             "role": "client",
-            "bindEnv": "SDKWORK_APPSTORE_INTERNAL_PC_RENDERER_BIND",
+            "applicationRoot": "apps/sdkwork-appstore-pc",
+            "bindEnv": "SDKWORK_APPSTORE_WEB_DEV_INGRESS_BIND",
             "runtimeTargets": [
               "browser"
             ],
             "clientArchitectures": [
-              "pc-web"
-            ]
+              "pc-web",
+              "h5"
+            ],
+            "required": true
           }
         ],
         "browserDeliveries": [
           {
-            "id": "pc-web",
+            "id": "appstore-adaptive-web",
             "applicationRoot": "apps/sdkwork-appstore-pc",
             "clientArchitectures": [
-              "pc-web"
+              "pc-web",
+              "h5"
             ],
             "originMode": "same-origin",
             "deliveryMode": "dev-server-proxy",
+            "clientProcessId": "appstore-browser",
             "apiSurfaceId": "application.public-ingress",
-            "clientProcessId": "storefront-renderer",
-            "preserveCanonicalPaths": true
+            "preserveCanonicalPaths": true,
+            "tabletArchitecture": "pc-web",
+            "renderers": {
+              "pc-web": {
+                "applicationRoot": "apps/sdkwork-appstore-pc",
+                "script": "dev",
+                "defaultPort": 4210,
+                "portEnv": "SDKWORK_APPSTORE_PC_INTERNAL_DEV_PORT",
+                "env": {}
+              },
+              "h5": {
+                "applicationRoot": "apps/sdkwork-appstore-h5",
+                "script": "dev",
+                "defaultPort": 4211,
+                "portEnv": "SDKWORK_APPSTORE_H5_INTERNAL_DEV_PORT",
+                "env": {}
+              }
+            }
           }
         ],
         "accessEndpoints": [
@@ -329,10 +377,57 @@
         ]
       },
       "cloud.development": {
-        "processes": [],
+        "processes": [
+          {
+            "id": "appstore-browser",
+            "role": "client",
+            "applicationRoot": "apps/sdkwork-appstore-pc",
+            "bindEnv": "SDKWORK_APPSTORE_WEB_DEV_INGRESS_BIND",
+            "runtimeTargets": [
+              "browser"
+            ],
+            "clientArchitectures": [
+              "pc-web",
+              "h5"
+            ],
+            "required": true
+          }
+        ],
         "healthSurfaces": [
           "application.public-ingress",
           "platform.api-gateway"
+        ],
+        "browserDeliveries": [
+          {
+            "id": "appstore-adaptive-web",
+            "applicationRoot": "apps/sdkwork-appstore-pc",
+            "clientArchitectures": [
+              "pc-web",
+              "h5"
+            ],
+            "originMode": "same-origin",
+            "deliveryMode": "dev-server-proxy",
+            "clientProcessId": "appstore-browser",
+            "apiSurfaceId": "application.public-ingress",
+            "preserveCanonicalPaths": true,
+            "tabletArchitecture": "pc-web",
+            "renderers": {
+              "pc-web": {
+                "applicationRoot": "apps/sdkwork-appstore-pc",
+                "script": "dev",
+                "defaultPort": 4210,
+                "portEnv": "SDKWORK_APPSTORE_PC_INTERNAL_DEV_PORT",
+                "env": {}
+              },
+              "h5": {
+                "applicationRoot": "apps/sdkwork-appstore-h5",
+                "script": "dev",
+                "defaultPort": 4211,
+                "portEnv": "SDKWORK_APPSTORE_H5_INTERNAL_DEV_PORT",
+                "env": {}
+              }
+            }
+          }
         ]
       },
       "cloud.production": {
@@ -362,6 +457,75 @@
         ],
         "healthSurfaces": [
           "application.public-ingress"
+        ]
+      },
+      "cloud.test": {
+        "processes": [
+          {
+            "id": "appstore-browser",
+            "role": "client",
+            "applicationRoot": "apps/sdkwork-appstore-pc",
+            "bindEnv": "SDKWORK_APPSTORE_WEB_DEV_INGRESS_BIND",
+            "runtimeTargets": [
+              "browser"
+            ],
+            "clientArchitectures": [
+              "pc-web",
+              "h5"
+            ],
+            "required": true
+          }
+        ],
+        "healthSurfaces": [
+          "application.public-ingress",
+          "platform.api-gateway"
+        ],
+        "browserDeliveries": [
+          {
+            "id": "appstore-adaptive-web",
+            "applicationRoot": "apps/sdkwork-appstore-pc",
+            "clientArchitectures": [
+              "pc-web",
+              "h5"
+            ],
+            "originMode": "same-origin",
+            "deliveryMode": "dev-server-proxy",
+            "clientProcessId": "appstore-browser",
+            "apiSurfaceId": "application.public-ingress",
+            "preserveCanonicalPaths": true,
+            "tabletArchitecture": "pc-web",
+            "renderers": {
+              "pc-web": {
+                "applicationRoot": "apps/sdkwork-appstore-pc",
+                "script": "dev",
+                "defaultPort": 4210,
+                "portEnv": "SDKWORK_APPSTORE_PC_INTERNAL_DEV_PORT",
+                "env": {}
+              },
+              "h5": {
+                "applicationRoot": "apps/sdkwork-appstore-h5",
+                "script": "dev",
+                "defaultPort": 4211,
+                "portEnv": "SDKWORK_APPSTORE_H5_INTERNAL_DEV_PORT",
+                "env": {}
+              }
+            }
+          }
+        ]
+      },
+      "cloud.staging": {
+        "processes": [
+          {
+            "id": "application.public-ingress",
+            "crate": "sdkwork-api-appstore-standalone-gateway",
+            "binary": "sdkwork-api-appstore-standalone-gateway",
+            "required": true,
+            "role": "api-standalone-gateway"
+          }
+        ],
+        "healthSurfaces": [
+          "application.public-ingress",
+          "platform.api-gateway"
         ]
       }
     }

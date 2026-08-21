@@ -1158,18 +1158,16 @@ market_channel 1───* market_release *───1 release
 | 本地/私有 | Rust + standalone-gateway | SQLite/PostgreSQL | 单租户 |
 | 桌面内嵌 | Rust service-host in Tauri | SQLite | 桌面客户端 |
 
-### 8.2 运行时拓扑（参考 configs/topology/）
+### 8.2 运行时拓扑（参考 etc/topology/）
 
 | 拓扑 | 说明 |
 | --- | --- |
-| standalone.unified-process | 单进程：gateway + service-host + worker |
-| standalone.split-services | 多进程：gateway、service-host、worker 分离 |
-| cloud.split-services | 云上多副本：gateway LB、service-host N副本、worker N副本 |
-| cloud.unified-process | 云上单进程（小规模） |
+| `standalone.development` / `standalone.production` | 单机：gateway 进程承载应用面 |
+| `cloud.development` / `cloud.production` | 云上：平台 API gateway + 应用 ingress |
 
 ### 8.3 配置
 
-- 配置文件：`configs/topology/*.env`、`configs/sdkwork-api-cloud-gateway.appstore.*.toml`
+- 配置文件：`etc/topology/*.env`、`configs/sdkwork-api-cloud-gateway.appstore.*.toml`
 - 环境变量：`.env.example`
 - 数据库：PostgreSQL（生产）/ SQLite（开发）
 - 对象存储：sdkwork-drive

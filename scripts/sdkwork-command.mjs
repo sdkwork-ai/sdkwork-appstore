@@ -14,7 +14,6 @@ const __dirname = dirname(__filename);
 const repoRoot = resolve(__dirname, "..");
 
 const ALLOWED_DATABASES = new Set(["postgres", "sqlite"]);
-const ALLOWED_SERVICE_LAYOUTS = new Set(["unified-process", "split-services"]);
 const ALLOWED_DEPLOYMENT_PROFILES = new Set(["standalone", "cloud"]);
 const ALLOWED_RUNTIME_TARGETS = new Set([
   "browser",
