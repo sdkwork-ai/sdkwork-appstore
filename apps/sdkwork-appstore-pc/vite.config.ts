@@ -18,11 +18,6 @@ const SDK_COMMON_SOURCE_ROOT = path.resolve(
   'sdkwork-sdk-commons/sdkwork-sdk-common-typescript/src',
 );
 const SDK_COMMON_ENTRY = path.resolve(SDK_COMMON_SOURCE_ROOT, 'index.ts');
-const SDKWORK_UTILS_SOURCE_ROOT = path.resolve(
-  WORKSPACE_ROOT,
-  'sdkwork-utils/packages/sdkwork-utils-typescript/src',
-);
-const SDKWORK_UTILS_ENTRY = path.resolve(SDKWORK_UTILS_SOURCE_ROOT, 'index.ts');
 
 function createSharedWorkspaceAliases() {
   return [
@@ -32,8 +27,6 @@ function createSharedWorkspaceAliases() {
     { find: '@sdkwork/sdk-common/errors', replacement: path.resolve(SDK_COMMON_SOURCE_ROOT, 'errors/index.ts') },
     { find: '@sdkwork/sdk-common/utils', replacement: path.resolve(SDK_COMMON_SOURCE_ROOT, 'utils/index.ts') },
     { find: '@sdkwork/sdk-common', replacement: SDK_COMMON_ENTRY },
-    { find: /^@sdkwork\/utils\/(.+)$/, replacement: `${SDKWORK_UTILS_SOURCE_ROOT}/$1` },
-    { find: '@sdkwork/utils', replacement: SDKWORK_UTILS_ENTRY },
   ];
 }
 

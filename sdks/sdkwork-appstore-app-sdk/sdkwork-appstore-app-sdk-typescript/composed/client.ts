@@ -1,3 +1,4 @@
+import { uuid } from '@sdkwork/utils/id';
 import { createClient as createGeneratedClient, SdkworkAppstoreAppClient } from '../generated/server-openapi/src/index';
 import type { AuthTokenManager } from '../generated/server-openapi/src/auth/index';
 import type { SdkworkAppConfig } from '../generated/server-openapi/src/types/common';
@@ -29,7 +30,7 @@ export function isAppStoreApiError(error: unknown): error is AppStoreApiError {
     && typeof (error as AppStoreApiError).status === 'number';
 }
 
-const commandOptions = () => ({ idempotencyKey: crypto.randomUUID() });
+const commandOptions = () => ({ idempotencyKey: uuid() });
 const pageParams = (params?: { cursor?: string; limit?: number }) =>
   params ? { cursor: params.cursor, pageSize: params.limit } : undefined;
 

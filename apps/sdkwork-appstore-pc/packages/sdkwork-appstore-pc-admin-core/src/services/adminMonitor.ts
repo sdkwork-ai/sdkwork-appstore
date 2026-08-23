@@ -8,6 +8,7 @@ import {
   type SystemAuditEntry,
   type SystemMetrics,
 } from '@sdkwork/appstore-pc-core';
+import { uuid } from '@sdkwork/utils/id';
 
 /**
  * Backend-admin monitor surface. Constructed only inside this backend-admin
@@ -82,7 +83,7 @@ export function createAdminMonitorServicePort(
           decisionStatus: 'FINAL',
           reasonDetail,
         },
-        { idempotencyKey: crypto.randomUUID() },
+        { idempotencyKey: uuid() },
       );
       return true;
     },

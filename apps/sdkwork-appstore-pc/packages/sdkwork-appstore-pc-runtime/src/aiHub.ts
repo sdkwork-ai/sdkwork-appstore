@@ -7,6 +7,7 @@ import {
   type AICompletionResult,
   type AIModelInfo,
 } from '@sdkwork/appstore-pc-core';
+import { uuid } from '@sdkwork/utils/id';
 
 /** Maximum AI storefront inventory for the AI Hub apps tab. */
 const aiHubPageSize = 200;
@@ -24,7 +25,7 @@ export function configureAppstorePcAIHub(
 
       const result = await agentsClient.ai.agents.previewResponses.create(agentId, {
         content: prompt,
-        executionId: crypto.randomUUID(),
+        executionId: uuid(),
         inputPayload: { source: 'sdkwork-appstore-pc' },
         model: modelId,
         requestedAt: new Date().toISOString(),
