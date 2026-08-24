@@ -40,6 +40,38 @@ profiles:
         tls: dtupay.cn
         mode: web+api
         web: adaptive
+      - domain: appstore-test.skubc.com
+        tls: skubc.com
+        mode: web+api
+        web: adaptive
+      - domain: appstore-test.skubc.cn
+        tls: skubc.cn
+        mode: web+api
+        web: adaptive
+      - domain: appstore-test.zowalk.com
+        tls: zowalk.com
+        mode: web+api
+        web: adaptive
+      - domain: appstore-test.zowalk.cn
+        tls: zowalk.cn
+        mode: web+api
+        web: adaptive
+      - domain: appstore-test.offer86.com
+        tls: offer86.com
+        mode: web+api
+        web: adaptive
+      - domain: appstore-test.offer86.cn
+        tls: offer86.cn
+        mode: web+api
+        web: adaptive
+      - domain: appstore-test.86offer.com
+        tls: 86offer.com
+        mode: web+api
+        web: adaptive
+      - domain: appstore-test.86offer.cn
+        tls: 86offer.cn
+        mode: web+api
+        web: adaptive
     packages: []
     overrides:
       topology:
@@ -85,6 +117,38 @@ profiles:
         tls: dtupay.cn
         mode: web+api
         web: adaptive
+      - domain: appstore-staging.skubc.com
+        tls: skubc.com
+        mode: web+api
+        web: adaptive
+      - domain: appstore-staging.skubc.cn
+        tls: skubc.cn
+        mode: web+api
+        web: adaptive
+      - domain: appstore-staging.zowalk.com
+        tls: zowalk.com
+        mode: web+api
+        web: adaptive
+      - domain: appstore-staging.zowalk.cn
+        tls: zowalk.cn
+        mode: web+api
+        web: adaptive
+      - domain: appstore-staging.offer86.com
+        tls: offer86.com
+        mode: web+api
+        web: adaptive
+      - domain: appstore-staging.offer86.cn
+        tls: offer86.cn
+        mode: web+api
+        web: adaptive
+      - domain: appstore-staging.86offer.com
+        tls: 86offer.com
+        mode: web+api
+        web: adaptive
+      - domain: appstore-staging.86offer.cn
+        tls: 86offer.cn
+        mode: web+api
+        web: adaptive
     packages: []
     overrides:
       topology:
@@ -128,6 +192,38 @@ profiles:
         web: adaptive
       - domain: appstore.dtupay.cn
         tls: dtupay.cn
+        mode: web+api
+        web: adaptive
+      - domain: appstore.skubc.com
+        tls: skubc.com
+        mode: web+api
+        web: adaptive
+      - domain: appstore.skubc.cn
+        tls: skubc.cn
+        mode: web+api
+        web: adaptive
+      - domain: appstore.zowalk.com
+        tls: zowalk.com
+        mode: web+api
+        web: adaptive
+      - domain: appstore.zowalk.cn
+        tls: zowalk.cn
+        mode: web+api
+        web: adaptive
+      - domain: appstore.offer86.com
+        tls: offer86.com
+        mode: web+api
+        web: adaptive
+      - domain: appstore.offer86.cn
+        tls: offer86.cn
+        mode: web+api
+        web: adaptive
+      - domain: appstore.86offer.com
+        tls: 86offer.com
+        mode: web+api
+        web: adaptive
+      - domain: appstore.86offer.cn
+        tls: 86offer.cn
         mode: web+api
         web: adaptive
     packages: []
@@ -178,6 +274,46 @@ profiles:
         apiPathStyle: full-prefix
       - domain: appstore.dtupay.cn
         tls: dtupay.cn
+        mode: web+api
+        web: adaptive
+        apiPathStyle: full-prefix
+      - domain: appstore.skubc.com
+        tls: skubc.com
+        mode: web+api
+        web: adaptive
+        apiPathStyle: full-prefix
+      - domain: appstore.skubc.cn
+        tls: skubc.cn
+        mode: web+api
+        web: adaptive
+        apiPathStyle: full-prefix
+      - domain: appstore.zowalk.com
+        tls: zowalk.com
+        mode: web+api
+        web: adaptive
+        apiPathStyle: full-prefix
+      - domain: appstore.zowalk.cn
+        tls: zowalk.cn
+        mode: web+api
+        web: adaptive
+        apiPathStyle: full-prefix
+      - domain: appstore.offer86.com
+        tls: offer86.com
+        mode: web+api
+        web: adaptive
+        apiPathStyle: full-prefix
+      - domain: appstore.offer86.cn
+        tls: offer86.cn
+        mode: web+api
+        web: adaptive
+        apiPathStyle: full-prefix
+      - domain: appstore.86offer.com
+        tls: 86offer.com
+        mode: web+api
+        web: adaptive
+        apiPathStyle: full-prefix
+      - domain: appstore.86offer.cn
+        tls: 86offer.cn
         mode: web+api
         web: adaptive
         apiPathStyle: full-prefix

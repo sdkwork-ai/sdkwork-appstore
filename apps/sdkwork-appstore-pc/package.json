@@ -13,8 +13,8 @@
     "dev:tablet-ipados": "vite --port=3000 --host=0.0.0.0",
     "dev:tablet-android": "vite --port=3000 --host=0.0.0.0",
     "build": "vite build && esbuild server.ts --bundle --platform=node --format=cjs --packages=external --sourcemap --outfile=dist/server.cjs",
-    "build:staging": "vite build --mode standalone.staging",
-    "build:prod": "vite build --mode standalone.production",
+    "build:staging": "node ../../../sdkwork-specs/tools/build-browser-client.mjs --app-root . --environment staging",
+    "build:prod": "node ../../../sdkwork-specs/tools/build-browser-client.mjs --app-root . --environment prod",
     "build:desktop": "vite build",
     "build:desktop:prod": "vite build --mode standalone.production",
     "build:tablet-ipados": "vite build",
@@ -26,7 +26,9 @@
     "lint": "tsc --noEmit",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "test:config": "tsc --noEmit"
+    "test:config": "tsc --noEmit",
+    "build:dev": "node ../../../sdkwork-specs/tools/build-browser-client.mjs --app-root . --environment dev",
+    "build:test": "node ../../../sdkwork-specs/tools/build-browser-client.mjs --app-root . --environment test"
   },
   "dependencies": {
     "@sdkwork/agents-app-sdk": "workspace:*",

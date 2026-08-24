@@ -1,3 +1,11 @@
+import { resolveBrowserDistOutDir } from '../../../sdkwork-specs/tools/browser-dist-layout.mjs';
+function resolveViteEnvironment(mode, processEnv = process.env) {
+  const profileMatch = /^(standalone|cloud)\.(development|test|staging|production)$/u.exec(mode ?? '');
+  return profileMatch?.[2]
+    ?? (['development', 'test', 'staging', 'production'].includes(processEnv.SDKWORK_ENVIRONMENT ?? '')
+      ? processEnv.SDKWORK_ENVIRONMENT
+      : 'production');
+}
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import { createSdkworkCredentialEntryBootstrapVitePlugin } from '@sdkwork/iam-credential-entry/vite';
@@ -38,6 +46,10 @@ function resolveTcpBinding(rawValue: string | undefined, fallback: string) {
     throw new Error(`TCP binding must use <host>:<port>, received: ${raw}`);
   }
   return {
+    build: {
+      outDir: resolveBrowserDistOutDir(resolveViteEnvironment(mode, process.env)),
+      emptyOutDir: true,
+    },
     host: match[1] ?? match[2],
     port,
   };
