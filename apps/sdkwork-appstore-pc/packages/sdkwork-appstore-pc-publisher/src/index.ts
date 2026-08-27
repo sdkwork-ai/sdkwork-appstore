@@ -1,3 +1,11 @@
-export { default as PublisherOverviewPage } from '@/src/pages/publisher/PublisherOverview';
-export { default as PublisherCreateAppPage } from '@/src/pages/publisher/PublisherCreateApp';
-export { default as PublisherAppManagePage } from '@/src/pages/publisher/PublisherAppManage';
+export {
+  PublisherOverviewPage,
+  PublisherCreateAppPage,
+  PublisherAppManagePage,
+} from '@sdkwork/appstore-pc-product';
+
+export const publisherRoute = {
+  path: '/publisher',
+  title: 'Publisher',
+  id: 'publisher',
+};

@@ -1,3 +1,7 @@
-export { default as ChartsPage } from '@/src/pages/Charts';
-export { ChartsList } from '@/src/components/charts/ChartsList';
-export * from './routes';
+export { ChartsPage, ChartsList } from '@sdkwork/appstore-pc-product';
+
+export const chartsRoute = {
+  path: '/charts',
+  title: 'Charts',
+  id: 'charts',
+};

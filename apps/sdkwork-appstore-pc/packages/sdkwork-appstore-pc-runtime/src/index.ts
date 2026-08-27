@@ -1,5 +1,6 @@
 export * from './runtime';
 export * from './environment';
+export { resolveAppstorePcAuthRuntimeConfig } from './authConfig';
 export * from './iamRuntime';
 export * from './sdkClients';
 export * from './sessionStore';

@@ -46,10 +46,6 @@ function resolveTcpBinding(rawValue: string | undefined, fallback: string) {
     throw new Error(`TCP binding must use <host>:<port>, received: ${raw}`);
   }
   return {
-    build: {
-      outDir: resolveBrowserDistOutDir(resolveViteEnvironment(mode, process.env)),
-      emptyOutDir: true,
-    },
     host: match[1] ?? match[2],
     port,
   };
@@ -93,6 +89,10 @@ export default defineConfig(({ mode }) => {
   const gatewayOrigin = resolveGatewayOrigin(process.env);
 
   return {
+    build: {
+      outDir: resolveBrowserDistOutDir(resolveViteEnvironment(mode, process.env)),
+      emptyOutDir: true,
+    },
     define: {
       'process.env.SDKWORK_ACCESS_TOKEN': JSON.stringify(bootstrapAccessToken ?? ''),
     },

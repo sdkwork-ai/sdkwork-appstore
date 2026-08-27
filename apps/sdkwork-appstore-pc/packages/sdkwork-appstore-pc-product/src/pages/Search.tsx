@@ -37,11 +37,11 @@ export default function Search() {
     { key: SEARCH_FILTER_KEYS.utilities, label: t('search.filters.utilities') },
     { key: SEARCH_FILTER_KEYS.ai, label: t('search.filters.ai') },
   ];
-  const activeFilterLabel =
-    filterCategories.find((item) => item.key === activeFilter)?.label ?? activeFilter;
 
   const [query, setQuery] = useState(urlQuery);
   const [activeFilter, setActiveFilter] = useState(urlCategory);
+  const activeFilterLabel =
+    filterCategories.find((item) => item.key === activeFilter)?.label ?? activeFilter;
   const [results, setResults] = useState<AppItem[]>([]);
   const [trending, setTrending] = useState<string[]>([]);
   const [history, setHistory] = useState<string[]>([]);

@@ -41,6 +41,9 @@
       ],
       "@sdkwork/sdk-common/*": [
         "../../../../sdkwork-sdk-commons/sdkwork-sdk-common-typescript/src/*"
+      ],
+      "@sdkwork/cloudrouter-app-sdk": [
+        "../../../sdkwork-cloudrouter/sdks/cloudrouter-app-sdk/cloudrouter-app-sdk-typescript/src/index.ts"
       ]
     }
   },

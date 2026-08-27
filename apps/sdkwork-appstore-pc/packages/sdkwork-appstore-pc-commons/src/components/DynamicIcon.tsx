@@ -6,7 +6,7 @@ interface DynamicIconProps extends Omit<LucideProps, 'className'> {
   className?: string
 }
 
-const ICON_MAP = Icons as Record<string, typeof Icons.HelpCircle>
+const ICON_MAP = Icons as unknown as Record<string, typeof Icons.HelpCircle>
 
 /**
  * Render a Lucide icon by catalog name, falling back to HelpCircle.

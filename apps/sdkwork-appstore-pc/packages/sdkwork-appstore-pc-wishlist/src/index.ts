@@ -1,3 +1,11 @@
-export { default as WishlistPage } from '@/src/pages/Wishlist';
-export { WishlistCard } from '@/src/components/wishlist/WishlistCard';
-export { WishlistEmptyState } from '@/src/components/wishlist/WishlistEmptyState';
+export {
+  WishlistPage,
+  WishlistCard,
+  WishlistEmptyState,
+} from '@sdkwork/appstore-pc-product';
+
+export const wishlistRoute = {
+  path: '/wishlist',
+  title: 'Wishlist',
+  id: 'wishlist',
+};
