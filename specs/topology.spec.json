@@ -482,6 +482,7 @@
             "script": "_sdkwork:client:browser",
             "required": true,
             "role": "client",
+            "applicationRoot": "apps/sdkwork-appstore-pc",
             "bindEnv": "SDKWORK_APPSTORE_INTERNAL_PC_RENDERER_BIND",
             "runtimeTargets": [
               "browser"
@@ -618,6 +619,24 @@
         ],
         "healthSurfaces": [
           "application.public-ingress"
+        ],
+        "browserDeliveries": [
+          {
+            "id": "appstore-static-v1",
+            "applicationRoot": "apps/sdkwork-appstore-pc",
+            "clientArchitectures": [
+              "pc-web",
+              "h5"
+            ],
+            "originMode": "same-origin",
+            "deliveryMode": "gateway-static",
+            "apiSurfaceId": "application.public-ingress",
+            "hostProcessId": "application.public-ingress",
+            "buildOutput": "apps/sdkwork-appstore-pc/dist",
+            "runtimeRootEnv": "SDKWORK_APPSTORE_PC_STATIC_ROOT",
+            "mountPath": "/",
+            "spaFallback": "/index.html"
+          }
         ]
       },
       "cloud.test": {
@@ -691,7 +710,8 @@
       },
       "standalone.demo": {
         "processes": [],
-        "healthSurfaces": []
+        "healthSurfaces": [],
+        "browserDeliveries": []
       },
       "cloud.demo": {
         "processes": [],

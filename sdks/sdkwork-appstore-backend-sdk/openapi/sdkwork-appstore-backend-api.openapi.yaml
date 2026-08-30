@@ -120,6 +120,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SdkWorkResourceResponse'
+      x-sdkwork-idempotent: true
   /backend/v3/api/moderation/appeals:
     post:
       tags:
@@ -142,6 +143,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SdkWorkResourceResponse'
+      parameters: []
     get:
       tags:
       - moderation
@@ -228,6 +230,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SdkWorkResourceResponse'
+      parameters: []
   /backend/v3/api/appstore/catalog/collections/{collectionId}:
     patch:
       tags:
@@ -340,6 +343,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SdkWorkResourceResponse'
+      parameters: []
   /backend/v3/api/appstore/catalog/categories/{categoryId}:
     patch:
       tags:
@@ -671,6 +675,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SdkWorkResourceResponse'
+      parameters: []
   /backend/v3/api/market_channels/{marketChannelId}:
     patch:
       tags:
@@ -751,6 +756,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SdkWorkResourceResponse'
+      x-sdkwork-idempotent: true
 components:
   securitySchemes:
     AuthToken:
@@ -781,6 +787,8 @@ components:
       required: true
       schema:
         type: string
+        minLength: 1
+        maxLength: 128
     ReviewId:
       name: reviewId
       in: path

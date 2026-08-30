@@ -1,4 +1,7 @@
-import { createClient as createIamAppClient, type SdkworkAppClient } from '@sdkwork/iam-app-sdk';
+import {
+  createAppstorePcIamAppClient,
+  type AppstorePcIamAppClient,
+} from '@sdkwork/appstore-pc-core';
 import {
   createSdkworkAppbasePcAuthRuntime,
   type SdkworkAppbasePcAuthRuntimeComposition,
@@ -10,7 +13,7 @@ import type { AuthTokenManager } from '@sdkwork/sdk-common';
 
 import { prepareAppstorePcCredentialEntryTokens } from './credentialEntry';
 import type { AppstorePcRuntimeConfig } from './environment';
-import { normalizeGeneratedSdkBaseUrl, type AppstorePcSdkClientInventory } from './sdkClients';
+import { type AppstorePcSdkClientInventory } from './sdkClients';
 import type { AppstorePcSessionSnapshot, AppstorePcSessionStore } from './sessionStore';
 import { sessionSnapshotsEqual } from './sessionStore';
 
@@ -81,13 +84,8 @@ export function createAppstorePcIamRuntime(
 function createAppbaseAppClient(
   config: AppstorePcRuntimeConfig,
   tokenManager: AuthTokenManager,
-): SdkworkAppClient {
-  return createIamAppClient({
-    authMode: 'dual-token',
-    baseUrl: normalizeGeneratedSdkBaseUrl(config.iamAppApiBaseUrl, '/app/v3/api'),
-    platform: 'pc',
-    tokenManager,
-  });
+): AppstorePcIamAppClient {
+  return createAppstorePcIamAppClient(config, tokenManager);
 }
 
 function commitIamSession(

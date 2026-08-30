@@ -1,4 +1,4 @@
-import type { AppStoreClient } from '@sdkwork/appstore-app-sdk';
+import type { AppStoreClient } from '@sdkwork/appstore-pc-core';
 import {
   configureInstallServicePort,
   type InstallServicePort,

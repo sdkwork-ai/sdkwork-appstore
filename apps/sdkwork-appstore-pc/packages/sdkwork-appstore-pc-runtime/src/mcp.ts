@@ -1,4 +1,4 @@
-import type { McpServerRecord, SdkworkMcpAppClient } from '@sdkwork/mcp-app-sdk';
+import type { McpServerRecord, McpAppClient } from '@sdkwork/appstore-pc-core';
 import {
   configureMcpServicePort,
   type McpServicePort,
@@ -8,11 +8,11 @@ import type { McpServerItem } from '../types';
 
 const registryPageSize = 48;
 
-export function configureAppstorePcMcp(client: SdkworkMcpAppClient): void {
+export function configureAppstorePcMcp(client: McpAppClient): void {
   configureMcpServicePort(createMcpServicePort(client));
 }
 
-export function createMcpServicePort(client: SdkworkMcpAppClient): McpServicePort {
+export function createMcpServicePort(client: McpAppClient): McpServicePort {
   const serversById = new Map<string, McpServerItem>();
 
   return {

@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Bell, ArrowLeft, ExternalLink } from 'lucide-react';
 import { useNotifications, formatApiError } from '@/hooks/useApi';
-import { getNotificationService } from '@/services/notificationClient';
+import { getNotificationService } from '@/bootstrap/sdkClients';
 import { isAuthenticated } from '@/bootstrap/iamRuntime';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import type { AppstoreNotificationItem } from '@sdkwork/appstore-notification-core';

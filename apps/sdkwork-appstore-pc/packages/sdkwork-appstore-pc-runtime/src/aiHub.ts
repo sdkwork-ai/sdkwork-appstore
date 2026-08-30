@@ -1,5 +1,8 @@
-import type { AgentRuntimeExecutionRecord, SdkworkAppClient } from '@sdkwork/agents-app-sdk';
-import type { AppStoreClient } from '@sdkwork/appstore-app-sdk';
+import type {
+  AgentRuntimeExecutionRecord,
+  AgentsAppClient,
+  AppStoreClient,
+} from '@sdkwork/appstore-pc-core';
 import type { AppItem } from '../types';
 import {
   configureAICompletionPort,
@@ -13,7 +16,7 @@ import { uuid } from '@sdkwork/utils/id';
 const aiHubPageSize = 200;
 
 export function configureAppstorePcAIHub(
-  agentsClient: SdkworkAppClient,
+  agentsClient: AgentsAppClient,
   appstoreClient: AppStoreClient,
   agentId: string | undefined,
 ): void {

@@ -17,7 +17,7 @@
   },
   "canonicalSpecs": [],
   "contracts": {
-    "layerRole": "runtime",
+    "layerRole": "runtime-composition",
     "publicExports": [".", "./environment", "./runtime", "./session"],
     "providedPorts": [
       { "name": "appstorePcRuntime", "export": "." },

@@ -6,8 +6,7 @@ import { createTokenManager, type AuthTokenManager } from '@sdkwork/sdk-common';
 import { getEnvironment } from './environment';
 import { resetStoreClient } from '@/services/storeClient';
 import { resetDriveClient } from '@/services/driveClient';
-import { resetCommentsClient } from '@/services/commentsClient';
-import { resetNotificationClient } from '@/services/notificationClient';
+import { resetCommentsClient, resetNotificationClient } from '@/bootstrap/sdkClients';
 import { resetCommerceDomainsClient } from '@/services/commerceDomainsClient';
 
 const AUTH_TOKEN_KEY = 'auth-token';

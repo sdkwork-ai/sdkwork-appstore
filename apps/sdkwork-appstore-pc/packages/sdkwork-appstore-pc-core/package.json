@@ -17,6 +17,12 @@
     "./composition": "./src/composition/index.ts"
   },
   "dependencies": {
-    "@sdkwork/comments-app-sdk": "workspace:*"
+    "@sdkwork/agents-app-sdk": "workspace:*",
+    "@sdkwork/appstore-app-sdk": "workspace:*",
+    "@sdkwork/comments-app-sdk": "workspace:*",
+    "@sdkwork/iam-app-sdk": "workspace:*",
+    "@sdkwork/mcp-app-sdk": "workspace:*",
+    "@sdkwork/sdk-common": "workspace:*",
+    "@sdkwork/skills-app-sdk": "workspace:*"
   }
 }

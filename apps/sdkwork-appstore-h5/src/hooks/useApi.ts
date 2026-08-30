@@ -8,9 +8,8 @@ import {
   type PaidCheckoutResult,
 } from '@sdkwork/appstore-listing-acquire-core';
 import { getStoreClient } from '@/services/storeClient';
-import { getCommentsClient } from '@/services/commentsClient';
+import { getCommentsClient, getNotificationService } from '@/bootstrap/sdkClients';
 import { getDriveClient } from '@/services/driveClient';
-import { getNotificationService } from '@/services/notificationClient';
 import { getCommerceDomainsClient } from '@/services/commerceDomainsClient';
 
 export interface UseApiOptions {

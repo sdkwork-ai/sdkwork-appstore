@@ -10,10 +10,15 @@
     "domain": "appstore",
     "capability": "admin-core",
     "surface": "backend-admin",
-    "languages": ["typescript"],
+    "languages": [
+      "typescript"
+    ],
     "generated": false,
     "status": "active",
-    "manifests": ["package.json", "specs/component.spec.json"]
+    "manifests": [
+      "package.json",
+      "specs/component.spec.json"
+    ]
   },
   "canonicalSpecs": [
     {
@@ -33,7 +38,14 @@
     }
   ],
   "contracts": {
-    "publicExports": [".", "./sdk", "./modules", "./host", "./session", "./composition"],
+    "publicExports": [
+      ".",
+      "./sdk",
+      "./modules",
+      "./host",
+      "./session",
+      "./composition"
+    ],
     "sdkDependencies": [
       {
         "workspace": "sdkwork-appstore-backend-sdk",
@@ -41,7 +53,9 @@
         "credentialMode": "authenticated-backend-admin"
       }
     ],
-    "sdkClients": ["@sdkwork/appstore-backend-sdk"],
+    "sdkClients": [
+      "@sdkwork/appstore-backend-sdk"
+    ],
     "permissionComposition": {
       "inheritanceMode": "module-catalog-with-overrides",
       "applicationModule": {
@@ -53,12 +67,6 @@
           "manifestRef": "../../../../specs/iam.module.manifest.json",
           "inheritPermissions": true,
           "inheritRoles": true
-        },
-        {
-          "moduleId": "iam-kernel",
-          "manifestRef": "../../../../../sdkwork-iam/iam/modules/iam-kernel/iam.module.manifest.json",
-          "inheritPermissions": true,
-          "inheritRoles": false
         }
       ],
       "bootstrapAccessTokenScope": {
@@ -81,6 +89,8 @@
     "dependencyApiSurfaces": []
   },
   "verification": {
-    "commands": ["pnpm --dir apps/sdkwork-appstore-pc typecheck"]
+    "commands": [
+      "pnpm --dir apps/sdkwork-appstore-pc typecheck"
+    ]
   }
 }

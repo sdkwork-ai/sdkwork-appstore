@@ -17,7 +17,7 @@
   },
   "canonicalSpecs": [],
   "contracts": {
-    "layerRole": "frontend-product",
+    "layerRole": "frontend-feature",
     "publicExports": [".", "./i18n"],
     "providedPorts": [
       { "name": "appstorePcProduct", "export": "." },

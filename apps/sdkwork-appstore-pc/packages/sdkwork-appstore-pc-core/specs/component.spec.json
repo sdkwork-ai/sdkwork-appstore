@@ -10,10 +10,15 @@
     "domain": "appstore",
     "capability": "core",
     "surface": "app",
-    "languages": ["typescript"],
+    "languages": [
+      "typescript"
+    ],
     "generated": false,
     "status": "active",
-    "manifests": ["package.json", "specs/component.spec.json"]
+    "manifests": [
+      "package.json",
+      "specs/component.spec.json"
+    ]
   },
   "canonicalSpecs": [
     {
@@ -33,7 +38,14 @@
     }
   ],
   "contracts": {
-    "publicExports": [".", "./sdk", "./modules", "./host", "./session", "./composition"],
+    "publicExports": [
+      ".",
+      "./sdk",
+      "./modules",
+      "./host",
+      "./session",
+      "./composition"
+    ],
     "sdkDependencies": [
       {
         "workspace": "sdkwork-agents-app-sdk",
@@ -90,14 +102,14 @@
       },
       "moduleCatalogRefs": [
         {
-          "moduleId": "appstore",
-          "manifestRef": "../../../../specs/iam.module.manifest.json",
+          "moduleId": "agents",
+          "manifestRef": "../../../../../sdkwork-agents/specs/iam.module.manifest.json",
           "inheritPermissions": true,
           "inheritRoles": true
         },
         {
-          "moduleId": "agents",
-          "manifestRef": "../../../../../sdkwork-agents/specs/iam.module.manifest.json",
+          "moduleId": "appstore",
+          "manifestRef": "../../../../specs/iam.module.manifest.json",
           "inheritPermissions": true,
           "inheritRoles": true
         },
@@ -126,14 +138,14 @@
           "inheritRoles": false
         },
         {
-          "moduleId": "skills",
-          "manifestRef": "../../../../../sdkwork-skills/specs/iam.module.manifest.json",
+          "moduleId": "mcp",
+          "manifestRef": "../../../../../sdkwork-iam/iam/modules/mcp/iam.module.manifest.json",
           "inheritPermissions": true,
           "inheritRoles": true
         },
         {
-          "moduleId": "mcp",
-          "manifestRef": "../../../../../sdkwork-mcp/specs/iam.module.manifest.json",
+          "moduleId": "skills",
+          "manifestRef": "../../../../../sdkwork-iam/iam/modules/skills/iam.module.manifest.json",
           "inheritPermissions": true,
           "inheritRoles": true
         }
@@ -158,6 +170,8 @@
     "dependencyApiSurfaces": []
   },
   "verification": {
-    "commands": ["pnpm --dir apps/sdkwork-appstore-pc typecheck"]
+    "commands": [
+      "pnpm --dir apps/sdkwork-appstore-pc typecheck"
+    ]
   }
 }

@@ -4,3 +4,5 @@ export interface AppstorePcSdkPort<TClients = unknown> {
 
 export type AppstorePcSdkPortFactory<TClients = unknown> = () =>
   AppstorePcSdkPort<TClients>;
+
+export * from './clients';

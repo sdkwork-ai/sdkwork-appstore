@@ -52,6 +52,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HomeFeedResponse'
+      parameters: []
   /app/v3/api/appstore/catalog/categories:
     get:
       tags:
@@ -170,6 +171,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/FeaturedListResponse'
+      parameters: []
   /app/v3/api/appstore/catalog/charts/{chartCode}:
     get:
       tags:
@@ -420,6 +422,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SdkWorkApiResponse'
+      parameters: []
     delete:
       tags:
       - catalog
@@ -431,6 +434,7 @@ paths:
       responses:
         '204':
           description: Removed
+      parameters: []
   /app/v3/api/appstore/catalog/templates:
     get:
       tags:
@@ -489,6 +493,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AppTemplateResponse'
+      x-sdkwork-idempotent: true
   /app/v3/api/appstore/catalog/templates/{templateId}:
     get:
       tags:
@@ -540,6 +545,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AppTemplateUsageResponse'
+      x-sdkwork-idempotent: true
   /app/v3/api/appstore/catalog/feedback:
     post:
       tags:
@@ -564,6 +570,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/FeedbackResponse'
+      x-sdkwork-idempotent: true
   /app/v3/api/listings:
     post:
       tags:
@@ -588,6 +595,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ListingResponse'
+      x-sdkwork-idempotent: true
   /app/v3/api/listings/{listingId}:
     get:
       tags:
@@ -806,6 +814,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ReleaseResponse'
+      x-sdkwork-idempotent: true
   /app/v3/api/listings/{listingId}/releases/history:
     get:
       tags:
@@ -953,6 +962,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ListingSubmissionResponse'
+      x-sdkwork-idempotent: true
   /app/v3/api/publishers/me:
     get:
       tags:
@@ -969,6 +979,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PublisherResponse'
+      parameters: []
   /app/v3/api/publishers/me/listings:
     get:
       tags:
@@ -1024,6 +1035,7 @@ paths:
                       properties:
                         item:
                           $ref: '#/components/schemas/PublisherAppBootstrapResponse'
+      x-sdkwork-idempotent: true
   /app/v3/api/publishers:
     post:
       tags:
@@ -1046,6 +1058,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PublisherResponse'
+      parameters: []
   /app/v3/api/publishers/{publisherId}:
     patch:
       tags:
@@ -1417,6 +1430,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/LibraryInstallResponse'
+      x-sdkwork-idempotent: true
   /app/v3/api/library/uninstall:
     post:
       tags:
@@ -1439,6 +1453,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SdkWorkResourceResponse'
+      parameters: []
   /app/v3/api/library/updates/check:
     post:
       tags:
@@ -1461,6 +1476,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/LibraryUpdatesCheckResponse'
+      parameters: []
   /app/v3/api/wishlist/items:
     get:
       tags:
@@ -1501,6 +1517,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/WishlistItemResponse'
+      parameters: []
   /app/v3/api/wishlist/items/{listingId}:
     delete:
       tags:
@@ -1539,6 +1556,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DownloadGrantResponse'
+      x-sdkwork-idempotent: true
   /app/v3/api/download_grants/{grantId}/consume:
     post:
       tags:
@@ -1591,6 +1609,8 @@ components:
       required: true
       schema:
         type: string
+        minLength: 1
+        maxLength: 128
     ListingId:
       name: listingId
       in: path

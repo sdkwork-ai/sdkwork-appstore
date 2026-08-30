@@ -43,6 +43,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ReleaseCheckUpdateResponse'
+      parameters: []
   /store/v3/api/artifacts/resolve_download:
     post:
       tags:
@@ -64,6 +65,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ArtifactResolveDownloadResponse'
+      parameters: []
   /store/v3/api/listings/{listingSlug}:
     get:
       tags:
@@ -157,6 +159,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AutomationSubmissionResponse'
+      x-sdkwork-idempotent: true
 components:
   securitySchemes:
     ApiKey:
@@ -170,6 +173,8 @@ components:
       required: true
       schema:
         type: string
+        minLength: 1
+        maxLength: 128
   schemas:
     ReleaseCheckUpdateRequest:
       type: object

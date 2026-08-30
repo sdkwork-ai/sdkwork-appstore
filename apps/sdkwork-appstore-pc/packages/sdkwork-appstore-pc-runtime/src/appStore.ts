@@ -1,5 +1,4 @@
-import type { AppStoreClient } from '@sdkwork/appstore-app-sdk';
-import type { SdkworkAppClient as CommentsAppClient } from '@sdkwork/comments-app-sdk';
+import type { AppStoreClient, CommentsAppClient } from '@sdkwork/appstore-pc-core';
 import {
   configureAppStoreServicePort,
   type AppStoreServicePort,

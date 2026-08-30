@@ -1,9 +1,9 @@
 import type {
-  SdkworkSkillsAppClient,
+  SkillsAppClient,
   SkillArtifactRecord,
   SkillInstallationRecord,
   SkillRecord,
-} from '@sdkwork/skills-app-sdk';
+} from '@sdkwork/appstore-pc-core';
 import {
   configureSkillsServicePort,
   type SkillsServicePort,
@@ -14,12 +14,12 @@ import type { SkillItem } from '../types';
 const marketplacePageSize = 48;
 const installationPageSize = 200;
 
-export function configureAppstorePcSkills(client: SdkworkSkillsAppClient): void {
+export function configureAppstorePcSkills(client: SkillsAppClient): void {
   configureSkillsServicePort(createSkillsServicePort(client));
 }
 
 export function createSkillsServicePort(
-  client: SdkworkSkillsAppClient,
+  client: SkillsAppClient,
 ): SkillsServicePort {
   const recordsById = new Map<string, SkillRecord>();
   const installedSkillIds = new Set<string>();
