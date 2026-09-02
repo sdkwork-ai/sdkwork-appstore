@@ -7,7 +7,7 @@ use sdkwork_database_sqlx::enable_process_shared_database_pool;
 use sdkwork_iam_web_adapter::{
     build_web_framework_builder_with_open_api_prefixes, iam_web_request_context_resolver_from_env,
 };
-use sdkwork_web_bootstrap::{infra_public_path_prefixes, ComposedApiAssembly};
+use sdkwork_web_bootstrap::{ApiModuleRegistry, ComposedApiAssembly, infra_public_path_prefixes};
 use sdkwork_web_core::{memory_idempotency_store, memory_rate_limit_store};
 use tracing_subscriber::EnvFilter;
 
@@ -50,7 +50,10 @@ async fn main() {
         .await
         .expect("IAM app API contribution assembly failed");
     tracing::info!("appstore and IAM routes assembled; wiring IAM web framework");
-    let composed = ComposedApiAssembly::try_compose("SDKWork AppStore API", vec![appstore, iam])
+    let mut module_registry = ApiModuleRegistry::new();
+    module_registry.add_modules(vec![appstore, iam]);
+    let composed = module_registry
+        .try_compose("SDKWork AppStore API")
         .expect("appstore gateway composition failed");
     let mut public_path_prefixes = infra_public_path_prefixes();
     public_path_prefixes.extend(appstore_public_path_prefixes());
