@@ -28,6 +28,10 @@ profiles:
         tls: dtupay.com
         mode: web+api
         web: adaptive
+      - domain: appstore-test.noaper.com
+        tls: noaper.com
+        mode: web+api
+        web: adaptive
       - domain: appstore-test.sdkwork.cn
         tls: sdkwork.cn
         mode: web+api
@@ -38,6 +42,10 @@ profiles:
         web: adaptive
       - domain: appstore-test.dtupay.cn
         tls: dtupay.cn
+        mode: web+api
+        web: adaptive
+      - domain: appstore-test.noaper.cn
+        tls: noaper.cn
         mode: web+api
         web: adaptive
       - domain: appstore-test.skubc.com
@@ -105,6 +113,10 @@ profiles:
         tls: dtupay.com
         mode: web+api
         web: adaptive
+      - domain: appstore-staging.noaper.com
+        tls: noaper.com
+        mode: web+api
+        web: adaptive
       - domain: appstore-staging.sdkwork.cn
         tls: sdkwork.cn
         mode: web+api
@@ -115,6 +127,10 @@ profiles:
         web: adaptive
       - domain: appstore-staging.dtupay.cn
         tls: dtupay.cn
+        mode: web+api
+        web: adaptive
+      - domain: appstore-staging.noaper.cn
+        tls: noaper.cn
         mode: web+api
         web: adaptive
       - domain: appstore-staging.skubc.com
@@ -182,6 +198,10 @@ profiles:
         tls: dtupay.com
         mode: web+api
         web: adaptive
+      - domain: appstore.noaper.com
+        tls: noaper.com
+        mode: web+api
+        web: adaptive
       - domain: appstore.sdkwork.cn
         tls: sdkwork.cn
         mode: web+api
@@ -192,6 +212,10 @@ profiles:
         web: adaptive
       - domain: appstore.dtupay.cn
         tls: dtupay.cn
+        mode: web+api
+        web: adaptive
+      - domain: appstore.noaper.cn
+        tls: noaper.cn
         mode: web+api
         web: adaptive
       - domain: appstore.skubc.com
@@ -262,6 +286,11 @@ profiles:
         mode: web+api
         web: adaptive
         apiPathStyle: full-prefix
+      - domain: appstore.noaper.com
+        tls: noaper.com
+        mode: web+api
+        web: adaptive
+        apiPathStyle: full-prefix
       - domain: appstore.sdkwork.cn
         tls: sdkwork.cn
         mode: web+api
@@ -274,6 +303,11 @@ profiles:
         apiPathStyle: full-prefix
       - domain: appstore.dtupay.cn
         tls: dtupay.cn
+        mode: web+api
+        web: adaptive
+        apiPathStyle: full-prefix
+      - domain: appstore.noaper.cn
+        tls: noaper.cn
         mode: web+api
         web: adaptive
         apiPathStyle: full-prefix

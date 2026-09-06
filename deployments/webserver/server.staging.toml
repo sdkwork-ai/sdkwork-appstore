@@ -4,6 +4,6 @@ environment = "staging"
 
 [[http.server]]
 listen = ["80"]
-serverName = ["appstore-staging.sdkwork.com", "appstore-staging.birdcoder.com", "appstore-staging.dtupay.com", "appstore-staging.sdkwork.cn", "appstore-staging.birdcoder.cn", "appstore-staging.dtupay.cn", "appstore-staging.skubc.com", "appstore-staging.skubc.cn", "appstore-staging.zowalk.com", "appstore-staging.zowalk.cn", "appstore-staging.offer86.com", "appstore-staging.offer86.cn", "appstore-staging.86offer.com", "appstore-staging.86offer.cn"]
+serverName = ["appstore-staging.sdkwork.com", "appstore-staging.birdcoder.com", "appstore-staging.dtupay.com", "appstore-staging.noaper.com", "appstore-staging.sdkwork.cn", "appstore-staging.birdcoder.cn", "appstore-staging.dtupay.cn", "appstore-staging.noaper.cn", "appstore-staging.skubc.com", "appstore-staging.skubc.cn", "appstore-staging.zowalk.com", "appstore-staging.zowalk.cn", "appstore-staging.offer86.com", "appstore-staging.offer86.cn", "appstore-staging.86offer.com", "appstore-staging.86offer.cn"]
 include = ["snippets/gateway-locations.nonproduction.conf"]
 
