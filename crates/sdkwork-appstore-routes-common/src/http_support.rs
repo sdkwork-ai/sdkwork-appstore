@@ -48,6 +48,16 @@ fn require_org_id(base: &AppstoreRequestContext) -> Result<String, Response> {
         .ok_or_else(|| crate::unauthorized_response(None, "Organization context is required"))
 }
 
+/// PERMISSION_STANDARD_SPEC §Tenant-Default Organization Context: consumer app-api
+/// surfaces must not reject a personal (tenant-scope) session for lacking organization
+/// context; a missing organization normalizes to "0".
+fn organization_id_or_default(base: &AppstoreRequestContext) -> String {
+    base.organization_id
+        .clone()
+        .filter(|id| !id.trim().is_empty())
+        .unwrap_or_else(|| "0".to_string())
+}
+
 pub fn to_catalog_context(
     ext: Option<&Extension<WebRequestContext>>,
 ) -> Result<sdkwork_appstore_catalog_service::context::AppstoreRequestContext, Response> {
@@ -96,7 +106,7 @@ pub fn to_listing_context(
     ext: Option<&Extension<WebRequestContext>>,
 ) -> Result<sdkwork_appstore_listing_service::context::AppstoreRequestContext, Response> {
     let base = authenticated_base(ext)?;
-    let organization_id = require_org_id(&base)?;
+    let organization_id = organization_id_or_default(&base);
     let user_id = require_user_id(&base)?;
     Ok(
         sdkwork_appstore_listing_service::context::AppstoreRequestContext {
@@ -160,7 +170,7 @@ pub fn to_library_context(
     ext: Option<&Extension<WebRequestContext>>,
 ) -> Result<sdkwork_appstore_library_service::context::AppstoreRequestContext, Response> {
     let base = authenticated_base(ext)?;
-    let organization_id = require_org_id(&base)?;
+    let organization_id = organization_id_or_default(&base);
     let user_id = require_user_id(&base)?;
     Ok(
         sdkwork_appstore_library_service::context::AppstoreRequestContext {
@@ -407,7 +417,7 @@ pub fn to_user_store_context(
     ext: Option<&Extension<WebRequestContext>>,
 ) -> Result<sdkwork_appstore_user_store_service::context::AppstoreRequestContext, Response> {
     let base = authenticated_base(ext)?;
-    let organization_id = require_org_id(&base)?;
+    let organization_id = organization_id_or_default(&base);
     let user_id = require_user_id(&base)?;
     Ok(
         sdkwork_appstore_user_store_service::context::AppstoreRequestContext {
