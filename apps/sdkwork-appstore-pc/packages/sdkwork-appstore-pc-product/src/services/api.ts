@@ -8,6 +8,7 @@ export {
   ConsoleService,
   AdminMonitorService,
   InstallService,
+  UserStoreService,
 } from '@sdkwork/appstore-pc-core';
 
 export type {
@@ -20,6 +21,19 @@ export type {
   IConsoleSDK,
   IAdminMonitorSDK,
   IInstallSDK,
+  IUserStoreSDK,
+  UserCategory,
+  UserCategoryItem,
+  UserStoreShare,
+  UserStoreListingCard,
+  UserStoreShareCreateInput,
+  UserCategoryCreateInput,
+  UserCategoryUpdateInput,
+  UserStoreItemPage,
+  UserCategoryItemWithCard,
+  PublicUserStoreItemPage,
+  PublicUserStoreView,
+  PublicUserStoreCategorySummary,
   AIModelInfo,
   AICompletionResult,
   ManagedApp,

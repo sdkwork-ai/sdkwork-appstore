@@ -16,6 +16,7 @@ members = [
   "crates/sdkwork-appstore-moderation-service",
   "crates/sdkwork-appstore-compliance-service",
   "crates/sdkwork-appstore-market-service",
+  "crates/sdkwork-appstore-user-store-service",
   "crates/sdkwork-routes-appstore-catalog-app-api",
   "crates/sdkwork-routes-listing-app-api",
   "crates/sdkwork-routes-release-app-api",
@@ -31,7 +32,9 @@ members = [
   "crates/sdkwork-routes-release-open-api",
   "crates/sdkwork-routes-appstore-catalog-open-api",
   "crates/sdkwork-routes-listing-open-api",
-  "crates/sdkwork-routes-automation-open-api"
+  "crates/sdkwork-routes-automation-open-api",
+  "crates/sdkwork-routes-user-store-app-api",
+  "crates/sdkwork-routes-user-store-open-api"
 ]
 resolver = "2"
 
@@ -59,6 +62,9 @@ sdkwork-appstore-library-service = { path = "crates/sdkwork-appstore-library-ser
 sdkwork-appstore-moderation-service = { path = "crates/sdkwork-appstore-moderation-service" }
 sdkwork-appstore-compliance-service = { path = "crates/sdkwork-appstore-compliance-service" }
 sdkwork-appstore-market-service = { path = "crates/sdkwork-appstore-market-service" }
+sdkwork-appstore-user-store-service = { path = "crates/sdkwork-appstore-user-store-service" }
+sdkwork-routes-user-store-app-api = { path = "crates/sdkwork-routes-user-store-app-api" }
+sdkwork-routes-user-store-open-api = { path = "crates/sdkwork-routes-user-store-open-api" }
 sdkwork-appstore-service-host = { path = "crates/sdkwork-appstore-service-host" }
 sdkwork-routes-appstore-catalog-app-api = { path = "crates/sdkwork-routes-appstore-catalog-app-api" }
 sdkwork-routes-appstore-catalog-backend-api = { path = "crates/sdkwork-routes-appstore-catalog-backend-api" }

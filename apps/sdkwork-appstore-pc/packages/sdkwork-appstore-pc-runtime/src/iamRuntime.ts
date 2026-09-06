@@ -4,6 +4,7 @@ import {
 } from '@sdkwork/appstore-pc-core';
 import {
   createSdkworkAppbasePcAuthRuntime,
+  type CreateSdkworkSessionAuthUnauthorizedIntegrationOptions,
   type SdkworkAppbasePcAuthRuntimeComposition,
   type SdkworkAppbasePcAuthRuntimeSdkClient,
 } from '@sdkwork/auth-runtime-pc-react';
@@ -27,6 +28,14 @@ export interface CreateAppstorePcIamRuntimeOptions {
   sdkClients: AppstorePcSdkClientInventory;
   session: AppstorePcSessionStore;
   tokenManager: AuthTokenManager;
+  /**
+   * Session-auth boundary policy forwarded to the appbase auth runtime
+   * (`createSdkworkAppbasePcAuthRuntime`). Standalone runtimes omit it so an
+   * unauthorized response keeps the default window redirect to the sign-in
+   * route; embedded hosts pass `shouldRedirectOnUnauthorized: () => false`
+   * because the outer window belongs to the embedding application.
+   */
+  sessionAuth?: boolean | CreateSdkworkSessionAuthUnauthorizedIntegrationOptions;
 }
 
 interface IamSessionLike {
@@ -44,6 +53,7 @@ export function createAppstorePcIamRuntime(
 ): AppstorePcIamRuntime {
   const appbaseApp = createAppbaseAppClient(options.config, options.tokenManager);
   const composition = createSdkworkAppbasePcAuthRuntime({
+    ...(options.sessionAuth === undefined ? {} : { sessionAuth: options.sessionAuth }),
     app: {
       appId: options.config.appKey,
       deploymentMode: toIamDeploymentMode(options.config.deploymentProfile),

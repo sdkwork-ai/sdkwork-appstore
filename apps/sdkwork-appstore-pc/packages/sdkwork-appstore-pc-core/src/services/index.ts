@@ -7,3 +7,4 @@ export * from './templates';
 export * from './console';
 export * from './admin';
 export * from './install';
+export * from './userStore';

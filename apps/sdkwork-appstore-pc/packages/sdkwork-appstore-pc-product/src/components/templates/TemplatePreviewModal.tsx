@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { TemplateItem } from '../../types';
-import { ModalShell } from '../common/ModalShell';
+import { ModalShell } from '@sdkwork/appstore-pc-commons';
 import { TemplateModalHeader } from './TemplateModalHeader';
 import { TemplateDetailNav } from './TemplateDetailNav';
 import { TemplateDetailNavTabs, TemplateTabType } from './TemplateDetailNavTabs';

@@ -76,6 +76,18 @@ export const common = {
   categories: {
     all: '全部'
   },
+  platformGroups: {
+    title: '平台',
+    all: '全部平台',
+    android: '安卓',
+    ios: 'iOS',
+    harmonyos: '鸿蒙',
+    pcDesktop: 'PC桌面',
+    pcWeb: 'PC网页',
+    h5Web: 'H5网页',
+    miniprogram: '小程序',
+    browserExtension: '浏览器扩展'
+  },
   time: {
     recently: '最近'
   },

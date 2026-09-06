@@ -12,7 +12,8 @@ use crate::db::rows::{
     MarketChannelRow, MarketReleaseRow, ModerationDecisionRow, ModerationReviewRow,
     PublisherMemberRow, PublisherRow, PublisherVerificationRow, RegionalAvailabilityRow,
     ReleaseArtifactRow, ReleaseChannelRow, ReleaseNoteLocalizationRow, ReleaseRolloutRow,
-    ReleaseRow, UserLibraryItemRow, UserWishlistItemRow,
+    ReleaseRow, UserCategoryItemRow, UserCategoryRow, UserLibraryItemRow, UserStoreShareRow,
+    UserWishlistItemRow,
 };
 use sdkwork_appstore_catalog_service::domain::models::{
     AppTemplate, AppTemplateUsage, AppTemplateUsageKind, AudienceScope as CatalogAudienceScope,
@@ -51,6 +52,10 @@ use sdkwork_appstore_release_service::domain::models::{
     DownloadGrantId, GrantReason, GrantStatus, Release, ReleaseArtifact, ReleaseChannel,
     ReleaseChannelId, ReleaseId, ReleaseNoteLocalization, ReleaseRollout, ReleaseStatus,
     RolloutStatus, RolloutStrategy, SignatureSnapshot,
+};
+use sdkwork_appstore_user_store_service::domain::models::{
+    ShareScope, ShareStatus, ShareVisibility, UserCategory as UserStoreCategory,
+    UserCategoryItem as UserStoreCategoryItem, UserCategoryStatus, UserStoreShare,
 };
 
 pub fn map_publisher_row_to_domain(row: PublisherRow) -> Result<Publisher, String> {
@@ -1269,4 +1274,94 @@ pub fn map_listing_rating_row_to_domain(row: ListingRatingRow) -> Result<Listing
         created_at: row.created_at,
         updated_at: row.updated_at,
     })
+}
+
+pub fn map_user_category_row_to_domain(row: UserCategoryRow) -> Result<UserStoreCategory, String> {
+    let status = UserCategoryStatus::from_str(&row.category_status)
+        .ok_or_else(|| format!("Invalid user category status: {}", row.category_status))?;
+
+    Ok(UserStoreCategory {
+        id: row.id,
+        tenant_id: row.tenant_id,
+        owner_user_id: row.owner_user_id,
+        name: row.name,
+        description: row.description,
+        icon_media_resource_id: row.icon_media_resource_id,
+        sort_order: row.sort_order,
+        status,
+        created_at: row.created_at,
+        updated_at: row.updated_at,
+    })
+}
+
+pub fn map_user_category_status_to_row(category: &UserStoreCategory) -> String {
+    category.status.as_str().to_string()
+}
+
+pub fn map_user_category_item_row_to_domain(
+    row: UserCategoryItemRow,
+) -> Result<UserStoreCategoryItem, String> {
+    Ok(UserStoreCategoryItem {
+        id: row.id,
+        tenant_id: row.tenant_id,
+        user_category_id: row.user_category_id,
+        listing_id: row.listing_id,
+        note: row.note,
+        sort_order: row.sort_order,
+        created_at: row.created_at,
+        updated_at: row.updated_at,
+    })
+}
+
+pub fn map_user_store_share_row_to_domain(
+    row: UserStoreShareRow,
+) -> Result<UserStoreShare, String> {
+    let scope = ShareScope::from_str(&row.share_scope)
+        .ok_or_else(|| format!("Invalid share scope: {}", row.share_scope))?;
+    let visibility = ShareVisibility::from_str(&row.share_visibility)
+        .ok_or_else(|| format!("Invalid share visibility: {}", row.share_visibility))?;
+    let status = ShareStatus::from_str(&row.share_status)
+        .ok_or_else(|| format!("Invalid share status: {}", row.share_status))?;
+    let selected_category_ids: Vec<String> = serde_json::from_str(&row.selected_category_ids_json)
+        .map_err(|e| format!("Invalid selected_category_ids_json: {}", e))?;
+
+    Ok(UserStoreShare {
+        id: row.id,
+        tenant_id: row.tenant_id,
+        owner_user_id: row.owner_user_id,
+        share_token: row.share_token,
+        title: row.title,
+        description: row.description,
+        scope,
+        selected_category_ids,
+        visibility,
+        status,
+        expires_at: row.expires_at,
+        view_count: row.view_count,
+        created_at: row.created_at,
+        updated_at: row.updated_at,
+    })
+}
+
+pub fn map_user_store_share_domain_to_share_columns(
+    share: &UserStoreShare,
+) -> Result<
+    (
+        String,
+        String,
+        String,
+        String,
+        Option<chrono::DateTime<chrono::Utc>>,
+    ),
+    String,
+> {
+    let selected_category_ids_json = serde_json::to_string(&share.selected_category_ids)
+        .map_err(|e| format!("Serialize selected_category_ids failed: {}", e))?;
+    Ok((
+        share.scope.as_str().to_string(),
+        selected_category_ids_json,
+        share.visibility.as_str().to_string(),
+        share.status.as_str().to_string(),
+        share.expires_at,
+    ))
 }

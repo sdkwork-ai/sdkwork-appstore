@@ -722,3 +722,50 @@ pub struct ListingRatingRow {
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
 }
+
+#[derive(Debug, Clone, FromRow)]
+pub struct UserCategoryRow {
+    pub id: String,
+    pub tenant_id: String,
+    pub organization_id: String,
+    pub owner_user_id: String,
+    pub name: String,
+    pub description: Option<String>,
+    pub icon_media_resource_id: Option<String>,
+    pub sort_order: i32,
+    pub category_status: String,
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
+}
+
+#[derive(Debug, Clone, FromRow)]
+pub struct UserCategoryItemRow {
+    pub id: String,
+    pub tenant_id: String,
+    pub organization_id: String,
+    pub user_category_id: String,
+    pub listing_id: String,
+    pub note: Option<String>,
+    pub sort_order: i32,
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
+}
+
+#[derive(Debug, Clone, FromRow)]
+pub struct UserStoreShareRow {
+    pub id: String,
+    pub tenant_id: String,
+    pub organization_id: String,
+    pub owner_user_id: String,
+    pub share_token: String,
+    pub title: String,
+    pub description: Option<String>,
+    pub share_scope: String,
+    pub selected_category_ids_json: String,
+    pub share_visibility: String,
+    pub share_status: String,
+    pub expires_at: Option<DateTime<Utc>>,
+    pub view_count: i64,
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
+}

@@ -6,6 +6,7 @@ export const nav = {
     apps: 'Apps',
     games: 'Games',
     aiHub: 'AI Hub',
+    experts: 'Experts',
     plugins: 'Plugins',
     skills: 'Skills',
     mcp: 'MCP Servers',

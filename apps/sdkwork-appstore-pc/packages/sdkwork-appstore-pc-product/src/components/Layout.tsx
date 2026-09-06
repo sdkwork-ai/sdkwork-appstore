@@ -7,7 +7,16 @@ import { DesktopSidebar } from './layout/DesktopSidebar';
 import { DesktopHeader } from './layout/DesktopHeader';
 import { ErrorBoundary } from './common/ErrorBoundary';
 
-export default function Layout() {
+interface LayoutProps {
+  /**
+   * Whether the desktop header's right-hand action cluster (language,
+   * updates, theme, user badge, window controls) renders. Embedding hosts
+   * that already own these affordances pass false; standalone defaults to true.
+   */
+  showHeaderActions?: boolean;
+}
+
+export default function Layout({ showHeaderActions = true }: LayoutProps) {
   const { t } = useTranslation();
   const location = useLocation();
 
@@ -30,7 +39,7 @@ export default function Layout() {
       {/* Main Content Area */}
       <main className="flex-1 flex flex-col min-w-0 h-screen bg-[#f8f9fa] dark:bg-[#181a20] overflow-hidden relative">
         {/* Desktop Header */}
-        <DesktopHeader />
+        <DesktopHeader showActions={showHeaderActions} />
 
         <div id="main-scroll-area" className="flex-1 overflow-y-auto pb-16 md:pb-0 custom-scrollbar">
           <AnimatePresence mode="wait">

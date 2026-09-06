@@ -42,7 +42,8 @@
   "profiles": {
     "minimal": {
       "common": [
-        "common/002_default_publisher.sql"
+        "common/002_default_publisher.sql",
+        "common/011_platform_dictionary.sql"
       ],
       "locales": {
         "zh-CN": []
@@ -51,6 +52,7 @@
     "standard": {
       "common": [
         "common/002_default_publisher.sql",
+        "common/011_platform_dictionary.sql",
         "common/003_catalog_categories.sql",
         "common/004_catalog_categories_extended.sql",
         "common/005_storefront_listings.sql",

@@ -3,211 +3,7 @@
   "kind": "sdkwork.database.table-registry",
   "tables": [
     {
-      "table_name": "appstore_app",
-      "owner": "appstore-platform",
-      "compliance_level": "L2",
-      "lifecycle_status": "active"
-    },
-    {
-      "table_name": "appstore_app_dependency",
-      "owner": "appstore-platform",
-      "compliance_level": "L2",
-      "lifecycle_status": "active"
-    },
-    {
-      "table_name": "appstore_app_template",
-      "owner": "appstore-platform",
-      "compliance_level": "L2",
-      "lifecycle_status": "active"
-    },
-    {
-      "table_name": "appstore_app_template_usage",
-      "owner": "appstore-platform",
-      "compliance_level": "L2",
-      "lifecycle_status": "active"
-    },
-    {
-      "table_name": "appstore_app_template_version",
-      "owner": "appstore-platform",
-      "compliance_level": "L2",
-      "lifecycle_status": "active"
-    },
-    {
-      "table_name": "appstore_catalog_chart_snapshot",
-      "owner": "appstore-platform",
-      "compliance_level": "L2",
-      "lifecycle_status": "active"
-    },
-    {
-      "table_name": "appstore_catalog_collection",
-      "owner": "appstore-platform",
-      "compliance_level": "L2",
-      "lifecycle_status": "active"
-    },
-    {
-      "table_name": "appstore_catalog_collection_item",
-      "owner": "appstore-platform",
-      "compliance_level": "L2",
-      "lifecycle_status": "active"
-    },
-    {
-      "table_name": "appstore_catalog_collection_localization",
-      "owner": "appstore-platform",
-      "compliance_level": "L2",
-      "lifecycle_status": "active"
-    },
-    {
-      "table_name": "appstore_catalog_featured_slot",
-      "owner": "appstore-platform",
-      "compliance_level": "L2",
-      "lifecycle_status": "active"
-    },
-    {
-      "table_name": "appstore_catalog_search_history",
-      "owner": "appstore-platform",
-      "compliance_level": "L2",
-      "lifecycle_status": "active"
-    },
-    {
-      "table_name": "appstore_catalog_trending_term",
-      "owner": "appstore-platform",
-      "compliance_level": "L2",
-      "lifecycle_status": "active"
-    },
-    {
-      "table_name": "appstore_category",
-      "owner": "appstore-platform",
-      "compliance_level": "L2",
-      "lifecycle_status": "active"
-    },
-    {
-      "table_name": "appstore_category_localization",
-      "owner": "appstore-platform",
-      "compliance_level": "L2",
-      "lifecycle_status": "active"
-    },
-    {
-      "table_name": "appstore_compliance_permission_disclosure",
-      "owner": "appstore-platform",
-      "compliance_level": "L2",
-      "lifecycle_status": "active"
-    },
-    {
-      "table_name": "appstore_compliance_profile",
-      "owner": "appstore-platform",
-      "compliance_level": "L2",
-      "lifecycle_status": "active"
-    },
-    {
-      "table_name": "appstore_download_grant",
-      "owner": "appstore-platform",
-      "compliance_level": "L2",
-      "lifecycle_status": "active"
-    },
-    {
-      "table_name": "appstore_entitlement",
-      "owner": "appstore-platform",
-      "compliance_level": "L2",
-      "lifecycle_status": "active"
-    },
-    {
-      "table_name": "appstore_feedback",
-      "owner": "appstore-platform",
-      "compliance_level": "L2",
-      "lifecycle_status": "active"
-    },
-    {
       "table_name": "appstore_idempotency_key",
-      "owner": "appstore-platform",
-      "compliance_level": "L2",
-      "lifecycle_status": "active"
-    },
-    {
-      "table_name": "appstore_install_event",
-      "owner": "appstore-platform",
-      "compliance_level": "L2",
-      "lifecycle_status": "active"
-    },
-    {
-      "table_name": "appstore_listing",
-      "owner": "appstore-platform",
-      "compliance_level": "L2",
-      "lifecycle_status": "active"
-    },
-    {
-      "table_name": "appstore_listing_category_binding",
-      "owner": "appstore-platform",
-      "compliance_level": "L2",
-      "lifecycle_status": "active"
-    },
-    {
-      "table_name": "appstore_listing_iap_item",
-      "owner": "appstore-platform",
-      "compliance_level": "L2",
-      "lifecycle_status": "active"
-    },
-    {
-      "table_name": "appstore_listing_localization",
-      "owner": "appstore-platform",
-      "compliance_level": "L2",
-      "lifecycle_status": "active"
-    },
-    {
-      "table_name": "appstore_listing_media",
-      "owner": "appstore-platform",
-      "compliance_level": "L2",
-      "lifecycle_status": "active"
-    },
-    {
-      "table_name": "appstore_listing_metric_snapshot",
-      "owner": "appstore-platform",
-      "compliance_level": "L2",
-      "lifecycle_status": "active"
-    },
-    {
-      "table_name": "appstore_listing_rating",
-      "owner": "appstore-platform",
-      "compliance_level": "L2",
-      "lifecycle_status": "active"
-    },
-    {
-      "table_name": "appstore_listing_submission",
-      "owner": "appstore-platform",
-      "compliance_level": "L2",
-      "lifecycle_status": "active"
-    },
-    {
-      "table_name": "appstore_listing_tag_binding",
-      "owner": "appstore-platform",
-      "compliance_level": "L2",
-      "lifecycle_status": "active"
-    },
-    {
-      "table_name": "appstore_market_channel",
-      "owner": "appstore-platform",
-      "compliance_level": "L2",
-      "lifecycle_status": "active"
-    },
-    {
-      "table_name": "appstore_market_release",
-      "owner": "appstore-platform",
-      "compliance_level": "L2",
-      "lifecycle_status": "active"
-    },
-    {
-      "table_name": "appstore_moderation_appeal",
-      "owner": "appstore-platform",
-      "compliance_level": "L2",
-      "lifecycle_status": "active"
-    },
-    {
-      "table_name": "appstore_moderation_decision",
-      "owner": "appstore-platform",
-      "compliance_level": "L2",
-      "lifecycle_status": "active"
-    },
-    {
-      "table_name": "appstore_moderation_review",
       "owner": "appstore-platform",
       "compliance_level": "L2",
       "lifecycle_status": "active"
@@ -231,43 +27,25 @@
       "lifecycle_status": "active"
     },
     {
-      "table_name": "appstore_regional_availability",
+      "table_name": "appstore_app",
       "owner": "appstore-platform",
       "compliance_level": "L2",
       "lifecycle_status": "active"
     },
     {
-      "table_name": "appstore_release",
+      "table_name": "appstore_app_dependency",
       "owner": "appstore-platform",
       "compliance_level": "L2",
       "lifecycle_status": "active"
     },
     {
-      "table_name": "appstore_release_artifact",
+      "table_name": "appstore_category",
       "owner": "appstore-platform",
       "compliance_level": "L2",
       "lifecycle_status": "active"
     },
     {
-      "table_name": "appstore_release_beta_invite",
-      "owner": "appstore-platform",
-      "compliance_level": "L2",
-      "lifecycle_status": "active"
-    },
-    {
-      "table_name": "appstore_release_channel",
-      "owner": "appstore-platform",
-      "compliance_level": "L2",
-      "lifecycle_status": "active"
-    },
-    {
-      "table_name": "appstore_release_note_localization",
-      "owner": "appstore-platform",
-      "compliance_level": "L2",
-      "lifecycle_status": "active"
-    },
-    {
-      "table_name": "appstore_release_rollout",
+      "table_name": "appstore_category_localization",
       "owner": "appstore-platform",
       "compliance_level": "L2",
       "lifecycle_status": "active"
@@ -285,6 +63,144 @@
       "lifecycle_status": "active"
     },
     {
+      "table_name": "appstore_listing",
+      "owner": "appstore-platform",
+      "compliance_level": "L2",
+      "lifecycle_status": "active"
+    },
+    {
+      "table_name": "appstore_listing_localization",
+      "owner": "appstore-platform",
+      "compliance_level": "L2",
+      "lifecycle_status": "active"
+    },
+    {
+      "table_name": "appstore_listing_media",
+      "owner": "appstore-platform",
+      "compliance_level": "L2",
+      "lifecycle_status": "active"
+    },
+    {
+      "table_name": "appstore_listing_category_binding",
+      "owner": "appstore-platform",
+      "compliance_level": "L2",
+      "lifecycle_status": "active"
+    },
+    {
+      "table_name": "appstore_listing_tag_binding",
+      "owner": "appstore-platform",
+      "compliance_level": "L2",
+      "lifecycle_status": "active"
+    },
+    {
+      "table_name": "appstore_regional_availability",
+      "owner": "appstore-platform",
+      "compliance_level": "L2",
+      "lifecycle_status": "active"
+    },
+    {
+      "table_name": "appstore_compliance_profile",
+      "owner": "appstore-platform",
+      "compliance_level": "L2",
+      "lifecycle_status": "active"
+    },
+    {
+      "table_name": "appstore_compliance_permission_disclosure",
+      "owner": "appstore-platform",
+      "compliance_level": "L2",
+      "lifecycle_status": "active"
+    },
+    {
+      "table_name": "appstore_release_channel",
+      "owner": "appstore-platform",
+      "compliance_level": "L2",
+      "lifecycle_status": "active"
+    },
+    {
+      "table_name": "appstore_release",
+      "owner": "appstore-platform",
+      "compliance_level": "L2",
+      "lifecycle_status": "active"
+    },
+    {
+      "table_name": "appstore_release_note_localization",
+      "owner": "appstore-platform",
+      "compliance_level": "L2",
+      "lifecycle_status": "active"
+    },
+    {
+      "table_name": "appstore_release_artifact",
+      "owner": "appstore-platform",
+      "compliance_level": "L2",
+      "lifecycle_status": "active"
+    },
+    {
+      "table_name": "appstore_release_rollout",
+      "owner": "appstore-platform",
+      "compliance_level": "L2",
+      "lifecycle_status": "active"
+    },
+    {
+      "table_name": "appstore_market_channel",
+      "owner": "appstore-platform",
+      "compliance_level": "L2",
+      "lifecycle_status": "active"
+    },
+    {
+      "table_name": "appstore_market_release",
+      "owner": "appstore-platform",
+      "compliance_level": "L2",
+      "lifecycle_status": "active"
+    },
+    {
+      "table_name": "appstore_listing_submission",
+      "owner": "appstore-platform",
+      "compliance_level": "L2",
+      "lifecycle_status": "active"
+    },
+    {
+      "table_name": "appstore_moderation_review",
+      "owner": "appstore-platform",
+      "compliance_level": "L2",
+      "lifecycle_status": "active"
+    },
+    {
+      "table_name": "appstore_moderation_decision",
+      "owner": "appstore-platform",
+      "compliance_level": "L2",
+      "lifecycle_status": "active"
+    },
+    {
+      "table_name": "appstore_catalog_collection",
+      "owner": "appstore-platform",
+      "compliance_level": "L2",
+      "lifecycle_status": "active"
+    },
+    {
+      "table_name": "appstore_catalog_collection_localization",
+      "owner": "appstore-platform",
+      "compliance_level": "L2",
+      "lifecycle_status": "active"
+    },
+    {
+      "table_name": "appstore_catalog_collection_item",
+      "owner": "appstore-platform",
+      "compliance_level": "L2",
+      "lifecycle_status": "active"
+    },
+    {
+      "table_name": "appstore_catalog_featured_slot",
+      "owner": "appstore-platform",
+      "compliance_level": "L2",
+      "lifecycle_status": "active"
+    },
+    {
+      "table_name": "appstore_catalog_chart_snapshot",
+      "owner": "appstore-platform",
+      "compliance_level": "L2",
+      "lifecycle_status": "active"
+    },
+    {
       "table_name": "appstore_user_library_item",
       "owner": "appstore-platform",
       "compliance_level": "L2",
@@ -292,6 +208,180 @@
     },
     {
       "table_name": "appstore_user_wishlist_item",
+      "owner": "appstore-platform",
+      "compliance_level": "L2",
+      "lifecycle_status": "active"
+    },
+    {
+      "table_name": "appstore_entitlement",
+      "owner": "appstore-platform",
+      "compliance_level": "L2",
+      "lifecycle_status": "active"
+    },
+    {
+      "table_name": "appstore_download_grant",
+      "owner": "appstore-platform",
+      "compliance_level": "L2",
+      "lifecycle_status": "active"
+    },
+    {
+      "table_name": "appstore_install_event",
+      "owner": "appstore-platform",
+      "compliance_level": "L2",
+      "lifecycle_status": "active"
+    },
+    {
+      "table_name": "appstore_listing_metric_snapshot",
+      "owner": "appstore-platform",
+      "compliance_level": "L2",
+      "lifecycle_status": "active"
+    },
+    {
+      "table_name": "appstore_app_template",
+      "owner": "appstore-platform",
+      "compliance_level": "L2",
+      "lifecycle_status": "active"
+    },
+    {
+      "table_name": "appstore_app_template_version",
+      "owner": "appstore-platform",
+      "compliance_level": "L2",
+      "lifecycle_status": "active"
+    },
+    {
+      "table_name": "appstore_app_template_usage",
+      "owner": "appstore-platform",
+      "compliance_level": "L2",
+      "lifecycle_status": "active"
+    },
+    {
+      "table_name": "appstore_listing_iap_item",
+      "owner": "appstore-platform",
+      "compliance_level": "L2",
+      "lifecycle_status": "active"
+    },
+    {
+      "table_name": "appstore_catalog_search_history",
+      "owner": "appstore-platform",
+      "compliance_level": "L2",
+      "lifecycle_status": "active"
+    },
+    {
+      "table_name": "appstore_catalog_trending_term",
+      "owner": "appstore-platform",
+      "compliance_level": "L2",
+      "lifecycle_status": "active"
+    },
+    {
+      "table_name": "appstore_moderation_appeal",
+      "owner": "appstore-platform",
+      "compliance_level": "L2",
+      "lifecycle_status": "active"
+    },
+    {
+      "table_name": "appstore_release_beta_invite",
+      "owner": "appstore-platform",
+      "compliance_level": "L2",
+      "lifecycle_status": "active"
+    },
+    {
+      "table_name": "appstore_listing_rating",
+      "owner": "appstore-platform",
+      "compliance_level": "L2",
+      "lifecycle_status": "active"
+    },
+    {
+      "table_name": "appstore_feedback",
+      "owner": "appstore-platform",
+      "compliance_level": "L2",
+      "lifecycle_status": "active"
+    },
+    {
+      "table_name": "appstore_platform_dictionary",
+      "owner": "appstore-platform",
+      "compliance_level": "L2",
+      "lifecycle_status": "active"
+    },
+    {
+      "table_name": "appstore_app_platform",
+      "owner": "appstore-platform",
+      "compliance_level": "L2",
+      "lifecycle_status": "active"
+    },
+    {
+      "table_name": "appstore_platform_release",
+      "owner": "appstore-platform",
+      "compliance_level": "L2",
+      "lifecycle_status": "active"
+    },
+    {
+      "table_name": "appstore_signing_credential",
+      "owner": "appstore-platform",
+      "compliance_level": "L2",
+      "lifecycle_status": "active"
+    },
+    {
+      "table_name": "appstore_listing_review",
+      "owner": "appstore-platform",
+      "compliance_level": "L2",
+      "lifecycle_status": "active"
+    },
+    {
+      "table_name": "appstore_listing_review_vote",
+      "owner": "appstore-platform",
+      "compliance_level": "L2",
+      "lifecycle_status": "active"
+    },
+    {
+      "table_name": "appstore_listing_review_report",
+      "owner": "appstore-platform",
+      "compliance_level": "L2",
+      "lifecycle_status": "active"
+    },
+    {
+      "table_name": "appstore_rating_distribution_snapshot",
+      "owner": "appstore-platform",
+      "compliance_level": "L2",
+      "lifecycle_status": "active"
+    },
+    {
+      "table_name": "appstore_listing_price",
+      "owner": "appstore-platform",
+      "compliance_level": "L2",
+      "lifecycle_status": "active"
+    },
+    {
+      "table_name": "appstore_promo_code_batch",
+      "owner": "appstore-platform",
+      "compliance_level": "L2",
+      "lifecycle_status": "active"
+    },
+    {
+      "table_name": "appstore_promo_code",
+      "owner": "appstore-platform",
+      "compliance_level": "L2",
+      "lifecycle_status": "active"
+    },
+    {
+      "table_name": "appstore_release_tester_group",
+      "owner": "appstore-platform",
+      "compliance_level": "L2",
+      "lifecycle_status": "active"
+    },
+    {
+      "table_name": "appstore_release_tester_group_member",
+      "owner": "appstore-platform",
+      "compliance_level": "L2",
+      "lifecycle_status": "active"
+    },
+    {
+      "table_name": "appstore_catalog_search_doc",
+      "owner": "appstore-platform",
+      "compliance_level": "L2",
+      "lifecycle_status": "active"
+    },
+    {
+      "table_name": "appstore_analytics_metric_daily",
       "owner": "appstore-platform",
       "compliance_level": "L2",
       "lifecycle_status": "active"

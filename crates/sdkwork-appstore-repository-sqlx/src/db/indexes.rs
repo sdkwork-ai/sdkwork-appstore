@@ -77,4 +77,24 @@ pub const APPSTORE_INDEXES: &[(&str, &str, &[&str])] = &[
         "appstore_install_event",
         &["tenant_id", "listing_id", "occurred_at"],
     ),
+    (
+        "idx_appstore_user_category_owner",
+        "appstore_user_category",
+        &[
+            "tenant_id",
+            "owner_user_id",
+            "category_status",
+            "sort_order",
+        ],
+    ),
+    (
+        "idx_appstore_user_category_item_category",
+        "appstore_user_category_item",
+        &["tenant_id", "user_category_id", "sort_order"],
+    ),
+    (
+        "idx_appstore_user_category_item_listing",
+        "appstore_user_category_item",
+        &["tenant_id", "listing_id"],
+    ),
 ];

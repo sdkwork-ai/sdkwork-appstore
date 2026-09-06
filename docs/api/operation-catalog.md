@@ -12,30 +12,30 @@ Prefix lock:
 
 | operationId | Method | Path | Permission |
 | --- | --- | --- | --- |
-| `appstore.catalog.home.retrieve` | GET | `/app/v3/api/appstore/catalog/home` | `appstore.catalog.read` |
-| `appstore.catalog.categories.list` | GET | `/app/v3/api/appstore/catalog/categories` | `appstore.catalog.read` |
-| `appstore.catalog.categories.retrieve` | GET | `/app/v3/api/appstore/catalog/categories/{categoryId}` | `appstore.catalog.read` |
-| `appstore.catalog.collections.list` | GET | `/app/v3/api/appstore/catalog/collections` | `appstore.catalog.read` |
-| `appstore.catalog.collections.retrieve` | GET | `/app/v3/api/appstore/catalog/collections/{collectionId}` | `appstore.catalog.read` |
-| `appstore.catalog.featured.list` | GET | `/app/v3/api/appstore/catalog/featured` | `appstore.catalog.read` |
-| `appstore.catalog.charts.retrieve` | GET | `/app/v3/api/appstore/catalog/charts/{chartCode}` | `appstore.catalog.read` |
-| `appstore.catalog.listings.list` | GET | `/app/v3/api/appstore/catalog/listings/search` | `appstore.catalog.read` |
-| `appstore.catalog.templates.list` | GET | `/app/v3/api/appstore/catalog/templates` | `appstore.catalog.read` |
+| `appstore.catalog.home.retrieve` | GET | `/app/v3/api/appstore/catalog/home` | — (tier 0 public) |
+| `appstore.catalog.categories.list` | GET | `/app/v3/api/appstore/catalog/categories` | — (tier 0 public) |
+| `appstore.catalog.categories.retrieve` | GET | `/app/v3/api/appstore/catalog/categories/{categoryId}` | — (tier 0 public) |
+| `appstore.catalog.collections.list` | GET | `/app/v3/api/appstore/catalog/collections` | — (tier 0 public) |
+| `appstore.catalog.collections.retrieve` | GET | `/app/v3/api/appstore/catalog/collections/{collectionId}` | — (tier 0 public) |
+| `appstore.catalog.featured.list` | GET | `/app/v3/api/appstore/catalog/featured` | — (tier 0 public) |
+| `appstore.catalog.charts.retrieve` | GET | `/app/v3/api/appstore/catalog/charts/{chartCode}` | — (tier 0 public) |
+| `appstore.catalog.listings.list` | GET | `/app/v3/api/appstore/catalog/listings/search` | — (tier 0 public) |
+| `appstore.catalog.templates.list` | GET | `/app/v3/api/appstore/catalog/templates` | — (tier 0 public) |
 | `appstore.catalog.templates.create` | POST | `/app/v3/api/appstore/catalog/templates` | `appstore.catalog.write` |
-| `appstore.catalog.templates.retrieve` | GET | `/app/v3/api/appstore/catalog/templates/{templateId}` | `appstore.catalog.read` |
+| `appstore.catalog.templates.retrieve` | GET | `/app/v3/api/appstore/catalog/templates/{templateId}` | — (tier 0 public) |
 | `appstore.catalog.templates.usage.create` | POST | `/app/v3/api/appstore/catalog/templates/{templateId}/usage` | `appstore.catalog.write` |
 | `appstore.catalog.feedback.create` | POST | `/app/v3/api/appstore/catalog/feedback` | `appstore.catalog.write` |
 | `appstore.listings.ratings.list` | GET | `/app/v3/api/listings/{listingId}/ratings` | `appstore.listings.read` |
 | `appstore.listings.ratings.update` | PUT | `/app/v3/api/listings/{listingId}/ratings/me` | `appstore.listings.write` |
-| `appstore.catalog.recommendations.list` | GET | `/app/v3/api/appstore/catalog/recommendations` | `appstore.catalog.read` |
-| `appstore.catalog.recentlyUpdated.list` | GET | `/app/v3/api/appstore/catalog/recently_updated` | `appstore.catalog.read` |
-| `appstore.catalog.events.list` | GET | `/app/v3/api/appstore/catalog/events` | `appstore.catalog.read` |
-| `appstore.catalog.events.retrieve` | GET | `/app/v3/api/appstore/catalog/events/{eventId}` | `appstore.catalog.read` |
-| `appstore.catalog.search.suggestions.list` | GET | `/app/v3/api/appstore/catalog/search/suggestions` | `appstore.catalog.read` |
-| `appstore.catalog.search.trending.list` | GET | `/app/v3/api/appstore/catalog/search/trending` | `appstore.catalog.read` |
-| `appstore.catalog.search.history.list` | GET | `/app/v3/api/appstore/catalog/search/history` | `appstore.catalog.read` |
-| `appstore.catalog.search.history.update` | PUT | `/app/v3/api/appstore/catalog/search/history` | `appstore.catalog.read` |
-| `appstore.catalog.search.history.delete` | DELETE | `/app/v3/api/appstore/catalog/search/history` | `appstore.catalog.read` |
+| `appstore.catalog.recommendations.list` | GET | `/app/v3/api/appstore/catalog/recommendations` | — (tier 0 public) |
+| `appstore.catalog.recentlyUpdated.list` | GET | `/app/v3/api/appstore/catalog/recently_updated` | — (tier 0 public) |
+| `appstore.catalog.events.list` | GET | `/app/v3/api/appstore/catalog/events` | — (tier 0 public) |
+| `appstore.catalog.events.retrieve` | GET | `/app/v3/api/appstore/catalog/events/{eventId}` | — (tier 0 public) |
+| `appstore.catalog.search.suggestions.list` | GET | `/app/v3/api/appstore/catalog/search/suggestions` | — (tier 0 public) |
+| `appstore.catalog.search.trending.list` | GET | `/app/v3/api/appstore/catalog/search/trending` | — (tier 0 public) |
+| `appstore.catalog.search.history.list` | GET | `/app/v3/api/appstore/catalog/search/history` | — (tier 2 ownership) |
+| `appstore.catalog.search.history.update` | PUT | `/app/v3/api/appstore/catalog/search/history` | — (tier 2 ownership) |
+| `appstore.catalog.search.history.delete` | DELETE | `/app/v3/api/appstore/catalog/search/history` | — (tier 2 ownership) |
 
 ## App API �?Listings
 

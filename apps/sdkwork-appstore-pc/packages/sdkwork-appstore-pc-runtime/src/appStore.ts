@@ -119,6 +119,7 @@ export function createAppStoreServicePort(
       reviewsCount: readNumber(item, 'ratingCount', 'rating_count') ?? 0,
       description: readString(item, 'description') || '',
       screenshots: readStringArray(item, 'screenshots', 'mediaScreenshots'),
+      platforms: readPlatformCodes(item),
       icon: visual.icon,
       iconColor: visual.color,
       version: readString(item, 'currentVersion', 'current_version') || '1.0.0',
@@ -622,6 +623,28 @@ function pricingToPrice(pricingModel: string): number {
     default:
       return 0;
   }
+}
+
+/**
+ * Raw platform codes for a listing row (appstore_app_platform / catalog
+ * projection). Accepts arrays or comma-joined strings under several key
+ * spellings. Falls back to the PC storefront context (Windows) when the
+ * backend row carries no platform projection yet.
+ */
+function readPlatformCodes(item: Record<string, unknown>): string[] {
+  const raw = readStringArray(
+    item,
+    'platforms',
+    'platformCodes',
+    'platform_codes',
+    'platformFamilies',
+    'platform_families',
+  );
+  const codes = raw
+    .flatMap((entry) => entry.split(','))
+    .map((code) => code.trim())
+    .filter(Boolean);
+  return codes.length > 0 ? Array.from(new Set(codes)) : ['windows'];
 }
 
 function formatSize(fileSizeBytes: string | undefined): string {

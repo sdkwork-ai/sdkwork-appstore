@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { AppStoreService } from '../services/api';
@@ -7,10 +7,14 @@ import {
   SearchHeader,
   SearchInput,
   SearchFilters,
+  PlatformFilterBar,
+  PLATFORM_FILTER_ALL,
+  type PlatformFilterValue,
   TrendingSearches,
   SearchResults,
   SearchHistory,
 } from '../components/search';
+import { appSupportsPlatformGroup } from '@sdkwork/appstore-pc-core';
 
 const SEARCH_FILTER_KEYS = {
   all: 'all',
@@ -40,12 +44,23 @@ export default function Search() {
 
   const [query, setQuery] = useState(urlQuery);
   const [activeFilter, setActiveFilter] = useState(urlCategory);
+  const [platformFilter, setPlatformFilter] = useState<PlatformFilterValue>(PLATFORM_FILTER_ALL);
   const activeFilterLabel =
     filterCategories.find((item) => item.key === activeFilter)?.label ?? activeFilter;
   const [results, setResults] = useState<AppItem[]>([]);
   const [trending, setTrending] = useState<string[]>([]);
   const [history, setHistory] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
+
+  // Platform facet is applied client-side on the fetched page of results
+  // until the catalog API exposes a server-side platform filter.
+  const filteredResults = useMemo(
+    () =>
+      platformFilter === PLATFORM_FILTER_ALL
+        ? results
+        : results.filter((app) => appSupportsPlatformGroup(app.platforms, platformFilter)),
+    [results, platformFilter],
+  );
 
   useEffect(() => {
     if (urlQuery) setQuery(urlQuery);
@@ -150,8 +165,10 @@ export default function Search() {
         onSelectFilter={setActiveFilter}
       />
 
+      <PlatformFilterBar activeFilter={platformFilter} onSelectFilter={setPlatformFilter} />
+
       {query.trim() || activeFilter !== SEARCH_FILTER_KEYS.all ? (
-        <SearchResults query={query || activeFilterLabel} results={results} loading={loading} />
+        <SearchResults query={query || activeFilterLabel} results={filteredResults} loading={loading} />
       ) : (
         <>
           <SearchHistory

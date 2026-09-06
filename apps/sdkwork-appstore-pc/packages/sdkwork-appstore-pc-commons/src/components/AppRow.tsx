@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { motion } from 'motion/react'
 import type { AppItem } from '@sdkwork/appstore-pc-core'
 import { DynamicIcon } from './DynamicIcon'
+import { PlatformBadges } from './PlatformBadges'
 import { formatPrice } from '../formatPrice'
 import { useInstall } from '../install'
 
@@ -54,7 +55,10 @@ export function AppRow({ app, showRank, hideButton }: AppRowProps) {
             <h3 className="font-bold text-xs text-gray-900 dark:text-gray-100 truncate group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-colors">
               {app.name}
             </h3>
-            <p className="text-[11px] text-gray-500 dark:text-gray-400 truncate mt-0.5">{app.category}</p>
+            <div className="mt-0.5 flex items-center gap-1.5 min-w-0">
+              <p className="text-[11px] text-gray-500 dark:text-gray-400 truncate">{app.category}</p>
+              <PlatformBadges platforms={app.platforms} max={2} className="shrink-0" />
+            </div>
           </div>
         </div>
 

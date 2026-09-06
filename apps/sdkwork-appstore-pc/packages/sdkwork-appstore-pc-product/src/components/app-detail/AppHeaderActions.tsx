@@ -5,6 +5,7 @@ import { AppItem } from '../../types';
 import { formatPrice } from '../../lib/utils';
 import { useInstall } from '../../providers/InstallProvider';
 import { AppStoreService } from '../../services/api';
+import { AddToCategoryPopover } from '../user-store/AddToCategoryPopover';
 
 interface AppHeaderActionsProps {
   app: AppItem;
@@ -68,7 +69,9 @@ export const AppHeaderActions: React.FC<AppHeaderActionsProps> = ({ app }) => {
       >
         <Heart className={`w-5 h-5 ${wishlisted ? 'fill-current' : ''}`} />
       </button>
-      <button 
+      {/* 收入自定义分类：个人 Appstore 收录入口 */}
+      <AddToCategoryPopover listingId={app.id} />
+      <button
         type="button"
         aria-label={t('appDetail.header.share')}
         className="p-2 bg-gray-100 dark:bg-[#2C2C2E] text-blue-600 dark:text-[#0A84FF] rounded-full hover:bg-gray-200 dark:hover:bg-[#3C3C3E] transition-colors cursor-pointer"

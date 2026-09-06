@@ -138,12 +138,6 @@ tables:
   - name: appstore_listing_iap_item
     lifecycle_status: active
     owner: appstore-platform
-  - name: appstore_listing_rating
-    lifecycle_status: active
-    owner: appstore-platform
-  - name: appstore_feedback
-    lifecycle_status: active
-    owner: appstore-platform
   - name: appstore_catalog_search_history
     lifecycle_status: active
     owner: appstore-platform
@@ -154,5 +148,56 @@ tables:
     lifecycle_status: active
     owner: appstore-platform
   - name: appstore_release_beta_invite
+    lifecycle_status: active
+    owner: appstore-platform
+  - name: appstore_listing_rating
+    lifecycle_status: active
+    owner: appstore-platform
+  - name: appstore_feedback
+    lifecycle_status: active
+    owner: appstore-platform
+  - name: appstore_platform_dictionary
+    lifecycle_status: active
+    owner: appstore-platform
+  - name: appstore_app_platform
+    lifecycle_status: active
+    owner: appstore-platform
+  - name: appstore_platform_release
+    lifecycle_status: active
+    owner: appstore-platform
+  - name: appstore_signing_credential
+    lifecycle_status: active
+    owner: appstore-platform
+  - name: appstore_listing_review
+    lifecycle_status: active
+    owner: appstore-platform
+  - name: appstore_listing_review_vote
+    lifecycle_status: active
+    owner: appstore-platform
+  - name: appstore_listing_review_report
+    lifecycle_status: active
+    owner: appstore-platform
+  - name: appstore_rating_distribution_snapshot
+    lifecycle_status: active
+    owner: appstore-platform
+  - name: appstore_listing_price
+    lifecycle_status: active
+    owner: appstore-platform
+  - name: appstore_promo_code_batch
+    lifecycle_status: active
+    owner: appstore-platform
+  - name: appstore_promo_code
+    lifecycle_status: active
+    owner: appstore-platform
+  - name: appstore_release_tester_group
+    lifecycle_status: active
+    owner: appstore-platform
+  - name: appstore_release_tester_group_member
+    lifecycle_status: active
+    owner: appstore-platform
+  - name: appstore_catalog_search_doc
+    lifecycle_status: active
+    owner: appstore-platform
+  - name: appstore_analytics_metric_daily
     lifecycle_status: active
     owner: appstore-platform

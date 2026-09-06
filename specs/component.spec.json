@@ -15,6 +15,11 @@
   },
   "canonicalSpecs": [
     {
+      "file": "AGENTS_DEPENDENCY_BOUNDARY_SPEC.md",
+      "path": "specs/AGENTS_DEPENDENCY_BOUNDARY_SPEC.md",
+      "purpose": "Mandatory sdkwork-agents consumer direction and Agents SDK import closure boundary."
+    },
+    {
       "file": "DOMAIN_SPEC.md",
       "path": "../sdkwork-specs/DOMAIN_SPEC.md",
       "purpose": "Canonical domain boundaries."

@@ -12,7 +12,7 @@ export type AppstorePcAuthGateDecision =
 const AUTH_BASE_PATH = '/auth';
 const AUTH_LOGIN_PATH = '/auth/login';
 const DEFAULT_HOME_PATH = '/';
-const PROTECTED_PATH_PREFIXES = ['/updates', '/console', '/admin', '/library', '/wishlist', '/publisher'];
+const PROTECTED_PATH_PREFIXES = ['/updates', '/console', '/admin', '/library', '/wishlist', '/user-store', '/publisher'];
 
 export function buildAppstorePcLoginRedirect(location: AppstoreRouteLocation): string {
   const returnPath = `${normalizePathname(location.pathname)}${location.search ?? ''}${location.hash ?? ''}`;

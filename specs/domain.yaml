@@ -29,6 +29,7 @@ capabilities:
   - library
   - moderation
   - compliance
+  - userStore
   - analytics
 depends_on:
   - iam

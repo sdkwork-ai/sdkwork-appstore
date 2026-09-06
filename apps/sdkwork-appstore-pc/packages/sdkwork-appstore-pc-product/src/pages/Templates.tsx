@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { TemplateItem } from '../types';
+import { CardGrid } from '../components/common';
 import { TemplateCard } from '../components/templates/TemplateCard';
 import { PublishTemplateModal } from '../components/templates/PublishTemplateModal';
 import { TemplatesHeaderBanner } from '../components/templates/TemplatesHeaderBanner';
@@ -61,7 +62,7 @@ export function TemplatesPage() {
   };
 
   return (
-    <div className="p-6 md:p-8 w-full max-w-full space-y-6 animate-fade-in">
+    <div className="p-6 md:p-8 w-full max-w-full space-y-6 animate-fade-in @container">
       {/* Header Banner Subcomponent */}
       <TemplatesHeaderBanner />
 
@@ -79,11 +80,11 @@ export function TemplatesPage() {
         onSelectCategory={setSelectedCategory}
       />
 
-      {/* Template Grid */}
+      {/* Template Grid — container-query driven, up to 4 columns on wide screens */}
       {loading ? (
         <div className="py-20 text-center text-xs text-gray-400">{t('templates.loading')}</div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <CardGrid>
           {templates.map((template) => (
             <TemplateCard
               key={template.id}
@@ -91,7 +92,7 @@ export function TemplatesPage() {
               onSelect={handleSelectTemplate}
             />
           ))}
-        </div>
+        </CardGrid>
       )}
 
       {templates.length === 0 && !loading && <TemplatesEmptyState />}

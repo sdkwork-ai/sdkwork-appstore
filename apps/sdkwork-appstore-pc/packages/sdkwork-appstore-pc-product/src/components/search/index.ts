@@ -1,6 +1,7 @@
 export * from './SearchHeader';
 export * from './SearchEmptyState';
 export * from './SearchFilters';
+export * from './PlatformFilterBar';
 export * from './SearchInput';
 export * from './SearchResults';
 export * from './SearchHistory';

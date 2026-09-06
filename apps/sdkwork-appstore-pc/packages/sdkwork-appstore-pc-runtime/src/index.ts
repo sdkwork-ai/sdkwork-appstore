@@ -1,6 +1,8 @@
 export * from './runtime';
 export * from './environment';
+export type { AuthTokenManager } from '@sdkwork/sdk-common';
 export { resolveAppstorePcAuthRuntimeConfig } from './authConfig';
+export { SDKWORK_SESSION_AUTH_UNAUTHORIZED_MODE_ENV_KEY } from '@sdkwork/auth-runtime-pc-react';
 export * from './iamRuntime';
 export * from './sdkClients';
 export * from './sessionStore';

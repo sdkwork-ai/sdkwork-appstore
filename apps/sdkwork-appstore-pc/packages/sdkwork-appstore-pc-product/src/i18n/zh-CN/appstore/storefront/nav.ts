@@ -6,6 +6,7 @@ export const nav = {
     apps: '软件应用',
     games: '游戏大厅',
     aiHub: 'AI 实验室',
+    experts: '专家',
     plugins: '扩展插件',
     skills: '技能中心',
     mcp: 'MCP 服务',

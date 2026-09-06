@@ -765,3 +765,47 @@ pub const APPSTORE_RELEASE_BETA_INVITE_COLUMNS: &[&str] = &[
     "created_at",
     "updated_at",
 ];
+
+pub const APPSTORE_USER_CATEGORY_COLUMNS: &[&str] = &[
+    "id",
+    "tenant_id",
+    "organization_id",
+    "owner_user_id",
+    "name",
+    "description",
+    "icon_media_resource_id",
+    "sort_order",
+    "category_status",
+    "created_at",
+    "updated_at",
+];
+
+pub const APPSTORE_USER_CATEGORY_ITEM_COLUMNS: &[&str] = &[
+    "id",
+    "tenant_id",
+    "organization_id",
+    "user_category_id",
+    "listing_id",
+    "note",
+    "sort_order",
+    "created_at",
+    "updated_at",
+];
+
+pub const APPSTORE_USER_STORE_SHARE_COLUMNS: &[&str] = &[
+    "id",
+    "tenant_id",
+    "organization_id",
+    "owner_user_id",
+    "share_token",
+    "title",
+    "description",
+    "share_scope",
+    "selected_category_ids_json",
+    "share_visibility",
+    "share_status",
+    "expires_at",
+    "view_count",
+    "created_at",
+    "updated_at",
+];

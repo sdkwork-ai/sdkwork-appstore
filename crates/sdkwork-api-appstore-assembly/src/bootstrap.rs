@@ -23,6 +23,7 @@ use sdkwork_appstore_repository_sqlx::repository::market_repository::SqlxMarketR
 use sdkwork_appstore_repository_sqlx::repository::moderation_repository::SqlxModerationRepository;
 use sdkwork_appstore_repository_sqlx::repository::publisher_repository::SqlxPublisherRepository;
 use sdkwork_appstore_repository_sqlx::repository::release_repository::SqlxReleaseRepository;
+use sdkwork_appstore_repository_sqlx::repository::user_store_repository::SqlxUserStoreRepository;
 use sdkwork_appstore_repository_sqlx::AppstoreSqlxDb;
 use sdkwork_appstore_routes_common::AppState;
 use sdkwork_appstore_service_host::integrations::http_market_channel_connector::register_http_market_connectors;
@@ -30,6 +31,7 @@ use sdkwork_appstore_service_host::integrations::{
     DriveIntegrationAdapter, MarketChannelIntegrationAdapter, PlatformIntegrationAdapter,
     SearchFederationAdapter, SearchProjectionAdapter,
 };
+use sdkwork_appstore_user_store_service::service::user_store_service::UserStoreService;
 use sdkwork_database_sqlx::DatabasePool;
 
 use self::decision_listing_projection::decision_listing_projection_port;
@@ -64,6 +66,7 @@ pub async fn assemble_api_router_with_pool(pool: DatabasePool) -> Result<ApiAsse
     let moderation_repo = SqlxModerationRepository::new(db.clone());
     let compliance_repo = SqlxComplianceRepository::new(db.clone());
     let market_repo = SqlxMarketRepository::new(db.clone());
+    let user_store_repo = SqlxUserStoreRepository::new(db.clone());
 
     let listing_service = {
         let mut service = ListingService::new(listing_repo);
@@ -123,6 +126,7 @@ pub async fn assemble_api_router_with_pool(pool: DatabasePool) -> Result<ApiAsse
         moderation_service,
         compliance_service: ComplianceService::new(compliance_repo),
         market_service,
+        user_store_service: UserStoreService::new(user_store_repo),
     };
 
     let business = Router::new()
@@ -165,7 +169,10 @@ pub async fn assemble_api_router_with_pool(pool: DatabasePool) -> Result<ApiAsse
         .merge(sdkwork_routes_release_open_api::gateway_mount(
             state.clone(),
         ))
-        .merge(sdkwork_routes_automation_open_api::gateway_mount(state));
+        .merge(sdkwork_routes_user_store_app_api::gateway_mount(
+            state.clone(),
+        ))
+        .merge(sdkwork_routes_user_store_open_api::gateway_mount(state));
 
     let routes = [
         sdkwork_routes_appstore_catalog_app_api::app_route_manifest(),
@@ -184,6 +191,8 @@ pub async fn assemble_api_router_with_pool(pool: DatabasePool) -> Result<ApiAsse
         sdkwork_routes_listing_open_api::open_route_manifest(),
         sdkwork_routes_release_open_api::open_route_manifest(),
         sdkwork_routes_automation_open_api::open_route_manifest(),
+        sdkwork_routes_user_store_app_api::app_route_manifest(),
+        sdkwork_routes_user_store_open_api::open_route_manifest(),
     ]
     .into_iter()
     .flat_map(|manifest| manifest.routes().to_vec())
@@ -216,5 +225,7 @@ pub async fn web_module() -> Result<WebModule, String> {
 /// Same as [`web_module`] but composed on a process-shared database pool
 /// (platform gateways, API_ASSEMBLY_SPEC §4.1.1).
 pub async fn web_module_with_pool(pool: DatabasePool) -> Result<WebModule, String> {
-    Ok(WebModule::from_contribution(assemble_api_router_with_pool(pool).await?))
+    Ok(WebModule::from_contribution(
+        assemble_api_router_with_pool(pool).await?,
+    ))
 }

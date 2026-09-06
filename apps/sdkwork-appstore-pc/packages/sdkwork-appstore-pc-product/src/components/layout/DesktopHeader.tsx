@@ -10,16 +10,26 @@ import { AppStoreService } from '../../services/api';
 
 interface DesktopHeaderProps {
   pendingUpdatesCount?: number;
+  /**
+   * Whether the right-hand action cluster (language switcher, updates link,
+   * theme toggle, user badge, window controls) renders. Embedding hosts that
+   * already own these affordances pass false; standalone defaults to true.
+   */
+  showActions?: boolean;
 }
 
-export function DesktopHeader({ pendingUpdatesCount: initialCount = 0 }: DesktopHeaderProps) {
+export function DesktopHeader({ pendingUpdatesCount: initialCount = 0, showActions = true }: DesktopHeaderProps) {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [pendingUpdatesCount, setPendingUpdatesCount] = useState(initialCount);
 
   // Hydrate the real pending-updates count when the library endpoint responds;
-  // anonymous sessions keep the initial value without erroring.
+  // anonymous sessions keep the initial value without erroring. Skipped when
+  // the action cluster is hidden: the count feeds only HeaderUpdateNav.
   useEffect(() => {
+    if (!showActions) {
+      return;
+    }
     let cancelled = false;
     AppStoreService.getPendingUpdates()
       .then((apps) => {
@@ -62,24 +72,26 @@ export function DesktopHeader({ pendingUpdatesCount: initialCount = 0 }: Desktop
       />
 
       {/* Right User & Window Actions */}
-      <div className="flex items-center gap-1 xl:gap-3 shrink-0">
-        {/* Sub-component: Language Switcher */}
-        <HeaderLanguageToggle />
+      {showActions && (
+        <div className="flex items-center gap-1 xl:gap-3 shrink-0">
+          {/* Sub-component: Language Switcher */}
+          <HeaderLanguageToggle />
 
-        {/* Sub-component: Updates Link */}
-        <HeaderUpdateNav pendingUpdatesCount={pendingUpdatesCount} />
+          {/* Sub-component: Updates Link */}
+          <HeaderUpdateNav pendingUpdatesCount={pendingUpdatesCount} />
 
-        {/* Sub-component: Theme Toggle */}
-        <HeaderThemeToggle />
+          {/* Sub-component: Theme Toggle */}
+          <HeaderThemeToggle />
 
-        {/* Sub-component: User Account Avatar */}
-        <HeaderUserBadge initials="CL" />
+          {/* Sub-component: User Account Avatar */}
+          <HeaderUserBadge initials="CL" />
 
-        {/* Sub-component: Desktop Window Controls (_ [] X) */}
-        <div className="hidden xl:block">
-          <HeaderWindowControls />
+          {/* Sub-component: Desktop Window Controls (_ [] X) */}
+          <div className="hidden xl:block">
+            <HeaderWindowControls />
+          </div>
         </div>
-      </div>
+      )}
     </header>
   );
 }

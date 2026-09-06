@@ -30,6 +30,8 @@ tags:
   description: Installed apps and updates
 - name: wishlist
   description: Saved listings
+- name: userStore
+  description: User-defined custom categories and shareable personal appstore views
 - name: downloadGrants
   description: Controlled artifact download authorization
 security:
@@ -1532,6 +1534,287 @@ paths:
       responses:
         '204':
           description: Removed
+  /app/v3/api/user-store/categories:
+    get:
+      tags:
+      - userStore
+      summary: List my custom categories
+      operationId: appstore.userStore.category.list
+      security:
+      - AuthToken: []
+        AccessToken: []
+      parameters:
+      - $ref: '#/components/parameters/Cursor'
+      - $ref: '#/components/parameters/PageSize'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserCategoryPageResponse'
+      parameters: []
+    post:
+      tags:
+      - userStore
+      summary: Create custom category
+      operationId: appstore.userStore.category.create
+      security:
+      - AuthToken: []
+        AccessToken: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCategoryCreateRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserCategoryResponse'
+      parameters: []
+  /app/v3/api/user-store/categories/{userCategoryId}:
+    get:
+      tags:
+      - userStore
+      summary: Retrieve custom category
+      operationId: appstore.userStore.category.retrieve
+      security:
+      - AuthToken: []
+        AccessToken: []
+      parameters:
+      - $ref: '#/components/parameters/UserCategoryId'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserCategoryResponse'
+      parameters: []
+    patch:
+      tags:
+      - userStore
+      summary: Update custom category
+      operationId: appstore.userStore.category.update
+      security:
+      - AuthToken: []
+        AccessToken: []
+      parameters:
+      - $ref: '#/components/parameters/UserCategoryId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCategoryUpdateRequest'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserCategoryResponse'
+      parameters: []
+    delete:
+      tags:
+      - userStore
+      summary: Delete custom category
+      operationId: appstore.userStore.category.delete
+      security:
+      - AuthToken: []
+        AccessToken: []
+      parameters:
+      - $ref: '#/components/parameters/UserCategoryId'
+      responses:
+        '204':
+          description: Deleted
+  /app/v3/api/user-store/categories/{userCategoryId}/items:
+    get:
+      tags:
+      - userStore
+      summary: List custom category items
+      operationId: appstore.userStore.item.list
+      security:
+      - AuthToken: []
+        AccessToken: []
+      parameters:
+      - $ref: '#/components/parameters/UserCategoryId'
+      - $ref: '#/components/parameters/Cursor'
+      - $ref: '#/components/parameters/PageSize'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserCategoryItemPageResponse'
+      parameters: []
+    post:
+      tags:
+      - userStore
+      summary: Add listing to custom category
+      operationId: appstore.userStore.item.create
+      security:
+      - AuthToken: []
+        AccessToken: []
+      parameters:
+      - $ref: '#/components/parameters/UserCategoryId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCategoryItemAddRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserCategoryItemResponse'
+      parameters: []
+    patch:
+      tags:
+      - userStore
+      summary: Reorder custom category items
+      operationId: appstore.userStore.item.update
+      security:
+      - AuthToken: []
+        AccessToken: []
+      parameters:
+      - $ref: '#/components/parameters/UserCategoryId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCategoryItemsReorderRequest'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserStoreCommandResponse'
+      parameters: []
+  /app/v3/api/user-store/categories/{userCategoryId}/items/{itemId}:
+    delete:
+      tags:
+      - userStore
+      summary: Remove item from custom category
+      operationId: appstore.userStore.item.delete
+      security:
+      - AuthToken: []
+        AccessToken: []
+      parameters:
+      - $ref: '#/components/parameters/UserCategoryId'
+      - $ref: '#/components/parameters/ItemPathId'
+      responses:
+        '204':
+          description: Removed
+  /app/v3/api/user-store/shares:
+    get:
+      tags:
+      - userStore
+      summary: List my share links
+      operationId: appstore.userStore.share.list
+      security:
+      - AuthToken: []
+        AccessToken: []
+      parameters:
+      - $ref: '#/components/parameters/Cursor'
+      - $ref: '#/components/parameters/PageSize'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserStoreSharePageResponse'
+      parameters: []
+    post:
+      tags:
+      - userStore
+      summary: Create share link
+      operationId: appstore.userStore.share.create
+      security:
+      - AuthToken: []
+        AccessToken: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserStoreShareCreateRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserStoreShareResponse'
+      parameters: []
+  /app/v3/api/user-store/shares/{shareId}:
+    patch:
+      tags:
+      - userStore
+      summary: Update share link
+      operationId: appstore.userStore.share.update
+      security:
+      - AuthToken: []
+        AccessToken: []
+      parameters:
+      - $ref: '#/components/parameters/ShareId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserStoreShareUpdateRequest'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserStoreShareResponse'
+      parameters: []
+    delete:
+      tags:
+      - userStore
+      summary: Revoke share link
+      operationId: appstore.userStore.share.delete
+      security:
+      - AuthToken: []
+        AccessToken: []
+      parameters:
+      - $ref: '#/components/parameters/ShareId'
+      responses:
+        '204':
+          description: Revoked
+  /app/v3/api/user-store/shares/{shareId}/refresh:
+    post:
+      tags:
+      - userStore
+      summary: Regenerate share token
+      operationId: appstore.userStore.share.refresh
+      security:
+      - AuthToken: []
+        AccessToken: []
+      parameters:
+      - $ref: '#/components/parameters/ShareId'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserStoreShareResponse'
+      parameters: []
   /app/v3/api/download_grants:
     post:
       tags:
@@ -1603,6 +1886,24 @@ components:
         minimum: 1
         maximum: 200
         default: 20
+    UserCategoryId:
+      name: userCategoryId
+      in: path
+      required: true
+      schema:
+        type: string
+    ItemPathId:
+      name: itemId
+      in: path
+      required: true
+      schema:
+        type: string
+    ShareId:
+      name: shareId
+      in: path
+      required: true
+      schema:
+        type: string
     IdempotencyKey:
       name: Idempotency-Key
       in: header
@@ -3634,6 +3935,362 @@ components:
             properties:
               item:
                 $ref: '#/components/schemas/Feedback'
+    UserCategory:
+      type: object
+      additionalProperties: false
+      required:
+      - id
+      - name
+      - sortOrder
+      - itemCount
+      - status
+      - createdAt
+      - updatedAt
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        iconMediaResourceId:
+          type: string
+        sortOrder:
+          type: integer
+        itemCount:
+          type: integer
+        status:
+          type: string
+          enum:
+          - active
+          - archived
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    UserCategoryCreateRequest:
+      type: object
+      required:
+      - name
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 64
+        description:
+          type: string
+        iconMediaResourceId:
+          type: string
+    UserCategoryUpdateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 64
+        description:
+          type: string
+        iconMediaResourceId:
+          type: string
+        sortOrder:
+          type: integer
+    UserCategoryResponse:
+      allOf:
+      - $ref: '#/components/schemas/SdkWorkApiResponse'
+      - type: object
+        required:
+        - data
+        properties:
+          data:
+            type: object
+            required:
+            - item
+            properties:
+              item:
+                $ref: '#/components/schemas/UserCategory'
+    UserCategoryPageResponse:
+      allOf:
+      - $ref: '#/components/schemas/SdkWorkApiResponse'
+      - type: object
+        required:
+        - data
+        properties:
+          data:
+            type: object
+            required:
+            - items
+            - pageInfo
+            properties:
+              items:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserCategory'
+              pageInfo:
+                $ref: '#/components/schemas/PageInfo'
+    ListingCard:
+      type: object
+      additionalProperties: false
+      required:
+      - listingId
+      - displayName
+      - downloadCount
+      properties:
+        listingId:
+          type: string
+        displayName:
+          type: string
+        subtitle:
+          type: string
+        iconMediaResourceId:
+          type: string
+        averageRating:
+          type: string
+        downloadCount:
+          type: string
+          pattern: ^[0-9]+$
+    UserCategoryItem:
+      type: object
+      additionalProperties: false
+      required:
+      - id
+      - userCategoryId
+      - listingId
+      - sortOrder
+      - createdAt
+      properties:
+        id:
+          type: string
+        userCategoryId:
+          type: string
+        listingId:
+          type: string
+        note:
+          type: string
+        sortOrder:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    UserCategoryItemAddRequest:
+      type: object
+      required:
+      - listingId
+      properties:
+        listingId:
+          type: string
+        note:
+          type: string
+    UserCategoryItemsReorderRequest:
+      type: object
+      required:
+      - itemIds
+      properties:
+        itemIds:
+          type: array
+          items:
+            type: string
+    UserCategoryItemWithCard:
+      type: object
+      additionalProperties: false
+      required:
+      - item
+      properties:
+        item:
+          $ref: '#/components/schemas/UserCategoryItem'
+        listingCard:
+          $ref: '#/components/schemas/ListingCard'
+    UserCategoryItemResponse:
+      allOf:
+      - $ref: '#/components/schemas/SdkWorkApiResponse'
+      - type: object
+        required:
+        - data
+        properties:
+          data:
+            type: object
+            required:
+            - item
+            properties:
+              item:
+                $ref: '#/components/schemas/UserCategoryItemWithCard'
+    UserCategoryItemPageResponse:
+      allOf:
+      - $ref: '#/components/schemas/SdkWorkApiResponse'
+      - type: object
+        required:
+        - data
+        properties:
+          data:
+            type: object
+            required:
+            - items
+            - pageInfo
+            properties:
+              items:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserCategoryItemWithCard'
+              pageInfo:
+                $ref: '#/components/schemas/PageInfo'
+    UserStoreCommandResponse:
+      allOf:
+      - $ref: '#/components/schemas/SdkWorkApiResponse'
+      - type: object
+        required:
+        - data
+        properties:
+          data:
+            type: object
+            required:
+            - item
+            properties:
+              item:
+                type: object
+                required:
+                - accepted
+                properties:
+                  accepted:
+                    type: boolean
+    UserStoreShare:
+      type: object
+      additionalProperties: false
+      required:
+      - id
+      - shareToken
+      - title
+      - scope
+      - selectedCategoryIds
+      - visibility
+      - status
+      - viewCount
+      - createdAt
+      - updatedAt
+      properties:
+        id:
+          type: string
+        shareToken:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        scope:
+          type: string
+          enum:
+          - all
+          - selected
+        selectedCategoryIds:
+          type: array
+          items:
+            type: string
+        visibility:
+          type: string
+          enum:
+          - public
+          - unlisted
+        status:
+          type: string
+          enum:
+          - active
+          - revoked
+        expiresAt:
+          type: string
+          format: date-time
+        viewCount:
+          type: string
+          pattern: ^[0-9]+$
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    UserStoreShareCreateRequest:
+      type: object
+      required:
+      - title
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 128
+        description:
+          type: string
+        scope:
+          type: string
+          enum:
+          - all
+          - selected
+        selectedCategoryIds:
+          type: array
+          items:
+            type: string
+        visibility:
+          type: string
+          enum:
+          - public
+          - unlisted
+    UserStoreShareUpdateRequest:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 128
+        description:
+          type: string
+        scope:
+          type: string
+          enum:
+          - all
+          - selected
+        selectedCategoryIds:
+          type: array
+          items:
+            type: string
+        visibility:
+          type: string
+          enum:
+          - public
+          - unlisted
+    UserStoreShareResponse:
+      allOf:
+      - $ref: '#/components/schemas/SdkWorkApiResponse'
+      - type: object
+        required:
+        - data
+        properties:
+          data:
+            type: object
+            required:
+            - item
+            properties:
+              item:
+                $ref: '#/components/schemas/UserStoreShare'
+    UserStoreSharePageResponse:
+      allOf:
+      - $ref: '#/components/schemas/SdkWorkApiResponse'
+      - type: object
+        required:
+        - data
+        properties:
+          data:
+            type: object
+            required:
+            - items
+            - pageInfo
+            properties:
+              items:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserStoreShare'
+              pageInfo:
+                $ref: '#/components/schemas/PageInfo'
     SdkWorkApiResponse:
       type: object
       additionalProperties: false

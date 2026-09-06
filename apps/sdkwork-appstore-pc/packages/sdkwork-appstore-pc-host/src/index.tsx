@@ -16,6 +16,7 @@ import {
   ConsoleSettingsPage,
   DiscoverPage,
   EventPage,
+  ExpertsPage,
   GamesPage,
   InstallProvider,
   Layout,
@@ -32,6 +33,8 @@ import {
   ThemeProvider,
   UpdatesPage,
   WishlistPage,
+  UserStorePage,
+  PublicUserStorePage,
   initializeAppstorePcI18n,
   i18n,
 } from '@sdkwork/appstore-pc-product'
@@ -44,8 +47,10 @@ import {
   createAppstorePcRuntime,
   resolveAppstorePcAuthRuntimeConfig,
   resolveAppstorePcRuntimeConfig,
+  SDKWORK_SESSION_AUTH_UNAUTHORIZED_MODE_ENV_KEY,
   type AppstorePcRuntime,
   type AppstorePcRuntimeConfig,
+  type AuthTokenManager,
 } from '@sdkwork/appstore-pc-runtime'
 import './styles.css'
 
@@ -60,22 +65,57 @@ export interface AppstorePcHostProps {
   initialPath?: string
   session?: AppstorePcHostSession | null
   runtime?: AppstorePcRuntime
+  /**
+   * Token manager shared with the embedding application. Passed to the created
+   * runtime so every SDK client binds the host's single TokenManager instance
+   * (APP_SDK_INTEGRATION_SPEC closure rule); ignored when `runtime` is given.
+   */
+  tokenManager?: AuthTokenManager
   onPathChange?: (path: string) => void
+  /**
+   * Whether the embedded product renders its own header action icons
+   * (language switcher, updates link, theme toggle, user badge, window
+   * controls). Embedding applications that already provide these affordances
+   * pass false to avoid duplicated chrome; the standalone default is true.
+   */
+  showHeaderActions?: boolean
   resolveHostColorScheme?: () => 'light' | 'dark'
   subscribeHostColorScheme?: (listener: (scheme: 'light' | 'dark') => void) => () => void
 }
 
 /** Public route composition used by the PC app and embedded hosts. */
-export function AppstorePcRoutes({ runtime }: { runtime: AppstorePcRuntime }) {
+export function AppstorePcRoutes({
+  protectedRouteSignIn = 'auth-route',
+  showHeaderActions = true,
+  runtime,
+}: {
+  runtime: AppstorePcRuntime;
+  /**
+   * Sign-in UX for protected routes: "modal" (embedded hosts) opens the
+   * sign-in dialog over the requested page; "auth-route" (standalone app)
+   * navigates to the full auth route.
+   */
+  protectedRouteSignIn?: 'modal' | 'auth-route';
+  /**
+   * Whether the layout renders the header action icon cluster. Embedding
+   * hosts that already own these affordances pass false.
+   */
+  showHeaderActions?: boolean;
+}) {
   return (
-    <SdkworkSessionAuthBrowserRoot>
-      <AuthGate runtime={runtime}>
+    <SdkworkSessionAuthBrowserRoot
+      getRuntime={() => runtime.iamRuntime}
+      locale={runtime.config.locale}
+      runtimeConfig={resolveAppstorePcAuthRuntimeConfig()}
+    >
+      <AuthGate protectedRouteSignIn={protectedRouteSignIn} runtime={runtime}>
         <Routes>
-          <Route path="/" element={<Layout />}>
+          <Route path="/" element={<Layout showHeaderActions={showHeaderActions} />}>
             <Route index element={<DiscoverPage />} />
             <Route path="apps" element={<AppsPage />} />
             <Route path="games" element={<GamesPage />} />
             <Route path="ai-hub" element={<AIHubPage />} />
+            <Route path="experts" element={<ExpertsPage />} />
             <Route path="plugins" element={<PluginsPage />} />
             <Route path="skills" element={<SkillsPage />} />
             <Route path="mcp" element={<McpPage />} />
@@ -89,6 +129,11 @@ export function AppstorePcRoutes({ runtime }: { runtime: AppstorePcRuntime }) {
             <Route path="events/:id" element={<EventPage />} />
             <Route path="library" element={<LibraryPage />} />
             <Route path="wishlist" element={<WishlistPage />} />
+            <Route path="user-store" element={<UserStorePage />} />
+            {/* Anonymous public share view: /store/:shareToken must stay
+              outside the protected-path prefixes (authGateLogic) so visitors
+              without a session can browse a shared personal Appstore. */}
+            <Route path="store/:shareToken" element={<PublicUserStorePage />} />
             <Route path="updates" element={<UpdatesPage />} />
             <Route path="app/:id" element={<AppDetailPage />} />
             <Route path="console/settings" element={<ConsoleSettingsPage />} />
@@ -227,7 +272,36 @@ export function AppstorePcHost(props: AppstorePcHostProps = {}) {
     [props.apiBaseUrl, props.locale],
   )
   const runtimeRef = useRef<AppstorePcRuntime | undefined>(undefined)
-  const runtime = props.runtime ?? runtimeRef.current ?? (runtimeRef.current = createAppstorePcRuntime(config))
+  if (runtimeRef.current === undefined && props.runtime === undefined) {
+    // Seed the session store before the first render: page data loaders run in
+    // child effects ahead of useHostSessionSync's post-render apply, and the
+    // generated SDK clients refuse to dispatch without credentials, so a late
+    // session would silently empty every first-mount page.
+    //
+    // The session-auth boundary never redirects or hijacks the outer window:
+    // an unauthorized response inside an embedded surface must not navigate
+    // the hosting application away (a desktop carrier 404s on /auth/login and
+    // the whole window goes blank), and the modal dispatch would still steer
+    // the embedded router to the sign-in route on background catalog calls.
+    // Both knobs are pinned: the mode resolves to "redirect" (no dispatch)
+    // and the redirect itself is suppressed. Anonymous catalog browsing keeps
+    // rendering, the embedded AuthGate owns the sign-in flow at the route
+    // level, and account-bound calls degrade through their own catch handlers.
+    const initialRuntime = createAppstorePcRuntime(config, {
+      ...(props.tokenManager === undefined ? {} : { tokenManager: props.tokenManager }),
+      sessionAuth: {
+        readEnv: (name) =>
+          name === SDKWORK_SESSION_AUTH_UNAUTHORIZED_MODE_ENV_KEY ? 'redirect' : undefined,
+        shouldRedirectOnUnauthorized: () => false,
+      },
+    })
+    const initialSession = buildAppstorePcHostSessionCandidate(props.session, props.accessToken)
+    if (initialSession) {
+      initialRuntime.session.setSession(initialSession)
+    }
+    runtimeRef.current = initialRuntime
+  }
+  const runtime = props.runtime ?? runtimeRef.current
   const locale = props.locale?.trim() || config.locale
 
   initializeAppstorePcI18n(locale)
@@ -243,7 +317,11 @@ export function AppstorePcHost(props: AppstorePcHostProps = {}) {
         <InstallProvider>
           <MemoryRouter initialEntries={[props.initialPath ?? '/']}>
             <PathObserver onPathChange={props.onPathChange} />
-            <AppstorePcRoutes runtime={runtime} />
+            <AppstorePcRoutes
+              protectedRouteSignIn="modal"
+              showHeaderActions={props.showHeaderActions}
+              runtime={runtime}
+            />
           </MemoryRouter>
         </InstallProvider>
       </ThemeProvider>

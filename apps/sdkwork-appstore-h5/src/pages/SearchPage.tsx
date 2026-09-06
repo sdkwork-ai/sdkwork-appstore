@@ -1,14 +1,24 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { Search, X } from 'lucide-react';
 import { useSearch, formatApiError } from '@/hooks/useApi';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
+import {
+  PlatformBadges,
+  PlatformFilterBar,
+  type PlatformFilterValue,
+} from '@/components/common/PlatformBadges';
+import {
+  appSupportsPlatformGroup,
+  readListingPlatformCodes,
+} from '@/platforms';
 
 interface SearchResultItem {
   id: string;
   name: string;
   developer: string;
   rating: number;
+  platforms: string[];
 }
 
 function mapSearchResult(item: unknown, index: number): SearchResultItem {
@@ -19,6 +29,7 @@ function mapSearchResult(item: unknown, index: number): SearchResultItem {
     name: String(row.displayName ?? row.title ?? '应用'),
     developer: String(row.developerName ?? row.publisherName ?? '开发者'),
     rating: Number(row.rating ?? row.averageRating ?? 0),
+    platforms: readListingPlatformCodes(row),
   };
 }
 
@@ -27,6 +38,7 @@ export function SearchPage() {
   const initialQuery = searchParams.get('q') ?? '';
   const [query, setQuery] = useState(initialQuery);
   const [submittedQuery, setSubmittedQuery] = useState(initialQuery);
+  const [platformFilter, setPlatformFilter] = useState<PlatformFilterValue>('all');
   const { data, loading, error } = useSearch(submittedQuery);
 
   useEffect(() => {
@@ -42,7 +54,14 @@ export function SearchPage() {
     setSearchParams(trimmed ? { q: trimmed } : {}, { replace: true });
   }
 
-  const items = (data?.items ?? []).map(mapSearchResult);
+  const items = useMemo(() => {
+    const mapped = (data?.items ?? []).map(mapSearchResult);
+    if (platformFilter === 'all') {
+      return mapped;
+    }
+    // 平台过滤在当前页结果上生效，待目录 API 支持服务端平台筛选后切换。
+    return mapped.filter((app) => appSupportsPlatformGroup(app.platforms, platformFilter));
+  }, [data, platformFilter]);
 
   return (
     <div className="animate-fade-in">
@@ -86,6 +105,10 @@ export function SearchPage() {
         </form>
       </div>
 
+      <div className="px-4">
+        <PlatformFilterBar activeFilter={platformFilter} onSelectFilter={setPlatformFilter} />
+      </div>
+
       <div className="px-4 py-4">
         {error ? (
           <p className="text-sm text-[var(--danger)]">{formatApiError(error)}</p>
@@ -96,7 +119,11 @@ export function SearchPage() {
         ) : items.length === 0 ? (
           <div className="card p-8 text-center">
             <p className="text-sm text-[var(--text-secondary)]">
-              {submittedQuery ? `没有找到与「${submittedQuery}」相关的内容` : '输入关键词开始搜索'}
+              {submittedQuery
+                ? `没有找到与「${submittedQuery}」相关的内容`
+                : platformFilter === 'all'
+                  ? '输入关键词开始搜索'
+                  : '该平台下暂无匹配内容'}
             </p>
           </div>
         ) : (
@@ -119,6 +146,7 @@ export function SearchPage() {
                 <div className="min-w-0 flex-1">
                   <h3 className="truncate text-sm font-semibold">{app.name}</h3>
                   <p className="truncate text-xs text-[var(--text-tertiary)]">{app.developer}</p>
+                  <PlatformBadges platforms={app.platforms} max={2} className="mt-0.5" />
                 </div>
                 {app.rating > 0 ? (
                   <span className="text-xs text-[var(--text-secondary)]">{app.rating.toFixed(1)}★</span>

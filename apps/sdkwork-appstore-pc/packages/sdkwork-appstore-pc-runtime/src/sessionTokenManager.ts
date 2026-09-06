@@ -5,22 +5,16 @@ import { createTokenManager, type AuthTokenManager } from '@sdkwork/sdk-common';
 import type { AppstorePcSessionStore } from './sessionStore';
 
 /**
- * Session-backed token manager. Token lifecycle events (expired/invalid)
- * clear the persisted session so the AuthGate redirects to the login flow
- * instead of silently failing every authenticated request.
+ * Mirror the session store's tokens into a token manager and keep the mirror
+ * current. The store is the embedded surface's session truth; every bound SDK
+ * client reads credentials through the manager, so host-injected instances
+ * go through the same bridge (APP_SDK_INTEGRATION_SPEC closure rule).
+ * @returns the disposer for the session subscription.
  */
-export function createAppstorePcSessionTokenManager(
+export function hydrateAppstorePcSessionTokenManager(
+  tokenManager: AuthTokenManager,
   session: AppstorePcSessionStore,
-): AuthTokenManager {
-  const handleExpired = () => {
-    session.clearSession();
-  };
-
-  const tokenManager = createTokenManager(undefined, {
-    onTokenExpired: handleExpired,
-    onTokenInvalid: handleExpired,
-  });
-
+): () => void {
   const hydrate = () => {
     const snapshot = session.getSnapshot();
     const hasSessionTokens = Boolean(
@@ -43,6 +37,26 @@ export function createAppstorePcSessionTokenManager(
   };
 
   hydrate();
-  session.subscribe(hydrate);
+  return session.subscribe(hydrate);
+}
+
+/**
+ * Session-backed token manager. Token lifecycle events (expired/invalid)
+ * clear the persisted session so the AuthGate redirects to the login flow
+ * instead of silently failing every authenticated request.
+ */
+export function createAppstorePcSessionTokenManager(
+  session: AppstorePcSessionStore,
+): AuthTokenManager {
+  const handleExpired = () => {
+    session.clearSession();
+  };
+
+  const tokenManager = createTokenManager(undefined, {
+    onTokenExpired: handleExpired,
+    onTokenInvalid: handleExpired,
+  });
+
+  hydrateAppstorePcSessionTokenManager(tokenManager, session);
   return tokenManager;
 }

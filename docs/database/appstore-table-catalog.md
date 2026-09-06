@@ -1532,3 +1532,424 @@ CREATE TABLE IF NOT EXISTS appstore_feedback (
   updated_at TIMESTAMPTZ NOT NULL
 );
 ```
+
+## Platform Evolution Tables (migration 0002)
+
+Added by `database/migrations/postgres/0002_appstore_platform_evolution.up.sql`.
+
+
+## appstore_platform_dictionary
+
+- profile: master
+- complianceLevel: L2
+
+### DDL
+
+```sql
+CREATE TABLE IF NOT EXISTS appstore_platform_dictionary (
+  id TEXT PRIMARY KEY,
+  tenant_id TEXT NOT NULL DEFAULT '0',
+  platform_code TEXT NOT NULL,
+  platform_family TEXT NOT NULL,
+  os_vendor TEXT NOT NULL,
+  package_formats JSONB NOT NULL DEFAULT '[]',
+  identity_field TEXT NOT NULL,
+  requires_store_review INTEGER NOT NULL DEFAULT 1,
+  platform_status TEXT NOT NULL DEFAULT 'active',
+  sort_order INTEGER NOT NULL DEFAULT 0,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  UNIQUE (tenant_id, platform_code)
+);;
+```
+
+
+## appstore_app_platform
+
+- profile: master
+- complianceLevel: L2
+
+### DDL
+
+```sql
+CREATE TABLE IF NOT EXISTS appstore_app_platform (
+  id TEXT PRIMARY KEY,
+  tenant_id TEXT NOT NULL,
+  organization_id TEXT NOT NULL DEFAULT '0',
+  app_id TEXT NOT NULL,
+  platform_code TEXT NOT NULL,
+  platform_status TEXT NOT NULL DEFAULT 'draft',
+  package_identity TEXT NOT NULL,
+  external_store_app_id TEXT,
+  min_os_version TEXT,
+  target_os_version TEXT,
+  supported_architectures JSONB NOT NULL DEFAULT '[]',
+  device_families JSONB NOT NULL DEFAULT '[]',
+  compatibility_json JSONB NOT NULL DEFAULT '{}',
+  distribution_mode TEXT NOT NULL DEFAULT 'store',
+  config_json JSONB NOT NULL DEFAULT '{}',
+  version INTEGER NOT NULL DEFAULT 0,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  UNIQUE (tenant_id, app_id, platform_code),
+  UNIQUE (tenant_id, platform_code, package_identity)
+);;
+```
+
+
+## appstore_platform_release
+
+- profile: master
+- complianceLevel: L2
+
+### DDL
+
+```sql
+CREATE TABLE IF NOT EXISTS appstore_platform_release (
+  id TEXT PRIMARY KEY,
+  tenant_id TEXT NOT NULL,
+  organization_id TEXT NOT NULL DEFAULT '0',
+  app_platform_id TEXT NOT NULL,
+  channel_id TEXT NOT NULL,
+  release_no TEXT NOT NULL,
+  version_name TEXT NOT NULL,
+  version_code BIGINT NOT NULL,
+  release_status TEXT NOT NULL,
+  release_phase TEXT NOT NULL DEFAULT 'production',
+  force_update_flag INTEGER NOT NULL DEFAULT 0,
+  min_supported_version_code BIGINT,
+  kill_switch_flag INTEGER NOT NULL DEFAULT 0,
+  manifest_snapshot_json JSONB NOT NULL DEFAULT '{}',
+  submitted_at TIMESTAMPTZ,
+  approved_at TIMESTAMPTZ,
+  published_at TIMESTAMPTZ,
+  retired_at TIMESTAMPTZ,
+  version INTEGER NOT NULL DEFAULT 0,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  UNIQUE (tenant_id, release_no),
+  UNIQUE (tenant_id, app_platform_id, channel_id, version_code)
+);;
+```
+
+
+## appstore_signing_credential
+
+- profile: master
+- complianceLevel: L3
+
+### DDL
+
+```sql
+CREATE TABLE IF NOT EXISTS appstore_signing_credential (
+  id TEXT PRIMARY KEY,
+  tenant_id TEXT NOT NULL,
+  organization_id TEXT NOT NULL DEFAULT '0',
+  publisher_id TEXT NOT NULL,
+  app_id TEXT,
+  platform_code TEXT NOT NULL,
+  credential_type TEXT NOT NULL,
+  fingerprint_sha256 TEXT NOT NULL,
+  certificate_subject TEXT,
+  valid_from TIMESTAMPTZ,
+  valid_until TIMESTAMPTZ,
+  credential_status TEXT NOT NULL,
+  rotated_from_credential_id TEXT,
+  evidence_media_resource_id TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  UNIQUE (tenant_id, fingerprint_sha256)
+);;
+```
+
+
+## appstore_listing_review
+
+- profile: master
+- complianceLevel: L2
+
+### DDL
+
+```sql
+CREATE TABLE IF NOT EXISTS appstore_listing_review (
+  id TEXT PRIMARY KEY,
+  tenant_id TEXT NOT NULL,
+  organization_id TEXT NOT NULL DEFAULT '0',
+  listing_id TEXT NOT NULL,
+  user_id TEXT NOT NULL,
+  release_id TEXT,
+  platform_code TEXT,
+  rating INTEGER NOT NULL CHECK (rating BETWEEN 1 AND 5),
+  title TEXT,
+  review_body TEXT NOT NULL DEFAULT '',
+  locale TEXT,
+  review_status TEXT NOT NULL DEFAULT 'published',
+  developer_reply TEXT,
+  developer_user_id TEXT,
+  developer_reply_at TIMESTAMPTZ,
+  helpful_count INTEGER NOT NULL DEFAULT 0,
+  report_count INTEGER NOT NULL DEFAULT 0,
+  edited_at TIMESTAMPTZ,
+  deleted_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  UNIQUE (tenant_id, listing_id, user_id)
+);;
+```
+
+
+## appstore_listing_review_vote
+
+- profile: relation
+- complianceLevel: L2
+
+### DDL
+
+```sql
+CREATE TABLE IF NOT EXISTS appstore_listing_review_vote (
+  id TEXT PRIMARY KEY,
+  tenant_id TEXT NOT NULL,
+  review_id TEXT NOT NULL,
+  user_id TEXT NOT NULL,
+  vote_value INTEGER NOT NULL DEFAULT 1,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  UNIQUE (tenant_id, review_id, user_id)
+);;
+```
+
+
+## appstore_listing_review_report
+
+- profile: workflow
+- complianceLevel: L2
+
+### DDL
+
+```sql
+CREATE TABLE IF NOT EXISTS appstore_listing_review_report (
+  id TEXT PRIMARY KEY,
+  tenant_id TEXT NOT NULL,
+  review_id TEXT NOT NULL,
+  reporter_user_id TEXT NOT NULL,
+  report_reason_code TEXT NOT NULL,
+  report_note TEXT,
+  report_status TEXT NOT NULL DEFAULT 'open',
+  handled_by TEXT,
+  handled_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  UNIQUE (tenant_id, review_id, reporter_user_id)
+);;
+```
+
+
+## appstore_rating_distribution_snapshot
+
+- profile: read_model
+- complianceLevel: L2
+
+### DDL
+
+```sql
+CREATE TABLE IF NOT EXISTS appstore_rating_distribution_snapshot (
+  id TEXT PRIMARY KEY,
+  tenant_id TEXT NOT NULL,
+  listing_id TEXT NOT NULL,
+  snapshot_date TEXT NOT NULL,
+  star_1_count INTEGER NOT NULL DEFAULT 0,
+  star_2_count INTEGER NOT NULL DEFAULT 0,
+  star_3_count INTEGER NOT NULL DEFAULT 0,
+  star_4_count INTEGER NOT NULL DEFAULT 0,
+  star_5_count INTEGER NOT NULL DEFAULT 0,
+  rating_avg NUMERIC(4,2),
+  rating_count INTEGER NOT NULL DEFAULT 0,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  UNIQUE (tenant_id, listing_id, snapshot_date)
+);;
+```
+
+
+## appstore_listing_price
+
+- profile: master
+- complianceLevel: L2
+
+### DDL
+
+```sql
+CREATE TABLE IF NOT EXISTS appstore_listing_price (
+  id TEXT PRIMARY KEY,
+  tenant_id TEXT NOT NULL,
+  organization_id TEXT NOT NULL DEFAULT '0',
+  listing_id TEXT NOT NULL,
+  region_code TEXT NOT NULL DEFAULT 'GLOBAL',
+  currency_code TEXT NOT NULL,
+  price_amount NUMERIC(12,2) NOT NULL DEFAULT 0,
+  price_tier_code TEXT,
+  pricing_mode TEXT NOT NULL DEFAULT 'free',
+  starts_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  ends_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  UNIQUE (tenant_id, listing_id, region_code, starts_at)
+);;
+```
+
+
+## appstore_promo_code_batch
+
+- profile: master
+- complianceLevel: L2
+
+### DDL
+
+```sql
+CREATE TABLE IF NOT EXISTS appstore_promo_code_batch (
+  id TEXT PRIMARY KEY,
+  tenant_id TEXT NOT NULL,
+  organization_id TEXT NOT NULL DEFAULT '0',
+  listing_id TEXT NOT NULL,
+  release_id TEXT,
+  batch_no TEXT NOT NULL,
+  purpose TEXT NOT NULL DEFAULT 'promotional',
+  total_count INTEGER NOT NULL DEFAULT 0,
+  redeemed_count INTEGER NOT NULL DEFAULT 0,
+  starts_at TIMESTAMPTZ,
+  expires_at TIMESTAMPTZ,
+  batch_status TEXT NOT NULL DEFAULT 'active',
+  created_by TEXT NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  UNIQUE (tenant_id, batch_no)
+);;
+```
+
+
+## appstore_promo_code
+
+- profile: ledger_event
+- complianceLevel: L3
+
+### DDL
+
+```sql
+CREATE TABLE IF NOT EXISTS appstore_promo_code (
+  id TEXT PRIMARY KEY,
+  tenant_id TEXT NOT NULL,
+  batch_id TEXT NOT NULL,
+  listing_id TEXT NOT NULL,
+  code_hash TEXT NOT NULL,
+  code_hint TEXT,
+  code_status TEXT NOT NULL DEFAULT 'active',
+  redeemed_by TEXT,
+  redeemed_at TIMESTAMPTZ,
+  expires_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  UNIQUE (tenant_id, code_hash)
+);;
+```
+
+
+## appstore_release_tester_group
+
+- profile: master
+- complianceLevel: L2
+
+### DDL
+
+```sql
+CREATE TABLE IF NOT EXISTS appstore_release_tester_group (
+  id TEXT PRIMARY KEY,
+  tenant_id TEXT NOT NULL,
+  organization_id TEXT NOT NULL DEFAULT '0',
+  app_id TEXT NOT NULL,
+  group_no TEXT NOT NULL,
+  group_name TEXT NOT NULL,
+  group_type TEXT NOT NULL DEFAULT 'external',
+  group_status TEXT NOT NULL DEFAULT 'active',
+  max_testers INTEGER,
+  created_by TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  UNIQUE (tenant_id, group_no)
+);;
+```
+
+
+## appstore_release_tester_group_member
+
+- profile: relation
+- complianceLevel: L2
+
+### DDL
+
+```sql
+CREATE TABLE IF NOT EXISTS appstore_release_tester_group_member (
+  id TEXT PRIMARY KEY,
+  tenant_id TEXT NOT NULL,
+  group_id TEXT NOT NULL,
+  user_id TEXT,
+  contact_email TEXT NOT NULL,
+  member_status TEXT NOT NULL DEFAULT 'invited',
+  added_by TEXT,
+  added_at TIMESTAMPTZ,
+  removed_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  UNIQUE (tenant_id, group_id, contact_email)
+);;
+```
+
+
+## appstore_catalog_search_doc
+
+- profile: read_model
+- complianceLevel: L2
+
+### DDL
+
+```sql
+CREATE TABLE IF NOT EXISTS appstore_catalog_search_doc (
+  id TEXT PRIMARY KEY,
+  tenant_id TEXT NOT NULL,
+  listing_id TEXT NOT NULL,
+  locale TEXT NOT NULL,
+  display_name TEXT NOT NULL,
+  subtitle TEXT,
+  keywords TEXT NOT NULL DEFAULT '',
+  short_description TEXT,
+  platform_codes TEXT NOT NULL DEFAULT '[]',
+  popularity_score NUMERIC(12,4) NOT NULL DEFAULT 0,
+  doc_status TEXT NOT NULL DEFAULT 'active',
+  indexed_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  UNIQUE (tenant_id, listing_id, locale)
+);;
+```
+
+
+## appstore_analytics_metric_daily
+
+- profile: read_model
+- complianceLevel: L2
+
+### DDL
+
+```sql
+CREATE TABLE IF NOT EXISTS appstore_analytics_metric_daily (
+  id TEXT PRIMARY KEY,
+  tenant_id TEXT NOT NULL,
+  subject_type TEXT NOT NULL,
+  subject_id TEXT NOT NULL,
+  metric_code TEXT NOT NULL,
+  platform_code TEXT NOT NULL DEFAULT 'ALL',
+  region_code TEXT NOT NULL DEFAULT 'GLOBAL',
+  metric_value NUMERIC(18,4) NOT NULL DEFAULT 0,
+  snapshot_date TEXT NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  UNIQUE (tenant_id, subject_type, subject_id, metric_code, platform_code, region_code, snapshot_date)
+);;
+```

@@ -76,6 +76,18 @@ export const common = {
   categories: {
     all: 'All'
   },
+  platformGroups: {
+    title: 'Platform',
+    all: 'All platforms',
+    android: 'Android',
+    ios: 'iOS',
+    harmonyos: 'HarmonyOS',
+    pcDesktop: 'PC Desktop',
+    pcWeb: 'PC Web',
+    h5Web: 'H5 Web',
+    miniprogram: 'Mini Program',
+    browserExtension: 'Browser Extension'
+  },
   time: {
     recently: 'Recently'
   },

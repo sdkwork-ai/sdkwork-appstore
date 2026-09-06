@@ -16,6 +16,12 @@ const PublisherRoutes = lazy(() =>
 );
 const AppsBrowsePage = lazy(() => import('./pages/BrowsePage').then(m => ({ default: m.AppsBrowsePage })));
 const GamesBrowsePage = lazy(() => import('./pages/BrowsePage').then(m => ({ default: m.GamesBrowsePage })));
+const UserStorePage = lazy(() =>
+  import('./pages/user-store/UserStorePage').then(m => ({ default: m.UserStorePage })),
+);
+const PublicUserStorePage = lazy(() =>
+  import('./pages/user-store/PublicUserStorePage').then(m => ({ default: m.PublicUserStorePage })),
+);
 
 function PageLoader() {
   return (
@@ -72,6 +78,16 @@ export default function App() {
               </AuthGate>
             }
           />
+          <Route
+            path="/user-store"
+            element={
+              <AuthGate>
+                <UserStorePage />
+              </AuthGate>
+            }
+          />
+          {/* 匿名公开分享视图：访客无需登录即可浏览个人 Appstore */}
+          <Route path="/store/:shareToken" element={<PublicUserStorePage />} />
           <Route
             path="/publisher/*"
             element={

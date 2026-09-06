@@ -402,3 +402,51 @@ pub fn map_market_error(
         AppstoreServiceError::Internal(m) => AppstoreServiceErrorKind::Internal(m),
     )
 }
+
+pub fn to_user_store_context(
+    ext: Option<&Extension<WebRequestContext>>,
+) -> Result<sdkwork_appstore_user_store_service::context::AppstoreRequestContext, Response> {
+    let base = authenticated_base(ext)?;
+    let organization_id = require_org_id(&base)?;
+    let user_id = require_user_id(&base)?;
+    Ok(
+        sdkwork_appstore_user_store_service::context::AppstoreRequestContext {
+            tenant_id: base.tenant_id,
+            organization_id,
+            user_id,
+            request_id: base.request_id,
+            trace_id: trace_id(web_context(ext)),
+            permission_scopes: permission_scopes(web_context(ext)),
+        },
+    )
+}
+
+pub fn to_user_store_context_public(
+    ext: Option<&Extension<WebRequestContext>>,
+) -> sdkwork_appstore_user_store_service::context::AppstoreRequestContext {
+    let base = base_context(web_context(ext));
+    sdkwork_appstore_user_store_service::context::AppstoreRequestContext {
+        tenant_id: base.tenant_id,
+        organization_id: base.organization_id.unwrap_or_default(),
+        user_id: base.user_id.unwrap_or_default(),
+        request_id: base.request_id,
+        trace_id: trace_id(web_context(ext)),
+        permission_scopes: permission_scopes(web_context(ext)),
+    }
+}
+
+pub fn map_user_store_error(
+    ext: Option<&Extension<WebRequestContext>>,
+    error: sdkwork_appstore_user_store_service::error::AppstoreServiceError,
+) -> Response {
+    use sdkwork_appstore_user_store_service::error::AppstoreServiceError;
+    map_service_err!(ext, error,
+        AppstoreServiceError::NotFound(m) => AppstoreServiceErrorKind::NotFound(m),
+        AppstoreServiceError::AlreadyExists(m) => AppstoreServiceErrorKind::AlreadyExists(m),
+        AppstoreServiceError::InvalidState(m) => AppstoreServiceErrorKind::InvalidState(m),
+        AppstoreServiceError::ValidationFailed(m) => AppstoreServiceErrorKind::ValidationFailed(m),
+        AppstoreServiceError::PermissionDenied(m) => AppstoreServiceErrorKind::PermissionDenied(m),
+        AppstoreServiceError::Conflict(m) => AppstoreServiceErrorKind::Conflict(m),
+        AppstoreServiceError::Internal(m) => AppstoreServiceErrorKind::Internal(m),
+    )
+}

@@ -44,9 +44,10 @@ Use dynamic progressive loading and inspect implementation files only after reso
 1. Read the nearest `AGENTS.md`.
 2. Read `sdkwork.app.config.json` and `etc/` only when identity, runtime, release, or deployment is in scope.
 3. Read the nearest module `specs/`, then repository `specs/`, when their contracts are touched.
-4. Read relevant `.sdkwork/` metadata only when a local extension is in scope.
-5. Resolve the task row in `../sdkwork-specs/README.md`.
-6. Read only the selected global specs, then inspect implementation files.
+4. Read `specs/AGENTS_DEPENDENCY_BOUNDARY_SPEC.md` when the `sdkwork-agents` dependency, `@sdkwork/agents-app-sdk` consumption, or the AI Lab 专家/独立页面 composition is touched.
+5. Read relevant `.sdkwork/` metadata only when a local extension is in scope.
+6. Resolve the task row in `../sdkwork-specs/README.md`.
+7. Read only the selected global specs, then inspect implementation files.
 
 ## Required Specs By Task Type
 
@@ -55,6 +56,7 @@ Use dynamic progressive loading and inspect implementation files only after reso
 - TypeScript/Node: `TYPESCRIPT_CODE_SPEC.md`; language specs load on demand only.
 - Rust/Cargo: `RUST_CODE_SPEC.md`, `WEB_BACKEND_SPEC.md`, `TEST_SPEC.md`.
 - API/SDK: `API_SPEC.md`, `SDK_SPEC.md`, `SDK_WORKSPACE_GENERATION_SPEC.md`, `APP_SDK_INTEGRATION_SPEC.md`, `TEST_SPEC.md`.
+- Agents dependency integration: `specs/AGENTS_DEPENDENCY_BOUNDARY_SPEC.md`, `../sdkwork-specs/APP_SDK_INTEGRATION_SPEC.md`.
 - List/search: add `PAGINATION_SPEC.md`.
 - Component composition: `COMPONENT_SPEC.md`, `COMPOSABLE_ARCHITECTURE_SPEC.md`, `APP_COMPOSITION_SPEC.md`.
 - Source config: `SOURCE_CONFIG_SPEC.md`, `CONFIG_SPEC.md`, `ENVIRONMENT_SPEC.md`, `DEPLOYMENT_SPEC.md`.
@@ -102,6 +104,8 @@ Do not use `cargo fmt --all`; optional sibling workspace paths are outside this 
 
 - Appstore owns marketplace catalog, publisher, listing, release, library, moderation, and store analytics APIs.
 - IAM, Drive, Comments, and commerce domains remain dependency-owned and are consumed through approved SDKs or composed facades.
+- `sdkwork-agents` is consumed only through `@sdkwork/agents-app-sdk` bound in `*-core` SDK client inventories; never add raw HTTP, manual auth headers, DTO forks, local SDK proxies, deep generated imports, or a reverse dependency on appstore sources. See `specs/AGENTS_DEPENDENCY_BOUNDARY_SPEC.md`.
+- The AI Lab sidebar group composes independent appstore pages in order 专家 (`/experts`), 扩展插件 (`/plugins`), 技能中心 (`/skills`), MCP 服务 (`/mcp`), 应用模板 (`/templates`); the 专家 page mirrors the 应用模板 page layout, and Agents runtime state never persists in appstore stores.
 - Paid checkout uses `@sdkwork/cloudrouter-app-sdk/domains`; do not add raw HTTP, manual auth headers, DTO forks, or local SDK proxies.
 - Do not change database schema or migrations without explicit user confirmation.
 - Preserve unrelated dirty work and use evidence from executable checks before completion.
@@ -109,6 +113,7 @@ Do not use `cargo fmt --all`; optional sibling workspace paths are outside this 
 ## Task-Specific Standards
 
 - App SDK consumer work routes to `../sdkwork-specs/APP_SDK_INTEGRATION_SPEC.md`; verify scoped composed imports with `node ../sdkwork-specs/tools/check-app-sdk-consumer-imports.mjs --workspace .`.
+- Agents SDK consumer and AI Lab 专家 page work routes to `specs/AGENTS_DEPENDENCY_BOUNDARY_SPEC.md`; verify workspace federation with `node ../sdkwork-specs/tools/check-workspace-member-protocol.mjs --root .`.
 - HTTP API input, output, envelope, error, and operation work routes to `../sdkwork-specs/API_SPEC.md`; run `check-api-operation-patterns.mjs` and `check-api-response-envelope.mjs` from `../sdkwork-specs/tools/`.
 - List and search work routes to `../sdkwork-specs/PAGINATION_SPEC.md`; verify store-level canonical pagination with `node ../sdkwork-specs/tools/check-pagination.mjs --workspace .`.
 
@@ -296,3 +301,20 @@ Verification:
 node ../sdkwork-specs/tools/sync-agent-sdk-generation-standard.mjs --root . --check
 ```
 <!-- /SDKWORK-SDK-GENERATION-STANDARD: v1 -->
+
+
+## Deployment Standard (bin/)
+
+Per `../sdkwork-specs/MODULE_BIN_SPEC.md`, this module ships the standardized
+nine-entrypoint `bin/` family; all build/package/deploy/installer work `MUST`
+go through them. See `bin/README.md` for the usage card and
+`bin/lib/module.sh` for the delegation wiring (hooks not yet wired to a
+canonical repository command fail fast with guidance).
+
+- App types declared: see `SDKWORK_APP_TYPES` in `bin/lib/module.sh`;
+  environments: `development`, `test`, `staging`, `demo`, `production`.
+- Image reference: `registry.sdkwork.com/apps/<docker-name>:<version>`
+  (`DOCKER_SPEC.md` §2.1; no `latest`, no env-suffixed tags).
+- Authoritative specs: `MODULE_BIN_SPEC.md`, `DOCKER_SPEC.md`,
+  `DEPLOYMENT_SPEC.md`, `OPERATIONS_SPEC.md`.
+<!-- /SDKWORK-DEPLOYMENT-STANDARD: scaffolded -->

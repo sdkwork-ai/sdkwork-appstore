@@ -1,5 +1,6 @@
 import { AppItem } from '../../types';
 import { useInstall } from '../../providers/InstallProvider';
+import { PlatformBadges } from '@sdkwork/appstore-pc-commons';
 import { Sparkles, ArrowUpRight, Cpu } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -67,9 +68,10 @@ export function FeaturedTodayCard({ app }: FeaturedTodayCardProps) {
 
         {/* Bottom CTA Bar */}
         <div className="flex items-center justify-between pt-4 border-t border-slate-200 dark:border-slate-800 z-10">
-          <div className="flex flex-col">
+          <div className="flex flex-col gap-1">
             <span className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">{t('common.labels.rating')}: {app.rating} ★</span>
             <span className="text-xs font-semibold text-slate-700 dark:text-slate-200">{app.category}</span>
+            <PlatformBadges platforms={app.platforms} max={3} />
           </div>
 
           <button

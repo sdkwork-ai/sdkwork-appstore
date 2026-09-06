@@ -14,6 +14,8 @@ export interface AppItem {
   reviewsCount: number;
   ratingBreakdown?: [number, number, number, number, number]; // [5 star, 4 star, 3, 2, 1] percentages
   description: string;
+  /** Raw platform codes this listing ships for (see platforms.ts display groups). */
+  platforms?: string[];
   whatsNew?: { version: string; date: string; notes: string };
   screenshots: string[];
   icon: string; // Lucide icon name or emoji

@@ -30,6 +30,7 @@
     "@sdkwork/appstore-pc-commons": "workspace:*",
     "@sdkwork/appstore-pc-core": "workspace:*",
     "@sdkwork/appstore-pc-games": "workspace:*",
+    "@sdkwork/appstore-pc-markets": "workspace:*",
     "@sdkwork/appstore-pc-runtime": "workspace:*",
     "@sdkwork/auth-pc-react": "workspace:*",
     "@sdkwork/auth-runtime-pc-react": "workspace:*",

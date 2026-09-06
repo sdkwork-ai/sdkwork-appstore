@@ -1,0 +1,21 @@
+[package]
+name = "sdkwork-routes-user-store-app-api"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+path = "src/lib.rs"
+
+[dependencies]
+sdkwork-appstore-routes-common.workspace = true
+sdkwork-appstore-user-store-service.workspace = true
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+sdkwork-web-core = { workspace = true }
+axum = { version = "0.8", default-features = false, features = ["json"] }
+sdkwork-iam-web-adapter = { workspace = true }
+sdkwork-web-axum = { workspace = true }
+sdkwork-web-bootstrap = { workspace = true }
+
+[dev-dependencies]
+sdkwork-web-core = { workspace = true }

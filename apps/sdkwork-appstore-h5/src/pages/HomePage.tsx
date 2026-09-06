@@ -7,6 +7,8 @@ import {
   formatApiError,
 } from '@/hooks/useApi';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
+import { PlatformBadges } from '@/components/common/PlatformBadges';
+import { readListingPlatformCodes } from '@/platforms';
 
 function readListingCard(item: unknown, index: number) {
   const row = (item ?? {}) as unknown as unknown as Record<string, unknown>;
@@ -18,6 +20,7 @@ function readListingCard(item: unknown, index: number) {
     developer: String(row.developerName ?? row.publisherName ?? '开发者'),
     rating: Number(row.averageRating ?? row.rating ?? 0),
     pricing: String(row.pricingModel ?? row.pricing_model ?? 'FREE').toUpperCase(),
+    platforms: readListingPlatformCodes(row),
   };
 }
 
@@ -163,6 +166,7 @@ export function HomePage() {
                 <div className="min-w-0 flex-1">
                   <h3 className="truncate text-sm font-semibold text-[var(--text-primary)]">{app.name}</h3>
                   <p className="truncate text-xs text-[var(--text-tertiary)]">{app.developer}</p>
+                  <PlatformBadges platforms={app.platforms} max={2} className="mt-1" />
                   <p className="mt-1 text-[11px] text-[var(--text-secondary)]">
                     {app.pricing === 'FREE' ? '免费' : '付费'}
                     {app.rating > 0 ? ` · ${app.rating.toFixed(1)}★` : ''}

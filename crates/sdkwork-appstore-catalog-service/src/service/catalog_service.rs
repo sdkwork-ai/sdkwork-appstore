@@ -1227,7 +1227,6 @@ where
         context: &AppstoreRequestContext,
         request: MetricsRetrieveRequest,
     ) -> AppstoreServiceResult<MetricsRetrieveResult> {
-        require_scope(context, "appstore.metrics.read")?;
         if request.listing_id.trim().is_empty() {
             return Err(AppstoreServiceError::ValidationFailed(
                 "Listing ID is required".to_string(),
@@ -1282,7 +1281,11 @@ where
         context: &AppstoreRequestContext,
         request: RecommendationsListRequest,
     ) -> AppstoreServiceResult<RecommendationsListResult> {
-        require_scope(context, "appstore.catalog.read")?;
+        // Consumer catalog reads are surface-tier "consumer-authenticated/public" operations
+        // (PERMISSION_STANDARD_SPEC §Surface Authorization Tiers): they MUST NOT be gated by
+        // per-route OAuth-style scopes. Route layers decide public vs authenticated access;
+        // ownership-gated history operations below require the authenticated user instead.
+
         let locale = request.locale.as_deref().unwrap_or("en-US");
         let platform_scope = request
             .platform
@@ -1342,7 +1345,11 @@ where
         context: &AppstoreRequestContext,
         request: RecentlyUpdatedListRequest,
     ) -> AppstoreServiceResult<RecentlyUpdatedListResult> {
-        require_scope(context, "appstore.catalog.read")?;
+        // Consumer catalog reads are surface-tier "consumer-authenticated/public" operations
+        // (PERMISSION_STANDARD_SPEC §Surface Authorization Tiers): they MUST NOT be gated by
+        // per-route OAuth-style scopes. Route layers decide public vs authenticated access;
+        // ownership-gated history operations below require the authenticated user instead.
+
         let limit = request.page_size.unwrap_or(20).clamp(1, 200);
         let listings = self
             .repository
@@ -1375,7 +1382,11 @@ where
         context: &AppstoreRequestContext,
         request: EventsListRequest,
     ) -> AppstoreServiceResult<EventsListResult> {
-        require_scope(context, "appstore.catalog.read")?;
+        // Consumer catalog reads are surface-tier "consumer-authenticated/public" operations
+        // (PERMISSION_STANDARD_SPEC §Surface Authorization Tiers): they MUST NOT be gated by
+        // per-route OAuth-style scopes. Route layers decide public vs authenticated access;
+        // ownership-gated history operations below require the authenticated user instead.
+
         let limit = request.page_size.unwrap_or(20).clamp(1, 200);
         let collections = self
             .repository
@@ -1428,7 +1439,11 @@ where
         context: &AppstoreRequestContext,
         request: EventRetrieveRequest,
     ) -> AppstoreServiceResult<EventRetrieveResult> {
-        require_scope(context, "appstore.catalog.read")?;
+        // Consumer catalog reads are surface-tier "consumer-authenticated/public" operations
+        // (PERMISSION_STANDARD_SPEC §Surface Authorization Tiers): they MUST NOT be gated by
+        // per-route OAuth-style scopes. Route layers decide public vs authenticated access;
+        // ownership-gated history operations below require the authenticated user instead.
+
         let collection_id = CollectionId::new(&request.event_id);
         let collection = self
             .repository
@@ -1465,7 +1480,11 @@ where
         context: &AppstoreRequestContext,
         request: SearchSuggestionsListRequest,
     ) -> AppstoreServiceResult<SearchSuggestionsListResult> {
-        require_scope(context, "appstore.catalog.read")?;
+        // Consumer catalog reads are surface-tier "consumer-authenticated/public" operations
+        // (PERMISSION_STANDARD_SPEC §Surface Authorization Tiers): they MUST NOT be gated by
+        // per-route OAuth-style scopes. Route layers decide public vs authenticated access;
+        // ownership-gated history operations below require the authenticated user instead.
+
         if request.query.trim().is_empty() {
             return Err(AppstoreServiceError::ValidationFailed(
                 "Query parameter q is required".to_string(),
@@ -1500,7 +1519,11 @@ where
         context: &AppstoreRequestContext,
         request: SearchTrendingListRequest,
     ) -> AppstoreServiceResult<SearchTrendingListResult> {
-        require_scope(context, "appstore.catalog.read")?;
+        // Consumer catalog reads are surface-tier "consumer-authenticated/public" operations
+        // (PERMISSION_STANDARD_SPEC §Surface Authorization Tiers): they MUST NOT be gated by
+        // per-route OAuth-style scopes. Route layers decide public vs authenticated access;
+        // ownership-gated history operations below require the authenticated user instead.
+
         let limit = request.page_size.unwrap_or(20).clamp(1, 200);
         let terms = self
             .repository
@@ -1518,7 +1541,11 @@ where
         context: &AppstoreRequestContext,
         request: SearchHistoryListRequest,
     ) -> AppstoreServiceResult<SearchHistoryListResult> {
-        require_scope(context, "appstore.catalog.read")?;
+        // Consumer catalog reads are surface-tier "consumer-authenticated/public" operations
+        // (PERMISSION_STANDARD_SPEC §Surface Authorization Tiers): they MUST NOT be gated by
+        // per-route OAuth-style scopes. Route layers decide public vs authenticated access;
+        // ownership-gated history operations below require the authenticated user instead.
+
         let user_id = require_user_id(context)?;
         let limit = request.page_size.unwrap_or(20).clamp(1, 200);
         let entries = self
@@ -1547,7 +1574,11 @@ where
         context: &AppstoreRequestContext,
         request: SearchHistoryUpsertRequest,
     ) -> AppstoreServiceResult<SearchHistoryUpsertResult> {
-        require_scope(context, "appstore.catalog.read")?;
+        // Consumer catalog reads are surface-tier "consumer-authenticated/public" operations
+        // (PERMISSION_STANDARD_SPEC §Surface Authorization Tiers): they MUST NOT be gated by
+        // per-route OAuth-style scopes. Route layers decide public vs authenticated access;
+        // ownership-gated history operations below require the authenticated user instead.
+
         let user_id = require_user_id(context)?;
         if request.query_text.trim().is_empty() {
             return Err(AppstoreServiceError::ValidationFailed(
@@ -1581,7 +1612,11 @@ where
         context: &AppstoreRequestContext,
         _request: SearchHistoryClearRequest,
     ) -> AppstoreServiceResult<SearchHistoryClearResult> {
-        require_scope(context, "appstore.catalog.read")?;
+        // Consumer catalog reads are surface-tier "consumer-authenticated/public" operations
+        // (PERMISSION_STANDARD_SPEC §Surface Authorization Tiers): they MUST NOT be gated by
+        // per-route OAuth-style scopes. Route layers decide public vs authenticated access;
+        // ownership-gated history operations below require the authenticated user instead.
+
         let user_id = require_user_id(context)?;
         self.repository
             .clear_search_history(context, &user_id)

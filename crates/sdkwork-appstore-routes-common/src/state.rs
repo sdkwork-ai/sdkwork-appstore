@@ -14,6 +14,8 @@ use sdkwork_appstore_repository_sqlx::repository::market_repository::SqlxMarketR
 use sdkwork_appstore_repository_sqlx::repository::moderation_repository::SqlxModerationRepository;
 use sdkwork_appstore_repository_sqlx::repository::publisher_repository::SqlxPublisherRepository;
 use sdkwork_appstore_repository_sqlx::repository::release_repository::SqlxReleaseRepository;
+use sdkwork_appstore_repository_sqlx::repository::user_store_repository::SqlxUserStoreRepository;
+use sdkwork_appstore_user_store_service::service::user_store_service::UserStoreService;
 
 #[derive(Clone)]
 pub struct AppState {
@@ -25,4 +27,5 @@ pub struct AppState {
     pub moderation_service: ModerationService<SqlxModerationRepository>,
     pub compliance_service: ComplianceService<SqlxComplianceRepository>,
     pub market_service: MarketService<SqlxMarketRepository>,
+    pub user_store_service: UserStoreService<SqlxUserStoreRepository>,
 }

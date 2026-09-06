@@ -1,6 +1,16 @@
+import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useSearch } from '@/hooks/useApi';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
+import {
+  PlatformBadges,
+  PlatformFilterBar,
+  type PlatformFilterValue,
+} from '@/components/common/PlatformBadges';
+import {
+  appSupportsPlatformGroup,
+  readListingPlatformCodes,
+} from '@/platforms';
 
 interface BrowsePageProps {
   title: string;
@@ -9,17 +19,26 @@ interface BrowsePageProps {
 
 export function BrowsePage({ title, defaultQuery }: BrowsePageProps) {
   const { data, loading, error } = useSearch(defaultQuery);
+  const [platformFilter, setPlatformFilter] = useState<PlatformFilterValue>('all');
 
-  const items = (data?.items ?? []).map((item, index) => {
-    const row = item as unknown as Record<string, unknown>;
-    const slug = String(row.listingSlug ?? row.id ?? index);
-    return {
-      id: slug,
-      name: String(row.displayName ?? row.title ?? '应用'),
-      developer: String(row.developerName ?? row.publisherName ?? '开发者'),
-      rating: Number(row.rating ?? row.averageRating ?? 0),
-    };
-  });
+  const items = useMemo(() => {
+    const mapped = (data?.items ?? []).map((item, index) => {
+      const row = item as unknown as Record<string, unknown>;
+      const slug = String(row.listingSlug ?? row.id ?? index);
+      return {
+        id: slug,
+        name: String(row.displayName ?? row.title ?? '应用'),
+        developer: String(row.developerName ?? row.publisherName ?? '开发者'),
+        rating: Number(row.rating ?? row.averageRating ?? 0),
+        platforms: readListingPlatformCodes(row),
+      };
+    });
+    if (platformFilter === 'all') {
+      return mapped;
+    }
+    // 平台过滤在当前页结果上生效，待目录 API 支持服务端平台筛选后切换。
+    return mapped.filter((app) => appSupportsPlatformGroup(app.platforms, platformFilter));
+  }, [data, platformFilter]);
 
   return (
     <div className="animate-fade-in">
@@ -27,6 +46,10 @@ export function BrowsePage({ title, defaultQuery }: BrowsePageProps) {
         <h1 className="text-xl font-bold text-[var(--text-primary)]">{title}</h1>
         <p className="text-sm text-[var(--text-tertiary)] mt-1">浏览 {title} 分类下的热门内容</p>
       </header>
+
+      <div className="px-4">
+        <PlatformFilterBar activeFilter={platformFilter} onSelectFilter={setPlatformFilter} />
+      </div>
 
       <div className="px-4 py-4">
         {error ? (
@@ -37,7 +60,9 @@ export function BrowsePage({ title, defaultQuery }: BrowsePageProps) {
           </div>
         ) : items.length === 0 ? (
           <div className="card p-8 text-center">
-            <p className="text-sm text-[var(--text-secondary)]">暂无内容</p>
+            <p className="text-sm text-[var(--text-secondary)]">
+              {platformFilter === 'all' ? '暂无内容' : '该平台下暂无匹配内容'}
+            </p>
             <Link to="/search" className="btn-primary mt-4 inline-flex text-sm">
               去搜索
             </Link>
@@ -62,6 +87,7 @@ export function BrowsePage({ title, defaultQuery }: BrowsePageProps) {
                 <div className="min-w-0 flex-1">
                   <h3 className="truncate text-sm font-semibold">{app.name}</h3>
                   <p className="truncate text-xs text-[var(--text-tertiary)]">{app.developer}</p>
+                  <PlatformBadges platforms={app.platforms} max={2} className="mt-0.5" />
                 </div>
                 {app.rating > 0 ? (
                   <span className="text-xs text-[var(--text-secondary)]">{app.rating.toFixed(1)}★</span>

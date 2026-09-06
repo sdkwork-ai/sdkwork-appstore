@@ -1,6 +1,6 @@
-import { type ReactNode, useEffect, useMemo, useState, useSyncExternalStore } from 'react';
+import { Fragment, type ReactNode, useEffect, useMemo, useState, useSyncExternalStore } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { SdkworkIamAuthRoutes } from '@sdkwork/auth-pc-react';
+import { SdkworkIamAuthRoutes, SdkworkSessionAuthLoginModal } from '@sdkwork/auth-pc-react';
 
 import {
   hasAuthenticatedAppstorePcSession,
@@ -16,9 +16,22 @@ import { resolveAppstoreAuthAppearance } from './auth/appstoreAuthAppearance';
 interface AuthGateProps {
   children: ReactNode;
   runtime: AppstorePcRuntime;
+  /**
+   * Sign-in UX when an unauthenticated visitor opens a protected route
+   * (library, wishlist, updates, console, publisher): "modal" renders the
+   * sign-in dialog over the requested page so the surrounding application
+   * state survives; "auth-route" navigates to the full auth route (the
+   * standalone application). Direct visits to /auth/* always render the auth
+   * route.
+   */
+  protectedRouteSignIn?: 'modal' | 'auth-route';
 }
 
-export function AuthGate({ children, runtime }: AuthGateProps) {
+export function AuthGate({
+  children,
+  protectedRouteSignIn = 'auth-route',
+  runtime,
+}: AuthGateProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const [hydrating, setHydrating] = useState(true);
@@ -27,6 +40,7 @@ export function AuthGate({ children, runtime }: AuthGateProps) {
     () => runtime.session.getSnapshot(),
     () => runtime.session.getSnapshot(),
   );
+  const authenticated = hasAuthenticatedAppstorePcSession(snapshot);
 
   useEffect(() => {
     let active = true;
@@ -57,19 +71,54 @@ export function AuthGate({ children, runtime }: AuthGateProps) {
   const decision = useMemo(
     () =>
       resolveAppstorePcAuthGateDecision({
-        hasSession: hasAuthenticatedAppstorePcSession(snapshot),
+        hasSession: authenticated,
         location,
       }),
-    [location, snapshot],
+    [authenticated, location],
   );
 
   useEffect(() => {
-    if (!hydrating && decision.kind === 'redirect') {
-      navigate(decision.to, { replace: true });
+    if (hydrating || decision.kind !== 'redirect') {
+      return;
     }
-  }, [decision, hydrating, navigate]);
+    // Modal mode keeps unauthenticated visitors mounted on the requested
+    // route behind the sign-in dialog; only the authenticated auth-route
+    // cleanup (a signed-in visit to /auth/*) navigates away.
+    if (protectedRouteSignIn === 'modal' && !authenticated) {
+      return;
+    }
+    navigate(decision.to, { replace: true });
+  }, [authenticated, decision, hydrating, navigate, protectedRouteSignIn]);
+
+  const gatedChildren = (
+    <Fragment key={authenticated ? 'appstore-auth-gate-authenticated' : 'appstore-auth-gate-anonymous'}>
+      {children}
+    </Fragment>
+  );
 
   if (hydrating || decision.kind === 'redirect') {
+    if (decision.kind === 'redirect' && protectedRouteSignIn === 'modal' && !authenticated) {
+      // The requested page stays mounted behind the dialog; the keyed children
+      // remount once sign-in commits so its data loads run with the session.
+      return (
+        <>
+          {gatedChildren}
+          <SdkworkSessionAuthLoginModal
+            appearance={resolveAppstoreAuthAppearance()}
+            getRuntime={() => runtime.iamRuntime}
+            locale={runtime.config.locale}
+            onAuthComplete={() => {
+              runtime.session.refreshSession();
+            }}
+            onDismiss={() => {
+              navigate(-1);
+            }}
+            returnPath={`${location.pathname}${location.search ?? ''}${location.hash ?? ''}`}
+            runtimeConfig={resolveAppstorePcAuthRuntimeConfig()}
+          />
+        </>
+      );
+    }
     return <LoadingSpinner className="min-h-screen" />;
   }
 
@@ -90,5 +139,5 @@ export function AuthGate({ children, runtime }: AuthGateProps) {
     );
   }
 
-  return <>{children}</>;
+  return gatedChildren;
 }

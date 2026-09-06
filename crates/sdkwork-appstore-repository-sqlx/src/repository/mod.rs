@@ -7,3 +7,4 @@ pub mod moderation_repository;
 pub mod publisher_repository;
 pub mod queries;
 pub mod release_repository;
+pub mod user_store_repository;

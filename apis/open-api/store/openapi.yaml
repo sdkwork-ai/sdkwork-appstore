@@ -21,6 +21,7 @@ tags:
 - name: listings
 - name: catalog
 - name: automation
+- name: userStore
 paths:
   /store/v3/api/releases/check_update:
     post:
@@ -136,6 +137,68 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PublicFeaturedListResponse'
+  /store/v3/api/user-stores/{shareToken}:
+    get:
+      tags:
+      - userStore
+      operationId: appstore.userStores.public.retrieve
+      security: []
+      summary: Retrieve a shared personal appstore view
+      x-sdkwork-auth-mode: anonymous
+      parameters:
+      - name: shareToken
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PublicUserStoreViewResponse'
+        '404':
+          description: Share not available
+  /store/v3/api/user-stores/{shareToken}/categories/{userCategoryId}/items:
+    get:
+      tags:
+      - userStore
+      operationId: appstore.userStores.public.items.list
+      security: []
+      summary: List listings in a shared personal appstore category
+      x-sdkwork-auth-mode: anonymous
+      parameters:
+      - name: shareToken
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: userCategoryId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: cursor
+        in: query
+        schema:
+          type: string
+      - name: page_size
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 200
+          default: 20
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PublicUserStoreItemsResponse'
+        '404':
+          description: Share or category not available
   /store/v3/api/automation/submissions:
     post:
       tags:
@@ -176,6 +239,96 @@ components:
         minLength: 1
         maxLength: 128
   schemas:
+    PublicUserStoreCategorySummary:
+      type: object
+      additionalProperties: false
+      required:
+      - userCategoryId
+      - name
+      - sortOrder
+      - itemCount
+      properties:
+        userCategoryId:
+          type: string
+        name:
+          type: string
+        iconMediaResourceId:
+          type: string
+        sortOrder:
+          type: integer
+        itemCount:
+          type: string
+          pattern: ^[0-9]+$
+    PublicUserStoreListingCard:
+      type: object
+      additionalProperties: false
+      required:
+      - listingId
+      - displayName
+      properties:
+        listingId:
+          type: string
+        displayName:
+          type: string
+        subtitle:
+          type: string
+        iconMediaResourceId:
+          type: string
+        averageRating:
+          type: string
+    PublicUserStoreViewResponse:
+      allOf:
+      - $ref: '#/components/schemas/SdkWorkApiResponse'
+      - type: object
+        required:
+        - data
+        properties:
+          data:
+            type: object
+            required:
+            - item
+            properties:
+              item:
+                type: object
+                additionalProperties: false
+                required:
+                - shareToken
+                - title
+                - ownerUserId
+                - categories
+                properties:
+                  shareToken:
+                    type: string
+                  title:
+                    type: string
+                  description:
+                    type: string
+                  ownerUserId:
+                    type: string
+                  categories:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/PublicUserStoreCategorySummary'
+    PublicUserStoreItemsResponse:
+      allOf:
+      - $ref: '#/components/schemas/SdkWorkApiResponse'
+      - type: object
+        required:
+        - data
+        properties:
+          data:
+            type: object
+            required:
+            - items
+            - pageInfo
+            properties:
+              items:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PublicUserStoreListingCard'
+              pageInfo:
+                $ref: '#/components/schemas/PageInfo'
+
     ReleaseCheckUpdateRequest:
       type: object
       required:

@@ -155,10 +155,59 @@ tables:
   - name: appstore_app_template_version
     profile: master
     complianceLevel: L2
+  - name: appstore_platform_dictionary
+    profile: master
+    complianceLevel: L2
+  - name: appstore_app_platform
+    profile: master
+    complianceLevel: L2
+  - name: appstore_platform_release
+    profile: master
+    complianceLevel: L2
+  - name: appstore_signing_credential
+    profile: master
+    complianceLevel: L3
+  - name: appstore_listing_review
+    profile: master
+    complianceLevel: L2
+  - name: appstore_listing_review_vote
+    profile: relation
+    complianceLevel: L2
+  - name: appstore_listing_review_report
+    profile: workflow
+    complianceLevel: L2
+  - name: appstore_rating_distribution_snapshot
+    profile: read_model
+    complianceLevel: L2
+  - name: appstore_listing_price
+    profile: master
+    complianceLevel: L2
+  - name: appstore_promo_code_batch
+    profile: master
+    complianceLevel: L2
+  - name: appstore_promo_code
+    profile: ledger_event
+    complianceLevel: L3
+  - name: appstore_release_tester_group
+    profile: master
+    complianceLevel: L2
+  - name: appstore_release_tester_group_member
+    profile: relation
+    complianceLevel: L2
+  - name: appstore_catalog_search_doc
+    profile: read_model
+    complianceLevel: L2
+  - name: appstore_analytics_metric_daily
+    profile: read_model
+    complianceLevel: L2
 migrations:
   - id: "0001"
     file: migrations/0001_appstore_foundation.sql
   - id: "0002"
     file: migrations/0002_appstore_extensions.sql
+  - id: "0003"
     file: migrations/0003_appstore_rating_feedback.sql
+  - id: "0004"
     file: migrations/0004_appstore_timestamps_timestamptz.sql
+  - id: "0005"
+    file: ../../database/migrations/postgres/0002_appstore_platform_evolution.up.sql

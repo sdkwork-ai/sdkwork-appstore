@@ -22,3 +22,4 @@ sdkwork-appstore-library-service.workspace = true
 sdkwork-appstore-moderation-service.workspace = true
 sdkwork-appstore-compliance-service.workspace = true
 sdkwork-appstore-market-service.workspace = true
+sdkwork-appstore-user-store-service.workspace = true

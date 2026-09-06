@@ -100,7 +100,15 @@ body.sdkwork-appstore-auth-active {
   scrollbar-gutter: auto;
 }
 
-.sdkwork-appstore-auth-shell {
+/* Auth theme variables live at :root, not on the auth shell: the modal
+   sign-in dialog (SdkworkSessionAuthLoginModal, the protected-route "modal"
+   presentation) renders OUTSIDE .sdkwork-appstore-auth-shell, and a var()
+   scoped to the shell alone makes every dialog fill (shell card, content
+   column, fields) fall back to transparent. Dark is the default; the
+   html.light-mode block below overrides for light — both the standalone
+   AppstoreAuthShell and the embedding host toggle html-level mode classes,
+   so the dialog and the full-screen shell always agree. */
+:root {
   --sdkwork-appstore-auth-bg: #0c0d11;
   --sdkwork-appstore-auth-content-bg: rgba(17, 18, 24, 0.96);
   --sdkwork-appstore-auth-content-text: #f8fafc;
@@ -115,6 +123,26 @@ body.sdkwork-appstore-auth-active {
   --sdkwork-appstore-auth-aside-badge-bg: rgb(var(--sdkwork-sidebar-accent-rgb) / 0.14);
   --sdkwork-appstore-auth-aside-badge-text: rgb(var(--sdkwork-sidebar-accent-soft-rgb));
   --sdkwork-appstore-auth-qr-bg: rgba(8, 11, 18, 0.94);
+}
+
+html.light-mode {
+  --sdkwork-appstore-auth-bg: #f4f4f5;
+  --sdkwork-appstore-auth-content-bg: rgba(255, 255, 255, 0.96);
+  --sdkwork-appstore-auth-content-text: #18181b;
+  --sdkwork-appstore-auth-muted-text: #71717a;
+  --sdkwork-appstore-auth-field-bg: rgba(15, 23, 42, 0.04);
+  --sdkwork-appstore-auth-divider: rgba(15, 23, 42, 0.1);
+  --sdkwork-appstore-auth-aside-bg: #ffffff;
+  --sdkwork-appstore-auth-aside-border: rgba(15, 23, 42, 0.08);
+  --sdkwork-appstore-auth-aside-text: #18181b;
+  --sdkwork-appstore-auth-aside-card-bg: rgba(15, 23, 42, 0.04);
+  --sdkwork-appstore-auth-aside-card-border: rgba(15, 23, 42, 0.08);
+  --sdkwork-appstore-auth-aside-badge-bg: rgb(var(--sdkwork-sidebar-accent-rgb) / 0.12);
+  --sdkwork-appstore-auth-aside-badge-text: rgb(var(--sdkwork-sidebar-accent-hover-rgb));
+  --sdkwork-appstore-auth-qr-bg: rgba(255, 255, 255, 0.94);
+}
+
+.sdkwork-appstore-auth-shell {
   background:
     radial-gradient(circle at 18% 24%, rgb(var(--sdkwork-sidebar-accent-rgb) / 0.16), transparent 30%),
     radial-gradient(circle at 82% 72%, rgb(var(--sdkwork-sidebar-accent-hover-rgb) / 0.12), transparent 32%),
@@ -132,20 +160,6 @@ body.sdkwork-appstore-auth-active {
 }
 
 html.light-mode .sdkwork-appstore-auth-shell {
-  --sdkwork-appstore-auth-bg: #f4f4f5;
-  --sdkwork-appstore-auth-content-bg: rgba(255, 255, 255, 0.96);
-  --sdkwork-appstore-auth-content-text: #18181b;
-  --sdkwork-appstore-auth-muted-text: #71717a;
-  --sdkwork-appstore-auth-field-bg: rgba(15, 23, 42, 0.04);
-  --sdkwork-appstore-auth-divider: rgba(15, 23, 42, 0.1);
-  --sdkwork-appstore-auth-aside-bg: #ffffff;
-  --sdkwork-appstore-auth-aside-border: rgba(15, 23, 42, 0.08);
-  --sdkwork-appstore-auth-aside-text: #18181b;
-  --sdkwork-appstore-auth-aside-card-bg: rgba(15, 23, 42, 0.04);
-  --sdkwork-appstore-auth-aside-card-border: rgba(15, 23, 42, 0.08);
-  --sdkwork-appstore-auth-aside-badge-bg: rgb(var(--sdkwork-sidebar-accent-rgb) / 0.12);
-  --sdkwork-appstore-auth-aside-badge-text: rgb(var(--sdkwork-sidebar-accent-hover-rgb));
-  --sdkwork-appstore-auth-qr-bg: rgba(255, 255, 255, 0.94);
   background:
     radial-gradient(circle at 18% 24%, rgb(var(--sdkwork-sidebar-accent-rgb) / 0.1), transparent 30%),
     radial-gradient(circle at 82% 72%, rgb(var(--sdkwork-sidebar-accent-hover-rgb) / 0.08), transparent 32%),
