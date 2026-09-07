@@ -6,6 +6,8 @@ export interface AccessTokenContextClaims {
   organizationId?: string;
   sessionId?: string;
   appId?: string;
+  dataScope?: string[];
+  permissionScope?: string[];
   environment?: string;
   deploymentMode?: string;
   authLevel?: string;
@@ -58,6 +60,22 @@ function readJwtStringClaim(
   return undefined;
 }
 
+function readJwtStringListClaim(
+  claims: Record<string, unknown>,
+  ...keys: string[]
+): string[] | undefined {
+  for (const key of keys) {
+    const value = claims[key];
+    if (Array.isArray(value)) {
+      const strings = value.filter((entry): entry is string => typeof entry === 'string');
+      if (strings.length > 0) return strings;
+    } else if (typeof value === 'string' && value.trim() !== '') {
+      return value.split(/[\s,]+/).filter(Boolean);
+    }
+  }
+  return undefined;
+}
+
 /**
  * Read AppContext identity fields encoded in a bootstrap or session access token.
  * @param accessToken - JWT access token from bootstrap or IAM session state.
@@ -87,6 +105,8 @@ export function readAccessTokenContextClaims(
     'deploymentMode',
   );
   const authLevel = readJwtStringClaim(claims, 'auth_level', 'authLevel');
+  const dataScope = readJwtStringListClaim(claims, 'data_scope', 'dataScope');
+  const permissionScope = readJwtStringListClaim(claims, 'permission_scope', 'permissionScope');
   if (
     tenantId === undefined
     && userId === undefined
@@ -96,6 +116,8 @@ export function readAccessTokenContextClaims(
     && environment === undefined
     && deploymentMode === undefined
     && authLevel === undefined
+    && dataScope === undefined
+    && permissionScope === undefined
   ) {
     return undefined;
   }
@@ -108,6 +130,8 @@ export function readAccessTokenContextClaims(
     ...(environment === undefined ? {} : { environment }),
     ...(deploymentMode === undefined ? {} : { deploymentMode }),
     ...(authLevel === undefined ? {} : { authLevel }),
+    ...(dataScope === undefined ? {} : { dataScope }),
+    ...(permissionScope === undefined ? {} : { permissionScope }),
   };
 }
 
@@ -156,11 +180,13 @@ function buildContextFromClaims(
     tenantId,
     userId,
     appId,
+    sessionId: accessClaims.sessionId ?? '',
+    dataScope: accessClaims.dataScope ?? [],
+    permissionScope: accessClaims.permissionScope ?? [],
     ...(accessClaims.organizationId === undefined ? {} : { organizationId: accessClaims.organizationId }),
-    ...(accessClaims.sessionId === undefined ? {} : { sessionId: accessClaims.sessionId }),
-    ...(accessClaims.environment === undefined ? {} : { environment: accessClaims.environment as AppstorePcSessionContext['environment'] }),
-    ...(accessClaims.deploymentMode === undefined ? {} : { deploymentMode: accessClaims.deploymentMode as AppstorePcSessionContext['deploymentMode'] }),
-    ...(accessClaims.authLevel === undefined ? {} : { authLevel: accessClaims.authLevel as AppstorePcSessionContext['authLevel'] }),
+    environment: (accessClaims.environment as AppstorePcSessionContext['environment']) ?? 'dev',
+    deploymentMode: (accessClaims.deploymentMode as AppstorePcSessionContext['deploymentMode']) ?? 'saas',
+    authLevel: (accessClaims.authLevel as AppstorePcSessionContext['authLevel']) ?? 'anonymous',
   };
 }
 

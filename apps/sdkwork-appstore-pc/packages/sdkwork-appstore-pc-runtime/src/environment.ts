@@ -30,8 +30,10 @@ const environmentAliases: Record<string, AppstorePcEnvironment> = {
   test: 'test',
 };
 
+const importMetaEnv = (import.meta as unknown as { env: Record<string, string | undefined> }).env;
+
 function readEnv(key: string): string | undefined {
-  const value = import.meta.env[key];
+  const value = importMetaEnv[key];
   return typeof value === 'string' && value.trim() ? value.trim() : undefined;
 }
 
@@ -56,9 +58,9 @@ export interface AppstorePcRuntimeConfigOverrides {
 }
 
 export function resolveAppstorePcRuntimeConfig(
-  modeOrOverrides: string | AppstorePcRuntimeConfigOverrides = import.meta.env.MODE,
+  modeOrOverrides: string | AppstorePcRuntimeConfigOverrides = importMetaEnv.MODE ?? 'development',
 ): AppstorePcRuntimeConfig {
-  const mode = typeof modeOrOverrides === 'string' ? modeOrOverrides : import.meta.env.MODE
+  const mode = typeof modeOrOverrides === 'string' ? modeOrOverrides : (importMetaEnv.MODE ?? 'development')
   const overrides = typeof modeOrOverrides === 'string' ? {} : modeOrOverrides
   const environment = resolveEnvironment(readEnv('VITE_SDKWORK_ENVIRONMENT') ?? mode);
   const deploymentProfile =

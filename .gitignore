@@ -77,4 +77,32 @@ Thumbs.db
 
 # Runtime-generated env config (modified by local dev server)
 **/public/runtime-env.json
+**/etc/browser/runtime-env.*.json
 /bin/
+
+# Workspace junk / temp files and directories
+_tmp_*/
+_tmp_*
+.workbuddy/
+
+# TypeScript build output in source directories (compiled alongside source)
+**/src/**/*.js
+**/src/**/*.js.map
+**/src/**/*.d.ts
+**/src/**/*.d.ts.map
+
+# TypeScript build output at package root (e.g. types.js, types.d.ts)
+**/packages/**/*.js
+**/packages/**/*.js.map
+**/packages/**/*.d.ts
+**/packages/**/*.d.ts.map
+
+# Generated SDK build output (rebuilt by regenerating SDK, not hand-edited)
+sdks/**/generated/server-openapi/src/**/*.js
+sdks/**/generated/server-openapi/src/**/*.js.map
+sdks/**/generated/server-openapi/src/**/*.d.ts
+sdks/**/generated/server-openapi/src/**/*.d.ts.map
+sdks/**/composed/*.js
+sdks/**/composed/*.js.map
+sdks/**/composed/*.d.ts
+sdks/**/composed/*.d.ts.map

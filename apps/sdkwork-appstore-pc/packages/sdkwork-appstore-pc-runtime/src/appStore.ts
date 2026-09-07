@@ -231,7 +231,7 @@ export function createAppStoreServicePort(
         client.catalog.getHome(),
         this.getAllApps(),
       ]);
-      const homeRow = (home ?? {}) as Record<string, unknown>;
+      const homeRow = (home ?? {}) as unknown as Record<string, unknown>;
       const featuredSlots = readArray(homeRow, 'featuredSlots', 'featured_slots');
       const collections = readArray(homeRow, 'collections');
       const featuredListingIds = featuredSlots
@@ -472,7 +472,7 @@ export function createAppStoreServicePort(
     },
 
     async likeReview(reviewId: string): Promise<boolean> {
-      await comments.engagement.likes.upsert('comment', reviewId);
+      await comments.engagement.likes.update('comment', reviewId);
       return true;
     },
 

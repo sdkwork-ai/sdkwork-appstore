@@ -151,7 +151,7 @@ export default function AIHubPage() {
   }
 
   return (
-    <div className="p-5 md:p-6 space-y-7 w-full max-w-full select-none transition-colors duration-200">
+    <div className="p-5 md:p-6 space-y-7 w-full max-w-full select-none transition-colors duration-200 @container">
       {/* Sub-component: AI Hub Header Banner */}
       <AIHubHeaderBanner />
 

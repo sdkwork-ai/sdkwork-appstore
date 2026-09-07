@@ -42,7 +42,7 @@ export function ExpertsPage() {
   }, [searchQuery, selectedCategory]);
 
   return (
-    <div className="p-6 md:p-8 w-full max-w-full space-y-6 animate-fade-in">
+    <div className="p-6 md:p-8 w-full max-w-full space-y-6 animate-fade-in @container">
       {/* Header Banner Subcomponent */}
       <ExpertsHeaderBanner />
 

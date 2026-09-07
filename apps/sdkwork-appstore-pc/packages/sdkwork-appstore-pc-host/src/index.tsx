@@ -301,7 +301,7 @@ export function AppstorePcHost(props: AppstorePcHostProps = {}) {
     }
     runtimeRef.current = initialRuntime
   }
-  const runtime = props.runtime ?? runtimeRef.current
+  const runtime = props.runtime ?? runtimeRef.current!
   const locale = props.locale?.trim() || config.locale
 
   initializeAppstorePcI18n(locale)
@@ -331,3 +331,9 @@ export function AppstorePcHost(props: AppstorePcHostProps = {}) {
 
 export { AppstoreAuthShell, resolveAppstorePcAuthRuntimeConfig }
 export type { AppstorePcRuntime, AppstorePcRuntimeConfig }
+export {
+  AppstoreMarketsSurface,
+  type AppstoreMarketsPage,
+  type AppstoreMarketsSurfaceProps,
+  type AppstoreMarketsSurfaceSession,
+} from './AppstoreMarketsSurface'

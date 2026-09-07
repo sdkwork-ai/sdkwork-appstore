@@ -17,7 +17,7 @@ export function createMcpServicePort(client: McpAppClient): McpServicePort {
 
   return {
     async getMcpServers(query = ''): Promise<McpServerItem[]> {
-      const response = await client.mcp.listServers({
+      const response = await client.mcp.servers.list({
         page: 1,
         pageSize: registryPageSize,
         q: query.trim() || undefined,
