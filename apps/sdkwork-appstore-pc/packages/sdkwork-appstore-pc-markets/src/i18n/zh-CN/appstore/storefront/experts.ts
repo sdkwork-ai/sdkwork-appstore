@@ -11,6 +11,22 @@ export const experts = {
     tryInLab: '立即体验',
     popularity: '{{count}} 人使用'
   },
+  add: {
+    label: '添加',
+    aria: '添加插件、技能或自定义专家',
+    customExpert: {
+      title: '自定义专家',
+      desc: '创建专属行业 Copilot，内置系统提示词'
+    },
+    plugin: {
+      title: '注册自定义 OpenAPI 插件',
+      desc: '通过 OpenAPI / Swagger 规范录入企业内部 API 插件组件'
+    },
+    skill: {
+      title: '创建并发布 Agent Skill',
+      desc: '为 Agent 注入专业 Task 规则与 SKILL.md 文档'
+    }
+  },
   empty: {
     title: '暂无匹配的专家',
     subtitle: '尝试调整搜索关键词或选择其他分类'

@@ -5,6 +5,8 @@
   "type": "module",
   "main": "src/index.ts",
   "dependencies": {
-    "@sdkwork/appstore-pc-commons": "workspace:*"
+    "@sdkwork/appstore-pc-commons": "workspace:*",
+    "@sdkwork/appstore-pc-core": "workspace:*",
+    "@sdkwork/appstore-pc-markets": "workspace:*"
   }
 }

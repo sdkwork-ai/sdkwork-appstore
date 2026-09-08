@@ -1,6 +1,8 @@
 export { LoadingSpinner } from './components/common/LoadingSpinner'
 export { CardGrid } from './components/common/CardGrid'
 export { ModalShell } from './components/ModalShell'
+export { AddDropdown } from './components/AddDropdown'
+export type { AddDropdownItem } from './components/AddDropdown'
 export { SegmentedControl } from './components/SegmentedControl'
 export { DynamicIcon } from './components/DynamicIcon'
 export { AppRow } from './components/AppRow'

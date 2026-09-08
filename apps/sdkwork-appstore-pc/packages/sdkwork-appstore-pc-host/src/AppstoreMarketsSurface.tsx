@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef } from 'react';
+import { MemoryRouter } from 'react-router-dom';
 import { I18nextProvider } from 'react-i18next';
 import {
   ExpertsPage,
@@ -197,7 +198,13 @@ export function AppstoreMarketsSurface(props: AppstoreMarketsSurfaceProps) {
         resolveHostColorScheme={props.resolveHostColorScheme}
         subscribeHostColorScheme={props.subscribeHostColorScheme}
       >
-        <MarketPage />
+        {/* Market pages render router-aware widgets (ExpertsSearchBar,
+            ExpertCard call useNavigate), so the surface owns a MemoryRouter
+            just like the full AppstorePcHost embed: hosts without a React
+            Router context must still be able to mount one page. */}
+        <MemoryRouter initialEntries={['/']}>
+          <MarketPage />
+        </MemoryRouter>
       </ThemeProvider>
     </I18nextProvider>
   )

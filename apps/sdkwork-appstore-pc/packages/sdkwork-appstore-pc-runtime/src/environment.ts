@@ -30,7 +30,11 @@ const environmentAliases: Record<string, AppstorePcEnvironment> = {
   test: 'test',
 };
 
-const importMetaEnv = (import.meta as unknown as { env: Record<string, string | undefined> }).env;
+// Bundlers that cannot keep `import.meta` semantics (e.g. tsdown emitting a
+// plain ESM lib) collapse the expression to `{}.env === undefined`; fall back
+// to an empty bag so the resolver works outside a Vite app shell.
+const importMetaEnv: Record<string, string | undefined> =
+  (import.meta as unknown as { env?: Record<string, string | undefined> }).env ?? {};
 
 function readEnv(key: string): string | undefined {
   const value = importMetaEnv[key];

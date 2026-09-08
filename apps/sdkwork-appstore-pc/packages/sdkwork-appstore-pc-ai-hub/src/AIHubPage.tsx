@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { AIHubService, AppStoreService } from '@sdkwork/appstore-pc-core';
+import { AIHubService, AppStoreService, PluginsService, SkillsService } from '@sdkwork/appstore-pc-core';
 import { AppItem, ExpertItem } from '@sdkwork/appstore-pc-core';
 import { LoadingSpinner } from '@sdkwork/appstore-pc-commons';
+// Marketplace add flows, reused verbatim so the AI Lab's add dropdown opens
+// the exact same modals (and copy) as the marketplace's Plugins/Skills pages.
+import { RegisterPluginModal } from '@sdkwork/appstore-pc-markets';
+import { PublishSkillModal } from '@sdkwork/appstore-pc-markets';
 import { AIHubHeaderBanner } from './components/AIHubHeaderBanner';
 import { AIExpertsHeader } from './components/AIExpertsHeader';
-import { FeaturedScenariosSection } from './components/FeaturedScenariosSection';
-import { AIExpertsRoster } from './components/AIExpertsRoster';
-import { ExpertDetailModal } from './components/ExpertDetailModal';
 import { AISandboxAssistant } from './components/AISandboxAssistant';
 import { AIAppsGrid } from './components/AIAppsGrid';
 import { CreateCustomExpertModal } from './components/CreateCustomExpertModal';
@@ -27,20 +28,14 @@ export default function AIHubPage() {
   const [expertsList, setExpertsList] = useState<ExpertItem[]>(expertItems);
   const [searchQuery, setSearchQuery] = useState('');
   const [showOnlyMine, setShowOnlyMine] = useState(false);
-  const [selectedScenario, setSelectedScenario] = useState<string | null>(null);
-  const [myExpertIds, setMyExpertIds] = useState<string[]>(() => {
-    try {
-      const saved = localStorage.getItem('ai_hub_my_experts');
-      return saved ? JSON.parse(saved) : ['exp-senior-dev', 'exp-wechat-miniapp', 'exp-info-express'];
-    } catch (e) {
-      return ['exp-senior-dev', 'exp-wechat-miniapp', 'exp-info-express'];
-    }
-  });
 
   // Modal State
-  const [selectedExpert, setSelectedExpert] = useState<ExpertItem | null>(null);
-  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [isCustomModalOpen, setIsCustomModalOpen] = useState(false);
+  // Marketplace add flows, reused from the Plugins/Skills marketplace pages:
+  // the header's add dropdown opens these same modals with the same copy.
+  const [isRegisterPluginOpen, setIsRegisterPluginOpen] = useState(false);
+  const [isPublishSkillOpen, setIsPublishSkillOpen] = useState(false);
+  const [marketActionError, setMarketActionError] = useState<string | null>(null);
 
   // Active Prompt for Sandbox
   const [sandboxPrompt, setSandboxPrompt] = useState('');
@@ -75,48 +70,6 @@ export default function AIHubPage() {
     loadAIHub();
   }, []);
 
-  const handleToggleMyExpert = (expertId: string, e?: React.MouseEvent) => {
-    if (e) e.stopPropagation();
-    setMyExpertIds(prev => {
-      const next = prev.includes(expertId)
-        ? prev.filter(id => id !== expertId)
-        : [...prev, expertId];
-      try {
-        localStorage.setItem('ai_hub_my_experts', JSON.stringify(next));
-      } catch (err) {
-        console.error('Failed to save my experts', err);
-      }
-      return next;
-    });
-  };
-
-  const handleOpenExpertDetail = (expert: ExpertItem) => {
-    setSelectedExpert(expert);
-    setIsDetailModalOpen(true);
-  };
-
-  const handleOpenSandboxChat = (expert: ExpertItem, e: React.MouseEvent) => {
-    e.stopPropagation();
-    setActiveExpertName(expert.name);
-    const prefill = `${t('aihub.sandbox.prefillSystemInstruction', {
-      name: expert.name,
-      nickname: expert.nickname,
-    })}\n${expert.systemPrompt || expert.description}\n\n${t('aihub.sandbox.prefillNeeds')}`;
-    setSandboxPrompt(prefill);
-    setActiveTab('sandbox');
-  };
-
-  const handleTestInSandboxFromModal = (expert: ExpertItem, userMessage?: string) => {
-    setActiveExpertName(expert.name);
-    const msg = userMessage && userMessage.trim() ? userMessage : t('aihub.sandbox.defaultCollaborateMsg');
-    const prefill = `${t('aihub.sandbox.prefillSystemInstruction', {
-      name: expert.name,
-      nickname: expert.nickname,
-    })}\n${expert.systemPrompt || expert.description}\n\n${t('aihub.sandbox.prefillUserQuestion')}\n${msg}`;
-    setSandboxPrompt(prefill);
-    setActiveTab('sandbox');
-  };
-
   const handleCreateCustomExpert = (data: {
     name: string;
     nickname: string;
@@ -143,7 +96,59 @@ export default function AIHubPage() {
     };
 
     setExpertsList(prev => [newExp, ...prev]);
-    setMyExpertIds(prev => [...prev, newExp.id]);
+  };
+
+  // Marketplace-shared submit handlers: identical payloads and service calls
+  // to the marketplace's PluginsPage.handleRegisterSubmit and
+  // SkillsPage.handlePublishSubmit, so both surfaces behave the same.
+  const PLUGIN_CATEGORIES = [
+    t('plugins.categories.all'),
+    t('plugins.categories.codeDev'),
+    t('plugins.categories.dataRetrieval'),
+    t('plugins.categories.docProcessing'),
+    t('plugins.categories.databaseApps'),
+    t('plugins.categories.imageProcessing'),
+    t('plugins.categories.business')
+  ];
+  const SKILL_CATEGORIES = [
+    t('skills.categories.all'),
+    t('skills.categories.dataScience'),
+    t('skills.categories.frontendDesign'),
+    t('skills.categories.architecture'),
+    t('skills.categories.codeRefactor'),
+    t('skills.categories.nlp')
+  ];
+
+  const handleRegisterPluginSubmit = async (pluginData: {
+    name: string;
+    category: string;
+    apiSchemaType: 'OpenAPI' | 'GraphQL' | 'gRPC' | 'REST';
+    description: string;
+    capabilities: string[];
+  }) => {
+    setMarketActionError(null);
+    try {
+      await PluginsService.registerPlugin(pluginData);
+      setIsRegisterPluginOpen(false);
+    } catch (error) {
+      setMarketActionError(error instanceof Error ? error.message : 'Plugin registration failed.');
+    }
+  };
+
+  const handlePublishSkillSubmit = async (skillData: {
+    name: string;
+    category: string;
+    triggers: string[];
+    promptTemplate: string;
+    skillMarkdown: string;
+  }) => {
+    setMarketActionError(null);
+    try {
+      await SkillsService.publishSkill(skillData);
+      setIsPublishSkillOpen(false);
+    } catch (error) {
+      setMarketActionError(error instanceof Error ? error.message : 'Skill publishing failed.');
+    }
   };
 
   if (loading) {
@@ -166,39 +171,25 @@ export default function AIHubPage() {
       {/* Tab 1: AI Experts Marketplace */}
       {activeTab === 'experts' && (
         <div className="space-y-7 animate-fade-in">
-          {/* Top Search & Actions Banner */}
+          {/* Top Search & Actions Banner (marketplace-style add dropdown) */}
           <AIExpertsHeader
             searchQuery={searchQuery}
             onSearchChange={setSearchQuery}
             showOnlyMine={showOnlyMine}
             onToggleShowMine={() => setShowOnlyMine(prev => !prev)}
             onOpenCustomModal={() => setIsCustomModalOpen(true)}
+            onOpenRegisterPlugin={() => setIsRegisterPluginOpen(true)}
+            onOpenPublishSkill={() => setIsPublishSkillOpen(true)}
             selectedTag={''}
             onSelectTag={() => {}}
             totalCount={expertsList.length}
           />
 
-          {/* Section 1: 精选场景 (Featured Scenarios) */}
-          <FeaturedScenariosSection
-            selectedScenario={selectedScenario}
-            onSelectScenario={(scenTitle) => setSelectedScenario(scenTitle)}
-            onSelectExpertByName={(name) => {
-              const matched = expertsList.find(e => e.name === name);
-              if (matched) handleOpenExpertDetail(matched);
-            }}
-          />
-
-          {/* Section 2: 专家 / 专家团 (Experts Grid with Filter Tags & Sort) */}
-          <AIExpertsRoster
-            experts={expertsList}
-            myExpertIds={myExpertIds}
-            onToggleMyExpert={handleToggleMyExpert}
-            onSelectExpert={handleOpenExpertDetail}
-            onOpenSandboxChat={handleOpenSandboxChat}
-            searchQuery={searchQuery}
-            showOnlyMine={showOnlyMine}
-            selectedScenario={selectedScenario}
-          />
+          {marketActionError && (
+            <p role="alert" className="text-xs text-indigo-700 dark:text-indigo-300">
+              {marketActionError}
+            </p>
+          )}
         </div>
       )}
 
@@ -223,21 +214,25 @@ export default function AIHubPage() {
         </div>
       )}
 
-      {/* Modal: Expert Detail Modal */}
-      <ExpertDetailModal
-        expert={selectedExpert}
-        isOpen={isDetailModalOpen}
-        onClose={() => setIsDetailModalOpen(false)}
-        isMyExpert={selectedExpert ? myExpertIds.includes(selectedExpert.id) : false}
-        onToggleMyExpert={(id) => handleToggleMyExpert(id)}
-        onTestInSandbox={handleTestInSandboxFromModal}
-      />
-
       {/* Modal: Create Custom Expert Subcomponent */}
       <CreateCustomExpertModal
         isOpen={isCustomModalOpen}
         onClose={() => setIsCustomModalOpen(false)}
         onCreateExpert={handleCreateCustomExpert}
+      />
+
+      {/* Marketplace modals, reused verbatim from the Plugins/Skills pages */}
+      <RegisterPluginModal
+        isOpen={isRegisterPluginOpen}
+        onClose={() => setIsRegisterPluginOpen(false)}
+        onSubmit={handleRegisterPluginSubmit}
+        categories={PLUGIN_CATEGORIES}
+      />
+      <PublishSkillModal
+        isOpen={isPublishSkillOpen}
+        onClose={() => setIsPublishSkillOpen(false)}
+        onSubmit={handlePublishSkillSubmit}
+        categories={SKILL_CATEGORIES}
       />
     </div>
   );
