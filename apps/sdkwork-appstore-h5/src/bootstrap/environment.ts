@@ -1,3 +1,5 @@
+import { resolveBaseUrl } from '@sdkwork/sdk-common';
+
 export interface RuntimeEnvironment {
   name: 'development' | 'test' | 'staging' | 'production';
   appstoreAppApiBaseUrl: string;
@@ -7,13 +9,19 @@ export interface RuntimeEnvironment {
   commentsAppApiBaseUrl: string;
 }
 
+// Derive the shared gateway origin through @sdkwork/sdk-common (env + brand +
+// protocol aware), eliminating the hardcoded localhost defaults. All the app
+// service surfaces ride the same SDKWork gateway origin; VITE_* overrides and
+// the runtime-env element still take precedence at consumption time.
+const resolvedOrigin = resolveBaseUrl().url;
+
 const defaultEnvironment: RuntimeEnvironment = {
   name: 'development',
-  appstoreAppApiBaseUrl: 'http://127.0.0.1:18090',
-  appstoreOpenApiBaseUrl: 'http://127.0.0.1:18092',
-  appbaseBaseUrl: 'http://127.0.0.1:18080',
-  driveAppApiBaseUrl: 'http://127.0.0.1:18080',
-  commentsAppApiBaseUrl: 'http://127.0.0.1:18080',
+  appstoreAppApiBaseUrl: resolvedOrigin,
+  appstoreOpenApiBaseUrl: resolvedOrigin,
+  appbaseBaseUrl: resolvedOrigin,
+  driveAppApiBaseUrl: resolvedOrigin,
+  commentsAppApiBaseUrl: resolvedOrigin,
 };
 
 let currentEnvironment: RuntimeEnvironment = defaultEnvironment;
