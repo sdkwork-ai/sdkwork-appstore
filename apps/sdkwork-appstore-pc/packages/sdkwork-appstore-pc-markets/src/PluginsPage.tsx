@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { PluginItem } from '@sdkwork/appstore-pc-core';
 import { CardGrid } from '@sdkwork/appstore-pc-commons';
@@ -7,7 +6,6 @@ import { PluginCard } from './components/plugins/PluginCard';
 import { PluginFilter } from './components/plugins/PluginFilter';
 import { PluginDetailModal } from './components/plugins/PluginDetailModal';
 import { PluginsHeaderBanner } from './components/plugins/PluginsHeaderBanner';
-import { RegisterPluginModal } from './components/plugins/RegisterPluginModal';
 import { PluginsEmptyState } from './components/plugins/PluginsEmptyState';
 import { PluginsService } from '@sdkwork/appstore-pc-core';
 
@@ -18,7 +16,6 @@ export function PluginsPage() {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [selectedPlugin, setSelectedPlugin] = useState<PluginItem | null>(null);
   const [loading, setLoading] = useState(true);
-  const [isRegisterOpen, setIsRegisterOpen] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
 
   const categories = [
@@ -62,23 +59,6 @@ export function PluginsPage() {
     }
   };
 
-  const handleRegisterSubmit = async (pluginData: {
-    name: string;
-    category: string;
-    apiSchemaType: 'OpenAPI' | 'GraphQL' | 'gRPC' | 'REST';
-    description: string;
-    capabilities: string[];
-  }) => {
-    setActionError(null);
-    try {
-      const created = await PluginsService.registerPlugin(pluginData);
-      setPlugins((prev) => [created, ...prev]);
-      setIsRegisterOpen(false);
-    } catch (error) {
-      setActionError(error instanceof Error ? error.message : 'Plugin registration failed.');
-    }
-  };
-
   return (
     <div className="p-6 md:p-8 w-full max-w-full space-y-6 animate-fade-in @container">
       {/* Header Banner Subcomponent */}
@@ -95,13 +75,6 @@ export function PluginsPage() {
             categories={categories}
           />
         </div>
-        <button
-          onClick={() => setIsRegisterOpen(true)}
-          className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl text-xs font-bold transition-all shadow-sm shrink-0 flex items-center justify-center gap-1.5 cursor-pointer h-10"
-        >
-          <Plus className="w-4 h-4" />
-          <span>{t('plugins.header.registerBtn')}</span>
-        </button>
       </div>
 
       {actionError && (
@@ -133,14 +106,6 @@ export function PluginsPage() {
         plugin={selectedPlugin}
         onClose={() => setSelectedPlugin(null)}
         onToggleEnable={handleToggleEnable}
-      />
-
-      {/* Register Plugin Modal Subcomponent */}
-      <RegisterPluginModal
-        isOpen={isRegisterOpen}
-        onClose={() => setIsRegisterOpen(false)}
-        onSubmit={handleRegisterSubmit}
-        categories={categories}
       />
     </div>
   );
