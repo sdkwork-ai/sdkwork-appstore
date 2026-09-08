@@ -1,7 +1,6 @@
 import React from 'react';
-import { Search, Bot } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
 
 interface ExpertsSearchBarProps {
   searchQuery: string;
@@ -13,7 +12,6 @@ export const ExpertsSearchBar: React.FC<ExpertsSearchBarProps> = ({
   onSearchChange,
 }) => {
   const { t } = useTranslation();
-  const navigate = useNavigate();
 
   return (
     <div className="flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
@@ -24,18 +22,8 @@ export const ExpertsSearchBar: React.FC<ExpertsSearchBarProps> = ({
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
           placeholder={t('experts.searchPlaceholder')}
-          className="w-full pl-10 pr-4 py-2 bg-white dark:bg-[#1b1e26] border border-gray-200 dark:border-[#282c38] rounded-2xl text-xs focus:outline-none focus:border-indigo-500 text-gray-900 dark:text-gray-100 placeholder-gray-400"
+          className="w-full pl-10 pr-4 py-2 bg-white dark:bg-[#1b1e26] border border-gray-200 dark:border-[#282c38] rounded-2xl text-xs focus:outline-none focus:border-blue-500 text-gray-900 dark:text-gray-100 placeholder-gray-400"
         />
-      </div>
-
-      <div className="flex items-center gap-2">
-        <button
-          onClick={() => navigate('/ai-hub')}
-          className="flex items-center justify-center gap-2 px-4 py-2 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-md transition-all cursor-pointer shrink-0"
-        >
-          <Bot className="w-4 h-4" />
-          <span>{t('experts.openLabBtn')}</span>
-        </button>
       </div>
     </div>
   );

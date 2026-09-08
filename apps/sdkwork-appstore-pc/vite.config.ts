@@ -104,6 +104,7 @@ export default defineConfig(({ mode }) => {
         { find: '@', replacement: path.resolve(CONFIG_DIR) },
         ...createSharedWorkspaceAliases(),
       ],
+      dedupe: ['react', 'react-dom'],
     },
     optimizeDeps: {
       include: ['@sdkwork/sdk-common', '@sdkwork/utils'],
