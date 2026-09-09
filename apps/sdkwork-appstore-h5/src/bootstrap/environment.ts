@@ -1,4 +1,4 @@
-import { resolveBaseUrl } from '@sdkwork/sdk-common';
+import {resolveBaseUrlWithAlignProtocol} from '@sdkwork/sdk-common';
 
 export interface RuntimeEnvironment {
   name: 'development' | 'test' | 'staging' | 'production';
@@ -13,7 +13,7 @@ export interface RuntimeEnvironment {
 // protocol aware), eliminating the hardcoded localhost defaults. All the app
 // service surfaces ride the same SDKWork gateway origin; VITE_* overrides and
 // the runtime-env element still take precedence at consumption time.
-const resolvedOrigin = resolveBaseUrl().url;
+const resolvedOrigin = resolveBaseUrlWithAlignProtocol().url;
 
 const defaultEnvironment: RuntimeEnvironment = {
   name: 'development',

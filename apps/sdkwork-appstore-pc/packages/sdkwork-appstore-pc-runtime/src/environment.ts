@@ -1,4 +1,5 @@
 import manifest from '../../../sdkwork.app.config.json';
+import {resolveBaseUrlWithAlignProtocol} from '@sdkwork/sdk-common';
 
 export type AppstorePcEnvironment = 'development' | 'test' | 'staging' | 'production';
 export type AppstorePcDeploymentProfile = 'cloud' | 'standalone';
@@ -75,9 +76,17 @@ export function resolveAppstorePcRuntimeConfig(
     readEnv('VITE_SDKWORK_APPSTORE_APPLICATION_PUBLIC_HTTP_URL') ??
     readEnv('VITE_SDKWORK_APPSTORE_APP_API_BASE_URL') ??
     resolveBrowserOrigin();
+  // Platform/dependency surfaces resolve through @sdkwork/sdk-common
+  // resolveBaseUrlWithAlignProtocol (ENVIRONMENT_SPEC.md §6.3): unified SDKWORK_API_BASE_URL
+  // candidates matched against the page host, else derived from it — built
+  // cloud pages map onto api[-<env>].<brand>, standalone pages stay
+  // same-origin, and pnpm dev pages resolve to the local dev-server origin
+  // or the cloud-gateway dev port. Explicit authored overrides above keep
+  // winning.
   const platformApiGatewayUrl =
     readEnv('VITE_SDKWORK_APPSTORE_PLATFORM_API_GATEWAY_HTTP_URL') ??
     readEnv('VITE_SDKWORK_IAM_APP_API_BASE_URL') ??
+    resolveBaseUrlWithAlignProtocol().url ??
     applicationPublicUrl;
 
   return {
