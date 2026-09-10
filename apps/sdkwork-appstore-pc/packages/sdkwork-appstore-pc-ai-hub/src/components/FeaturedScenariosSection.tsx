@@ -72,7 +72,7 @@ export const FeaturedScenariosSection: React.FC<FeaturedScenariosSectionProps> =
       </div>
 
       {/* Grid / Horizontal Deck of Scenario Cards */}
-      <div className="grid grid-cols-1 @sm:grid-cols-2 @lg:grid-cols-3 @5xl:grid-cols-4 gap-3.5">
+      <div className="grid grid-cols-1 @sm:grid-cols-2 @lg:grid-cols-3 @3xl:grid-cols-4 gap-3.5">
         {expertScenarios.map((scen) => {
           const IconComp = scenarioIcons[scen.icon] || Sparkles;
           const isSelected = selectedScenario === scen.title;

@@ -15,21 +15,24 @@ interface CardGridProps {
  * content area width — sidebar, window snapping and zoom all accounted for —
  * instead of the raw viewport width.
  *
- * Column tiers (container inline-size) — 4 columns is the DEFAULT layout:
+ * Column tiers (container inline-size) — 4 columns is the DEFAULT desktop
+ * layout: the tier starts at 48rem (768px), which every embedded desktop
+ * panel (BirdCoder markets column, full appstore window) clears comfortably,
+ * while narrow side panels still adapt down:
  * - 1 column below 384px
- * - 2 columns from 384px  (@sm = 24rem)
- * - 3 columns from 512px  (@lg = 32rem)
- * - 4 columns from 1024px (@5xl = 64rem, the typical desktop content width)
+ * - 2 columns from 384px  (@sm  = 24rem)
+ * - 3 columns from 512px  (@lg  = 32rem)
+ * - 4 columns from 768px  (@3xl = 48rem, the typical desktop panel width)
  *
  * The @-tier names map to `--container-*` theme sizes (NOT the viewport
- * breakpoints), ascending in min-width: @sm 24rem < @lg 32rem < @5xl 64rem,
- * so the ramp resolves 1 → 2 → 3 → 4 as the page grows. Every tier keeps
- * the card width in a comfortable 250px+ range on 4-column desktops.
+ * breakpoints), ascending in min-width: @sm 24rem < @lg 32rem < @3xl 48rem,
+ * so the ramp resolves 1 → 2 → 3 → 4 as the page grows. Embedded hosts keep
+ * the card width in a ~200px+ range on 4-column desktop panels.
  */
 export function CardGrid({ children, className = '' }: CardGridProps) {
   return (
     <div
-      className={`grid grid-cols-1 @sm:grid-cols-2 @lg:grid-cols-3 @5xl:grid-cols-4 gap-4 w-full ${className}`}
+      className={`grid grid-cols-1 @sm:grid-cols-2 @lg:grid-cols-3 @3xl:grid-cols-4 gap-4 w-full ${className}`}
     >
       {children}
     </div>

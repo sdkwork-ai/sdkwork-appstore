@@ -40,13 +40,11 @@ tower = "0.5"
 tower-http = { version = "0.6", features = ["cors", "trace"] }
 tracing = "0.1"
 uuid = { version = "1", features = ["v4"] }
+sdkwork-appstore-user-store-service.workspace = true
 sdkwork-routes-appstore-catalog-app-api.workspace = true
 sdkwork-routes-appstore-catalog-backend-api.workspace = true
 sdkwork-routes-appstore-catalog-open-api.workspace = true
 sdkwork-routes-automation-open-api.workspace = true
-sdkwork-appstore-user-store-service.workspace = true
-sdkwork-routes-user-store-app-api.workspace = true
-sdkwork-routes-user-store-open-api.workspace = true
 sdkwork-routes-compliance-app-api.workspace = true
 sdkwork-routes-library-app-api.workspace = true
 sdkwork-routes-listing-app-api.workspace = true
@@ -59,3 +57,5 @@ sdkwork-routes-publisher-app-api.workspace = true
 sdkwork-routes-publisher-backend-api.workspace = true
 sdkwork-routes-release-app-api.workspace = true
 sdkwork-routes-release-open-api.workspace = true
+sdkwork-routes-user-store-app-api.workspace = true
+sdkwork-routes-user-store-open-api.workspace = true

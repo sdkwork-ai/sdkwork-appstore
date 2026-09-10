@@ -181,6 +181,28 @@
       "componentRef": "crates/sdkwork-routes-release-open-api/specs/component.spec.json",
       "routeManifestRef": "crates/sdkwork-routes-release-open-api/src/http_route_manifest.rs#open_route_manifest",
       "sourceRef": "crates/sdkwork-routes-release-open-api/Cargo.toml"
+    },
+    {
+      "packageName": "sdkwork-routes-user-store-app-api",
+      "memberDir": "crates/sdkwork-routes-user-store-app-api",
+      "libName": "sdkwork_routes_user_store_app_api",
+      "surface": "app-api",
+      "pathPrefix": null,
+      "mountOrder": 16,
+      "componentRef": "crates/sdkwork-routes-user-store-app-api/specs/component.spec.json",
+      "routeManifestRef": "crates/sdkwork-routes-user-store-app-api/src/manifest.rs",
+      "sourceRef": "crates/sdkwork-routes-user-store-app-api/Cargo.toml"
+    },
+    {
+      "packageName": "sdkwork-routes-user-store-open-api",
+      "memberDir": "crates/sdkwork-routes-user-store-open-api",
+      "libName": "sdkwork_routes_user_store_open_api",
+      "surface": "open-api",
+      "pathPrefix": null,
+      "mountOrder": 17,
+      "componentRef": "crates/sdkwork-routes-user-store-open-api/specs/component.spec.json",
+      "routeManifestRef": "crates/sdkwork-routes-user-store-open-api/src/manifest.rs",
+      "sourceRef": "crates/sdkwork-routes-user-store-open-api/Cargo.toml"
     }
   ]
 }

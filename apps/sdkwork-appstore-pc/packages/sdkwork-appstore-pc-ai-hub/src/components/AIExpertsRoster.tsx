@@ -175,7 +175,7 @@ export const AIExpertsRoster: React.FC<AIExpertsRosterProps> = ({
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 @sm:grid-cols-2 @lg:grid-cols-3 @5xl:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 @sm:grid-cols-2 @lg:grid-cols-3 @3xl:grid-cols-4 gap-4">
           {filteredExperts.map((exp) => (
             <ExpertCard
               key={exp.id}
