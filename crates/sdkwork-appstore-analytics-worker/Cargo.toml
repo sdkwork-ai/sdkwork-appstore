@@ -1,9 +1,13 @@
 [package]
+rust-version.workspace = true
 name = "sdkwork-appstore-analytics-worker"
 version = "0.1.0"
 edition = "2021"
 description = "SDKWork App Store analytics projection worker (metrics, charts, trending)."
 
+
+[lints]
+workspace = true
 [lib]
 path = "src/lib.rs"
 

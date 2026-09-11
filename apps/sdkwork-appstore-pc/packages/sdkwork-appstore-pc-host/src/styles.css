@@ -1,21 +1,21 @@
-@import "tailwindcss";
-@plugin "tailwindcss-animate";
-@custom-variant dark (&:is(.dark *));
-@source "../../../../src";
-@source "../../../../packages";
-
-@theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --color-primary-50: #eff6ff;
-  --color-primary-100: #dbeafe;
-  --color-primary-200: #bfdbfe;
-  --color-primary-300: #93c5fd;
-  --color-primary-400: #60a5fa;
-  --color-primary-500: #2563eb;
-  --color-primary-600: #1d4ed8;
-  --color-primary-700: #1e40af;
-  --color-primary-900: #1e3a8a;
-}
+/**
+ * Host package stylesheet for the appstore PC surface.
+ *
+ * Plain CSS only — this sheet deliberately carries NO Tailwind directives.
+ * TAILWIND_CSS_INTEGRATION_SPEC.md section 4 allows exactly one Tailwind engine
+ * bootstrap per runnable application graph, and for this app that bootstrap is
+ * `apps/sdkwork-appstore-pc/src/index.css`: `src/main.tsx` imports it, it is the
+ * allowlisted standalone-app entry, and its `@source "../packages"` row already
+ * scans every package in this app — including this host package's own `src` — so
+ * every utility class used here is generated there.
+ *
+ * This file used to repeat the bootstrap (`@import "tailwindcss"`, `@plugin`,
+ * a duplicate `@theme`, a duplicate `@custom-variant dark`), which compiled
+ * Tailwind twice into one bundle: a second preflight reset and a second theme.
+ * Its `@source` rows were dead as well — `../../../../src` and
+ * `../../../../packages` resolved to `apps/src` and `apps/packages`, neither of
+ * which exists.
+ */
 
 :root { color-scheme: light; }
 html.dark { color-scheme: dark; }

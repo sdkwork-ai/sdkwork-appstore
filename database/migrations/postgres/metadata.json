@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "kind": "sdkwork.database.migration-metadata",
+  "engine": "postgres",
+  "sourcePolicy": "historical-immutable",
+  "migrations": {
+    "0003_user_store.up.sql": {
+      "reversible": "false",
+      "rollback": "forward-fix",
+      "correctionReason": "The structured header recorded raw SQL ('DROP TABLE IF EXISTS appstore_user_store_share;') where DATABASE_FRAMEWORK_SPEC.md section 7.2 requires a machine-readable strategy token. The migration creates the user-owned custom category and shareable personal appstore tables, so any reversal would drop user data and is lossy by nature; the strategy is therefore recorded as irreversible with a forward-fix rollback, matching the other lossy migrations in this module. The migration SQL is unchanged and remains checksum-covered."
+    }
+  }
+}

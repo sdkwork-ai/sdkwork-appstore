@@ -350,7 +350,7 @@
             "id": "application-ui",
             "kind": "user-interface",
             "source": {
-              "processId": "storefront-renderer"
+              "processId": "appstore-browser"
             },
             "path": "/",
             "primary": true,
@@ -460,7 +460,7 @@
             "id": "application-ui",
             "kind": "user-interface",
             "source": {
-              "processId": "storefront-renderer"
+              "processId": "appstore-browser"
             },
             "path": "/",
             "primary": true,

@@ -1,8 +1,12 @@
 [package]
+rust-version.workspace = true
 name = "sdkwork-appstore-library-service"
 version = "0.1.0"
 edition = "2021"
 
+
+[lints]
+workspace = true
 [lib]
 path = "src/lib.rs"
 

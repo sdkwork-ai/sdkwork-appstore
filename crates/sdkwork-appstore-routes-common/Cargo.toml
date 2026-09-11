@@ -1,9 +1,13 @@
 [package]
+rust-version.workspace = true
 name = "sdkwork-appstore-routes-common"
 version = "0.1.0"
 edition = "2021"
 description = "Shared HTTP response mapping and request context helpers for App Store route crates."
 
+
+[lints]
+workspace = true
 [lib]
 path = "src/lib.rs"
 

@@ -1,9 +1,13 @@
 [package]
+rust-version.workspace = true
 name = "sdkwork-appstore-database-host"
 version = "0.1.0"
 edition = "2021"
 description = "SDKWork App Store database lifecycle bootstrap."
 
+
+[lints]
+workspace = true
 [lib]
 path = "src/lib.rs"
 
