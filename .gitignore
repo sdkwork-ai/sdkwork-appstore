@@ -78,7 +78,6 @@ Thumbs.db
 # Runtime-generated env config (modified by local dev server)
 **/public/runtime-env.json
 **/etc/browser/runtime-env.*.json
-/bin/
 
 # Workspace junk / temp files and directories
 _tmp_*/
