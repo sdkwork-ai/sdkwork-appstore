@@ -24,7 +24,6 @@ import { collection as collectionZh } from './zh-CN/appstore/storefront/collecti
 import { events as eventsZh } from './zh-CN/appstore/storefront/events';
 import { publisher as publisherZh } from './zh-CN/appstore/storefront/publisher';
 import { consoleLocales as consoleLocalesZh } from './zh-CN/appstore/console/console';
-import { admin as adminZh } from './zh-CN/appstore/console/admin';
 import { install as installZh } from './zh-CN/appstore/system/install';
 
 import { nav as navEn } from './en/appstore/storefront/nav';
@@ -50,7 +49,6 @@ import { collection as collectionEn } from './en/appstore/storefront/collection'
 import { events as eventsEn } from './en/appstore/storefront/events';
 import { publisher as publisherEn } from './en/appstore/storefront/publisher';
 import { consoleLocales as consoleLocalesEn } from './en/appstore/console/console';
-import { admin as adminEn } from './en/appstore/console/admin';
 import { install as installEn } from './en/appstore/system/install';
 
 const SAVED_LANG_KEY = 'app_language';
@@ -108,7 +106,6 @@ const en = {
   events: eventsEn,
   publisher: publisherEn,
   console: consoleLocalesEn,
-  admin: adminEn,
   install: installEn,
 };
 

@@ -4,7 +4,6 @@ import {
   Home,
   Grid,
   Gamepad2,
-  Sparkles,
   Trophy,
   Search,
   Bot,
@@ -32,7 +31,6 @@ export function DesktopSidebar() {
     { name: t('nav.menu.discover'), path: '/', icon: Home },
     { name: t('nav.menu.apps'), path: '/apps', icon: Grid },
     { name: t('nav.menu.games'), path: '/games', icon: Gamepad2 },
-    { name: t('nav.menu.aiHub'), path: '/ai-hub', icon: Sparkles },
     { name: t('nav.menu.charts'), path: '/charts', icon: Trophy },
     { name: t('nav.menu.search'), path: '/search', icon: Search },
   ];

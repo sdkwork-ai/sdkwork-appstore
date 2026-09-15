@@ -24,28 +24,47 @@
     {
       "file": "APP_PC_ARCHITECTURE_SPEC.md",
       "path": "../../../../../sdkwork-specs/APP_PC_ARCHITECTURE_SPEC.md",
-      "purpose": "Explicit backend-admin runtime boundary."
+      "purpose": "Explicit backend-admin runtime boundary and package dependency direction."
     },
     {
       "file": "BACKEND_UI_SPEC.md",
       "path": "../../../../../sdkwork-specs/BACKEND_UI_SPEC.md",
-      "purpose": "Operator UI authorization and package placement."
+      "purpose": "Operator UI authorization, package placement, and admin capability inventory."
     },
     {
       "file": "APP_SDK_INTEGRATION_SPEC.md",
       "path": "../../../../../sdkwork-specs/APP_SDK_INTEGRATION_SPEC.md",
       "purpose": "Backend SDK injection in an explicit admin surface."
+    },
+    {
+      "file": "IAM_SPEC.md",
+      "path": "../../../../../sdkwork-specs/IAM_SPEC.md",
+      "purpose": "Permission codes and platform-administrator role evaluation."
     }
   ],
   "contracts": {
     "publicExports": [
-      ".",
-      "./sdk",
-      "./modules",
-      "./host",
-      "./session",
-      "./composition"
+      "."
     ],
+    "providedPorts": [
+      {
+        "port": "appstore.pc.admin.sdk-client",
+        "description": "Single legal construction point for the generated App Store backend SDK inside the backend-admin surface."
+      },
+      {
+        "port": "appstore.pc.admin.service-ports",
+        "description": "One backend-admin service port per backend domain namespace (dashboard, moderation, listings, catalog, publishers, market)."
+      },
+      {
+        "port": "appstore.pc.admin.access",
+        "description": "Backend-admin permission catalog, permission evaluation, and the headless route access guard."
+      },
+      {
+        "port": "appstore.pc.admin.routes",
+        "description": "Route and capability-module descriptor contracts consumed by pc-admin-shell and implemented by every pc-admin-* capability package."
+      }
+    ],
+    "requiredPorts": [],
     "sdkDependencies": [
       {
         "workspace": "sdkwork-appstore-backend-sdk",

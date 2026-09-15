@@ -10,7 +10,7 @@ export * from './hostSessionSync';
 export * from './accessTokenContextClaims';
 export * from './sessionTokenManager';
 export * from './credentialEntry';
-export * from './adminMonitor';
+export * from './adminRuntime';
 export * from './aiHub';
 export * from './appStore';
 export * from './console';

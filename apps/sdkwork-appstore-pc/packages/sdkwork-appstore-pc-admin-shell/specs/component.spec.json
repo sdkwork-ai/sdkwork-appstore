@@ -1,0 +1,108 @@
+{
+  "schemaVersion": 1,
+  "kind": "sdkwork.component.spec",
+  "component": {
+    "name": "@sdkwork/appstore-pc-admin-shell",
+    "displayName": "SDKWork App Store PC Admin Shell",
+    "version": "1.0.0",
+    "type": "typescript-package",
+    "root": "apps/sdkwork-appstore-pc/packages/sdkwork-appstore-pc-admin-shell",
+    "domain": "appstore",
+    "capability": "admin-shell",
+    "surface": "backend-admin",
+    "languages": [
+      "typescript"
+    ],
+    "generated": false,
+    "status": "active",
+    "manifests": [
+      "package.json",
+      "specs/component.spec.json"
+    ]
+  },
+  "canonicalSpecs": [
+    {
+      "file": "APP_PC_ARCHITECTURE_SPEC.md",
+      "path": "../../../../../sdkwork-specs/APP_PC_ARCHITECTURE_SPEC.md",
+      "purpose": "Admin shell ownership of the /admin route tree and layout composition."
+    },
+    {
+      "file": "BACKEND_UI_SPEC.md",
+      "path": "../../../../../sdkwork-specs/BACKEND_UI_SPEC.md",
+      "purpose": "Operator console shell structure, navigation, and access gate placement."
+    },
+    {
+      "file": "I18N_SPEC.md",
+      "path": "../../../../../sdkwork-specs/I18N_SPEC.md",
+      "purpose": "Package-owned locale fragments and thin registration aggregator."
+    },
+    {
+      "file": "COMPONENT_SPEC.md",
+      "path": "../../../../../sdkwork-specs/COMPONENT_SPEC.md",
+      "purpose": "Composed capability modules and declared ports."
+    }
+  ],
+  "contracts": {
+    "publicExports": [
+      "."
+    ],
+    "providedPorts": [
+      {
+        "port": "appstore.pc.admin.shell",
+        "description": "Renders the /admin chrome (navigation, breadcrumb, access gate) and the aggregated operator route tree."
+      },
+      {
+        "port": "appstore.pc.admin.i18n-registration",
+        "description": "Registers the admin surface locale fragments into the single application i18n provider."
+      }
+    ],
+    "requiredPorts": [
+      {
+        "port": "appstore.pc.admin.routes",
+        "description": "Route and capability-module descriptors from @sdkwork/appstore-pc-admin-core."
+      },
+      {
+        "port": "appstore.pc.admin.access",
+        "description": "Backend-admin access evaluation and the headless route guard from @sdkwork/appstore-pc-admin-core."
+      }
+    ],
+    "sdkDependencies": [],
+    "sdkClients": [],
+    "permissionComposition": {
+      "inheritanceMode": "module-catalog-with-overrides",
+      "applicationModule": {
+        "manifestRef": "../../../../specs/iam.module.manifest.json"
+      },
+      "moduleCatalogRefs": [
+        {
+          "moduleId": "appstore",
+          "manifestRef": "../../../../specs/iam.module.manifest.json",
+          "inheritPermissions": true,
+          "inheritRoles": true
+        }
+      ],
+      "bootstrapAccessTokenScope": {
+        "inheritFrom": "sdkwork.app.config.json#backend.accessTokenPermissionScope",
+        "supplement": [],
+        "overrideReplace": false
+      },
+      "routePermissionHints": {
+        "inheritFromOpenApi": true,
+        "inheritFromModuleManifests": true,
+        "overrides": []
+      },
+      "consumerPolicy": {
+        "forbidLocalPermissionCatalogForDependencyDomains": true,
+        "allowExplicitOverridesOnly": true,
+        "allowFrontendHintsWithoutServerDuplication": true
+      }
+    },
+    "dependencyApiExports": [],
+    "dependencyApiSurfaces": []
+  },
+  "verification": {
+    "commands": [
+      "pnpm --dir apps/sdkwork-appstore-pc typecheck"
+    ]
+  }
+}

@@ -5,6 +5,5 @@ export * from './skills';
 export * from './mcp';
 export * from './templates';
 export * from './console';
-export * from './admin';
 export * from './install';
 export * from './userStore';

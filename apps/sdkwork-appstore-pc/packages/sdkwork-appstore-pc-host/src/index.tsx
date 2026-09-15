@@ -3,8 +3,6 @@ import { I18nextProvider } from 'react-i18next'
 import { MemoryRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import { SdkworkSessionAuthBrowserRoot } from '@sdkwork/auth-pc-react'
 import {
-  AdminPermissionGate,
-  AdminMonitorPage,
   AppDetailPage,
   AppstoreAuthShell,
   AppsPage,
@@ -52,6 +50,7 @@ import {
   type AppstorePcRuntimeConfig,
   type AuthTokenManager,
 } from '@sdkwork/appstore-pc-runtime'
+import { AppstoreAdminSurface } from './AppstoreAdminSurface'
 import './styles.css'
 
 /** Session data accepted from an embedding application. */
@@ -141,15 +140,6 @@ export function AppstorePcRoutes({
             <Route path="publisher" element={<PublisherOverviewPage />} />
             <Route path="publisher/apps/new" element={<PublisherCreateAppPage />} />
             <Route path="publisher/apps/:id" element={<PublisherAppManagePage />} />
-            <Route
-              path="admin/monitor"
-              element={
-                <AdminPermissionGate runtime={runtime}>
-                  <AdminMonitorPage />
-                </AdminPermissionGate>
-              }
-            />
-            <Route path="admin" element={<Navigate to="/admin/monitor" replace />} />
           </Route>
         </Routes>
       </AuthGate>
@@ -331,6 +321,12 @@ export function AppstorePcHost(props: AppstorePcHostProps = {}) {
 
 export { AppstoreAuthShell, resolveAppstorePcAuthRuntimeConfig }
 export type { AppstorePcRuntime, AppstorePcRuntimeConfig }
+export {
+  AppstoreAdminSurface,
+  APPSTORE_ADMIN_MODULES,
+  ensureAppstoreAdminLocalesRegistered,
+  type AppstoreAdminSurfaceProps,
+} from './AppstoreAdminSurface'
 export {
   AppstoreMarketsSurface,
   type AppstoreMarketsPage,

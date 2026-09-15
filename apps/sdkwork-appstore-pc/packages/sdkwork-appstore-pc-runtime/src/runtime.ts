@@ -15,7 +15,7 @@ import {
   createAppstorePcSessionTokenManager,
   hydrateAppstorePcSessionTokenManager,
 } from './sessionTokenManager';
-import { configureAppstorePcAdminMonitorRuntime } from './adminMonitor';
+import { configureAppstorePcAdminRuntime } from './adminRuntime';
 import { configureAppstorePcAIHub } from './aiHub';
 import { configureAppstorePcAppStore } from './appStore';
 import { configureAppstorePcConsole } from './console';
@@ -80,7 +80,7 @@ export function createAppstorePcRuntime(
   configureAppstorePcPlugins(sdkClients.app);
   configureAppstorePcConsole(sdkClients.app);
   configureAppstorePcInstall(sdkClients.app);
-  configureAppstorePcAdminMonitorRuntime(config, tokenManager);
+  configureAppstorePcAdminRuntime(config, tokenManager);
 
   return { config, iamRuntime, sdkClients, session };
 }

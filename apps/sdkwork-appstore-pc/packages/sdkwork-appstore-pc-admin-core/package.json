@@ -9,18 +9,15 @@
       "types": "./src/index.ts",
       "import": "./src/index.ts",
       "default": "./src/index.ts"
-    },
-    "./sdk": "./src/sdk/index.ts",
-    "./modules": "./src/modules/index.ts",
-    "./host": "./src/host/index.ts",
-    "./session": "./src/session/index.ts",
-    "./composition": "./src/composition/index.ts",
-    "./services": "./src/services/index.ts"
+    }
   },
   "dependencies": {
     "@sdkwork/appstore-backend-sdk": "workspace:*",
-    "@sdkwork/appstore-pc-core": "workspace:*",
+    "@sdkwork/iam-contracts": "workspace:*",
     "@sdkwork/sdk-common": "workspace:*",
     "@sdkwork/utils": "workspace:*"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
   }
 }

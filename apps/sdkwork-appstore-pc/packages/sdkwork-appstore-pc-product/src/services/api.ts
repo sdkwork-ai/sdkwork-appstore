@@ -6,7 +6,6 @@ export {
   McpService,
   TemplatesService,
   ConsoleService,
-  AdminMonitorService,
   InstallService,
   UserStoreService,
 } from '@sdkwork/appstore-pc-core';
@@ -19,7 +18,6 @@ export type {
   IMcpSDK,
   ITemplatesSDK,
   IConsoleSDK,
-  IAdminMonitorSDK,
   IInstallSDK,
   IUserStoreSDK,
   UserCategory,
@@ -40,15 +38,9 @@ export type {
   ApiCredential,
   SecurityPolicy,
   ConsoleAuditLog,
-  SystemMetrics,
-  ClusterNode,
-  SystemAuditEntry,
-  OperatorDashboard,
-  ModerationQueueItem,
   StorageStats,
   PublisherProfile,
   ReleaseItem,
   ManagedAppDetail,
   PublisherMember,
 } from '@sdkwork/appstore-pc-core';
-

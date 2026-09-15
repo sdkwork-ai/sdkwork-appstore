@@ -1,0 +1,118 @@
+{
+  "schemaVersion": 1,
+  "kind": "sdkwork.component.spec",
+  "component": {
+    "name": "@sdkwork/appstore-pc-admin-catalog",
+    "displayName": "SDKWork App Store PC Admin Catalog",
+    "version": "1.0.0",
+    "type": "typescript-package",
+    "root": "apps/sdkwork-appstore-pc/packages/sdkwork-appstore-pc-admin-catalog",
+    "domain": "appstore",
+    "capability": "admin-catalog",
+    "surface": "backend-admin",
+    "languages": [
+      "typescript"
+    ],
+    "generated": false,
+    "status": "active",
+    "manifests": [
+      "package.json",
+      "specs/component.spec.json"
+    ]
+  },
+  "canonicalSpecs": [
+    {
+      "file": "BACKEND_UI_SPEC.md",
+      "path": "../../../../../sdkwork-specs/BACKEND_UI_SPEC.md",
+      "purpose": "Operator authoring-console page structure, permission hints, and backend-admin package placement for catalog mutations."
+    },
+    {
+      "file": "APP_PC_ARCHITECTURE_SPEC.md",
+      "path": "../../../../../sdkwork-specs/APP_PC_ARCHITECTURE_SPEC.md",
+      "purpose": "pc-admin-* capability package boundary and dependency direction for catalog governance."
+    },
+    {
+      "file": "I18N_SPEC.md",
+      "path": "../../../../../sdkwork-specs/I18N_SPEC.md",
+      "purpose": "Package-owned catalog locale fragments under src/i18n/<locale>/appstore/admin."
+    }
+  ],
+  "contracts": {
+    "publicExports": [
+      "."
+    ],
+    "providedPorts": [
+      {
+        "port": "appstore.pc.admin.catalog.module",
+        "description": "Catalog capability module: authoring routes, navigation metadata, and locale namespaces."
+      }
+    ],
+    "requiredPorts": [
+      {
+        "port": "appstore.pc.admin.service-ports",
+        "description": "catalog service port (category, collection, collection-item, and featured-slot writes) from @sdkwork/appstore-pc-admin-core."
+      },
+      {
+        "port": "appstore.pc.admin.shell",
+        "description": "Operator UI kit, shell context, and command hook from @sdkwork/appstore-pc-admin-shell."
+      }
+    ],
+    "sdkDependencies": [],
+    "sdkClients": [],
+    "permissionComposition": {
+      "inheritanceMode": "module-catalog-with-overrides",
+      "applicationModule": {
+        "manifestRef": "../../../../specs/iam.module.manifest.json"
+      },
+      "moduleCatalogRefs": [
+        {
+          "moduleId": "appstore",
+          "manifestRef": "../../../../specs/iam.module.manifest.json",
+          "inheritPermissions": true,
+          "inheritRoles": true
+        }
+      ],
+      "bootstrapAccessTokenScope": {
+        "inheritFrom": "sdkwork.app.config.json#backend.accessTokenPermissionScope",
+        "supplement": [],
+        "overrideReplace": false
+      },
+      "routePermissionHints": {
+        "inheritFromOpenApi": true,
+        "inheritFromModuleManifests": true,
+        "overrides": [
+          {
+            "routeId": "catalog-categories",
+            "permissions": [
+              "appstore.catalog.admin"
+            ]
+          },
+          {
+            "routeId": "catalog-collections",
+            "permissions": [
+              "appstore.catalog.admin"
+            ]
+          },
+          {
+            "routeId": "catalog-featured",
+            "permissions": [
+              "appstore.catalog.admin"
+            ]
+          }
+        ]
+      },
+      "consumerPolicy": {
+        "forbidLocalPermissionCatalogForDependencyDomains": true,
+        "allowExplicitOverridesOnly": true,
+        "allowFrontendHintsWithoutServerDuplication": true
+      }
+    },
+    "dependencyApiExports": [],
+    "dependencyApiSurfaces": []
+  },
+  "verification": {
+    "commands": [
+      "pnpm --dir apps/sdkwork-appstore-pc typecheck"
+    ]
+  }
+}

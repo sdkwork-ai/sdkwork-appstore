@@ -24,7 +24,6 @@
     "react-i18next": ">=14.0.0 <18"
   },
   "dependencies": {
-    "@sdkwork/appstore-pc-admin-core": "workspace:*",
     "@sdkwork/appstore-pc-ai-hub": "workspace:*",
     "@sdkwork/appstore-pc-apps": "workspace:*",
     "@sdkwork/appstore-pc-commons": "workspace:*",
