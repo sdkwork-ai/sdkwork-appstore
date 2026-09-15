@@ -1,4 +1,8 @@
-$root = "E:\sdkwork-space\sdkwork-appstore"
+# Self-locating repository root: this script lives in <repo>/tools, so the repo
+# root is its parent directory. The workspace is relocatable, and
+# DEPENDENCY_MANAGEMENT_SPEC.md section 1 forbids a machine-specific absolute
+# source path.
+$root = Split-Path -Parent $PSScriptRoot
 $deps = @"
 sdkwork-web-core = { path = "../../../sdkwork-web-framework/crates/sdkwork-web-core" }
 axum = { version = "0.8", default-features = false, features = ["json"] }

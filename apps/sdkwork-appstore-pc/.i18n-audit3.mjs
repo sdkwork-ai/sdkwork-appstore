@@ -1,7 +1,8 @@
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
 
-const ROOT = 'E:/sdkwork-space/sdkwork-appstore/apps/sdkwork-appstore-pc';
+const ROOT = path.dirname(fileURLToPath(import.meta.url));
 const scanDirs = ['src/pages', 'src/components', 'src/auth', 'src/providers', 'packages'].map((d) =>
   path.join(ROOT, d),
 );
