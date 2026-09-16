@@ -7,6 +7,14 @@
   "dependencies": {
     "@sdkwork/appstore-pc-commons": "workspace:*",
     "@sdkwork/appstore-pc-core": "workspace:*",
-    "@sdkwork/appstore-pc-markets": "workspace:*"
+    "@sdkwork/appstore-pc-markets": "workspace:*",
+    "lucide-react": "^0.546.0"
+  },
+  "peerDependencies": {
+    "react": ">=18.2.0 <20",
+    "react-i18next": ">=14.0.0 <18"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.14"
   }
 }
