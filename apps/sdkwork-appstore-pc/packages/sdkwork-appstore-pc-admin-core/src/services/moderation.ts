@@ -3,6 +3,7 @@ import { uuid } from '@sdkwork/utils/id';
 
 import { executeAdminOperation, requireAdminIdentifier } from './errors';
 import {
+  type AppstoreAdminDateRange,
   type AppstoreAdminPage,
   emptyPage,
   formatAdminDate,

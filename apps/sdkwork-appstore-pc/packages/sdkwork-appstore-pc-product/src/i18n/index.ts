@@ -78,7 +78,6 @@ const zhCN = {
   events: eventsZh,
   publisher: publisherZh,
   console: consoleLocalesZh,
-  admin: adminZh,
   install: installZh,
 };
 
