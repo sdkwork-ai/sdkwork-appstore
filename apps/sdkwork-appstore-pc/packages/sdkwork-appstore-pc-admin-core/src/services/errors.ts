@@ -57,7 +57,8 @@ export class AppstoreAdminServiceError extends Error implements AppstoreAdminSer
   public readonly i18nKey: string | undefined;
   public readonly operationId: string | undefined;
   public readonly fieldErrors: AppstoreAdminFieldError[];
-  public readonly cause: unknown;
+  /** Overrides `Error.cause`, so the modifier is required under `noImplicitOverride`. */
+  public override readonly cause: unknown;
 
   constructor(shape: AppstoreAdminServiceErrorShape) {
     super(shape.message);

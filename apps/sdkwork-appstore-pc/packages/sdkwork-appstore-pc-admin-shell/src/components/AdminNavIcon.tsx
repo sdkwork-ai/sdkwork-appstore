@@ -52,8 +52,10 @@ export interface AdminNavIconProps {
 /** Resolve a descriptor icon name to its rendered glyph. */
 export function AdminNavIcon({ className, name }: AdminNavIconProps) {
   const Icon = name ? ADMIN_NAV_ICONS[name] : undefined;
-  const resolved = Icon ?? Circle;
-  return <resolved className={className} />;
+  // JSX treats a lowercase tag as an intrinsic element, so the fallback has to
+  // keep a capitalized identifier to render the component it holds.
+  const Resolved = Icon ?? Circle;
+  return <Resolved className={className} />;
 }
 
 /** Icon names the shell can render; surfaced for capability package authors. */
