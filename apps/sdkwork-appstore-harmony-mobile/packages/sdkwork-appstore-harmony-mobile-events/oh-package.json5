@@ -1,0 +1,12 @@
+{
+  "name": "@sdkwork/sdkwork-appstore-harmony-mobile-events",
+  "version": "0.1.0",
+  "description": "SDKWork App Store HarmonyOS mobile events capability.",
+  "main": "src/main/ets/Index.ets",
+  "author": "SDKWork",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@sdkwork/sdkwork-appstore-harmony-mobile-core": "file:../sdkwork-appstore-harmony-mobile-core",
+    "@sdkwork/sdkwork-appstore-harmony-mobile-commons": "file:../sdkwork-appstore-harmony-mobile-commons"
+  }
+}

@@ -5,7 +5,7 @@
                       "version":  "0.1.0",
                       "root":  "apps/sdkwork-appstore-h5/packages/sdkwork-appstore-h5-console-shell",
                       "surface":  "app",
-                      "name":  "@sdkwork/appstore-appstore-h5-console-shell",
+                      "name":  "@sdkwork/appstore-h5-console-shell",
                       "capability":  "console-shell",
                       "languages":  [
                                         "typescript"
@@ -17,6 +17,11 @@
                       "displayName":  "sdkwork-appstore-h5-console-shell"
                   },
     "contracts":  {
+                      "layerRole":  "frontend-shell",
+                      "providedPorts":  [
+                                           ],
+                      "requiredPorts":  [
+                                           ],
                       "runtimeEntrypoints":  [
                                                  "package.json#scripts.typecheck"
                                              ],
@@ -54,7 +59,7 @@
                        ],
     "verification":  {
                          "commands":  [
-                                          "pnpm --filter @@sdkwork/appstore-h5-console-shell typecheck"
+                                          "pnpm --filter @sdkwork/appstore-h5-console-shell typecheck"
                                       ]
                      }
 }

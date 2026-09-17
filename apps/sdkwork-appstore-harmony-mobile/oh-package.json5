@@ -1,0 +1,34 @@
+{
+  "modelVersion": "5.0.0",
+  "name": "sdkwork-appstore-harmony-mobile",
+  "version": "0.1.0",
+  "description": "SDKWork App Store native HarmonyOS mobile client for discovering, installing, and operating marketplace applications.",
+  "main": "",
+  "author": "SDKWork",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@sdkwork/sdkwork-appstore-harmony-mobile-core": "file:./packages/sdkwork-appstore-harmony-mobile-core",
+    "@sdkwork/sdkwork-appstore-harmony-mobile-commons": "file:./packages/sdkwork-appstore-harmony-mobile-commons",
+    "@sdkwork/sdkwork-appstore-harmony-mobile-shell": "file:./packages/sdkwork-appstore-harmony-mobile-shell",
+    "@sdkwork/sdkwork-appstore-harmony-mobile-host": "file:./packages/sdkwork-appstore-harmony-mobile-host",
+    "@sdkwork/sdkwork-appstore-harmony-mobile-discover": "file:./packages/sdkwork-appstore-harmony-mobile-discover",
+    "@sdkwork/sdkwork-appstore-harmony-mobile-apps": "file:./packages/sdkwork-appstore-harmony-mobile-apps",
+    "@sdkwork/sdkwork-appstore-harmony-mobile-games": "file:./packages/sdkwork-appstore-harmony-mobile-games",
+    "@sdkwork/sdkwork-appstore-harmony-mobile-charts": "file:./packages/sdkwork-appstore-harmony-mobile-charts",
+    "@sdkwork/sdkwork-appstore-harmony-mobile-category": "file:./packages/sdkwork-appstore-harmony-mobile-category",
+    "@sdkwork/sdkwork-appstore-harmony-mobile-collection": "file:./packages/sdkwork-appstore-harmony-mobile-collection",
+    "@sdkwork/sdkwork-appstore-harmony-mobile-ai-hub": "file:./packages/sdkwork-appstore-harmony-mobile-ai-hub",
+    "@sdkwork/sdkwork-appstore-harmony-mobile-search": "file:./packages/sdkwork-appstore-harmony-mobile-search",
+    "@sdkwork/sdkwork-appstore-harmony-mobile-app-detail": "file:./packages/sdkwork-appstore-harmony-mobile-app-detail",
+    "@sdkwork/sdkwork-appstore-harmony-mobile-events": "file:./packages/sdkwork-appstore-harmony-mobile-events",
+    "@sdkwork/sdkwork-appstore-harmony-mobile-library": "file:./packages/sdkwork-appstore-harmony-mobile-library",
+    "@sdkwork/sdkwork-appstore-harmony-mobile-updates": "file:./packages/sdkwork-appstore-harmony-mobile-updates",
+    "@sdkwork/sdkwork-appstore-harmony-mobile-wishlist": "file:./packages/sdkwork-appstore-harmony-mobile-wishlist",
+    "@sdkwork/sdkwork-appstore-harmony-mobile-user-store": "file:./packages/sdkwork-appstore-harmony-mobile-user-store",
+    "@sdkwork/sdkwork-appstore-harmony-mobile-publisher": "file:./packages/sdkwork-appstore-harmony-mobile-publisher",
+    "@sdkwork/sdkwork-appstore-harmony-mobile-settings": "file:./packages/sdkwork-appstore-harmony-mobile-settings"
+  },
+  "devDependencies": {
+    "@ohos/hypium": "1.0.19"
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "@@locale": "zh-CN",
+  "title": "合集",
+  "@title": {
+    "description": "Screen title for the collection capability"
+  }
+}

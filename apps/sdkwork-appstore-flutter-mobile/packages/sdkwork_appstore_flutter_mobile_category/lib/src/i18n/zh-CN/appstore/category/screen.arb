@@ -1,0 +1,7 @@
+{
+  "@@locale": "zh-CN",
+  "title": "分类",
+  "@title": {
+    "description": "Screen title for the category capability"
+  }
+}

@@ -1,0 +1,56 @@
+name: appstore-flutter-mobile
+description: SDKWork App Store Flutter mobile client for discovering, installing, publishing, and operating marketplace applications and AI capabilities.
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: ">=3.5.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  sdkwork_appstore_flutter_mobile_core:
+    path: packages/sdkwork_appstore_flutter_mobile_core
+  sdkwork_appstore_flutter_mobile_commons:
+    path: packages/sdkwork_appstore_flutter_mobile_commons
+  sdkwork_appstore_flutter_mobile_shell:
+    path: packages/sdkwork_appstore_flutter_mobile_shell
+  sdkwork_appstore_flutter_mobile_host:
+    path: packages/sdkwork_appstore_flutter_mobile_host
+  sdkwork_appstore_flutter_mobile_discover:
+    path: packages/sdkwork_appstore_flutter_mobile_discover
+  sdkwork_appstore_flutter_mobile_apps:
+    path: packages/sdkwork_appstore_flutter_mobile_apps
+  sdkwork_appstore_flutter_mobile_games:
+    path: packages/sdkwork_appstore_flutter_mobile_games
+  sdkwork_appstore_flutter_mobile_charts:
+    path: packages/sdkwork_appstore_flutter_mobile_charts
+  sdkwork_appstore_flutter_mobile_category:
+    path: packages/sdkwork_appstore_flutter_mobile_category
+  sdkwork_appstore_flutter_mobile_collection:
+    path: packages/sdkwork_appstore_flutter_mobile_collection
+  sdkwork_appstore_flutter_mobile_ai_hub:
+    path: packages/sdkwork_appstore_flutter_mobile_ai_hub
+  sdkwork_appstore_flutter_mobile_search:
+    path: packages/sdkwork_appstore_flutter_mobile_search
+  sdkwork_appstore_flutter_mobile_app_detail:
+    path: packages/sdkwork_appstore_flutter_mobile_app_detail
+  sdkwork_appstore_flutter_mobile_events:
+    path: packages/sdkwork_appstore_flutter_mobile_events
+  sdkwork_appstore_flutter_mobile_library:
+    path: packages/sdkwork_appstore_flutter_mobile_library
+  sdkwork_appstore_flutter_mobile_updates:
+    path: packages/sdkwork_appstore_flutter_mobile_updates
+  sdkwork_appstore_flutter_mobile_wishlist:
+    path: packages/sdkwork_appstore_flutter_mobile_wishlist
+  sdkwork_appstore_flutter_mobile_user_store:
+    path: packages/sdkwork_appstore_flutter_mobile_user_store
+  sdkwork_appstore_flutter_mobile_publisher:
+    path: packages/sdkwork_appstore_flutter_mobile_publisher
+  sdkwork_appstore_flutter_mobile_settings:
+    path: packages/sdkwork_appstore_flutter_mobile_settings
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0

@@ -1,0 +1,7 @@
+{
+  "@@locale": "zh-CN",
+  "title": "我的库",
+  "@title": {
+    "description": "Screen title for the library capability"
+  }
+}

@@ -1,5 +1,5 @@
 {
-  "name": "@sdkwork/appstore-appstore-h5-host",
+  "name": "@sdkwork/appstore-h5-host",
   "version": "0.1.0",
   "private": true,
   "main": "./src/index.ts",
@@ -10,5 +10,8 @@
       "import": "./src/index.ts",
       "default": "./src/index.ts"
     }
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit -p tsconfig.json"
   }
 }

@@ -5,6 +5,8 @@ packages:
   - "apps/sdkwork-appstore-h5/packages/*"
   - "apps/sdkwork-appstore-pc"
   - "apps/sdkwork-appstore-pc/packages/*"
+  - "apps/sdkwork-appstore-mini-program"
+  - "apps/sdkwork-appstore-mini-program/packages/*"
   - "sdks/sdkwork-appstore-app-sdk/sdkwork-appstore-app-sdk-typescript"
   - "sdks/sdkwork-appstore-backend-sdk/sdkwork-appstore-backend-sdk-typescript"
   - "sdks/sdkwork-appstore-sdk/sdkwork-appstore-sdk-typescript"

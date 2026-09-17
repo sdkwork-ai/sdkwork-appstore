@@ -1,0 +1,6 @@
+{
+  "platform": "APP_HARMONY",
+  "bundleName": "com.sdkwork.appstore.mobile",
+  "signingProfileRef": "replace-with-secure-production-signing-profile",
+  "note": "Secret-free template. Supply a real signing profile reference through DevEco Studio or CI secure storage."
+}

@@ -17,6 +17,11 @@
                       "displayName":  "sdkwork-appstore-h5-commons"
                   },
     "contracts":  {
+                      "layerRole":  "frontend-commons",
+                      "providedPorts":  [
+                                           ],
+                      "requiredPorts":  [
+                                           ],
                       "runtimeEntrypoints":  [
                                                  "package.json#scripts.typecheck"
                                              ],
@@ -54,7 +59,7 @@
                        ],
     "verification":  {
                          "commands":  [
-                                          "pnpm --filter @@sdkwork/appstore-h5-commons typecheck"
+                                          "pnpm --filter @sdkwork/appstore-h5-commons typecheck"
                                       ]
                      }
 }

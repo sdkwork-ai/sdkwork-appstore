@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "kind": "sdkwork.component.spec",
+  "component": {
+    "name": "@sdkwork/sdkwork-appstore-harmony-mobile-app-detail",
+    "displayName": "App Detail (HarmonyOS mobile)",
+    "version": "0.1.0",
+    "type": "har-package",
+    "root": "apps/sdkwork-appstore-harmony-mobile/packages/sdkwork-appstore-harmony-mobile-app-detail",
+    "domain": "appstore",
+    "capability": "app-detail",
+    "surface": "app",
+    "languages": [
+      "arkts"
+    ],
+    "generated": false,
+    "manifests": [
+      "oh-package.json5"
+    ]
+  },
+  "canonicalSpecs": [
+    {
+      "file": "HARMONY_APP_MOBILE_ARCHITECTURE_SPEC.md",
+      "path": "../../../sdkwork-specs/HARMONY_APP_MOBILE_ARCHITECTURE_SPEC.md",
+      "purpose": "Native HarmonyOS mobile application root architecture."
+    },
+    {
+      "file": "APP_HARMONY_NATIVE_UI_SPEC.md",
+      "path": "../../../sdkwork-specs/APP_HARMONY_NATIVE_UI_SPEC.md",
+      "purpose": "Package-local pages, components, and view models."
+    },
+    {
+      "file": "APP_CLIENT_ARCHITECTURE_ALIGNMENT_SPEC.md",
+      "path": "../../../sdkwork-specs/APP_CLIENT_ARCHITECTURE_ALIGNMENT_SPEC.md",
+      "purpose": "Cross-client package role and dependency-direction alignment."
+    }
+  ],
+  "contracts": {
+    "layerRole": "frontend-feature",
+    "providedPorts": [
+                         ],
+    "requiredPorts": [
+                         ],
+    "publicExports": [
+      "."
+    ]
+  }
+}

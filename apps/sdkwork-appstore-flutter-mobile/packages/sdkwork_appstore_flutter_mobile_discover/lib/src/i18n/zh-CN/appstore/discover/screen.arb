@@ -1,0 +1,7 @@
+{
+  "@@locale": "zh-CN",
+  "title": "发现",
+  "@title": {
+    "description": "Screen title for the discover capability"
+  }
+}

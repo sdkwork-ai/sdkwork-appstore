@@ -1,0 +1,7 @@
+{
+  "@@locale": "en-US",
+  "title": "Category",
+  "@title": {
+    "description": "Screen title for the category capability"
+  }
+}

@@ -1,0 +1,142 @@
+{
+  "schemaVersion": 3,
+  "kind": "sdkwork.app",
+  "app": {
+    "key": "appstore-harmony-mobile",
+    "name": "SDKWork App Store HarmonyOS Mobile",
+    "displayName": "SDKWork App Store HarmonyOS Mobile",
+    "description": "SDKWork App Store native HarmonyOS mobile client for discovering, installing, and operating marketplace applications.",
+    "vendor": "SDKWork",
+    "officialWebsiteUrl": "https://sdkwork.com/apps/appstore-harmony-mobile",
+    "supportUrl": "https://sdkwork.com/support",
+    "privacyPolicyUrl": "https://sdkwork.com/privacy",
+    "termsOfServiceUrl": "https://sdkwork.com/terms",
+    "appType": "APP_HARMONY",
+    "versionSource": "oh-package.json5",
+    "identifiers": {
+      "packageName": "com.sdkwork.appstore.mobile",
+      "bundleId": "com.sdkwork.appstore.mobile",
+      "desktopAppId": null,
+      "containerImage": "registry.sdkwork.com/apps/appstore-harmony-mobile"
+    }
+  },
+  "backend": {
+    "profileKey": "backend-root-admin",
+    "ownerMode": "tenant",
+    "grantMode": "current",
+    "platform": "APP_HARMONY",
+    "appId": "sdkwork-appstore",
+    "organizationId": "0",
+    "tenantId": "100001",
+    "accessTokenPermissionScope": [
+      "iam:self"
+    ]
+  },
+  "runtime": {
+    "family": "mobile",
+    "framework": "arkts",
+    "runtimes": [
+      "APP_HARMONY",
+      "APP"
+    ],
+    "deliveryModes": [
+      "DIRECT_DOWNLOAD"
+    ],
+    "defaultPlatform": "APP_HARMONY",
+    "defaultArchitecture": "universal",
+    "supportedDeploymentProfiles": [
+      "standalone",
+      "cloud"
+    ],
+    "defaultDeploymentProfile": "standalone"
+  },
+  "media": {
+    "icons": {
+      "primary": {
+        "id": "appstore-harmony-mobile-primary-icon",
+        "type": "ICON",
+        "purpose": "PRIMARY",
+        "platform": "APP",
+        "locale": "en-US",
+        "width": 1024,
+        "height": 1024,
+        "format": "PNG",
+        "enabled": true,
+        "url": "https://cdn.sdkwork.com/apps/sdkwork-appstore/assets/icon-1024.png",
+        "metadata": {
+          "generatedPlaceholder": true
+        }
+      },
+      "platform": [],
+      "metadata": {
+        "generatedPlaceholder": true
+      }
+    },
+    "screenshots": [],
+    "previews": [],
+    "metadata": {
+      "assetVersion": "0.1.0",
+      "defaultLocale": "en-US"
+    }
+  },
+  "publish": {
+    "status": "DRAFT",
+    "installSkill": false,
+    "platforms": [
+      "APP_HARMONY",
+      "APP"
+    ],
+    "installPlatforms": [
+      "APP_HARMONY",
+      "APP"
+    ],
+    "config": {
+      "workspaceRoot": "apps/sdkwork-appstore-harmony-mobile",
+      "framework": "arkts",
+      "managedBy": "sdkwork-appstore-client-scaffold"
+    }
+  },
+  "artifacts": {
+    "installConfig": {
+      "packages": [],
+      "metadata": {
+        "workspaceRoot": "apps/sdkwork-appstore-harmony-mobile",
+        "framework": "arkts",
+        "packageManager": "ohpm"
+      }
+    }
+  },
+  "release": {
+    "currentVersion": "0.1.0",
+    "defaultChannel": "BETA",
+    "latest": {
+      "BETA": "0.1.0"
+    },
+    "notes": [
+      {
+        "version": "0.1.0",
+        "channel": "BETA",
+        "current": true,
+        "packageIds": []
+      }
+    ]
+  },
+  "security": {
+    "checksumRequired": true,
+    "signatureRequired": false,
+    "sbomRequired": true
+  },
+  "devApp": {
+    "build": {
+      "targets": []
+    },
+    "sourceRoot": "apps/sdkwork-appstore-harmony-mobile"
+  },
+  "metadata": {
+    "domain": "appstore",
+    "capability": "store",
+    "standardOwner": "sdkwork-appstore",
+    "deploymentConfig": "etc/sdkwork.deployment.config.json",
+    "releaseAuthority": "../../sdkwork.workflow.json"
+  }
+}

@@ -17,5 +17,8 @@
       "default": "./src/index.ts"
     },
     "./utils": "./src/utils/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit -p tsconfig.json"
   }
 }

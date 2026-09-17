@@ -1,0 +1,7 @@
+{
+  "@@locale": "zh-CN",
+  "title": "AI 实验室",
+  "@title": {
+    "description": "Screen title for the ai-hub capability"
+  }
+}

@@ -14,9 +14,12 @@ The repository root `sdkwork.app.config.json` governs the primary application ma
 
 | Directory | Surface role | Runnable | Purpose | Entry |
 | --- | --- | --- | --- | --- |
-| sdkwork-appstore-common | common | no | Cross-architecture shared packages consumed by PC and H5 surfaces. | `sdkwork-appstore-common/` |
-| sdkwork-appstore-h5 | h5 | yes | sdkwork-appstore-h5 h5 application root. | `sdkwork-appstore-h5/` |
-| sdkwork-appstore-pc | pc | yes | sdkwork-appstore-pc pc application root. | `sdkwork-appstore-pc/` |
+| sdkwork-appstore-common | common | no | SDKWork App Store Common | [README](sdkwork-appstore-common/README.md) |
+| sdkwork-appstore-flutter-mobile | flutter-mobile | yes | SDKWork App Store Mobile flutter-mobile application root. | [README](sdkwork-appstore-flutter-mobile/README.md) |
+| sdkwork-appstore-h5 | h5 | yes | SDKWork App Store h5 application root. | `sdkwork-appstore-h5/` |
+| sdkwork-appstore-harmony-mobile | harmony-mobile | yes | SDKWork App Store HarmonyOS Mobile harmony-mobile application root. | [README](sdkwork-appstore-harmony-mobile/README.md) |
+| sdkwork-appstore-mini-program | mini-program | yes | SDKWork App Store Mini Program mini-program application root. | [README](sdkwork-appstore-mini-program/README.md) |
+| sdkwork-appstore-pc | pc | yes | SDKWork App Store pc application root. | [README](sdkwork-appstore-pc/README.md) |
 
 ## Allowed Content
 

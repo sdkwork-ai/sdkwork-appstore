@@ -1,0 +1,12 @@
+{
+  "environment": "staging",
+  "deploymentProfile": "cloud",
+  "profileId": "cloud.staging",
+  "runtimeTarget": "flutter-android",
+  "applicationOrigin": "https://appstore-staging.sdkwork.com/",
+  "appstoreAppApiBaseUrl": "https://api-staging.sdkwork.com/app/v3/api",
+  "sdkworkEnvironmentAlias": "staging",
+  "sdkDependencies": [
+    "sdkwork-appstore-app-sdk"
+  ]
+}

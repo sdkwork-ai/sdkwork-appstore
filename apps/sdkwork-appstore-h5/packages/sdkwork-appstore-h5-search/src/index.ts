@@ -1,2 +1,11 @@
-export { SearchPage } from './pages/SearchPage';
-export { useSearch } from './hooks/useSearch';
+export * from './routes/routeContributions';
+export * from './routes/routeContributions';
+export * from './routes/routeContributions';
+export * from './routes/routeContributions';
+export * from './routes/routeContributions';
+export * from './routes/routeContributions';
+export * from './routes/routeContributions';
+export * from './routes/routeContributions';
+export * from './routes/routeContributions';
+export * from './routes/routeContributions';
+export * from './routes/routeContributions';

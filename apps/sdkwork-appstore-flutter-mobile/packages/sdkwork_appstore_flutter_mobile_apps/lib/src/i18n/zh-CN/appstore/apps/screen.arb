@@ -1,0 +1,7 @@
+{
+  "@@locale": "zh-CN",
+  "title": "应用",
+  "@title": {
+    "description": "Screen title for the apps capability"
+  }
+}

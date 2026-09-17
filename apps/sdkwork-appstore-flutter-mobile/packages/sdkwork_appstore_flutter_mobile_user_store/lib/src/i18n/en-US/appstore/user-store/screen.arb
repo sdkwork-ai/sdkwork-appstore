@@ -1,0 +1,7 @@
+{
+  "@@locale": "en-US",
+  "title": "Personal store",
+  "@title": {
+    "description": "Screen title for the user-store capability"
+  }
+}

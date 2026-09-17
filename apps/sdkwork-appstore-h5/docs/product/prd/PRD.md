@@ -119,16 +119,38 @@ H5 端是 SDKWork 应用市场的移动优先入口：单栏 + 底部 Tab 导航
 
 ## 8. 组件包映射
 
-| 包 | 职责 |
-| --- | --- |
-| `sdkwork-appstore-h5-shell` | Tab 壳、移动布局 |
-| `sdkwork-appstore-h5-commons` | 移动 UI  primitive |
-| `sdkwork-appstore-h5-catalog` | 首页、分类 |
-| `sdkwork-appstore-h5-listing` | 详情 |
-| `sdkwork-appstore-h5-library` | 库、更新 |
-| `sdkwork-appstore-h5-search` | 搜索 |
-| `sdkwork-appstore-h5-console-shell` | Publisher 移动壳 |
-| `sdkwork-appstore-h5-core` | SDK、IAM |
+包名、职责与所拥有的路由标识（`APP_CLIENT_ARCHITECTURE_ALIGNMENT_SPEC.md` §7）。
+能力包只导出集成契约（路由贡献、服务端口、状态切片、领域模型），不导出内部页面文件（同规范 §6）。
+
+| 包 | 职责 | 拥有的路由标识 |
+| --- | --- | --- |
+| `sdkwork-appstore-h5-core` | SDK 客户端工厂、TokenManager 绑定、会话、路由表 | — |
+| `sdkwork-appstore-h5-commons` | 移动 UI primitive、record 读取工具 | — |
+| `sdkwork-appstore-h5-shell` | Tab 壳、移动布局 | — |
+| `sdkwork-appstore-h5-host` | 平台宿主适配器契约 | — |
+| `sdkwork-appstore-h5-catalog` | 目录与发现 | `app.store.discover.index`、`app.store.apps.index`、`app.store.games.index`、`app.store.charts.index`、`app.store.category.detail`、`app.store.collection.detail` |
+| `sdkwork-appstore-h5-search` | 搜索 | `app.store.search.index` |
+| `sdkwork-appstore-h5-listing` | 应用详情、活动详情 | `app.store.app-detail.detail`、`app.store.events.detail` |
+| `sdkwork-appstore-h5-library` | 库、更新、愿望单 | `app.store.library.index`、`app.store.updates.index`、`app.store.wishlist.index` |
+| `sdkwork-appstore-h5-ai-hub` | AI 实验室组（专家/扩展插件/技能中心/MCP 服务/应用模板） | `app.store.ai-hub.*` |
+| `sdkwork-appstore-h5-user-store` | 个人商店与公开分享视图 | `app.store.user-store.index`、`app.store.user-store.public` |
+| `sdkwork-appstore-h5-console-publisher` | 发布者控制台 | `console.store.publisher.overview`、`console.store.publisher.app-create`、`console.store.publisher.app-manage` |
+| `sdkwork-appstore-h5-console-settings` | 控制台设置 | `console.system.settings.index` |
+| `sdkwork-appstore-h5-console-core` | 控制台运行时助手 | — |
+| `sdkwork-appstore-h5-console-shell` | 控制台导航与路由组合 | — |
+
+## 8.1 跨端路由标识
+
+H5 与 PC、Flutter、小程序、鸿蒙共享同一张路由标识表；物理路径按平台可不同，
+对齐的是标识与路径参数名。权威来源是 PC 根路由
+`AppstorePcRoutes`（`apps/sdkwork-appstore-pc/packages/sdkwork-appstore-pc-host/src/index.tsx`）。
+
+校验：
+
+```bash
+node scripts/verify-client-app-surfaces.mjs
+```
+
 
 ## 9. 性能目标
 

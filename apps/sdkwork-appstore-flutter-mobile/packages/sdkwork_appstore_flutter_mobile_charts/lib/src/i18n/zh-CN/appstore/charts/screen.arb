@@ -1,0 +1,7 @@
+{
+  "@@locale": "zh-CN",
+  "title": "排行榜",
+  "@title": {
+    "description": "Screen title for the charts capability"
+  }
+}

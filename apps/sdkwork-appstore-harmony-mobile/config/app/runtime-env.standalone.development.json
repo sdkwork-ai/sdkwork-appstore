@@ -1,0 +1,12 @@
+{
+  "environment": "development",
+  "deploymentProfile": "standalone",
+  "profileId": "standalone.development",
+  "runtimeTarget": "harmony-native",
+  "applicationOrigin": "http://appstore-dev.sdkwork.com:3900/",
+  "appstoreAppApiBaseUrl": "http://127.0.0.1:8090/app/v3/api",
+  "sdkworkEnvironmentAlias": "dev",
+  "sdkDependencies": [
+    "sdkwork-appstore-app-sdk"
+  ]
+}

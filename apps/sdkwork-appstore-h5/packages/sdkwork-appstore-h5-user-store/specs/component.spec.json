@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "kind": "sdkwork.component.spec",
+  "component": {
+    "name": "@sdkwork/appstore-h5-user-store",
+    "displayName": "User Store (H5)",
+    "version": "0.1.0",
+    "type": "react-package",
+    "root": "apps/sdkwork-appstore-h5/packages/sdkwork-appstore-h5-user-store",
+    "domain": "appstore",
+    "capability": "user-store",
+    "surface": "app",
+    "languages": [
+      "typescript"
+    ],
+    "generated": false,
+    "manifests": [
+      "package.json"
+    ]
+  },
+  "canonicalSpecs": [
+    {
+      "file": "APP_H5_ARCHITECTURE_SPEC.md",
+      "path": "../../../sdkwork-specs/APP_H5_ARCHITECTURE_SPEC.md",
+      "purpose": "H5 application root architecture."
+    },
+    {
+      "file": "APP_CLIENT_ARCHITECTURE_ALIGNMENT_SPEC.md",
+      "path": "../../../sdkwork-specs/APP_CLIENT_ARCHITECTURE_ALIGNMENT_SPEC.md",
+      "purpose": "Cross-client package role and route identity alignment."
+    }
+  ],
+  "contracts": {
+    "layerRole": "frontend-feature",
+    "publicExports": [
+      "."
+    ],
+    "providedPorts": [],
+    "requiredPorts": []
+  },
+  "verification": {
+    "commands": [
+      "pnpm --filter @sdkwork/appstore-h5-user-store typecheck"
+    ]
+  }
+}

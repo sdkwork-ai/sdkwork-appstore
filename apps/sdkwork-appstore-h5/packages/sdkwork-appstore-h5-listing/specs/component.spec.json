@@ -17,6 +17,11 @@
                       "displayName":  "sdkwork-appstore-h5-listing"
                   },
     "contracts":  {
+                      "layerRole":  "frontend-feature",
+                      "providedPorts":  [
+                                           ],
+                      "requiredPorts":  [
+                                           ],
                       "runtimeEntrypoints":  [
                                                  "package.json#scripts.typecheck"
                                              ],
@@ -54,7 +59,7 @@
                        ],
     "verification":  {
                          "commands":  [
-                                          "pnpm --filter @@sdkwork/appstore-h5-listing typecheck"
+                                          "pnpm --filter @sdkwork/appstore-h5-listing typecheck"
                                       ]
                      }
 }

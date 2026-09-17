@@ -1,0 +1,17 @@
+name: sdkwork_appstore_flutter_mobile_commons
+description: SDKWork App Store Flutter mobile commons: design tokens, shared widgets, locale helpers.
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: ">=3.5.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0

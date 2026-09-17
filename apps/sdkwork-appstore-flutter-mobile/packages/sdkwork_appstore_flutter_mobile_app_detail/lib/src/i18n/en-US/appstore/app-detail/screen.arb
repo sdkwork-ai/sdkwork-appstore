@@ -1,0 +1,7 @@
+{
+  "@@locale": "en-US",
+  "title": "App detail",
+  "@title": {
+    "description": "Screen title for the app-detail capability"
+  }
+}

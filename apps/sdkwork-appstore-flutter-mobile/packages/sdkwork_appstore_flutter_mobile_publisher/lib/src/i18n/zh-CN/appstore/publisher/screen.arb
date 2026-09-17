@@ -1,0 +1,7 @@
+{
+  "@@locale": "zh-CN",
+  "title": "发布者控制台",
+  "@title": {
+    "description": "Screen title for the publisher capability"
+  }
+}

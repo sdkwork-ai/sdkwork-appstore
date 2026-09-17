@@ -1,0 +1,7 @@
+{
+  "@@locale": "zh-CN",
+  "title": "活动",
+  "@title": {
+    "description": "Screen title for the events capability"
+  }
+}

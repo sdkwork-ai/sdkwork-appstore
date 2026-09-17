@@ -1,0 +1,11 @@
+{
+  "pages": [
+    "pages/home/index",
+    "pages/shell/index"
+  ],
+  "window": {
+    "navigationBarTitleText": "SDKWork App Store Mini Program",
+    "navigationBarBackgroundColor": "#0f766e",
+    "navigationBarTextStyle": "white"
+  }
+}

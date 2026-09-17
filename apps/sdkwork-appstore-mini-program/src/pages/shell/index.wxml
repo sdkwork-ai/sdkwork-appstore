@@ -1,0 +1,4 @@
+<view class="page">
+  <view class="page__title">SDKWork App Store Mini Program</view>
+  <view class="page__body">{{status}}</view>
+</view>

@@ -6,6 +6,7 @@
   "types": "./src/index.ts",
   "dependencies": {
     "@sdkwork/appstore-h5-commons": "workspace:*",
+    "@sdkwork/appstore-h5-core": "workspace:*",
     "@sdkwork/appstore-publisher-console-core": "workspace:*",
     "lucide-react": "catalog:",
     "react": "catalog:",
@@ -19,5 +20,8 @@
       "default": "./src/index.ts"
     },
     "./pages": "./src/pages/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit -p tsconfig.json"
   }
 }

@@ -1,0 +1,7 @@
+{
+  "@@locale": "en-US",
+  "title": "Wishlist",
+  "@title": {
+    "description": "Screen title for the wishlist capability"
+  }
+}

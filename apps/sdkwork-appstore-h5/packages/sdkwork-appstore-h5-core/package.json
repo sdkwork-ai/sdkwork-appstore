@@ -38,5 +38,8 @@
   },
   "dependencies": {
     "@sdkwork/appstore-app-sdk": "workspace:*"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit -p tsconfig.json"
   }
 }

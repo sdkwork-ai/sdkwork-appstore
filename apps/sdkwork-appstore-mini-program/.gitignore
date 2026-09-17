@@ -1,0 +1,5 @@
+# Mini program build output and local runtime state.
+dist/
+.cache/
+src/runtime/appstore-app.js
+src/runtime/runtime-env.js

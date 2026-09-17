@@ -1,0 +1,7 @@
+# Flutter / Dart build and tooling output.
+.dart_tool/
+.packages
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+env/sdkwork.local.*.json

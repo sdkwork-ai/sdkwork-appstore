@@ -1,5 +1,5 @@
 {
-  "name": "@sdkwork/appstore-appstore-h5-console-shell",
+  "name": "@sdkwork/appstore-h5-console-shell",
   "version": "0.1.0",
   "private": true,
   "main": "./src/index.ts",
@@ -10,5 +10,13 @@
       "import": "./src/index.ts",
       "default": "./src/index.ts"
     }
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "dependencies": {
+    "@sdkwork/appstore-h5-console-publisher": "workspace:*",
+    "@sdkwork/appstore-h5-console-settings": "workspace:*",
+    "@sdkwork/appstore-h5-core": "workspace:*"
   }
 }

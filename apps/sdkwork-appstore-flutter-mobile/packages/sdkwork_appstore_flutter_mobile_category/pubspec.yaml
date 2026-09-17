@@ -1,0 +1,20 @@
+name: sdkwork_appstore_flutter_mobile_category
+description: SDKWork App Store Flutter mobile category capability package.
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: ">=3.5.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  sdkwork_appstore_flutter_mobile_core:
+    path: ../sdkwork_appstore_flutter_mobile_core
+  sdkwork_appstore_flutter_mobile_commons:
+    path: ../sdkwork_appstore_flutter_mobile_commons
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0

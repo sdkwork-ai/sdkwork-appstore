@@ -1,0 +1,7 @@
+{
+  "@@locale": "zh-CN",
+  "title": "个人商店",
+  "@title": {
+    "description": "Screen title for the user-store capability"
+  }
+}

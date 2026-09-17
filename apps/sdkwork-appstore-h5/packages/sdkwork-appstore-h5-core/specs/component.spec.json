@@ -17,6 +17,11 @@
     "displayName": "sdkwork-appstore-h5-core"
   },
   "contracts": {
+    "layerRole": "frontend-core",
+    "providedPorts": [
+                         ],
+    "requiredPorts": [
+                         ],
     "runtimeEntrypoints": [
       "package.json#scripts.typecheck"
     ],
@@ -112,7 +117,7 @@
   ],
   "verification": {
     "commands": [
-      "pnpm --filter @@sdkwork/appstore-h5-core typecheck"
+      "pnpm --filter @sdkwork/appstore-h5-core typecheck"
     ]
   }
 }

@@ -1,0 +1,12 @@
+{
+  "environment": "demo",
+  "deploymentProfile": "standalone",
+  "profileId": "standalone.demo",
+  "runtimeTarget": "mini-program-weixin",
+  "applicationOrigin": "https://appstore-demo.sdkwork.com/",
+  "appstoreAppApiBaseUrl": "http://127.0.0.1:8090/app/v3/api",
+  "sdkworkEnvironmentAlias": "demo",
+  "sdkDependencies": [
+    "sdkwork-appstore-app-sdk"
+  ]
+}

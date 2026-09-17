@@ -1,0 +1,12 @@
+# HarmonyOS build, tooling, and signing output.
+oh_modules/
+.hvigor/
+build/
+.cxx/
+local.properties
+*.p12
+*.cer
+*.p7b
+*.hap
+*.har
+config/host/harmony.local.*.json

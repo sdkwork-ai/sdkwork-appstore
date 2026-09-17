@@ -22,9 +22,12 @@ import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { readRecordString as readString } from '@sdkwork/appstore-h5-commons';
 
 export function ListingDetailPage() {
-  const { listingSlug } = useParams<{ listingSlug: string }>();
+  // Path parameter name follows the shared route contract
+  // (`APP_CLIENT_ARCHITECTURE_ALIGNMENT_SPEC.md` section 7): PC and every other
+  // client root mount this screen at `/app/:id`.
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const slug = listingSlug ?? '';
+  const slug = id ?? '';
   const { data, loading, error } = usePublicListing(slug);
   const [showFullDesc, setShowFullDesc] = useState(false);
   const [isWishlisted, setIsWishlisted] = useState(false);

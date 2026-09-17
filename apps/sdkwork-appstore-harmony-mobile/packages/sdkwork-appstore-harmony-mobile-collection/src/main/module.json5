@@ -1,0 +1,12 @@
+{
+  "module": {
+    "name": "sdkwork-appstore-harmony-mobile-collection",
+    "type": "har",
+    "deviceTypes": [
+      "phone",
+      "tablet"
+    ],
+    "deliveryWithInstall": false,
+    "installationFree": false
+  }
+}

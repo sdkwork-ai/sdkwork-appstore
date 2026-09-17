@@ -1,0 +1,45 @@
+{
+  "name": "@sdkwork/appstore-mini-program",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "pnpm dev:standalone",
+    "dev:standalone": "pnpm exec sdkwork-app dev --root ../.. --deployment-profile standalone",
+    "dev:cloud": "pnpm exec sdkwork-app dev --root ../.. --deployment-profile cloud",
+    "build": "node scripts/build-runtime.mjs",
+    "build:standalone": "node scripts/build-runtime.mjs",
+    "build:cloud": "node scripts/build-runtime.mjs --deployment-profile cloud",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "node --test tests/mini-program-surface-contract.test.mjs",
+    "clean": "node -e \"const fs=require('node:fs'); for(const p of ['dist','.cache','src/runtime/appstore-app.js','src/runtime/runtime-env.js']) fs.rmSync(p,{recursive:true,force:true})\""
+  },
+  "dependencies": {
+    "@sdkwork/appstore-mp-core": "workspace:*",
+    "@sdkwork/appstore-mp-commons": "workspace:*",
+    "@sdkwork/appstore-mp-shell": "workspace:*",
+    "@sdkwork/appstore-mp-host": "workspace:*",
+    "@sdkwork/appstore-mp-discover": "workspace:*",
+    "@sdkwork/appstore-mp-apps": "workspace:*",
+    "@sdkwork/appstore-mp-games": "workspace:*",
+    "@sdkwork/appstore-mp-charts": "workspace:*",
+    "@sdkwork/appstore-mp-category": "workspace:*",
+    "@sdkwork/appstore-mp-collection": "workspace:*",
+    "@sdkwork/appstore-mp-ai-hub": "workspace:*",
+    "@sdkwork/appstore-mp-search": "workspace:*",
+    "@sdkwork/appstore-mp-app-detail": "workspace:*",
+    "@sdkwork/appstore-mp-events": "workspace:*",
+    "@sdkwork/appstore-mp-library": "workspace:*",
+    "@sdkwork/appstore-mp-updates": "workspace:*",
+    "@sdkwork/appstore-mp-wishlist": "workspace:*",
+    "@sdkwork/appstore-mp-user-store": "workspace:*",
+    "@sdkwork/appstore-mp-publisher": "workspace:*",
+    "@sdkwork/appstore-mp-settings": "workspace:*",
+    "@sdkwork/sdk-common": "workspace:*"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.10",
+    "miniprogram-api-typings": "^4.1.0",
+    "typescript": "catalog:"
+  }
+}

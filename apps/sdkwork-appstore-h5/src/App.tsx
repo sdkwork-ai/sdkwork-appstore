@@ -2,6 +2,7 @@ import { Routes, Route } from 'react-router-dom';
 import { AuthGate } from './AuthGate';
 import { MobileLayout } from './components/layout/MobileLayout';
 import { lazy, Suspense } from 'react';
+import { pendingRouteElements } from './routes/pendingRoutes';
 
 const LoginPage = lazy(() => import('./pages/LoginPage').then(m => ({ default: m.LoginPage })));
 const HomePage = lazy(() => import('./pages/HomePage').then(m => ({ default: m.HomePage })));
@@ -42,7 +43,7 @@ export default function App() {
           <Route path="/browse/apps" element={<AppsBrowsePage />} />
           <Route path="/browse/games" element={<GamesBrowsePage />} />
           <Route path="/search" element={<SearchPage />} />
-          <Route path="/app/:listingSlug" element={<ListingDetailPage />} />
+          <Route path="/app/:id" element={<ListingDetailPage />} />
           <Route path="/settings" element={<SettingsPage />} />
 
           {/* Authenticated routes */}
@@ -96,6 +97,9 @@ export default function App() {
               </AuthGate>
             }
           />
+
+          {/* Canonical routes whose capability screen is not implemented yet */}
+          {pendingRouteElements}
 
           {/* Catch-all */}
           <Route path="*" element={<NotFoundPage />} />

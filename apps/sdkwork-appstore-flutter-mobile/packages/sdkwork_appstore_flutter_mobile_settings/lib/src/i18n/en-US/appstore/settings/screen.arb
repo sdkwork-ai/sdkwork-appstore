@@ -1,0 +1,7 @@
+{
+  "@@locale": "en-US",
+  "title": "Console settings",
+  "@title": {
+    "description": "Screen title for the settings capability"
+  }
+}

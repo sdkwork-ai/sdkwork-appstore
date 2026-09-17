@@ -105,3 +105,5 @@ sdks/**/composed/*.js
 sdks/**/composed/*.js.map
 sdks/**/composed/*.d.ts
 sdks/**/composed/*.d.ts.map
+# Local one-off audit scratch (do not commit)
+.tmp-family-audit/

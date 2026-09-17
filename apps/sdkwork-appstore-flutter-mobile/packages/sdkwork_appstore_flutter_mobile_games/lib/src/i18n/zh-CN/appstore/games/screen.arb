@@ -1,0 +1,7 @@
+{
+  "@@locale": "zh-CN",
+  "title": "游戏",
+  "@title": {
+    "description": "Screen title for the games capability"
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "@@locale": "en-US",
+  "title": "Updates",
+  "@title": {
+    "description": "Screen title for the updates capability"
+  }
+}

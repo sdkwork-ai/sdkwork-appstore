@@ -1,0 +1,7 @@
+{
+  "@@locale": "en-US",
+  "title": "Collection",
+  "@title": {
+    "description": "Screen title for the collection capability"
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "@@locale": "zh-CN",
+  "title": "控制台设置",
+  "@title": {
+    "description": "Screen title for the settings capability"
+  }
+}

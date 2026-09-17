@@ -1,0 +1,5 @@
+{
+  "platform": "MP_WEIXIN",
+  "appId": "touristappid",
+  "note": "Secret-free template. Supply a real WeChat app id through CI secure storage."
+}

@@ -1,0 +1,7 @@
+{
+  "@@locale": "zh-CN",
+  "title": "更新",
+  "@title": {
+    "description": "Screen title for the updates capability"
+  }
+}
