@@ -1,8 +1,8 @@
 import { BrowserRouter } from 'react-router-dom'
-import { ThemeProvider, InstallProvider } from '@sdkwork/appstore-pc-product'
+import { ThemeProvider, InstallProvider } from '@sdkwork/appstore-pc-merchandise'
 import { createAppstorePcRuntime } from '@sdkwork/appstore-pc-runtime'
-import { AppstorePcRoutes } from '@sdkwork/appstore-pc-host'
-import '@sdkwork/appstore-pc-host/styles.css'
+import { AppstorePcRoutes } from '@sdkwork/appstore-pc-embed'
+import '@sdkwork/appstore-pc-embed/styles.css'
 
 const runtime = createAppstorePcRuntime()
 

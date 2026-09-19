@@ -9,7 +9,7 @@ import {
   initializeAppstorePcI18n,
   i18n,
   ThemeProvider,
-} from '@sdkwork/appstore-pc-product';
+} from '@sdkwork/appstore-pc-merchandise';
 import {
   createAppstorePcRuntime,
   resolveAppstorePcRuntimeConfig,

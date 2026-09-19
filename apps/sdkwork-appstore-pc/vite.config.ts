@@ -1,4 +1,4 @@
-import { resolveViteEnvironment, resolveLucideReactEntry } from '../../../sdkwork-specs/tools/vite-runtime-profile.mjs';
+import { resolveViteEnvironment, resolveViteRuntimeProfile, resolveLucideReactEntry } from '../../../sdkwork-specs/tools/vite-runtime-profile.mjs';
 import { resolveBrowserDistOutDir } from '../../../sdkwork-specs/tools/browser-dist-layout.mjs';
 
 import tailwindcss from '@tailwindcss/vite';
@@ -8,6 +8,15 @@ import { mergeRepoDevBootstrapAccessTokenEnv } from '@sdkwork/iam-credential-ent
 import path from 'path';
 import { fileURLToPath } from 'node:url';
 import { defineConfig, loadEnv } from 'vite';
+
+// `vite-runtime-profile.mjs` ships as an untyped Node script, so TypeScript
+// infers its second parameter as `undefined`. The runtime contract is Node's
+// ProcessEnv (it reads SDKWORK_ENVIRONMENT / SDKWORK_DEPLOYMENT_PROFILE); bind
+// that contract here once instead of loosening the shared spec tool.
+const resolveRuntimeProfile = resolveViteRuntimeProfile as (
+  mode: string | undefined,
+  processEnv?: NodeJS.ProcessEnv,
+) => { deploymentProfile: string; environment: string; profileId: string };
 
 const DEFAULT_RENDERER_BIND = '0.0.0.0:18092';
 const APP_API_PREFIX = '/app/v3/api';
@@ -60,15 +69,14 @@ function resolveGatewayOrigin(env: NodeJS.ProcessEnv): string {
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, CONFIG_DIR, '');
-  const environment = mode.includes('production')
-    ? 'production'
-    : mode.includes('test') || mode.includes('staging')
-      ? 'test'
-      : 'development';
-  const deploymentProfile =
-    env.VITE_SDKWORK_DEPLOYMENT_PROFILE?.trim()
-    ?? process.env.VITE_SDKWORK_DEPLOYMENT_PROFILE?.trim()
-    ?? 'standalone';
+  // ENVIRONMENT_SPEC.md §5.1.0.2 (Build-Serve Profile Coherence): the lifecycle
+  // environment vocabulary — including `demo` — comes from the shared resolver,
+  // never a local mode parser. The previous local copy dropped `demo`, so a
+  // `cloud.demo` Vite server was classified as `development` and would have
+  // injected a development bootstrap credential.
+  const runtimeProfile = resolveRuntimeProfile(mode, process.env);
+  const environment = runtimeProfile.environment;
+  const deploymentProfile = runtimeProfile.deploymentProfile;
   const mergedBootstrapEnv = mergeRepoDevBootstrapAccessTokenEnv({
     deploymentMode: deploymentProfile === 'cloud' ? 'saas' : 'local',
     env: { ...process.env, ...env },
@@ -88,9 +96,11 @@ export default defineConfig(({ mode }) => {
       outDir: resolveBrowserDistOutDir(resolveViteEnvironment(mode, process.env)),
       emptyOutDir: true,
     },
-    define: {
-      'process.env.SDKWORK_ACCESS_TOKEN': JSON.stringify(bootstrapAccessToken ?? ''),
-    },
+    // The bootstrap credential reaches the renderer through the IAM Vite plugin
+    // below (dev-server HTML injection as
+    // `globalThis.__SDKWORK_CREDENTIAL_ENTRY_BOOTSTRAP_ACCESS_TOKEN__`) and must
+    // never be exposed to the client bundle through `define`
+    // (`IAM_CREDENTIAL_ENTRY_SPEC.md` section 4/5).
     plugins: [
       createSdkworkCredentialEntryBootstrapVitePlugin({
         accessToken: bootstrapAccessToken,

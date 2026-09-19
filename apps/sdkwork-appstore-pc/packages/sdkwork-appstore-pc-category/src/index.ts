@@ -1,4 +1,4 @@
-export { CategoryPage } from '@sdkwork/appstore-pc-product';
+export { CategoryPage } from '@sdkwork/appstore-pc-merchandise';
 
 export const categoryRoute = {
   path: '/category/:id',

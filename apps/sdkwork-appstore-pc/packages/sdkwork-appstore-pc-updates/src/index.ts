@@ -8,7 +8,7 @@ export {
   DownloadQueueCard,
   LibraryAppsGrid,
   ReleaseNotesSection,
-} from '@sdkwork/appstore-pc-product';
+} from '@sdkwork/appstore-pc-merchandise';
 
 export const updatesRoute = {
   path: '/updates',

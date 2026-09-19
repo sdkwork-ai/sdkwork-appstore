@@ -3,10 +3,14 @@ import { useTranslation } from 'react-i18next';
 import { AIHubService, AppStoreService, PluginsService, SkillsService } from '@sdkwork/appstore-pc-core';
 import { AppItem, ExpertItem } from '@sdkwork/appstore-pc-core';
 import { LoadingSpinner } from '@sdkwork/appstore-pc-commons';
-// Marketplace add flows, reused verbatim so the AI Lab's add dropdown opens
-// the exact same modals (and copy) as the marketplace's Plugins/Skills pages.
-import { RegisterPluginModal } from '@sdkwork/appstore-pc-markets';
-import { PublishSkillModal } from '@sdkwork/appstore-pc-markets';
+// Marketplace add flows and experts content, reused verbatim so the AI Lab's
+// add dropdown opens the exact same modals (and copy) as the marketplace's
+// Plugins/Skills pages, and both pages render one experts dataset.
+import {
+  expertItems,
+  PublishSkillModal,
+  RegisterPluginModal,
+} from '@sdkwork/appstore-pc-markets';
 import { AIHubHeaderBanner } from './components/AIHubHeaderBanner';
 import { AIExpertsHeader } from './components/AIExpertsHeader';
 import { AISandboxAssistant } from './components/AISandboxAssistant';
@@ -14,7 +18,6 @@ import { AIAppsGrid } from './components/AIAppsGrid';
 import { CreateCustomExpertModal } from './components/CreateCustomExpertModal';
 import { AIHubTabNav, AIHubTabType } from './components/AIHubTabNav';
 import { AISandboxContextBanner } from './components/AISandboxContextBanner';
-import { expertItems } from './data/expertsData';
 
 export default function AIHubPage() {
   const { t } = useTranslation();

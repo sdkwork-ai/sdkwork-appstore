@@ -1,25 +1,42 @@
+import {
+  APPSTORE_APP_API_BASE_URL_ENV_KEY,
+  resolveAppstoreAppApiBaseUrl,
+} from "@sdkwork/appstore-mp-core";
+
 import { seedRuntimeEnv } from "./environment";
 
 declare const __SDKWORK_RUNTIME_ENV__: Record<string, string> | undefined;
 
-const fallback: Record<string, string> = {
-  SDKWORK_PROFILE_ID: "standalone.development",
-  SDKWORK_APPSTORE_APP_API_BASE_URL: "http://127.0.0.1:8090/app/v3/api",
-};
+/** Runtime env key carrying the selected deployment profile id. */
+const RUNTIME_ENV_PROFILE_ID_KEY = "SDKWORK_PROFILE_ID";
+
+function readBundledRuntimeEnv(): Record<string, string> {
+  return typeof __SDKWORK_RUNTIME_ENV__ === "undefined"
+    ? {}
+    : __SDKWORK_RUNTIME_ENV__;
+}
 
 /**
  * Seed the runtime environment from the build-time bundle.
  *
  * `scripts/build-runtime.mjs` injects `__SDKWORK_RUNTIME_ENV__` from the
- * selected `config/mini-program/runtime-env.<profile>.<environment>.json`.
+ * selected `config/mini-program/runtime-env.<profileId>.json`, so every runtime
+ * value has a single configuration owner and no origin is hardcoded in source.
+ *
+ * The app-api base URL is resolved through `@sdkwork/sdk-common`'s
+ * `resolveBaseUrl` (`ENVIRONMENT_SPEC.md` §6.3); a missing configuration fails
+ * closed in `configureAppstoreAppSdkBaseUrl` instead of silently pointing at a
+ * developer machine.
  */
-export function seedRuntimeEnvFromBundle(): void {
-  const source =
-    typeof __SDKWORK_RUNTIME_ENV__ === "undefined"
-      ? fallback
-      : __SDKWORK_RUNTIME_ENV__;
+export function seedRuntimeEnvFromBundle(
+  overrides: { appApiBaseUrl?: string } = {},
+): void {
+  const bundled = readBundledRuntimeEnv();
   seedRuntimeEnv({
-    profileId: source.SDKWORK_PROFILE_ID,
-    appstoreAppApiBaseUrl: source.SDKWORK_APPSTORE_APP_API_BASE_URL,
+    profileId: bundled[RUNTIME_ENV_PROFILE_ID_KEY] ?? "",
+    appstoreAppApiBaseUrl: resolveAppstoreAppApiBaseUrl({
+      baseUrls: overrides.appApiBaseUrl,
+      readEnv: (key) => bundled[key],
+    }),
   });
 }

@@ -2,13 +2,13 @@
   "schemaVersion": 1,
   "kind": "sdkwork.component.spec",
   "component": {
-    "name": "sdkwork-appstore-pc-host",
-    "displayName": "SDKWork App Store PC Host",
+    "name": "@sdkwork/appstore-pc-embed",
+    "displayName": "SDKWork App Store PC Embed",
     "version": "1.0.0",
-    "type": "frontend-host",
-    "root": "apps/sdkwork-appstore-pc/packages/sdkwork-appstore-pc-host",
+    "type": "react-package",
+    "root": "apps/sdkwork-appstore-pc/packages/sdkwork-appstore-pc-embed",
     "domain": "appstore",
-    "capability": "store",
+    "capability": "embed",
     "surface": "app",
     "languages": ["typescript", "css"],
     "generated": false,
@@ -17,12 +17,12 @@
   },
   "canonicalSpecs": [
     { "file": "TYPESCRIPT_CODE_SPEC.md", "path": "../../../../../../sdkwork-specs/TYPESCRIPT_CODE_SPEC.md", "purpose": "Public TypeScript package and export boundaries." },
-    { "file": "FRONTEND_CODE_SPEC.md", "path": "../../../../../../sdkwork-specs/FRONTEND_CODE_SPEC.md", "purpose": "Reusable React host and UI composition." },
+    { "file": "FRONTEND_CODE_SPEC.md", "path": "../../../../../../sdkwork-specs/FRONTEND_CODE_SPEC.md", "purpose": "Reusable React embed surface and UI composition." },
     { "file": "COMPOSABLE_ARCHITECTURE_SPEC.md", "path": "../../../../../../sdkwork-specs/COMPOSABLE_ARCHITECTURE_SPEC.md", "purpose": "Public ports and component composition." },
-    { "file": "TEST_SPEC.md", "path": "../../../../../../sdkwork-specs/TEST_SPEC.md", "purpose": "Host and route verification." }
+    { "file": "TEST_SPEC.md", "path": "../../../../../../sdkwork-specs/TEST_SPEC.md", "purpose": "Embed surface and route verification." }
   ],
   "contracts": {
-    "layerRole": "frontend-host",
+    "layerRole": "frontend-composition",
     "publicExports": ["src/index.tsx", "src/styles.css"],
     "providedPorts": [
       { "name": "appstorePcHost", "export": "src/index.tsx" },
@@ -34,6 +34,6 @@
     "dependencyApiSurfaces": []
   },
   "verification": {
-    "commands": ["pnpm --filter @sdkwork/appstore-pc-host typecheck", "pnpm --filter @sdkwork/appstore-pc-host test"]
+    "commands": ["pnpm --filter @sdkwork/appstore-pc-embed typecheck", "pnpm --filter @sdkwork/appstore-pc-embed test"]
   }
 }

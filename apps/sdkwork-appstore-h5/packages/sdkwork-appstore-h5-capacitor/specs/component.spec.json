@@ -3,10 +3,10 @@
                       "domain":  "appstore",
                       "type":  "react-package",
                       "version":  "0.1.0",
-                      "root":  "apps/sdkwork-appstore-h5/packages/sdkwork-appstore-h5-host",
+                      "root":  "apps/sdkwork-appstore-h5/packages/sdkwork-appstore-h5-capacitor",
                       "surface":  "app",
-                      "name":  "@sdkwork/appstore-h5-host",
-                      "capability":  "host",
+                      "name":  "@sdkwork/appstore-h5-capacitor",
+                      "capability":  "capacitor",
                       "languages":  [
                                         "typescript"
                                     ],
@@ -14,7 +14,7 @@
                       "manifests":  [
                                         "package.json"
                                     ],
-                      "displayName":  "sdkwork-appstore-h5-host"
+                      "displayName":  "sdkwork-appstore-h5-capacitor"
                   },
     "contracts":  {
                       "layerRole":  "frontend-host",
@@ -59,7 +59,7 @@
                        ],
     "verification":  {
                          "commands":  [
-                                          "pnpm --filter @sdkwork/appstore-h5-host typecheck"
+                                          "pnpm --filter @sdkwork/appstore-h5-capacitor typecheck"
                                       ]
                      }
 }

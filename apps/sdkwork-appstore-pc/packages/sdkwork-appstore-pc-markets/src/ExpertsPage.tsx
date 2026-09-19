@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { expertItems } from '@sdkwork/appstore-pc-ai-hub';
+import { expertItems } from './data/expertsData';
 import { CardGrid } from '@sdkwork/appstore-pc-commons';
 import { ExpertCard } from './components/experts/ExpertCard';
 import { ALL_CATEGORY, ExpertsCategoryFilter } from './components/experts/ExpertsCategoryFilter';

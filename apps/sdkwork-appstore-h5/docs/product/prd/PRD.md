@@ -127,7 +127,7 @@ H5 端是 SDKWork 应用市场的移动优先入口：单栏 + 底部 Tab 导航
 | `sdkwork-appstore-h5-core` | SDK 客户端工厂、TokenManager 绑定、会话、路由表 | — |
 | `sdkwork-appstore-h5-commons` | 移动 UI primitive、record 读取工具 | — |
 | `sdkwork-appstore-h5-shell` | Tab 壳、移动布局 | — |
-| `sdkwork-appstore-h5-host` | 平台宿主适配器契约 | — |
+| `sdkwork-appstore-h5-capacitor` | 平台宿主适配器契约 | — |
 | `sdkwork-appstore-h5-catalog` | 目录与发现 | `app.store.discover.index`、`app.store.apps.index`、`app.store.games.index`、`app.store.charts.index`、`app.store.category.detail`、`app.store.collection.detail` |
 | `sdkwork-appstore-h5-search` | 搜索 | `app.store.search.index` |
 | `sdkwork-appstore-h5-listing` | 应用详情、活动详情 | `app.store.app-detail.detail`、`app.store.events.detail` |
@@ -143,7 +143,7 @@ H5 端是 SDKWork 应用市场的移动优先入口：单栏 + 底部 Tab 导航
 
 H5 与 PC、Flutter、小程序、鸿蒙共享同一张路由标识表；物理路径按平台可不同，
 对齐的是标识与路径参数名。权威来源是 PC 根路由
-`AppstorePcRoutes`（`apps/sdkwork-appstore-pc/packages/sdkwork-appstore-pc-host/src/index.tsx`）。
+`AppstorePcRoutes`（`apps/sdkwork-appstore-pc/packages/sdkwork-appstore-pc-embed/src/index.tsx`）。
 
 校验：
 

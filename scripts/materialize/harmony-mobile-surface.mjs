@@ -850,7 +850,7 @@ export const sdkworkComponentSpecPath: string = '../../../specs/component.spec.j
  * format is \`<surface>.<domain>.<capability>.<screen>\` and the same route id
  * names the same workflow in every client architecture. Cross-checked against
  * the PC root router \`AppstorePcRoutes\`
- * (\`apps/sdkwork-appstore-pc/packages/sdkwork-appstore-pc-host/src/index.tsx\`).
+ * (\`apps/sdkwork-appstore-pc/packages/sdkwork-appstore-pc-embed/src/index.tsx\`).
  */
 ${sdkworkUiRouteContributionArkTs}
 const APPSTORE_ROUTE_TABLE: SdkworkUiRouteContribution[] = [

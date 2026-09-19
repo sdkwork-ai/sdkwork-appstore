@@ -1,4 +1,4 @@
-export { ChartsPage, ChartsList } from '@sdkwork/appstore-pc-product';
+export { ChartsPage, ChartsList } from '@sdkwork/appstore-pc-merchandise';
 
 export const chartsRoute = {
   path: '/charts',

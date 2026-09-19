@@ -146,7 +146,7 @@ export function alignH5Surface(appsDir) {
  * format is \`<surface>.<domain>.<capability>.<screen>\` and the same route id
  * names the same workflow in every client architecture. Cross-checked against
  * the PC root router \`AppstorePcRoutes\`
- * (\`apps/sdkwork-appstore-pc/packages/sdkwork-appstore-pc-host/src/index.tsx\`).
+ * (\`apps/sdkwork-appstore-pc/packages/sdkwork-appstore-pc-embed/src/index.tsx\`).
  *
  * Physical paths are this root's own; only the ids and the path parameter
  * names are shared contracts.

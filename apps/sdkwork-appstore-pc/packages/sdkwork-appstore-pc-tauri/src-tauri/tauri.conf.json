@@ -1,5 +1,5 @@
 {
-  "productName": "Nexus App Store",
+  "productName": "SDKWork App Store",
   "version": "1.0.0",
   "identifier": "com.sdkwork.appstore.pc",
   "build": {
@@ -9,7 +9,7 @@
   "app": {
     "windows": [
       {
-        "title": "Nexus App Store",
+        "title": "SDKWork App Store",
         "width": 1280,
         "height": 800
       }

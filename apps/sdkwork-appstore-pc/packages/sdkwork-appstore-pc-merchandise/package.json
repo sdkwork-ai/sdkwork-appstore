@@ -1,5 +1,5 @@
 {
-  "name": "@sdkwork/appstore-pc-product",
+  "name": "@sdkwork/appstore-pc-merchandise",
   "version": "1.0.0",
   "private": true,
   "type": "module",
@@ -32,8 +32,6 @@
     "@sdkwork/appstore-pc-markets": "workspace:*",
     "@sdkwork/appstore-pc-runtime": "workspace:*",
     "@sdkwork/auth-pc-react": "workspace:*",
-    "@sdkwork/auth-runtime-pc-react": "workspace:*",
-    "@sdkwork/iam-contracts": "workspace:*",
     "@sdkwork/utils": "workspace:*",
     "clsx": "^2.1.1",
     "lucide-react": "^0.546.0",

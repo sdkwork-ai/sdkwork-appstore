@@ -10,6 +10,9 @@
     "build": "node scripts/build-runtime.mjs",
     "build:standalone": "node scripts/build-runtime.mjs",
     "build:cloud": "node scripts/build-runtime.mjs --deployment-profile cloud",
+    "build:mini-program": "node scripts/build-runtime.mjs",
+    "build:mini-program:staging": "node scripts/build-runtime.mjs --deployment-profile cloud --environment staging",
+    "build:mini-program:prod": "node scripts/build-runtime.mjs --deployment-profile cloud --environment production",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "test": "node --test tests/mini-program-surface-contract.test.mjs",
     "clean": "node -e \"const fs=require('node:fs'); for(const p of ['dist','.cache','src/runtime/appstore-app.js','src/runtime/runtime-env.js']) fs.rmSync(p,{recursive:true,force:true})\""

@@ -51,11 +51,20 @@ describe('appstore PC host session sync', () => {
   it('does not downgrade an authenticated runtime session with bootstrap host tokens', () => {
     const hostFingerprint = fingerprintAppstorePcHostSessionInput(null, 'bootstrap-access');
     const state = createAppstorePcHostSessionSyncState();
-    const storeSnapshot = {
+    // Annotated, not inferred: a bare literal widens `authLevel`, `dataScope`
+    // or `environment` to `string`/`string[]` and stops matching
+    // `IamAppContext`'s union types.
+    const storeSnapshot: Parameters<typeof shouldApplyAppstorePcHostSession>[1] = {
       accessToken: 'access',
       authToken: 'auth',
       context: {
         appId: 'sdkwork-appstore-pc',
+        authLevel: 'mfa',
+        dataScope: ['publisher:owned'],
+        deploymentMode: 'saas',
+        environment: 'dev',
+        permissionScope: ['appstore.metrics.read'],
+        sessionId: 'session',
         tenantId: 'tenant',
         userId: 'user',
       },

@@ -77,7 +77,7 @@ export const cloudApiBaseUrls = {
  * each root may remap it.
  *
  * Authoritative source: the PC root router, `AppstorePcRoutes` in
- * `apps/sdkwork-appstore-pc/packages/sdkwork-appstore-pc-host/src/index.tsx`.
+ * `apps/sdkwork-appstore-pc/packages/sdkwork-appstore-pc-embed/src/index.tsx`.
  * The AI Lab sidebar group order (专家 `/experts`, 扩展插件 `/plugins`,
  * 技能中心 `/skills`, MCP 服务 `/mcp`, 应用模板 `/templates`) is fixed by the
  * repository `AGENTS.md`.

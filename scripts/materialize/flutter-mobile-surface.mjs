@@ -557,7 +557,7 @@ const List<String> appstoreHostRegistry = <String>[
 /// Authority: \`APP_CLIENT_ARCHITECTURE_ALIGNMENT_SPEC.md\` section 1 — the same
 /// route id names the same workflow in every client architecture. Cross-checked
 /// against the PC root router
-/// (\`apps/sdkwork-appstore-pc/packages/sdkwork-appstore-pc-host/src/index.tsx\`).
+/// (\`apps/sdkwork-appstore-pc/packages/sdkwork-appstore-pc-embed/src/index.tsx\`).
 ${sdkworkUiRouteContributionDart}
 const List<SdkworkUiRouteContribution> appstoreRouteTable =
     <SdkworkUiRouteContribution>[

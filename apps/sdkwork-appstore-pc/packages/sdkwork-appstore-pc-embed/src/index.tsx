@@ -35,7 +35,7 @@ import {
   PublicUserStorePage,
   initializeAppstorePcI18n,
   i18n,
-} from '@sdkwork/appstore-pc-product'
+} from '@sdkwork/appstore-pc-merchandise'
 import {
   buildAppstorePcHostSessionCandidate,
   createAppstorePcHostSessionSyncState,

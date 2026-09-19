@@ -1,7 +1,8 @@
 {
-  "name": "@sdkwork/appstore-h5-host",
+  "name": "@sdkwork/appstore-h5-capacitor",
   "version": "0.1.0",
   "private": true,
+  "description": "host package for the sdkwork-appstore-h5 client root.",
   "main": "./src/index.ts",
   "types": "src/index.ts",
   "exports": {

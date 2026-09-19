@@ -3,4 +3,4 @@ export {
   MobileNav,
   DesktopSidebar,
   DesktopHeader,
-} from '@sdkwork/appstore-pc-product';
+} from '@sdkwork/appstore-pc-merchandise';

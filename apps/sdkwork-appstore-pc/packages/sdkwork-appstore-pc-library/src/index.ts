@@ -2,7 +2,7 @@ export {
   LibraryPage,
   LibraryAppCard,
   LibraryEmptyState,
-} from '@sdkwork/appstore-pc-product';
+} from '@sdkwork/appstore-pc-merchandise';
 
 export const libraryRoute = {
   path: '/library',

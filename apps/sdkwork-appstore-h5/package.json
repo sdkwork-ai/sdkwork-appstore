@@ -36,6 +36,7 @@
     "@sdkwork/cloudrouter-app-sdk": "workspace:*",
     "@sdkwork/comments-app-sdk": "workspace:*",
     "@sdkwork/drive-app-sdk": "workspace:*",
+    "@sdkwork/iam-credential-entry": "workspace:*",
     "@sdkwork/sdk-common": "workspace:*",
     "@sdkwork/utils": "workspace:*",
     "@tailwindcss/vite": "catalog:",

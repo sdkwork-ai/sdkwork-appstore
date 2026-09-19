@@ -12,6 +12,6 @@
     }
   },
   "dependencies": {
-    "@sdkwork/appstore-pc-product": "workspace:*"
+    "@sdkwork/appstore-pc-merchandise": "workspace:*"
   }
 }

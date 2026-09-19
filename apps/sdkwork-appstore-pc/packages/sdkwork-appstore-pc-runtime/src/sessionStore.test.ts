@@ -69,11 +69,20 @@ describe('appstore PC session store', () => {
     const listener = vi.fn();
     store.subscribe(listener);
 
-    const session = {
+    // Annotated, not inferred: a bare literal widens `authLevel`, `dataScope`
+    // or `environment` to `string`/`string[]` and stops matching
+    // `IamAppContext`'s union types.
+    const session: Parameters<typeof store.setSession>[0] = {
       accessToken: 'access',
       authToken: 'auth',
       context: {
         appId: 'sdkwork-appstore-pc',
+        authLevel: 'mfa',
+        dataScope: ['publisher:owned'],
+        deploymentMode: 'saas',
+        environment: 'dev',
+        permissionScope: ['appstore.metrics.read'],
+        sessionId: 'session',
         tenantId: 'tenant',
         userId: 'user',
       },

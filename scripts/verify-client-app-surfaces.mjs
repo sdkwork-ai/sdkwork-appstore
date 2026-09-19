@@ -107,7 +107,7 @@ function rel(file) {
  * Read the canonical route surface from the PC root router.
  *
  * `AppstorePcRoutes` is the hand-authored authority
- * (`apps/sdkwork-appstore-pc/packages/sdkwork-appstore-pc-host/src/index.tsx`),
+ * (`apps/sdkwork-appstore-pc/packages/sdkwork-appstore-pc-embed/src/index.tsx`),
  * so parsing it keeps this check honest: the other four roots are generated and
  * are compared against authored source, not against their own generator.
  */
@@ -116,7 +116,7 @@ function readPcRouteSurface() {
     repoRoot,
     'apps',
     PC_ROOT,
-    'packages/sdkwork-appstore-pc-host/src/index.tsx',
+    'packages/sdkwork-appstore-pc-embed/src/index.tsx',
   );
   if (!fs.existsSync(hostIndex)) {
     return null;

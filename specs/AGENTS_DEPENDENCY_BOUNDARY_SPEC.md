@@ -57,8 +57,8 @@ The appstore owns its storefront composition. The AI Lab sidebar group orders
 its independent pages as 专家 (`/experts`), 扩展插件 (`/plugins`), 技能中心
 (`/skills`), MCP 服务 (`/mcp`), 应用模板 (`/templates`).
 
-- The 专家 page is an independent appstore page: its own route in the PC host
-  route tree, its own page component in `sdkwork-appstore-pc-product`, and its
+- The 专家 page is an independent appstore page: its own route in the PC app
+  route tree, its own page component in `sdkwork-appstore-pc-merchandise`, and its
   own subcomponents/i18n namespaces. Its layout mirrors the 应用模板 page
   (header banner, search bar, category filter, card grid, empty state) so the
   display effect stays consistent.

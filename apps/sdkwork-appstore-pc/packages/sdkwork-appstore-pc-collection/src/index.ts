@@ -1,4 +1,4 @@
-export { CollectionPage } from '@sdkwork/appstore-pc-product';
+export { CollectionPage } from '@sdkwork/appstore-pc-merchandise';
 
 export const collectionRoute = {
   path: '/collection/:id',

@@ -14,7 +14,7 @@ import {
   Sparkles,
   UserCheck
 } from 'lucide-react';
-import { expertScenarios } from '../data/expertsData';
+import { expertScenarios } from '@sdkwork/appstore-pc-markets';
 
 interface FeaturedScenariosSectionProps {
   selectedScenario: string | null;

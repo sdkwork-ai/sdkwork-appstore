@@ -15,7 +15,7 @@ import {
   appstoreAdminShellI18nBundle,
   registerAppstoreAdminI18nBundles,
 } from '@sdkwork/appstore-pc-admin-shell';
-import { i18n } from '@sdkwork/appstore-pc-product';
+import { i18n } from '@sdkwork/appstore-pc-merchandise';
 import type { AppstorePcRuntime } from '@sdkwork/appstore-pc-runtime';
 
 /**
