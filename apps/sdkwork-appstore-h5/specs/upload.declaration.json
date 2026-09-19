@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "appId": "sdkwork-appstore-h5",
+  "declarations": [
+    {
+      "appResourceType": "appstore.listing.media",
+      "appResourceIdKind": "entity",
+      "scene": "appstore",
+      "source": "listing-media",
+      "uploadProfileCode": "image",
+      "retention": "long_term",
+      "purpose": "App-store listing media (icon, cover, screenshot) attached to a published listing record."
+    },
+    {
+      "appResourceType": "appstore.artifact",
+      "appResourceIdKind": "entity",
+      "scene": "appstore",
+      "source": "artifact-upload",
+      "uploadProfileCode": "archive",
+      "retention": "long_term",
+      "purpose": "Application release artifact uploaded so an app-store release can reference a downloadable package."
+    }
+  ]
+}

@@ -1,6 +1,10 @@
 import { hexEncode } from '@sdkwork/utils';
 import type { DriveUploaderProgress } from '@sdkwork/drive-app-sdk';
 import type { ListingMediaAttachRequest } from '@sdkwork/appstore-app-sdk';
+import {
+  APPSTORE_H5_LISTING_MEDIA_UPLOAD,
+  APPSTORE_H5_RELEASE_ARTIFACT_UPLOAD,
+} from '@sdkwork/appstore-h5-core/sdk';
 import { getDriveClient } from '@/services/driveClient';
 import { getStoreClient } from '@/services/storeClient';
 
@@ -45,11 +49,11 @@ export async function uploadListingMedia(params: UploadListingMediaParams) {
   const profile = profileForFile(params.file);
   const uploadResult = await drive.uploader.uploadByProfile(profile, {
     file: params.file,
-    appResourceType: 'appstore.listing.media',
+    appResourceType: APPSTORE_H5_LISTING_MEDIA_UPLOAD.appResourceType,
     appResourceId: params.listingId,
     uploadProfileCode: profile,
-    scene: 'appstore',
-    source: 'listing-media',
+    scene: APPSTORE_H5_LISTING_MEDIA_UPLOAD.scene,
+    source: APPSTORE_H5_LISTING_MEDIA_UPLOAD.source,
     onProgress: params.onProgress,
   });
 
@@ -68,11 +72,11 @@ export async function uploadReleaseArtifact(params: UploadReleaseArtifactParams)
   const drive = getDriveClient();
   const uploadResult = await drive.uploader.uploadArchive({
     file: params.file,
-    appResourceType: 'appstore.artifact',
+    appResourceType: APPSTORE_H5_RELEASE_ARTIFACT_UPLOAD.appResourceType,
     appResourceId: params.releaseId,
-    uploadProfileCode: 'archive',
-    scene: 'appstore',
-    source: 'artifact-upload',
+    uploadProfileCode: APPSTORE_H5_RELEASE_ARTIFACT_UPLOAD.uploadProfileCode,
+    scene: APPSTORE_H5_RELEASE_ARTIFACT_UPLOAD.scene,
+    source: APPSTORE_H5_RELEASE_ARTIFACT_UPLOAD.source,
     onProgress: params.onProgress,
   });
 
