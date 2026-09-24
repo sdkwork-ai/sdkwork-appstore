@@ -85,9 +85,7 @@ _tmp_*
 .workbuddy/
 
 # TypeScript build output in source directories (compiled alongside source)
-**/src/**/*.js
 **/src/**/*.js.map
-**/src/**/*.d.ts
 **/src/**/*.d.ts.map
 
 # TypeScript build output at package root (e.g. types.js, types.d.ts)
@@ -107,3 +105,10 @@ sdks/**/composed/*.d.ts
 sdks/**/composed/*.d.ts.map
 # Local one-off audit scratch (do not commit)
 .tmp-family-audit/
+
+# Compiler emit is ignored only where the file is emit BY DEFINITION. The broad
+# `**/src/**/*.js` / `**/src/**/*.d.ts` globs are gone: `.gitignore` cannot express "ignore
+# this only when a same-stem .ts sibling exists", so they also hid authored declarations
+# (`vite-env.d.ts`, `styles.d.ts`, module shims) and real mini-program source under `src/`.
+# The sibling rule is enforced against tracked files by
+# `sdkwork-specs/tools/check-repository-baseline-content.mjs` instead.
