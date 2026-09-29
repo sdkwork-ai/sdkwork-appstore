@@ -31,15 +31,14 @@ export function MobileLayout() {
 
   return (
     <div
-      className="min-h-screen"
-      style={{
-        backgroundColor: 'var(--bg-canvas)',
-        paddingBottom: hideTabBar ? 0 : '4.5rem',
-      }}
+      className="app-canvas-viewport"
+      style={{ paddingBottom: hideTabBar ? 0 : '4.5rem' }}
     >
-      <main>
-        <Outlet />
-      </main>
+      <div className="app-canvas">
+        <main>
+          <Outlet />
+        </main>
+      </div>
 
       {!hideTabBar ? <TabBar items={tabs} /> : null}
     </div>

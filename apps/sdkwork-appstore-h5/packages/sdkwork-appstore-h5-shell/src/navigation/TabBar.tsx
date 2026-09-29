@@ -26,7 +26,10 @@ export interface TabBarProps {
 export function TabBar({ items }: TabBarProps) {
   return (
     <nav className="tab-bar" aria-label="主导航">
-      <div className="flex items-stretch justify-around h-16 max-w-lg mx-auto px-1">
+      <div
+        className="tab-bar__row"
+        style={{ maxWidth: '30rem', marginLeft: 'auto', marginRight: 'auto' }}
+      >
         {items.map((item) => (
           <NavLink
             key={item.path}

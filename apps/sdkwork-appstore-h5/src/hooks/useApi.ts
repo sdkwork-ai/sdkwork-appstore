@@ -238,6 +238,10 @@ export function formatApiError(error: unknown): string {
   if (isAppStoreApiError(error)) {
     return error.detail || error.title || `请求失败（${error.status}）`;
   }
+  if (error instanceof TypeError) {
+    // fetch 网络层失败（DNS/拒连/断网），原始 message 是浏览器英文细节。
+    return '网络连接失败，请检查网络后重试。';
+  }
   if (error instanceof Error && error.message) {
     return error.message;
   }
