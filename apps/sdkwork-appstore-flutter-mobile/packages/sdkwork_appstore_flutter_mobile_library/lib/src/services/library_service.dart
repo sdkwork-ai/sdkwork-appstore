@@ -4,9 +4,10 @@ import '../models/library_models.dart';
 
 /// Library service.
 ///
-/// The App Store app SDK clients are injected by the root bootstrap
-/// (`APP_SDK_INTEGRATION_SPEC.md`); this package never constructs a client and
-/// never issues raw HTTP.
+/// Injected clients only; data calls gate on the generated Dart SDK transport
+/// binding (PC explicit-unconfigured-port pattern). Backed by
+/// `library.listItems` and `library.uninstall` once the Dart SDK target is
+/// generated.
 class LibraryService {
   const LibraryService({required this.clients});
 
@@ -14,6 +15,15 @@ class LibraryService {
 
   String get capability => 'library';
 
-  LibraryPageResult<Never> empty() =>
-      const LibraryPageResult<Never>(items: <Never>[]);
+  /// Loads the installed library of the signed-in user.
+  Future<List<LibraryEntry>> loadInstalled() async {
+    clients.ensureTransportBound(capability);
+    throw AppstoreServiceUnconfiguredException(capability);
+  }
+
+  /// Uninstalls one installed listing.
+  Future<void> uninstall(String listingId) async {
+    clients.ensureTransportBound(capability);
+    throw AppstoreServiceUnconfiguredException(capability);
+  }
 }

@@ -2,11 +2,10 @@ import 'package:sdkwork_appstore_flutter_mobile_core/sdkwork_appstore_flutter_mo
 
 import '../models/games_models.dart';
 
-/// Games service.
+/// Games hall service.
 ///
-/// The App Store app SDK clients are injected by the root bootstrap
-/// (`APP_SDK_INTEGRATION_SPEC.md`); this package never constructs a client and
-/// never issues raw HTTP.
+/// Injected clients only; data calls gate on the generated Dart SDK transport
+/// binding (PC explicit-unconfigured-port pattern).
 class GamesService {
   const GamesService({required this.clients});
 
@@ -14,6 +13,10 @@ class GamesService {
 
   String get capability => 'games';
 
-  GamesPageResult<Never> empty() =>
-      const GamesPageResult<Never>(items: <Never>[]);
+  /// Loads the games hall feed: board-game hall (with sub-filters), mini
+  /// games, handheld games, and PC games sections.
+  Future<GamesFeed> loadFeed() async {
+    clients.ensureTransportBound(capability);
+    throw AppstoreServiceUnconfiguredException(capability);
+  }
 }

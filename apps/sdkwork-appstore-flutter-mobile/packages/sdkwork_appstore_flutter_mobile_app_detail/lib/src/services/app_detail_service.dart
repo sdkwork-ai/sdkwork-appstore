@@ -2,11 +2,13 @@ import 'package:sdkwork_appstore_flutter_mobile_core/sdkwork_appstore_flutter_mo
 
 import '../models/app_detail_models.dart';
 
-/// App Detail service.
+/// App detail service.
 ///
-/// The App Store app SDK clients are injected by the root bootstrap
-/// (`APP_SDK_INTEGRATION_SPEC.md`); this package never constructs a client and
-/// never issues raw HTTP.
+/// Injected clients only; data calls gate on the generated Dart SDK transport
+/// binding (PC explicit-unconfigured-port pattern). Backed by
+/// `listings.get/listSimilar/listMedia/listReleases/listRatings`,
+/// `wishlist.addItem/removeItem`, and `library.install` once the Dart SDK
+/// target is generated.
 class AppDetailService {
   const AppDetailService({required this.clients});
 
@@ -14,6 +16,21 @@ class AppDetailService {
 
   String get capability => 'app-detail';
 
-  AppDetailPageResult<Never> empty() =>
-      const AppDetailPageResult<Never>(items: <Never>[]);
+  /// Loads the full detail view model for [listingId].
+  Future<AppDetail> loadDetail(String listingId) async {
+    clients.ensureTransportBound(capability);
+    throw AppstoreServiceUnconfiguredException(capability);
+  }
+
+  /// Installs (acquires) the listing through the library domain.
+  Future<void> install(String listingId) async {
+    clients.ensureTransportBound(capability);
+    throw AppstoreServiceUnconfiguredException(capability);
+  }
+
+  /// Adds or removes the listing from the wishlist; returns the new state.
+  Future<bool> toggleWishlist(String listingId, {required bool add}) async {
+    clients.ensureTransportBound(capability);
+    throw AppstoreServiceUnconfiguredException(capability);
+  }
 }

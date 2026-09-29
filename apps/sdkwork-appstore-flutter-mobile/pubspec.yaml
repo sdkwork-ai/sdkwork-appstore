@@ -1,4 +1,4 @@
-name: appstore-flutter-mobile
+name: sdkwork_appstore_flutter_mobile
 description: SDKWork App Store Flutter mobile client for discovering, installing, publishing, and operating marketplace applications and AI capabilities.
 version: 0.1.0
 publish_to: none

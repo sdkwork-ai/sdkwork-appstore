@@ -12,3 +12,18 @@ class LibraryPageResult<TItem> {
   final List<TItem> items;
   final String? nextCursor;
 }
+
+/// One installed listing row.
+class LibraryEntry {
+  const LibraryEntry({
+    required this.listingId,
+    required this.title,
+    this.developer = '',
+    this.installedVersion = '',
+  });
+
+  final String listingId;
+  final String title;
+  final String developer;
+  final String installedVersion;
+}

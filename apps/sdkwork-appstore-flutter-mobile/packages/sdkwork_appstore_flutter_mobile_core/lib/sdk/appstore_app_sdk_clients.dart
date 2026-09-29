@@ -11,7 +11,7 @@
 /// manual auth headers.
 library;
 
-const String appstoreAppApiPrefix = '$appApiSuffix';
+const String appstoreAppApiPrefix = '/app/v3/api';
 
 /// Normalized, credential-aware App Store app-api client configuration.
 class AppstoreAppSdkClientConfig {
@@ -74,10 +74,24 @@ class AppstoreAppSdkClients {
   const AppstoreAppSdkClients({
     required this.appApiBaseUrl,
     required this.transportBaseUrl,
+    this.transportBound = false,
   });
 
   final String appApiBaseUrl;
   final String transportBaseUrl;
+
+  /// Whether a generated Dart app SDK transport is bound to this client set.
+  ///
+  /// Capability services gate every data call on this flag and throw
+  /// [AppstoreServiceUnconfiguredException] while it stays false.
+  final bool transportBound;
+
+  /// Guard used by capability services before any data call.
+  void ensureTransportBound(String capability) {
+    if (!transportBound) {
+      throw AppstoreServiceUnconfiguredException(capability);
+    }
+  }
 }
 
 AppstoreAppSdkClients createAppstoreAppSdkClients({
@@ -94,4 +108,25 @@ AppstoreAppSdkClients createAppstoreAppSdkClients({
 
 void resetAppstoreAppSdkClients() {
   _configuredBaseUrl = null;
+}
+
+/// Thrown by capability services when the generated Dart app SDK transport is
+/// not bound yet.
+///
+/// The PC root uses the same explicit-unconfigured-port pattern: screens render
+/// the error state, and no demo data is ever injected
+/// (`sdkwork-appstore-pc-core` services; `InstallProvider.tsx` "no demo apps
+/// are ever injected"). The gap is closed by generating the Dart target of
+/// `sdkwork-appstore-app-sdk` and binding it in the root bootstrap, never by
+/// raw HTTP in feature packages.
+class AppstoreServiceUnconfiguredException implements Exception {
+  const AppstoreServiceUnconfiguredException(this.capability);
+
+  final String capability;
+
+  @override
+  String toString() =>
+      'appstore.$capability: the generated Dart app SDK transport is not '
+      'bound yet; generate the Dart target of sdkwork-appstore-app-sdk and '
+      'bind it in the root bootstrap.';
 }

@@ -2,19 +2,14 @@
  * User custom store (个人自定义分类 / 分享) service access for H5.
  *
  * Mirrors the PC-side contract in `@sdkwork/appstore-pc-core` userStore
- * service. The authenticated surface binds `getStoreClient()`; the anonymous
- * public share view targets the open-api (`/store/v3/api`) userStores.public
- * operations. Wire shapes follow the OpenAPI contracts (int64 fields such as
- * `viewCount` and `downloadCount` are strings per API_SPEC §13.6).
- *
- * NOTE (SDK wiring TODO): the generated `@sdkwork/appstore-app-sdk` does not
- * yet expose the `userCategory` / `userStoreShare` / `publicUserStores`
- * namespaces (generated output is never hand-edited). Once the SDK is
- * regenerated from `apis/app-api/store/openapi.yaml` and
- * `apis/open-api/store/openapi.yaml`, replace the pending-port bodies with
- * the generated client calls — nothing else in the pages should change.
+ * service. The authenticated surface binds `getStoreClient()` through the
+ * generated `userStore` facade; the anonymous public share view binds the
+ * open-api client (`/store/v3/api`) `userStores.public` operations. Wire
+ * shapes follow the OpenAPI contracts (int64 fields such as `viewCount` and
+ * `downloadCount` are strings per API_SPEC §13.6).
  */
 import type { AppStoreClient } from '@sdkwork/appstore-app-sdk';
+import { getOpenApiClient } from '@/services/openApiClient';
 
 export type UserStoreShareScope = 'all' | 'selected';
 export type UserStoreShareVisibility = 'public' | 'unlisted';
@@ -26,7 +21,7 @@ export interface UserStoreListingCard {
   iconMediaResourceId?: string;
   averageRating?: string;
   /** int64 serialized as a decimal string. */
-  downloadCount: string;
+  downloadCount?: string;
 }
 
 export interface UserCategory {
@@ -102,50 +97,47 @@ export interface PublicUserStoreView {
   shareToken: string;
   title: string;
   description?: string;
-  scope: UserStoreShareScope;
   categories: PublicUserStoreCategorySummary[];
 }
 
-function pendingSdkPort(method: string): never {
-  throw new Error(
-    `userStore.${method}: the @sdkwork/appstore-app-sdk userStore namespaces `
-      + 'are not generated yet. Regenerate the SDK and wire the client here.',
-  );
+function toPage(result: { pageInfo?: { nextCursor?: string | null; hasMore?: boolean } }): {
+  cursor?: string;
+  hasMore: boolean;
+} {
+  return {
+    cursor: result.pageInfo?.nextCursor ?? undefined,
+    hasMore: result.pageInfo?.hasMore ?? false,
+  };
 }
 
 /** Authenticated owner operations (app-api, DualToken). */
 export const userStoreService = {
   async listCategories(client: AppStoreClient): Promise<UserCategory[]> {
-    void client;
-    pendingSdkPort('listCategories');
+    const page = await client.userStore.listCategories();
+    return page.items;
   },
   async createCategory(
     client: AppStoreClient,
     input: { name: string; description?: string },
   ): Promise<UserCategory> {
-    void client;
-    void input;
-    pendingSdkPort('createCategory');
+    return client.userStore.createCategory(input);
   },
   async deleteCategory(client: AppStoreClient, categoryId: string): Promise<void> {
-    void client;
-    void categoryId;
-    pendingSdkPort('deleteCategory');
+    await client.userStore.deleteCategory(categoryId);
   },
   async listItems(client: AppStoreClient, categoryId: string): Promise<UserStoreItemPage> {
-    void client;
-    void categoryId;
-    pendingSdkPort('listItems');
+    const page = await client.userStore.listCategoryItems(categoryId);
+    return {
+      items: page.items,
+      ...toPage(page),
+    };
   },
   async removeItem(client: AppStoreClient, categoryId: string, itemId: string): Promise<void> {
-    void client;
-    void categoryId;
-    void itemId;
-    pendingSdkPort('removeItem');
+    await client.userStore.removeCategoryItem(categoryId, itemId);
   },
   async listShares(client: AppStoreClient): Promise<UserStoreShare[]> {
-    void client;
-    pendingSdkPort('listShares');
+    const page = await client.userStore.listShares();
+    return page.items;
   },
   async createShare(
     client: AppStoreClient,
@@ -157,36 +149,69 @@ export const userStoreService = {
       visibility: UserStoreShareVisibility;
     },
   ): Promise<UserStoreShare> {
-    void client;
-    void input;
-    pendingSdkPort('createShare');
+    return client.userStore.createShare(input);
   },
   async updateShare(
     client: AppStoreClient,
     shareId: string,
     input: UserStoreShareUpdateInput,
   ): Promise<UserStoreShare> {
-    void client;
-    void shareId;
-    void input;
-    pendingSdkPort('updateShare');
+    return client.userStore.updateShare(shareId, input);
   },
   async revokeShare(client: AppStoreClient, shareId: string): Promise<void> {
-    void client;
-    void shareId;
-    pendingSdkPort('revokeShare');
+    await client.userStore.revokeShare(shareId);
   },
 };
 
 /** Anonymous visitor operations (open-api, no auth). */
 export const publicUserStoreService = {
   async getView(shareToken: string): Promise<PublicUserStoreView> {
-    void shareToken;
-    pendingSdkPort('public.getView');
+    const openClient = getOpenApiClient();
+    const view = await openClient.getPublicUserStore(shareToken);
+    return {
+      shareToken: view.shareToken,
+      title: view.title,
+      description: view.description,
+      categories: view.categories,
+    };
   },
-  async listItems(shareToken: string, categoryId?: string): Promise<PublicUserStoreItemPage> {
-    void shareToken;
-    void categoryId;
-    pendingSdkPort('public.listItems');
+  async listItems(
+    shareToken: string,
+    categoryId?: string,
+  ): Promise<PublicUserStoreItemPage> {
+    const openClient = getOpenApiClient();
+    if (!categoryId) {
+      // The open-api public surface pages items per category; the "全部" tab
+      // renders the union by walking the categories of the shared view.
+      const view = await openClient.getPublicUserStore(shareToken);
+      const pages = await Promise.all(
+        view.categories.map((category) =>
+          openClient.listPublicUserStoreItems(shareToken, category.userCategoryId),
+        ),
+      );
+      return {
+        items: pages.flatMap((page) =>
+          page.items.map((card) => ({
+            listingId: card.listingId,
+            displayName: card.displayName,
+            subtitle: card.subtitle,
+            iconMediaResourceId: card.iconMediaResourceId,
+            averageRating: card.averageRating,
+          })),
+        ),
+        hasMore: false,
+      };
+    }
+    const page = await openClient.listPublicUserStoreItems(shareToken, categoryId);
+    return {
+      items: page.items.map((card) => ({
+        listingId: card.listingId,
+        displayName: card.displayName,
+        subtitle: card.subtitle,
+        iconMediaResourceId: card.iconMediaResourceId,
+        averageRating: card.averageRating,
+      })),
+      ...toPage(page),
+    };
   },
 };

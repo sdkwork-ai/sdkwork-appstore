@@ -4,9 +4,10 @@ import '../models/wishlist_models.dart';
 
 /// Wishlist service.
 ///
-/// The App Store app SDK clients are injected by the root bootstrap
-/// (`APP_SDK_INTEGRATION_SPEC.md`); this package never constructs a client and
-/// never issues raw HTTP.
+/// Injected clients only; data calls gate on the generated Dart SDK transport
+/// binding (PC explicit-unconfigured-port pattern). Backed by
+/// `wishlist.listItems/addItem/removeItem` once the Dart SDK target is
+/// generated.
 class WishlistService {
   const WishlistService({required this.clients});
 
@@ -14,6 +15,15 @@ class WishlistService {
 
   String get capability => 'wishlist';
 
-  WishlistPageResult<Never> empty() =>
-      const WishlistPageResult<Never>(items: <Never>[]);
+  /// Loads the signed-in user's saved listings.
+  Future<List<WishlistEntry>> loadWishlist() async {
+    clients.ensureTransportBound(capability);
+    throw AppstoreServiceUnconfiguredException(capability);
+  }
+
+  /// Removes one listing from the wishlist.
+  Future<void> remove(String listingId) async {
+    clients.ensureTransportBound(capability);
+    throw AppstoreServiceUnconfiguredException(capability);
+  }
 }

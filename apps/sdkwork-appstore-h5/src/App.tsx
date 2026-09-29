@@ -23,6 +23,39 @@ const UserStorePage = lazy(() =>
 const PublicUserStorePage = lazy(() =>
   import('./pages/user-store/PublicUserStorePage').then(m => ({ default: m.PublicUserStorePage })),
 );
+const ChartsPage = lazy(() =>
+  import('./pages/ChartsPage').then(m => ({ default: m.ChartsPage })),
+);
+const CategoryPage = lazy(() =>
+  import('./pages/CategoryPage').then(m => ({ default: m.CategoryPage })),
+);
+const CollectionPage = lazy(() =>
+  import('./pages/CollectionPage').then(m => ({ default: m.CollectionPage })),
+);
+const EventPage = lazy(() =>
+  import('./pages/EventPage').then(m => ({ default: m.EventPage })),
+);
+const AIHubPage = lazy(() =>
+  import('./pages/ai-hub/AIHubPage').then(m => ({ default: m.AIHubPage })),
+);
+const ExpertsPage = lazy(() =>
+  import('./pages/ai-hub/ExpertsPage').then(m => ({ default: m.ExpertsPage })),
+);
+const PluginsPage = lazy(() =>
+  import('./pages/ai-hub/PluginsPage').then(m => ({ default: m.PluginsPage })),
+);
+const SkillsPage = lazy(() =>
+  import('./pages/ai-hub/SkillsPage').then(m => ({ default: m.SkillsPage })),
+);
+const McpPage = lazy(() =>
+  import('./pages/ai-hub/McpPage').then(m => ({ default: m.McpPage })),
+);
+const TemplatesPage = lazy(() =>
+  import('./pages/ai-hub/TemplatesPage').then(m => ({ default: m.TemplatesPage })),
+);
+const TemplateDetailPage = lazy(() =>
+  import('./pages/ai-hub/TemplateDetailPage').then(m => ({ default: m.TemplateDetailPage })),
+);
 
 function PageLoader() {
   return (
@@ -45,6 +78,18 @@ export default function App() {
           <Route path="/search" element={<SearchPage />} />
           <Route path="/app/:id" element={<ListingDetailPage />} />
           <Route path="/settings" element={<SettingsPage />} />
+          <Route path="/charts" element={<ChartsPage />} />
+          <Route path="/category/:id" element={<CategoryPage />} />
+          <Route path="/collection/:id" element={<CollectionPage />} />
+          <Route path="/events/:id" element={<EventPage />} />
+          <Route path="/ai-hub" element={<AIHubPage />} />
+          <Route path="/experts" element={<ExpertsPage />} />
+          <Route path="/plugins" element={<PluginsPage />} />
+          <Route path="/skills" element={<SkillsPage />} />
+          <Route path="/mcp" element={<McpPage />} />
+          <Route path="/templates" element={<TemplatesPage />} />
+          <Route path="/template/:id" element={<TemplateDetailPage />} />
+          <Route path="/templates/:id" element={<TemplateDetailPage />} />
 
           {/* Authenticated routes */}
           <Route

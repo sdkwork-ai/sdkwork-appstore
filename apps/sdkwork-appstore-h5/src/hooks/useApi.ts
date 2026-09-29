@@ -141,6 +141,30 @@ export function useRecommendations(limit: number) {
   });
 }
 
+/** Editorial collections rail (discover). */
+export function useCollections(limit: number) {
+  return useApi(async () => {
+    const page = await getStoreClient().catalog.listCollections({ limit });
+    return { items: page.items };
+  });
+}
+
+/** Active store events rail (discover). */
+export function useActiveEvents(limit: number) {
+  return useApi(async () => {
+    const page = await getStoreClient().catalog.listEvents({ status: 'active', limit });
+    return { items: page.items };
+  });
+}
+
+/** Recently updated listings rail (discover). */
+export function useRecentlyUpdated(limit: number) {
+  return useApi(async () => {
+    const page = await getStoreClient().catalog.listRecentlyUpdated({ limit });
+    return { items: page.items };
+  });
+}
+
 /** Public listing detail by slug (falls back to a search when not an id). */
 export function usePublicListing(slug: string) {
   return useApi(

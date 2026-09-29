@@ -4,16 +4,24 @@ import '../models/settings_models.dart';
 
 /// Settings service.
 ///
-/// The App Store app SDK clients are injected by the root bootstrap
-/// (`APP_SDK_INTEGRATION_SPEC.md`); this package never constructs a client and
-/// never issues raw HTTP.
+/// Reads the appbase IAM runtime session owned by core; no SDK construction
+/// and no raw transport here. IAM login/session behavior follows
+/// `IAM_LOGIN_INTEGRATION_SPEC.md` once the appbase Dart wrapper lands.
 class SettingsService {
-  const SettingsService({required this.clients});
+  const SettingsService({required this.iamRuntime});
 
-  final AppstoreAppSdkClients clients;
+  final AppstoreIamRuntime iamRuntime;
 
   String get capability => 'settings';
 
-  SettingsPageResult<Never> empty() =>
-      const SettingsPageResult<Never>(items: <Never>[]);
+  /// Signed-in state, or null-shaped anonymous account.
+  SettingsAccount loadAccount() {
+    return SettingsAccount(signedIn: iamRuntime.session.isAuthenticated);
+  }
+
+  /// Clears the local session (logout boundary; platform secure storage and
+  /// token-manager clearing land with the appbase Dart wrapper).
+  void signOut() {
+    iamRuntime.clearSession();
+  }
 }

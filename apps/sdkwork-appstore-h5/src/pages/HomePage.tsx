@@ -1,9 +1,12 @@
 import { Link } from 'react-router-dom';
-import { Sparkles, TrendingUp, LayoutGrid } from 'lucide-react';
+import { Sparkles, TrendingUp, LayoutGrid, Clock, CalendarClock, FolderHeart } from 'lucide-react';
 import {
   useHomeFeed,
   useCategories,
   useRecommendations,
+  useCollections,
+  useActiveEvents,
+  useRecentlyUpdated,
   formatApiError,
 } from '@/hooks/useApi';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
@@ -48,8 +51,11 @@ export function HomePage() {
   const { data: homeFeed, loading: feedLoading, error: feedError } = useHomeFeed();
   const { data: categories, loading: categoriesLoading, error: categoriesError } = useCategories(10);
   const { data: recommendations, loading: recLoading, error: recError } = useRecommendations(12);
+  const { data: collections, loading: collectionsLoading } = useCollections(8);
+  const { data: events, loading: eventsLoading } = useActiveEvents(6);
+  const { data: recentlyUpdated, loading: updatedLoading } = useRecentlyUpdated(6);
 
-  if (feedLoading || categoriesLoading || recLoading) {
+  if (feedLoading || categoriesLoading || recLoading || collectionsLoading || eventsLoading || updatedLoading) {
     return (
       <div className="flex min-h-[50vh] items-center justify-center">
         <LoadingSpinner size="lg" />
@@ -70,6 +76,45 @@ export function HomePage() {
 
   const categoryItems = categories?.items ?? [];
   const recItems = (recommendations?.items ?? []).map(readListingCard);
+  const collectionItems = (collections?.items ?? []) as unknown as Record<string, unknown>[];
+  const eventItems = (events?.items ?? []) as unknown as Record<string, unknown>[];
+  const updatedItems = (recentlyUpdated?.items ?? []).map(readListingCard);
+
+  const collectionName = (row: Record<string, unknown>): string => {
+    const localizations = Array.isArray(row.localizations)
+      ? (row.localizations as Record<string, unknown>[])
+      : [];
+    const preferred =
+      localizations.find((entry) => entry.locale === 'zh-CN' || entry.locale === 'zh_CN') ??
+      localizations[0];
+    return String(preferred?.displayName ?? '') || String(row.collectionCode ?? '精选合集');
+  };
+
+  const eventName = (row: Record<string, unknown>): string => {
+    const localizations = Array.isArray(row.localizations)
+      ? (row.localizations as Record<string, unknown>[])
+      : [];
+    const preferred =
+      localizations.find((entry) => entry.locale === 'zh-CN' || entry.locale === 'zh_CN') ??
+      localizations[0];
+    return (
+      String(preferred?.displayName ?? '') || String(row.title ?? '') || '限时活动'
+    );
+  };
+
+  const formatEventEnds = (row: Record<string, unknown>): string => {
+    const endsAt = String(row.endsAt ?? '');
+    const parsed = Date.parse(endsAt);
+    if (!Number.isFinite(parsed)) {
+      return endsAt;
+    }
+    return new Date(parsed).toLocaleString('zh-CN', {
+      month: 'numeric',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  };
 
   return (
     <div className="animate-fade-in pb-4">
@@ -117,7 +162,7 @@ export function HomePage() {
                 return (
                   <Link
                     key={String(row.id ?? index)}
-                    to={`/search?q=${encodeURIComponent(label)}`}
+                    to={`/category/${String(row.id ?? index)}`}
                     className="card card-press flex-shrink-0 rounded-full px-4 py-2 text-sm font-medium"
                     style={{ color: 'var(--text-primary)' }}
                   >
@@ -128,13 +173,82 @@ export function HomePage() {
             : ['效率', '社交', '游戏', '工具', '摄影'].map((label) => (
                 <Link
                   key={label}
-                  to={`/search?q=${encodeURIComponent(label)}`}
+                  to="/search"
                   className="card card-press flex-shrink-0 rounded-full px-4 py-2 text-sm font-medium"
                 >
                   {label}
                 </Link>
               ))}
         </div>
+      </section>
+
+      <section className="px-4 py-2">
+        <div className="mb-3 flex items-center gap-2">
+          <FolderHeart className="h-4 w-4 text-[var(--accent)]" />
+          <h2 className="section-title">编辑合集</h2>
+        </div>
+        {collectionItems.length === 0 ? null : (
+          <div className="scroll-x flex gap-3 pb-1">
+            {collectionItems.slice(0, 8).map((row, index) => {
+              const label = collectionName(row);
+              return (
+                <Link
+                  key={String(row.id ?? index)}
+                  to={`/collection/${String(row.id ?? index)}`}
+                  className="card card-press flex-shrink-0 w-44 overflow-hidden"
+                >
+                  <div
+                    className="flex h-24 items-center justify-center px-3 text-center text-base font-bold text-white"
+                    style={{
+                      background:
+                        index % 2 === 0
+                          ? 'linear-gradient(160deg, #6366f1, #8b5cf6)'
+                          : 'linear-gradient(160deg, #d946ef, #6366f1)',
+                    }}
+                  >
+                    <span className="line-clamp-2">{label}</span>
+                  </div>
+                  <p className="truncate p-3 text-sm font-semibold text-[var(--text-primary)]">
+                    {label}
+                  </p>
+                </Link>
+              );
+            })}
+          </div>
+        )}
+      </section>
+
+      <section className="px-4 py-2">
+        <div className="mb-3 flex items-center gap-2">
+          <CalendarClock className="h-4 w-4 text-[var(--warning)]" />
+          <h2 className="section-title">限时活动</h2>
+        </div>
+        {eventItems.length === 0 ? (
+          <p className="text-sm text-[var(--text-tertiary)] py-4 text-center">当前没有进行中的活动</p>
+        ) : (
+          <div className="scroll-x flex gap-3 pb-1">
+            {eventItems.slice(0, 6).map((row, index) => {
+              const label = eventName(row);
+              return (
+                <Link
+                  key={String(row.id ?? index)}
+                  to={`/events/${String(row.id ?? index)}`}
+                  className="card card-press flex-shrink-0 w-48 overflow-hidden"
+                >
+                  <div
+                    className="flex h-20 flex-col justify-between p-3 text-white"
+                    style={{ background: 'linear-gradient(120deg, #7c3aed, #ec4899)' }}
+                  >
+                    <p className="line-clamp-2 text-sm font-bold">{label}</p>
+                    <p className="text-[10px] text-white/85">
+                      {formatEventEnds(row) && `截止 ${formatEventEnds(row)}`}
+                    </p>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        )}
       </section>
 
       <section className="px-4 py-2">
@@ -203,6 +317,37 @@ export function HomePage() {
                 </div>
               );
             })}
+          </div>
+        </section>
+      ) : null}
+
+      {updatedItems.length > 0 ? (
+        <section className="px-4 py-4">
+          <div className="mb-3 flex items-center gap-2">
+            <Clock className="h-4 w-4 text-[var(--accent)]" />
+            <h2 className="section-title">最近更新</h2>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            {updatedItems.slice(0, 4).map((app) => (
+              <Link
+                key={app.id}
+                to={`/app/${app.id}`}
+                className="card card-press flex items-center gap-3 p-3"
+              >
+                <div
+                  className="app-icon flex h-11 w-11 flex-shrink-0 items-center justify-center text-base font-bold text-white"
+                  style={{ background: 'linear-gradient(135deg, var(--accent), #5856d6)' }}
+                >
+                  {app.name[0]?.toUpperCase() ?? 'A'}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <h3 className="truncate text-sm font-semibold text-[var(--text-primary)]">
+                    {app.name}
+                  </h3>
+                  <p className="truncate text-xs text-[var(--text-tertiary)]">{app.developer}</p>
+                </div>
+              </Link>
+            ))}
           </div>
         </section>
       ) : null}

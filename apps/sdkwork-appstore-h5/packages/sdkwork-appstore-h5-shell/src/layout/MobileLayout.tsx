@@ -11,13 +11,14 @@ import { TabBar, type TabBarItem } from '../navigation/TabBar';
  * packages own the screens it renders
  * (`APP_CLIENT_ARCHITECTURE_ALIGNMENT_SPEC.md` section 4).
  *
- * Tab paths stay on the H5 root's own spelling: route identity, not route
- * spelling, is the cross-client contract (section 7).
+ * Tab paths use the canonical route spelling shared with the route table
+ * (`apps/sdkwork-appstore-h5-core/src/composition/route-table.ts`); route
+ * identity, not route spelling, is the cross-client contract (section 7).
  */
 const tabs: readonly TabBarItem[] = [
   { path: '/', icon: Compass, label: '发现', end: true },
-  { path: '/browse/apps', icon: Grid3X3, label: '应用' },
-  { path: '/browse/games', icon: Gamepad2, label: '游戏' },
+  { path: '/apps', icon: Grid3X3, label: '应用' },
+  { path: '/games', icon: Gamepad2, label: '游戏' },
   { path: '/search', icon: Search, label: '搜索' },
   { path: '/library', icon: Download, label: '库' },
 ];

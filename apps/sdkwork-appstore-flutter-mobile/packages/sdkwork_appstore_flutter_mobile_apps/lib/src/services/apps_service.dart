@@ -2,11 +2,11 @@ import 'package:sdkwork_appstore_flutter_mobile_core/sdkwork_appstore_flutter_mo
 
 import '../models/apps_models.dart';
 
-/// Apps service.
+/// Apps browse service.
 ///
-/// The App Store app SDK clients are injected by the root bootstrap
-/// (`APP_SDK_INTEGRATION_SPEC.md`); this package never constructs a client and
-/// never issues raw HTTP.
+/// Injected clients only; data calls gate on the generated Dart SDK transport
+/// binding and throw [AppstoreServiceUnconfiguredException] while unbound
+/// (PC explicit-unconfigured-port pattern).
 class AppsService {
   const AppsService({required this.clients});
 
@@ -14,6 +14,10 @@ class AppsService {
 
   String get capability => 'apps';
 
-  AppsPageResult<Never> empty() =>
-      const AppsPageResult<Never>(items: <Never>[]);
+  /// Loads one keyset page of the apps catalog, optionally filtered by
+  /// subcategory (backed by `catalog.searchListings` cursor paging).
+  Future<AppsListPage> loadPage({String? cursor, String category = ''}) async {
+    clients.ensureTransportBound(capability);
+    throw AppstoreServiceUnconfiguredException(capability);
+  }
 }

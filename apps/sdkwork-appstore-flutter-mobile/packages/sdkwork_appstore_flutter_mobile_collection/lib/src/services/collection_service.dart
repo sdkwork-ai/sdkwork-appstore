@@ -2,11 +2,11 @@ import 'package:sdkwork_appstore_flutter_mobile_core/sdkwork_appstore_flutter_mo
 
 import '../models/collection_models.dart';
 
-/// Collection service.
+/// Editorial collection service.
 ///
-/// The App Store app SDK clients are injected by the root bootstrap
-/// (`APP_SDK_INTEGRATION_SPEC.md`); this package never constructs a client and
-/// never issues raw HTTP.
+/// Injected clients only; data calls gate on the generated Dart SDK transport
+/// binding (PC explicit-unconfigured-port pattern). Backed by
+/// `catalog.getCollection` + id-ordered `catalog.searchListings({ids})`.
 class CollectionService {
   const CollectionService({required this.clients});
 
@@ -14,6 +14,10 @@ class CollectionService {
 
   String get capability => 'collection';
 
-  CollectionPageResult<Never> empty() =>
-      const CollectionPageResult<Never>(items: <Never>[]);
+  /// Loads the collection detail with order-preserving listing cards for
+  /// [collectionId].
+  Future<CollectionDetail> loadDetail(String collectionId) async {
+    clients.ensureTransportBound(capability);
+    throw AppstoreServiceUnconfiguredException(capability);
+  }
 }

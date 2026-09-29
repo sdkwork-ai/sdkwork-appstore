@@ -12,3 +12,16 @@ class WishlistPageResult<TItem> {
   final List<TItem> items;
   final String? nextCursor;
 }
+
+/// One saved listing row.
+class WishlistEntry {
+  const WishlistEntry({
+    required this.listingId,
+    required this.title,
+    this.developer = '',
+  });
+
+  final String listingId;
+  final String title;
+  final String developer;
+}

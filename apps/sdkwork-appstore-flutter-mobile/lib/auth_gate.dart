@@ -3,10 +3,12 @@ import 'package:sdkwork_appstore_flutter_mobile_shell/sdkwork_appstore_flutter_m
 
 /// Root AuthGate. Authority: `IAM_LOGIN_INTEGRATION_SPEC.md`.
 class AuthGate extends StatelessWidget {
-  const AuthGate({super.key});
+  const AuthGate({required this.child, super.key});
+
+  final Widget child;
 
   @override
   Widget build(BuildContext context) {
-    return const AppstoreAuthGate(child: AppstoreRouteStack());
+    return AppstoreAuthGate(child: child);
   }
 }

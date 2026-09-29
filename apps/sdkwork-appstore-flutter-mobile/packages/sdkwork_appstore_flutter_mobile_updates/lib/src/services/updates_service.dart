@@ -4,9 +4,10 @@ import '../models/updates_models.dart';
 
 /// Updates service.
 ///
-/// The App Store app SDK clients are injected by the root bootstrap
-/// (`APP_SDK_INTEGRATION_SPEC.md`); this package never constructs a client and
-/// never issues raw HTTP.
+/// Injected clients only; data calls gate on the generated Dart SDK transport
+/// binding (PC explicit-unconfigured-port pattern). Backed by
+/// `library.checkUpdates` and drive-signed artifact downloads once the Dart
+/// SDK target is generated.
 class UpdatesService {
   const UpdatesService({required this.clients});
 
@@ -14,6 +15,15 @@ class UpdatesService {
 
   String get capability => 'updates';
 
-  UpdatesPageResult<Never> empty() =>
-      const UpdatesPageResult<Never>(items: <Never>[]);
+  /// Loads pending updates for the installed library.
+  Future<List<PendingUpdateEntry>> loadPendingUpdates() async {
+    clients.ensureTransportBound(capability);
+    throw AppstoreServiceUnconfiguredException(capability);
+  }
+
+  /// Updates one listing; returns the resolved download URL when available.
+  Future<String?> update(String listingId) async {
+    clients.ensureTransportBound(capability);
+    throw AppstoreServiceUnconfiguredException(capability);
+  }
 }

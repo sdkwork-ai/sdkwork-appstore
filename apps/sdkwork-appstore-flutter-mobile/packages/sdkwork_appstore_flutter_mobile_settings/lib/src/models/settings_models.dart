@@ -12,3 +12,12 @@ class SettingsPageResult<TItem> {
   final List<TItem> items;
   final String? nextCursor;
 }
+
+/// Signed-in state rendered by the settings account card.
+class SettingsAccount {
+  const SettingsAccount({required this.signedIn});
+
+  /// Whether the local IAM session holds tokens (no profile fields exist on
+  /// the core session projection until the appbase Dart wrapper lands).
+  final bool signedIn;
+}

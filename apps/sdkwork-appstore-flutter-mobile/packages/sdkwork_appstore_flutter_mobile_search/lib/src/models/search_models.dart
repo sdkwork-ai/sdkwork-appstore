@@ -12,3 +12,18 @@ class SearchPageResult<TItem> {
   final List<TItem> items;
   final String? nextCursor;
 }
+
+/// One search result row.
+class SearchEntry {
+  const SearchEntry({
+    required this.id,
+    required this.title,
+    this.developer = '',
+    this.pricingModel = 'FREE',
+  });
+
+  final String id;
+  final String title;
+  final String developer;
+  final String pricingModel;
+}

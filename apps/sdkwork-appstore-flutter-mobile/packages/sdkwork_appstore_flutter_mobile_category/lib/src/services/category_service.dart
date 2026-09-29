@@ -4,9 +4,10 @@ import '../models/category_models.dart';
 
 /// Category service.
 ///
-/// The App Store app SDK clients are injected by the root bootstrap
-/// (`APP_SDK_INTEGRATION_SPEC.md`); this package never constructs a client and
-/// never issues raw HTTP.
+/// Injected clients only; data calls gate on the generated Dart SDK transport
+/// binding (PC explicit-unconfigured-port pattern). Backed by
+/// `catalog.getCategory` + `catalog.searchListings({categoryId})` once the
+/// Dart SDK target is generated.
 class CategoryService {
   const CategoryService({required this.clients});
 
@@ -14,6 +15,9 @@ class CategoryService {
 
   String get capability => 'category';
 
-  CategoryPageResult<Never> empty() =>
-      const CategoryPageResult<Never>(items: <Never>[]);
+  /// Loads the category detail and its listing page for [categoryId].
+  Future<CategoryDetail> loadDetail(String categoryId) async {
+    clients.ensureTransportBound(capability);
+    throw AppstoreServiceUnconfiguredException(capability);
+  }
 }

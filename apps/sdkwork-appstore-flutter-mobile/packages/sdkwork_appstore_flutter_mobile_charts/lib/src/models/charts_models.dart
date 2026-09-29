@@ -12,3 +12,20 @@ class ChartsPageResult<TItem> {
   final List<TItem> items;
   final String? nextCursor;
 }
+
+/// One ranked row of a chart snapshot.
+class ChartEntry {
+  const ChartEntry({
+    required this.rank,
+    required this.id,
+    required this.title,
+    this.developer = '',
+    this.pricingModel = 'FREE',
+  });
+
+  final int rank;
+  final String id;
+  final String title;
+  final String developer;
+  final String pricingModel;
+}
