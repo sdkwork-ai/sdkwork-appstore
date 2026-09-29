@@ -126,3 +126,6 @@ sdks/**/*-typescript/src/*.d.ts
 # Python bytecode from the repo scripts under `scripts/` and `tools/` (regenerated on import).
 __pycache__/
 *.pyc
+
+# Dart local build caches
+.dart_tool/
