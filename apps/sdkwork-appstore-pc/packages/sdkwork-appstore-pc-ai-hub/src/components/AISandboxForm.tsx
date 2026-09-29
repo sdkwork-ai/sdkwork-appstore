@@ -20,19 +20,19 @@ export const AISandboxForm: React.FC<AISandboxFormProps> = ({
   return (
     <form onSubmit={onSubmit} className="flex gap-2">
       <div className="relative flex-1">
-        <Bot className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+        <Bot className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-store-ink-faint" />
         <input
           type="text"
           value={demoPrompt}
           onChange={(e) => onPromptChange(e.target.value)}
           placeholder={t('aihub.sandbox.inputPlaceholder')}
-          className="w-full bg-white dark:bg-[#20232b] border border-gray-200 dark:border-[#2d313c] rounded-xl pl-10 pr-3.5 py-2 text-xs text-gray-900 dark:text-gray-100 outline-none focus:ring-2 focus:ring-teal-500 font-medium"
+          className="w-full bg-store-field border border-store-line rounded-store-control pl-10 pr-3.5 text-sm text-store-ink outline-none focus:ring-2 focus:ring-store-brand/25 font-medium h-9 placeholder:text-store-ink-faint transition-colors focus:border-store-brand"
         />
       </div>
       <button
         type="submit"
         disabled={isGenerating}
-        className="px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-xs font-bold transition-all shadow-sm shrink-0 disabled:opacity-50 cursor-pointer flex items-center gap-1.5"
+        className="px-4 py-2 bg-store-info hover:bg-store-info-hover text-white rounded-store-control text-xs font-medium transition-all shadow-sm shrink-0 disabled:opacity-50 cursor-pointer flex items-center gap-1.5"
       >
         {isGenerating ? (
           <>

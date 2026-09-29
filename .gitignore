@@ -83,6 +83,9 @@ Thumbs.db
 _tmp_*/
 _tmp_*
 .workbuddy/
+.workbuddy-tmp/
+**/.workbuddy-tmp/
+dev/
 
 # TypeScript build output in source directories (compiled alongside source)
 **/src/**/*.js.map

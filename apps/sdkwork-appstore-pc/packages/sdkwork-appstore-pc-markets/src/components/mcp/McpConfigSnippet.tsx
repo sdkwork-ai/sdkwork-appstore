@@ -18,14 +18,14 @@ export const McpConfigSnippet: React.FC<McpConfigSnippetProps> = ({ configSnippe
 
   return (
     <div className="mt-4 relative">
-      <div className="flex items-center justify-between bg-slate-950 px-4 py-2 rounded-t-2xl border-b border-slate-800 text-xs text-slate-400 font-mono">
+      <div className="flex items-center justify-between bg-slate-950 px-4 py-2 rounded-t-store-card border-b border-store-line text-xs text-store-ink-faint font-mono">
         <span className="flex items-center gap-1.5">
-          <Terminal className="w-3.5 h-3.5 text-cyan-400" />
+          <Terminal className="w-3.5 h-3.5 text-store-info" />
           mcp_config.json
         </span>
         <button
           onClick={handleCopy}
-          className="flex items-center gap-1 text-cyan-400 hover:text-cyan-300 font-semibold cursor-pointer transition-colors"
+          className="flex items-center gap-1 text-store-info hover:text-store-info font-semibold cursor-pointer transition-colors"
         >
           {copied ? (
             <>
@@ -40,7 +40,7 @@ export const McpConfigSnippet: React.FC<McpConfigSnippetProps> = ({ configSnippe
           )}
         </button>
       </div>
-      <pre className="p-4 rounded-b-2xl bg-slate-900 text-cyan-300 text-xs font-mono overflow-x-auto leading-relaxed border border-slate-800">
+      <pre className="p-4 rounded-b-store-card bg-slate-900 text-store-info text-xs font-mono overflow-x-auto leading-relaxed border border-store-line">
         {configSnippet}
       </pre>
     </div>

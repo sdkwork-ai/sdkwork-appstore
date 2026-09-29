@@ -100,27 +100,27 @@ export default function Library() {
     <div className="p-6 md:p-8 w-full max-w-full transition-colors duration-200 select-none space-y-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
+          <h1 className="text-xl font-bold tracking-tight text-store-ink ">
             {t('library.header.title')}
           </h1>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+          <p className="text-xs text-store-ink-faint mt-1 ">
             {t('library.header.subtitle')}
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <label className="flex items-center gap-2 text-xs font-semibold text-gray-600 dark:text-gray-300 cursor-pointer">
+          <label className="flex items-center gap-2 text-xs font-semibold text-store-ink-soft cursor-pointer ">
             <input
               type="checkbox"
               checked={autoUpdate}
               onChange={(event) => setAutoUpdate(event.target.checked)}
-              className="w-3.5 h-3.5 accent-blue-600"
+              className="w-3.5 h-3.5 accent-store-brand"
             />
             {t('library.toolbar.autoUpdate')}
           </label>
           <button
             onClick={handleUpdateAll}
             disabled={updatableIds.size === 0 || updating.length > 0}
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white rounded-full text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer"
+            className="px-4 py-2 bg-store-brand hover:bg-store-brand disabled:opacity-50 text-white rounded-full text-xs font-medium transition-colors flex items-center gap-1.5 cursor-pointer"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${updating.length > 0 ? 'animate-spin' : ''}`} />
             {t('library.toolbar.updateAll')}
@@ -130,20 +130,20 @@ export default function Library() {
 
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1 max-w-sm">
-          <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+          <Search className="w-4 h-4 text-store-ink-faint absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             placeholder={t('library.toolbar.searchPlaceholder')}
-            className="w-full pl-9 pr-3 py-2 rounded-xl bg-gray-100 dark:bg-[#20222a] border border-gray-200 dark:border-gray-800 text-xs text-gray-900 dark:text-gray-100 placeholder-gray-400 outline-none focus:border-blue-500 transition-colors"
+            className="w-full pl-9 pr-3 rounded-store-control bg-store-field border border-store-line text-sm text-store-ink placeholder:text-store-ink-faint outline-none focus:border-store-brand transition-colors h-9 focus:ring-2 focus:ring-store-brand/25"
           />
         </div>
-        <div className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-gray-100 dark:bg-[#20222a] text-xs font-semibold text-gray-600 dark:text-gray-300">
+        <div className="flex items-center gap-1.5 px-3 py-2 rounded-store-control bg-store-subtle text-xs font-semibold text-store-ink-soft ">
           <ArrowDownUp className="w-3.5 h-3.5" />
           <select
             value={sortMode}
             onChange={(event) => setSortMode(event.target.value as LibrarySortMode)}
-            className="bg-transparent outline-none cursor-pointer text-gray-900 dark:text-gray-100"
+            className="bg-transparent outline-none cursor-pointer text-store-ink "
           >
             <option value="name">{t('library.toolbar.sortName')}</option>
             <option value="updated">{t('library.toolbar.sortUpdated')}</option>
@@ -152,7 +152,7 @@ export default function Library() {
       </div>
 
       <section className="space-y-4">
-        <h3 className="text-sm font-bold tracking-tight text-gray-900 dark:text-gray-100">
+        <h3 className="text-sm font-bold tracking-tight text-store-ink ">
           {t('library.grid.title', { count: visibleApps.length })}
         </h3>
         {visibleApps.length > 0 ? (

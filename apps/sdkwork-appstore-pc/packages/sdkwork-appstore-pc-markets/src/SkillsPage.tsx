@@ -114,21 +114,21 @@ export function SkillsPage() {
         </div>
         <button
           onClick={() => setIsPublishOpen(true)}
-          className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-2xl text-xs font-bold transition-all shadow-sm shrink-0 flex items-center justify-center gap-1.5 cursor-pointer h-10"
+          className="px-4 py-2 bg-store-warning hover:bg-store-warning text-white rounded-store-control text-xs font-medium transition-all shadow-sm shrink-0 flex items-center justify-center gap-1.5 cursor-pointer h-10"
         >
           <Plus className="w-4 h-4" />
           <span>{t('skills.header.createBtn')}</span>
         </button>
       </div>
       {actionError && (
-        <p role="alert" className="text-xs text-amber-700 dark:text-amber-300">
+        <p role="alert" className="text-xs text-store-warning ">
           {actionError}
         </p>
       )}
 
       {/* Skill Grid — container-query driven, up to 4 columns on wide screens */}
       {loading ? (
-        <div className="py-20 text-center text-xs text-gray-400">{t('skills.loading')}</div>
+        <div className="py-20 text-center text-xs text-store-ink-faint">{t('skills.loading')}</div>
       ) : (
         <CardGrid>
           {skills.map((skill) => (

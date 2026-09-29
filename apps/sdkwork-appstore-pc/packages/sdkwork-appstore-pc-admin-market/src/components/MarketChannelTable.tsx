@@ -36,7 +36,7 @@ export function MarketChannelTable({
       key: 'channelCode',
       header: t('adminMarket.channels.columns.channelCode'),
       render: (item) => (
-        <span className="font-mono text-[11px] text-gray-600 dark:text-gray-300">
+        <span className="font-mono text-[11px] text-store-ink-soft ">
           {item.channelCode || notAvailable}
         </span>
       ),
@@ -53,7 +53,7 @@ export function MarketChannelTable({
       width: 'w-40',
       hideBelowLarge: true,
       render: (item) => (
-        <span className="truncate text-xs text-gray-600 dark:text-gray-300">
+        <span className="truncate text-xs text-store-ink-soft ">
           {item.provider || notAvailable}
         </span>
       ),
@@ -70,7 +70,7 @@ export function MarketChannelTable({
       width: 'w-40',
       hideBelowLarge: true,
       render: (item) => (
-        <span className="font-mono text-[11px] text-gray-500 dark:text-gray-400">
+        <span className="font-mono text-[11px] text-store-ink-faint ">
           {item.externalStoreCode || notAvailable}
         </span>
       ),
@@ -81,7 +81,7 @@ export function MarketChannelTable({
       width: 'w-32',
       hideBelowLarge: true,
       render: (item) => (
-        <span className="text-xs text-gray-500 dark:text-gray-400">
+        <span className="text-xs text-store-ink-faint ">
           {formatAdminDate(item.updatedAt) || notAvailable}
         </span>
       ),

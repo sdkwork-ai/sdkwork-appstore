@@ -22,18 +22,18 @@ export const TemplateTechStackTab: React.FC<TemplateTechStackTabProps> = ({ temp
   return (
     <div className="space-y-4 animate-fade-in text-xs">
       {/* Framework & Tech Badges */}
-      <div className="p-4 rounded-2xl bg-gray-50 dark:bg-[#20232d] border border-gray-200/60 dark:border-[#2a2d39]">
-        <h4 className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-          <Cpu className="w-4 h-4 text-indigo-500" />
+      <div className="p-4 rounded-store-card bg-store-subtle border border-store-line/60 dark:border-store-line ">
+        <h4 className="text-[11px] font-bold text-store-ink-faint uppercase tracking-wider mb-2 flex items-center gap-1.5">
+          <Cpu className="w-4 h-4 text-store-brand" />
           {t('templates.detail.techStackTitle')}
         </h4>
         <div className="flex flex-wrap gap-2">
           {stack.map((tech, idx) => (
             <span
               key={idx}
-              className="px-3 py-1.5 rounded-xl bg-white dark:bg-[#181a21] border border-gray-200 dark:border-[#2f3240] font-semibold text-gray-800 dark:text-gray-200 shadow-sm flex items-center gap-1.5"
+              className="px-3 py-1.5 rounded-store-control bg-store-surface border border-store-line font-semibold text-store-ink shadow-sm flex items-center gap-1.5 "
             >
-              <span className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
+              <span className="w-1.5 h-1.5 rounded-full bg-store-brand" />
               {tech}
             </span>
           ))}
@@ -41,23 +41,23 @@ export const TemplateTechStackTab: React.FC<TemplateTechStackTabProps> = ({ temp
       </div>
 
       {/* Architecture Overview */}
-      <div className="p-4 rounded-2xl bg-gray-50 dark:bg-[#20232d] border border-gray-200/60 dark:border-[#2a2d39]">
-        <h4 className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-          <Server className="w-4 h-4 text-cyan-500" />
+      <div className="p-4 rounded-store-card bg-store-subtle border border-store-line/60 dark:border-store-line ">
+        <h4 className="text-[11px] font-bold text-store-ink-faint uppercase tracking-wider mb-2 flex items-center gap-1.5">
+          <Server className="w-4 h-4 text-store-info" />
           {t('templates.detail.archTitle')}
         </h4>
-        <p className="text-gray-700 dark:text-gray-300 leading-relaxed font-normal">
+        <p className="text-store-ink-soft leading-relaxed font-normal ">
           {template.architecture}
         </p>
       </div>
 
       {/* Environment Config Example */}
-      <div className="p-4 rounded-2xl bg-slate-900 text-indigo-200 border border-slate-800">
-        <h4 className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-          <ShieldAlert className="w-4 h-4 text-amber-400" />
+      <div className="p-4 rounded-store-card bg-slate-900 text-store-brand border border-store-line">
+        <h4 className="text-[11px] font-bold text-store-ink-faint uppercase tracking-wider mb-2 flex items-center gap-1.5">
+          <ShieldAlert className="w-4 h-4 text-store-warning" />
           {t('templates.detail.envExampleTitle')}
         </h4>
-        <pre className="font-mono text-[11px] text-green-400 bg-black/40 p-3 rounded-xl overflow-x-auto leading-relaxed border border-slate-800 select-text">
+        <pre className="font-mono text-[11px] text-store-success bg-store-overlay p-3 rounded-store-control overflow-x-auto leading-relaxed border border-store-line select-text">
 {`# Server-Side API Secrets
 GEMINI_API_KEY=your_gemini_api_key_here
 FIREBASE_PROJECT_ID=your_project_id

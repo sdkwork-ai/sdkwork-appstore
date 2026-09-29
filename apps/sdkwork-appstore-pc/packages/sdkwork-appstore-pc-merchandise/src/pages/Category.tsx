@@ -51,8 +51,8 @@ export default function Category() {
   if (!category) {
     return (
       <div className="p-6 md:p-8 w-full max-w-full">
-        <div className="flex flex-col items-center justify-center py-16 text-center gap-2 rounded-2xl border border-dashed border-gray-300 dark:border-gray-700">
-          <h3 className="text-sm font-bold text-gray-900 dark:text-gray-100">
+        <div className="flex flex-col items-center justify-center py-16 text-center gap-2 rounded-2xl border border-dashed border-store-line-strong ">
+          <h3 className="text-sm font-bold text-store-ink ">
             {t('category.grid.empty')}
           </h3>
         </div>
@@ -62,7 +62,7 @@ export default function Category() {
 
   return (
     <div className="p-6 md:p-8 w-full max-w-full transition-colors duration-200 select-none space-y-6">
-      <div className={`rounded-3xl p-8 text-white ${category.icon ? 'bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700' : 'bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700'}`}>
+      <div className={`rounded-store-card p-8 text-white ${category.icon ? 'bg-gradient-to-br from-store-brand via-store-brand to-purple-700' : 'bg-gradient-to-br from-store-brand via-store-brand to-purple-700'}`}>
         <h1 className="text-2xl font-bold tracking-tight">
           {t('category.header.title', { name: category.name })}
         </h1>
@@ -72,7 +72,7 @@ export default function Category() {
       </div>
 
       <section className="space-y-4">
-        <h3 className="text-sm font-bold tracking-tight text-gray-900 dark:text-gray-100">
+        <h3 className="text-sm font-bold tracking-tight text-store-ink ">
           {t('category.grid.title', { count: apps.length })}
         </h3>
         {apps.length > 0 ? (
@@ -82,8 +82,8 @@ export default function Category() {
             ))}
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center py-16 text-center gap-2 rounded-2xl border border-dashed border-gray-300 dark:border-gray-700">
-            <h3 className="text-sm font-bold text-gray-900 dark:text-gray-100">
+          <div className="flex flex-col items-center justify-center py-16 text-center gap-2 rounded-2xl border border-dashed border-store-line-strong ">
+            <h3 className="text-sm font-bold text-store-ink ">
               {t('category.grid.empty')}
             </h3>
           </div>

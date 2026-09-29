@@ -29,7 +29,7 @@ export default function Layout({ showHeaderActions = true }: LayoutProps) {
   ];
 
   return (
-    <div className="min-h-screen bg-[#f3f4f6] dark:bg-[#121316] text-gray-900 dark:text-gray-100 flex flex-col md:flex-row font-sans overflow-hidden transition-colors duration-200">
+    <div className="min-h-screen bg-store-raised text-store-ink flex flex-col md:flex-row font-sans overflow-hidden transition-colors duration-200 ">
       {/* Mobile Navigation */}
       <MobileNav tabs={mobileTabs} />
 
@@ -37,7 +37,7 @@ export default function Layout({ showHeaderActions = true }: LayoutProps) {
       <DesktopSidebar />
 
       {/* Main Content Area */}
-      <main className="flex-1 flex flex-col min-w-0 h-screen bg-[#f8f9fa] dark:bg-[#181a20] overflow-hidden relative">
+      <main className="flex-1 flex flex-col min-w-0 h-screen bg-store-raised overflow-hidden relative ">
         {/* Desktop Header */}
         <DesktopHeader showActions={showHeaderActions} />
 

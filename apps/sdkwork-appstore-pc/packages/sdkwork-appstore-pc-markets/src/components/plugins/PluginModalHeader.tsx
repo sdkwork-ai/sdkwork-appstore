@@ -18,12 +18,12 @@ export const PluginModalHeader: React.FC<PluginModalHeaderProps> = ({ plugin }) 
       <div>
         <div className="flex items-center gap-2">
           <h2 className="text-xl font-bold">{plugin.name}</h2>
-          <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-500">
+          <span className="text-xs font-medium px-2.5 py-0.5 rounded-full bg-store-brand/10 text-store-brand">
             {plugin.apiSchemaType}
           </span>
         </div>
-        <p className="text-xs text-gray-400 mt-1">
-          {t('plugins.modal.developer', '开发者')}: <span className="text-gray-700 dark:text-gray-300 font-medium">{plugin.developer}</span> · {t('plugins.modal.version', '版本')}: {plugin.version}
+        <p className="text-xs text-store-ink-faint mt-1">
+          {t('plugins.modal.developer', '开发者')}: <span className="text-store-ink-soft font-medium ">{plugin.developer}</span> · {t('plugins.modal.version', '版本')}: {plugin.version}
         </p>
       </div>
     </div>

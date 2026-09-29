@@ -21,6 +21,11 @@ export const discover = {
     recommended: 'Recommended for You',
     events: 'Limited-time Events'
   },
+  empty: {
+    title: 'Nothing featured yet',
+    subtitle: 'The store is still preparing its selection. Browse the full catalogue in the meantime, or check back later.',
+    action: 'Browse all apps'
+  },
   miniGamesBanner: {
     playInClient: 'No Download Needed · Instant Play'
   },

@@ -45,6 +45,7 @@ export const publisher = {
   manage: {
     back: 'Back to console',
     tabs: {
+      label: 'Sections',
       overview: 'Overview',
       releases: 'Releases',
       members: 'Members'

@@ -43,22 +43,22 @@ export const TemplateDetailNav: React.FC<TemplateDetailNavProps> = ({
     {
       id: 'demo',
       label: t('templates.detail.nav.demo'),
-      icon: <Play className="w-3.5 h-3.5 text-emerald-500" />,
+      icon: <Play className="w-3.5 h-3.5 text-store-success" />,
     },
   ];
 
   return (
-    <div className="flex items-center gap-1.5 border-b border-gray-200/80 dark:border-[#262933] overflow-x-auto my-3 pb-2 text-xs custom-scrollbar">
+    <div className="flex items-center gap-1.5 border-b border-store-line/80 dark:border-store-line overflow-x-auto my-3 pb-2 text-xs custom-scrollbar">
       {tabs.map((tab) => {
         const isActive = activeTab === tab.id;
         return (
           <button
             key={tab.id}
             onClick={() => onTabChange(tab.id)}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-semibold transition-all cursor-pointer shrink-0 ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-store-control font-medium transition-all cursor-pointer shrink-0 text-xs${
               isActive
-                ? 'bg-indigo-600 text-white shadow-sm'
-                : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-[#20232d] hover:text-gray-900 dark:hover:text-gray-100'
+                ? 'bg-store-brand text-white shadow-sm'
+                : 'text-store-ink-soft hover:bg-store-subtle hover:text-store-ink '
             }`}
           >
             {tab.icon}
@@ -67,8 +67,8 @@ export const TemplateDetailNav: React.FC<TemplateDetailNavProps> = ({
               <span
                 className={`px-1.5 py-0.2 rounded-full text-[10px] ${
                   isActive
-                    ? 'bg-white/20 text-white'
-                    : 'bg-gray-200 dark:bg-[#2a2d39] text-gray-700 dark:text-gray-300'
+                    ? 'bg-store-surface/20 text-white'
+                    : 'bg-store-raised text-store-ink-soft '
                 }`}
               >
                 {tab.badge}

@@ -24,14 +24,14 @@ export function SearchInput({
     <div className="relative mb-8 rounded-xl">
       <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
         {loading ? (
-          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 dark:border-[#0A84FF]"></div>
+          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-store-brand "></div>
         ) : (
-          <SearchIcon className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+          <SearchIcon className="h-5 w-5 text-store-ink-faint " />
         )}
       </div>
       <input
         type="text"
-        className="w-full bg-gray-100 dark:bg-[#1C1C1E] border-none text-[#1C1C1E] dark:text-[#F5F5F5] placeholder-gray-500 dark:placeholder-gray-400 rounded-xl py-3.5 pl-12 pr-10 outline-none focus:ring-2 focus:ring-blue-500 transition-all font-medium text-[17px]"
+        className="w-full bg-store-field border-none text-store-ink placeholder:text-store-ink-faint rounded-store-control pl-12 pr-10 outline-none focus:ring-2 focus:ring-store-brand/25 transition-all font-medium text-base h-9 transition-colors focus:border-store-brand"
         placeholder={placeholder ?? t('search.inputPlaceholder')}
         value={value}
         onChange={(e) => onChange(e.target.value)}
@@ -44,10 +44,10 @@ export function SearchInput({
       {value && (
         <button
           onClick={onClear}
-          className="absolute inset-y-0 right-4 flex items-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+          className="absolute inset-y-0 right-4 flex items-center text-store-ink-faint hover:text-store-ink-soft "
           aria-label={t('common.accessibility.clearSearch')}
         >
-          <X className="h-5 w-5 bg-gray-100 dark:bg-[#2C2C2E] rounded-full p-0.5 text-gray-500 dark:text-gray-400" />
+          <X className="h-5 w-5 bg-store-raised rounded-full p-0.5 text-store-ink-faint  " />
         </button>
       )}
     </div>

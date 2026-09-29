@@ -43,7 +43,7 @@ export const AddDropdown: React.FC<AddDropdownProps> = ({
   label,
   ariaLabel,
   items,
-  triggerClassName = 'bg-blue-600 hover:bg-blue-500 text-white',
+  triggerClassName = 'bg-store-brand hover:bg-store-brand text-white',
   align = 'right',
 }) => {
   const [open, setOpen] = useState(false);
@@ -88,7 +88,7 @@ export const AddDropdown: React.FC<AddDropdownProps> = ({
         <div
           role="menu"
           aria-label={ariaLabel ?? label}
-          className={`absolute top-full mt-2 z-50 min-w-[248px] flex flex-col gap-0.5 p-1.5 rounded-2xl border border-gray-200 dark:border-[#282c38] bg-white dark:bg-[#1b1e26] shadow-xl ${
+          className={`absolute top-full mt-2 z-50 min-w-[248px] flex flex-col gap-0.5 p-1.5 rounded-store-card border border-store-line bg-store-surface shadow-xl ${
             align === 'right' ? 'right-0' : 'left-0'
           }`}
         >
@@ -104,15 +104,15 @@ export const AddDropdown: React.FC<AddDropdownProps> = ({
                   setOpen(false);
                   item.onSelect();
                 }}
-                className="flex items-start gap-2.5 px-2.5 py-2 rounded-xl text-left transition-colors hover:bg-gray-100 dark:hover:bg-[#222632] cursor-pointer"
+                className="flex items-start gap-2.5 px-2.5 py-2 rounded-store-control text-left transition-colors hover:bg-store-subtle cursor-pointer text-sm font-medium"
               >
-                <Icon className="w-4 h-4 mt-0.5 shrink-0 text-gray-400 dark:text-gray-400" />
+                <Icon className="w-4 h-4 mt-0.5 shrink-0 text-store-ink-faint " />
                 <span className="flex flex-col gap-0.5 min-w-0">
-                  <span className="text-xs font-semibold text-gray-900 dark:text-gray-100 leading-4">
+                  <span className="text-xs font-semibold text-store-ink leading-4 ">
                     {item.title}
                   </span>
                   {item.desc && (
-                    <span className="text-[11px] text-gray-400 leading-4">
+                    <span className="text-[11px] text-store-ink-faint leading-4">
                       {item.desc}
                     </span>
                   )}

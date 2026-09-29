@@ -19,20 +19,20 @@ interface CategoryRef {
 
 /** Deterministic visual mapping (Lucide icon + Tailwind gradient) per storefront category. */
 const categoryVisuals: Record<string, { icon: string; color: string }> = {
-  'ai-assistants': { icon: 'Sparkles', color: 'bg-indigo-600' },
+  'ai-assistants': { icon: 'Sparkles', color: 'bg-store-brand' },
   'ai-coding': { icon: 'Code', color: 'bg-slate-900' },
   'ai-creative': { icon: 'Palette', color: 'bg-fuchsia-600' },
-  'ai-productivity': { icon: 'Briefcase', color: 'bg-sky-600' },
-  'ai-games': { icon: 'Gamepad2', color: 'bg-rose-700' },
-  'board-games': { icon: 'Dices', color: 'bg-amber-800' },
-  'mini-games': { icon: 'Smartphone', color: 'bg-teal-700' },
-  'mobile-games': { icon: 'Gamepad', color: 'bg-indigo-900' },
-  utilities: { icon: 'Wrench', color: 'bg-blue-700' },
+  'ai-productivity': { icon: 'Briefcase', color: 'bg-store-info' },
+  'ai-games': { icon: 'Gamepad2', color: 'bg-store-danger' },
+  'board-games': { icon: 'Dices', color: 'bg-store-warning' },
+  'mini-games': { icon: 'Smartphone', color: 'bg-store-info' },
+  'mobile-games': { icon: 'Gamepad', color: 'bg-store-brand' },
+  utilities: { icon: 'Wrench', color: 'bg-store-brand' },
   apps: { icon: 'AppWindow', color: 'bg-gray-800' },
-  games: { icon: 'Gamepad2', color: 'bg-emerald-700' },
+  games: { icon: 'Gamepad2', color: 'bg-store-success' },
   tools: { icon: 'Wrench', color: 'bg-orange-700' },
   productivity: { icon: 'Zap', color: 'bg-violet-600' },
-  education: { icon: 'GraduationCap', color: 'bg-sky-700' },
+  education: { icon: 'GraduationCap', color: 'bg-store-info' },
   entertainment: { icon: 'Clapperboard', color: 'bg-pink-700' },
 };
 const fallbackVisual = { icon: 'AppWindow', color: 'bg-slate-600' };
@@ -181,7 +181,7 @@ export function createAppStoreServicePort(
         title: readLocalizedName(item) || `合集 ${index + 1}`,
         subtitle: readLocalizedDescription(item),
         apps: readCollectionListingIds(item),
-        bannerColor: 'bg-gradient-to-br from-indigo-600 via-purple-600 to-fuchsia-600',
+        bannerColor: 'bg-gradient-to-br from-store-brand via-purple-600 to-fuchsia-600',
       }));
     },
 
@@ -199,7 +199,7 @@ export function createAppStoreServicePort(
         title: readLocalizedName(row) || id,
         subtitle: readLocalizedDescription(row),
         apps: readCollectionListingIds(row),
-        bannerColor: 'bg-gradient-to-br from-indigo-600 via-purple-600 to-fuchsia-600',
+        bannerColor: 'bg-gradient-to-br from-store-brand via-purple-600 to-fuchsia-600',
       };
     },
 
@@ -706,7 +706,7 @@ function mapEventItem(item: Record<string, unknown>): EventItem {
     id: readString(item, 'id'),
     title: readLocalizedName(item) || readString(item, 'title'),
     subtitle: readLocalizedDescription(item) || readString(item, 'subtitle'),
-    bannerColor: 'bg-gradient-to-r from-violet-600 via-fuchsia-600 to-rose-600',
+    bannerColor: 'bg-gradient-to-r from-violet-600 via-fuchsia-600 to-store-danger',
     startsAt: formatDate(readString(item, 'startsAt', 'starts_at')),
     endsAt: formatDate(readString(item, 'endsAt', 'ends_at')),
     status: readString(item, 'status'),

@@ -54,21 +54,21 @@ export const CreateCustomExpertModal: React.FC<CreateCustomExpertModalProps> = (
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-fade-in">
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 text-slate-100 shadow-2xl relative">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-store-overlay backdrop-blur-sm animate-fade-in">
+      <div className="bg-slate-900 border border-store-line rounded-store-modal max-w-lg w-full p-6 text-slate-100 shadow-2xl relative">
         <button
           type="button"
           onClick={onClose}
-          className="absolute right-4 top-4 text-slate-400 hover:text-white cursor-pointer"
+          className="absolute right-4 top-4 text-store-ink-faint hover:text-white cursor-pointer"
         >
           <X className="w-5 h-5" />
         </button>
 
         <h3 className="text-lg font-bold text-white mb-1 flex items-center gap-2">
-          <Plus className="w-5 h-5 text-indigo-400" />
+          <Plus className="w-5 h-5 text-store-brand" />
           <span>{t('aihub.experts.customModal.title')}</span>
         </h3>
-        <p className="text-xs text-slate-400 mb-5">
+        <p className="text-xs text-store-ink-faint mb-5">
           {t('aihub.experts.customModal.subtitle')}
         </p>
 
@@ -83,7 +83,7 @@ export const CreateCustomExpertModal: React.FC<CreateCustomExpertModalProps> = (
               value={customName}
               onChange={(e) => setCustomName(e.target.value)}
               placeholder={t('aihub.experts.customModal.namePlaceholder')}
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-slate-100 focus:outline-none focus:border-indigo-500"
+              className="w-full bg-store-field border border-store-line rounded-store-control px-3 text-store-ink focus:outline-none focus:border-store-brand h-9 text-sm placeholder:text-store-ink-faint outline-none transition-colors focus:ring-2 focus:ring-store-brand/25"
             />
           </div>
 
@@ -96,7 +96,7 @@ export const CreateCustomExpertModal: React.FC<CreateCustomExpertModalProps> = (
               value={customNickname}
               onChange={(e) => setCustomNickname(e.target.value)}
               placeholder={t('aihub.experts.customModal.nicknamePlaceholder')}
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-slate-100 focus:outline-none focus:border-indigo-500"
+              className="w-full bg-store-field border border-store-line rounded-store-control px-3 text-store-ink focus:outline-none focus:border-store-brand h-9 text-sm placeholder:text-store-ink-faint outline-none transition-colors focus:ring-2 focus:ring-store-brand/25"
             />
           </div>
 
@@ -107,7 +107,7 @@ export const CreateCustomExpertModal: React.FC<CreateCustomExpertModalProps> = (
             <select
               value={customCategory}
               onChange={(e) => setCustomCategory(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-slate-100 focus:outline-none focus:border-indigo-500"
+              className="w-full bg-store-field border border-store-line rounded-store-control px-3 text-store-ink focus:outline-none focus:border-store-brand h-9 text-sm placeholder:text-store-ink-faint outline-none transition-colors focus:ring-2 focus:ring-store-brand/25"
             >
               <option value={t('aihub.experts.scenarios.dev')}>{t('aihub.experts.scenarios.dev')}</option>
               <option value={t('aihub.experts.scenarios.content')}>{t('aihub.experts.scenarios.content')}</option>
@@ -131,7 +131,7 @@ export const CreateCustomExpertModal: React.FC<CreateCustomExpertModalProps> = (
               value={customDesc}
               onChange={(e) => setCustomDesc(e.target.value)}
               placeholder={t('aihub.experts.customModal.descPlaceholder')}
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-slate-100 focus:outline-none focus:border-indigo-500"
+              className="w-full bg-store-field border border-store-line rounded-store-control text-store-ink focus:outline-none focus:border-store-brand py-2 text-sm placeholder:text-store-ink-faint outline-none transition-colors focus:ring-2 focus:ring-store-brand/25 px-3"
             />
           </div>
 
@@ -144,7 +144,7 @@ export const CreateCustomExpertModal: React.FC<CreateCustomExpertModalProps> = (
               value={customPrompt}
               onChange={(e) => setCustomPrompt(e.target.value)}
               placeholder={t('aihub.experts.customModal.promptPlaceholder')}
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-slate-100 font-mono focus:outline-none focus:border-indigo-500"
+              className="w-full bg-store-field border border-store-line rounded-store-control text-store-ink font-mono focus:outline-none focus:border-store-brand py-2 text-sm placeholder:text-store-ink-faint outline-none transition-colors focus:ring-2 focus:ring-store-brand/25 px-3"
             />
           </div>
 
@@ -157,7 +157,7 @@ export const CreateCustomExpertModal: React.FC<CreateCustomExpertModalProps> = (
               value={customTags}
               onChange={(e) => setCustomTags(e.target.value)}
               placeholder={t('aihub.experts.customModal.tagsPlaceholder')}
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-slate-100 focus:outline-none focus:border-indigo-500"
+              className="w-full bg-store-field border border-store-line rounded-store-control px-3 text-store-ink focus:outline-none focus:border-store-brand h-9 text-sm placeholder:text-store-ink-faint outline-none transition-colors focus:ring-2 focus:ring-store-brand/25"
             />
           </div>
 
@@ -165,13 +165,13 @@ export const CreateCustomExpertModal: React.FC<CreateCustomExpertModalProps> = (
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 hover:text-white cursor-pointer"
+              className="px-4 py-2 rounded-store-control bg-slate-800 text-slate-300 hover:text-white cursor-pointer text-sm font-medium"
             >
               {t('aihub.experts.customModal.cancel')}
             </button>
             <button
               type="submit"
-              className="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold shadow-md shadow-indigo-600/20 cursor-pointer"
+              className="px-5 py-2 rounded-store-control bg-store-brand hover:bg-store-brand text-white font-medium shadow-md shadow-store-brand/20 cursor-pointer text-sm"
             >
               {t('aihub.experts.customModal.create')}
             </button>

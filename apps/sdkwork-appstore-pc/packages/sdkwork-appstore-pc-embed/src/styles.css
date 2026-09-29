@@ -15,22 +15,23 @@
  * Its `@source` rows were dead as well — `../../../../src` and
  * `../../../../packages` resolved to `apps/src` and `apps/packages`, neither of
  * which exists.
+ *
+ * It also used to repeat the app's *document-root* rules — `:root
+ * { color-scheme }`, `html.dark`, `::-webkit-scrollbar*`, `* { scrollbar-* }`
+ * and `body { font-family }`. Those belong to `src/index.css`, the app's page
+ * sheet. THEME_DARKMODE_SPEC.md §7.3 requires a feature sheet compiled into a
+ * host to leave `body`/`html` alone, and this one cannot rely on the host's
+ * cascade-layer containment: the harness inlines plain CSS from an SDKWork
+ * import verbatim, without wrapping it in the embedded-app layer, so these
+ * rules landed *unlayered* in the host and outranked the host's own font and
+ * scrollbar styling on document order. They are gone; the page sheet still owns
+ * them for the standalone app.
+ *
+ * What remains is surface-scoped and safe to inline anywhere.
  */
-
-:root { color-scheme: light; }
-html.dark { color-scheme: dark; }
-
-::-webkit-scrollbar { width: 8px; height: 8px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background-color: rgba(0, 0, 0, 0.18); border-radius: 9999px; border: 2px solid transparent; background-clip: content-box; }
-html.dark ::-webkit-scrollbar-thumb { background-color: rgba(255, 255, 255, 0.2); }
-* { scrollbar-width: thin; scrollbar-color: rgba(0, 0, 0, 0.2) transparent; }
-html.dark * { scrollbar-color: rgba(255, 255, 255, 0.25) transparent; }
 
 @layer utilities {
   .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
   .scrollbar-hide::-webkit-scrollbar { display: none; }
   .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
 }
-
-body { font-family: var(--font-sans); -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }

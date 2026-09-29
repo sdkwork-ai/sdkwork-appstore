@@ -123,7 +123,7 @@ function mapListingSummary(item: Record<string, unknown>, index = 0): AppItem {
     description: readString(item, 'description') || '',
     screenshots: [],
     icon: 'Sparkles',
-    iconColor: 'bg-indigo-600',
+    iconColor: 'bg-store-brand',
     version: readString(item, 'currentVersion', 'current_version') || '1.0.0',
     size: '—',
     ageRating: '4+',

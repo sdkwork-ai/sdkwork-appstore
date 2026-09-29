@@ -145,9 +145,9 @@ export function ShareManageDialog({
     >
       <div className="space-y-5">
         {/* Create form */}
-        <div className="space-y-3 p-4 rounded-2xl bg-gray-50 dark:bg-[#222530] border border-gray-200 dark:border-[#262933]">
+        <div className="space-y-3 p-4 rounded-store-card bg-store-subtle border border-store-line ">
           <div>
-            <label htmlFor="user-share-title" className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1.5">
+            <label htmlFor="user-share-title" className="block text-xs font-medium text-store-ink-faint mb-1.5 ">
               {t('userStore.share.titleInput')}
             </label>
             <input
@@ -156,12 +156,12 @@ export function ShareManageDialog({
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               maxLength={128}
-              className="w-full px-4 py-2.5 rounded-2xl bg-white dark:bg-[#181a20] border border-gray-200 dark:border-[#262933] text-sm outline-none focus:border-indigo-400 transition-colors"
+              className="w-full px-3 rounded-store-control bg-store-field border border-store-line text-sm outline-none focus:border-store-brand transition-colors h-9 text-store-ink placeholder:text-store-ink-faint focus:ring-2 focus:ring-store-brand/25"
               placeholder={t('userStore.share.titleInput')}
             />
           </div>
           <div>
-            <label htmlFor="user-share-description" className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1.5">
+            <label htmlFor="user-share-description" className="block text-xs font-medium text-store-ink-faint mb-1.5 ">
               {t('userStore.share.descriptionInput')}
             </label>
             <input
@@ -170,7 +170,7 @@ export function ShareManageDialog({
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               maxLength={500}
-              className="w-full px-4 py-2.5 rounded-2xl bg-white dark:bg-[#181a20] border border-gray-200 dark:border-[#262933] text-sm outline-none focus:border-indigo-400 transition-colors"
+              className="w-full px-3 rounded-store-control bg-store-field border border-store-line text-sm outline-none focus:border-store-brand transition-colors h-9 text-store-ink placeholder:text-store-ink-faint focus:ring-2 focus:ring-store-brand/25"
               placeholder={t('userStore.share.descriptionInput')}
             />
           </div>
@@ -180,10 +180,10 @@ export function ShareManageDialog({
                 key={option}
                 type="button"
                 onClick={() => setScope(option)}
-                className={`flex-1 px-3 py-2 rounded-xl text-xs font-medium transition-colors cursor-pointer ${
+                className={`flex-1 px-3 py-2 rounded-store-control text-xs font-medium transition-colors cursor-pointer ${
                   scope === option
-                    ? 'bg-indigo-600 text-white'
-                    : 'bg-white dark:bg-[#181a20] text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-[#262933]'
+                    ? 'bg-store-brand text-white'
+                    : 'bg-store-surface text-store-ink-soft border border-store-line '
                 }`}
               >
                 {t(option === 'all' ? 'userStore.share.scopeAll' : 'userStore.share.scopeSelected')}
@@ -196,7 +196,7 @@ export function ShareManageDialog({
               {categories.map((category) => (
                 <label
                   key={category.id}
-                  className="flex items-center gap-2.5 px-3 py-2 rounded-xl bg-white dark:bg-[#181a20] border border-gray-200 dark:border-[#262933] text-xs cursor-pointer"
+                  className="flex items-center gap-2.5 px-3 py-2 rounded-store-control bg-store-surface border border-store-line text-xs cursor-pointer "
                 >
                   <input
                     type="checkbox"
@@ -208,10 +208,10 @@ export function ShareManageDialog({
                           : prev.filter((id) => id !== category.id),
                       )
                     }
-                    className="accent-indigo-600"
+                    className="accent-store-brand"
                   />
                   <span className="truncate">{category.name}</span>
-                  <span className="ml-auto text-gray-400 shrink-0">
+                  <span className="ml-auto text-store-ink-faint shrink-0">
                     {t('userStore.category.itemCount', { count: category.itemCount })}
                   </span>
                 </label>
@@ -225,10 +225,10 @@ export function ShareManageDialog({
                 key={option}
                 type="button"
                 onClick={() => setVisibility(option)}
-                className={`flex-1 px-3 py-2 rounded-xl text-xs font-medium transition-colors cursor-pointer ${
+                className={`flex-1 px-3 py-2 rounded-store-control text-xs font-medium transition-colors cursor-pointer ${
                   visibility === option
-                    ? 'bg-indigo-600 text-white'
-                    : 'bg-white dark:bg-[#181a20] text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-[#262933]'
+                    ? 'bg-store-brand text-white'
+                    : 'bg-store-surface text-store-ink-soft border border-store-line '
                 }`}
               >
                 {t(option === 'public' ? 'userStore.share.visibilityPublic' : 'userStore.share.visibilityUnlisted')}
@@ -242,10 +242,10 @@ export function ShareManageDialog({
                 key={option}
                 type="button"
                 onClick={() => setExpiry(option)}
-                className={`flex-1 px-3 py-2 rounded-xl text-xs font-medium transition-colors cursor-pointer ${
+                className={`flex-1 px-3 py-2 rounded-store-control text-xs font-medium transition-colors cursor-pointer ${
                   expiry === option
-                    ? 'bg-indigo-600 text-white'
-                    : 'bg-white dark:bg-[#181a20] text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-[#262933]'
+                    ? 'bg-store-brand text-white'
+                    : 'bg-store-surface text-store-ink-soft border border-store-line '
                 }`}
               >
                 {t(`userStore.share.expiry${option === 'never' ? 'Never' : option === '7d' ? '7d' : '30d'}`)}
@@ -253,41 +253,41 @@ export function ShareManageDialog({
             ))}
           </div>
 
-          {error && <p className="text-xs text-red-500">{error}</p>}
+          {error && <p className="text-xs text-store-danger">{error}</p>}
           <button
             type="button"
             disabled={busy}
             onClick={handleCreate}
-            className="w-full px-4 py-2.5 rounded-full bg-indigo-600 hover:bg-indigo-500 disabled:opacity-60 text-white text-sm font-medium transition-colors cursor-pointer"
+            className="w-full px-4 py-2.5 rounded-full bg-store-brand hover:bg-store-brand disabled:opacity-60 text-white text-sm font-medium transition-colors cursor-pointer"
           >
             {t('userStore.share.create')}
           </button>
         </div>
 
-        {notice && <p className="text-xs text-emerald-500 text-center">{notice}</p>}
+        {notice && <p className="text-xs text-store-success text-center">{notice}</p>}
 
         {/* Existing shares */}
         <div className="space-y-2">
-          <h4 className="text-xs font-semibold text-gray-500 dark:text-gray-400">
+          <h4 className="text-xs font-semibold text-store-ink-faint ">
             {t('userStore.share.existing')}
           </h4>
           {activeShares.length === 0 ? (
-            <p className="text-xs text-gray-400 text-center py-3">{t('userStore.share.empty')}</p>
+            <p className="text-xs text-store-ink-faint text-center py-3">{t('userStore.share.empty')}</p>
           ) : (
             activeShares.map((share) => (
               <div
                 key={share.id}
-                className="flex items-center gap-3 p-3 rounded-2xl bg-white dark:bg-[#181a20] border border-gray-200 dark:border-[#262933]"
+                className="flex items-center gap-3 p-3 rounded-store-card bg-store-surface border border-store-line "
               >
-                <Link2 className="w-4 h-4 text-indigo-500 shrink-0" />
+                <Link2 className="w-4 h-4 text-store-brand shrink-0" />
                 <div className="min-w-0 flex-1">
-                  <p className="text-xs font-medium truncate text-gray-800 dark:text-gray-100">
+                  <p className="text-xs font-medium truncate text-store-ink ">
                     {share.title}
                   </p>
-                  <p className="text-[11px] font-mono truncate text-gray-500 dark:text-gray-400">
+                  <p className="text-[11px] font-mono truncate text-store-ink-faint ">
                     {`${window.location.origin}/store/${share.shareToken}`}
                   </p>
-                  <p className="text-[11px] text-gray-400 mt-0.5">
+                  <p className="text-[11px] text-store-ink-faint mt-0.5">
                     {t(share.scope === 'all' ? 'userStore.share.scopeAll' : 'userStore.share.scopeSelected')}
                     {' · '}
                     {t(share.visibility === 'public' ? 'userStore.share.visibilityPublic' : 'userStore.share.visibilityUnlisted')}
@@ -299,10 +299,10 @@ export function ShareManageDialog({
                   type="button"
                   onClick={() => handleCopy(share)}
                   aria-label={t('userStore.actions.copyLink')}
-                  className="p-1.5 rounded-full text-gray-400 hover:text-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 transition-colors cursor-pointer"
+                  className="p-1.5 rounded-full text-store-ink-faint hover:text-store-brand hover:bg-store-brand-soft dark:hover:bg-store-brand/10 transition-colors cursor-pointer text-xs font-medium"
                 >
                   {copiedId === share.id
-                    ? <Check className="w-4 h-4 text-emerald-500" />
+                    ? <Check className="w-4 h-4 text-store-success" />
                     : <Copy className="w-4 h-4" />}
                 </button>
                 <button
@@ -310,7 +310,7 @@ export function ShareManageDialog({
                   onClick={() => handleRefresh(share.id)}
                   aria-label={t('userStore.actions.refreshToken')}
                   disabled={busy}
-                  className="p-1.5 rounded-full text-gray-400 hover:text-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 disabled:opacity-50 transition-colors cursor-pointer"
+                  className="p-1.5 rounded-full text-store-ink-faint hover:text-store-brand hover:bg-store-brand-soft dark:hover:bg-store-brand/10 disabled:opacity-50 transition-colors cursor-pointer text-xs font-medium"
                 >
                   <RefreshCw className="w-4 h-4" />
                 </button>
@@ -319,7 +319,7 @@ export function ShareManageDialog({
                   onClick={() => handleRevoke(share.id)}
                   aria-label={t('userStore.actions.revoke')}
                   disabled={busy}
-                  className="p-1.5 rounded-full text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 disabled:opacity-50 transition-colors cursor-pointer"
+                  className="p-1.5 rounded-full text-store-ink-faint hover:text-store-danger hover:bg-store-danger-soft disabled:opacity-50 transition-colors cursor-pointer text-xs font-medium"
                 >
                   <Ban className="w-4 h-4" />
                 </button>

@@ -11,7 +11,7 @@ export const HeaderThemeToggle: React.FC = () => {
     <button
       onClick={toggleTheme}
       aria-label={t('common.accessibility.toggleTheme')}
-      className="p-1.5 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white rounded-full hover:bg-gray-100 dark:hover:bg-[#22252c] transition-colors cursor-pointer"
+      className="p-1.5 text-store-ink-faint hover:text-store-ink rounded-full hover:bg-store-subtle transition-colors cursor-pointer text-xs font-medium"
     >
       {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
     </button>

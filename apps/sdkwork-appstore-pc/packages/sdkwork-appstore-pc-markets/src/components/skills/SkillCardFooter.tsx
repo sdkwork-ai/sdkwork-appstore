@@ -12,9 +12,9 @@ export const SkillCardFooter: React.FC<SkillCardFooterProps> = ({ skill, onToggl
   const { t } = useTranslation();
 
   return (
-    <div className="flex items-center justify-between mt-4 pt-3 border-t border-gray-100 dark:border-[#222530]">
-      <span className="text-xs text-gray-400 flex items-center gap-1 font-medium">
-        <Zap className="w-3.5 h-3.5 text-amber-500" />
+    <div className="flex items-center justify-between mt-4 pt-3 border-t border-store-line-soft ">
+      <span className="text-xs text-store-ink-faint flex items-center gap-1 font-medium">
+        <Zap className="w-3.5 h-3.5 text-store-warning" />
         {(skill.activeCount / 1000).toFixed(1)}k {t('skills.modal.activeUses')}
       </span>
 
@@ -23,10 +23,10 @@ export const SkillCardFooter: React.FC<SkillCardFooterProps> = ({ skill, onToggl
           e.stopPropagation();
           onToggleInstall(skill.id);
         }}
-        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all shadow-sm ${
+        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-store-control text-xs font-medium transition-all shadow-sm ${
           skill.isInstalled
             ? 'bg-purple-600 hover:bg-purple-700 text-white'
-            : 'bg-gray-100 dark:bg-[#262a36] hover:bg-gray-200 dark:hover:bg-[#303545] text-gray-700 dark:text-gray-200'
+            : 'bg-store-subtle hover:bg-store-raised text-store-ink-soft '
         }`}
       >
         {skill.isInstalled ? (

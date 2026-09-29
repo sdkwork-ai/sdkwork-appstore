@@ -96,7 +96,7 @@ export const ExpertCard: React.FC<ExpertCardProps> = ({
   return (
     <div
       onClick={() => onClickCard(expert)}
-      className="group relative flex flex-col justify-between bg-white hover:bg-slate-50 border border-slate-200 hover:border-slate-300 rounded-2xl p-4 md:p-5 transition-all duration-200 cursor-pointer shadow-md hover:shadow-xl hover:shadow-indigo-500/5 hover:-translate-y-0.5 select-none dark:bg-slate-900/90 dark:hover:bg-slate-850/90 dark:border-slate-800/90 dark:hover:border-slate-700/90"
+      className="group relative flex flex-col justify-between bg-store-surface hover:bg-store-subtle border border-store-line hover:border-store-line-strong rounded-store-card p-4 md:p-5 transition-all duration-200 cursor-pointer shadow-md hover:shadow-xl hover:shadow-store-brand/5 hover:-translate-y-0.5 select-none dark:bg-slate-900/90 dark:hover:bg-slate-850/90 dark:border-store-line/90 dark:hover:border-store-line/90"
     >
       <div>
         {/* Top Header Row */}
@@ -104,8 +104,8 @@ export const ExpertCard: React.FC<ExpertCardProps> = ({
           <div className="flex items-center gap-3 min-w-0">
             {/* Avatar Icon */}
             <div
-              className={`w-11 h-11 rounded-xl ${
-                expert.avatarBg || 'bg-indigo-600'
+              className={`w-11 h-11 rounded-store-control ${
+                expert.avatarBg || 'bg-store-brand'
               } flex items-center justify-center text-white shadow-md shrink-0 transition-transform group-hover:scale-105`}
             >
               <IconComponent className="w-5.5 h-5.5" />
@@ -114,16 +114,16 @@ export const ExpertCard: React.FC<ExpertCardProps> = ({
             {/* Title & Nickname */}
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2 flex-wrap">
-                <h4 className="text-base font-bold text-slate-900 group-hover:text-indigo-600 transition-colors truncate dark:text-slate-100 dark:group-hover:text-indigo-300">
+                <h4 className="text-base font-bold text-store-ink group-hover:text-store-brand transition-colors truncate  ">
                   {expert.name}
                 </h4>
                 {expert.badge && (
-                  <span className="text-[10px] px-2 py-0.5 rounded-full font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                  <span className="text-xs px-2.5 py-0.5 rounded-full font-medium bg-store-warning/20 text-store-warning border border-store-warning/30">
                     {expert.badge}
                   </span>
                 )}
               </div>
-              <p className="text-xs text-slate-500 dark:text-slate-400 font-medium truncate mt-0.5">
+              <p className="text-xs text-store-ink-faint font-medium truncate mt-0.5 ">
                 {expert.nickname}
               </p>
             </div>
@@ -134,30 +134,30 @@ export const ExpertCard: React.FC<ExpertCardProps> = ({
             type="button"
             title={isMyExpert ? t('aihub.experts.card.addedToMine') : t('aihub.experts.card.addToMine')}
             onClick={(e) => onToggleMyExpert(expert.id, e)}
-            className={`p-1.5 rounded-xl border transition-all shrink-0 ${
+            className={`p-1.5 rounded-store-control border transition-all shrink-0 text-xs font-medium${
               isMyExpert
-                ? 'bg-indigo-600/30 border-indigo-500 text-indigo-300 hover:bg-indigo-600/40'
-                : 'bg-slate-100 border-slate-200 text-slate-500 hover:text-slate-900 hover:bg-slate-200 dark:bg-slate-800/80 dark:border-slate-700/80 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-700/80'
+                ? 'bg-store-brand/30 border-store-brand text-store-brand hover:bg-store-brand/40'
+                : 'bg-store-subtle border-store-line text-store-ink-faint hover:text-store-ink hover:bg-store-raised dark:bg-slate-800/80 dark:border-store-line/80 dark:hover:bg-slate-700/80 '
             }`}
           >
-            {isMyExpert ? <Check className="w-4 h-4 text-indigo-400" /> : <Plus className="w-4 h-4" />}
+            {isMyExpert ? <Check className="w-4 h-4 text-store-brand" /> : <Plus className="w-4 h-4" />}
           </button>
         </div>
 
         {/* Description Body */}
-        <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed line-clamp-2 min-h-[2.25rem] mb-3.5">
+        <p className="text-xs text-store-ink-soft leading-relaxed line-clamp-2 min-h-[2.25rem] mb-3.5 ">
           {expert.description}
         </p>
       </div>
 
       {/* Footer Tags & Actions */}
-      <div className="space-y-3 pt-2 border-t border-slate-200 dark:border-slate-800/60">
+      <div className="space-y-3 pt-2 border-t border-store-line dark:border-store-line/60">
         {/* Chips */}
         <div className="flex flex-wrap items-center gap-1.5">
           {expert.tags.map((tag, idx) => (
             <span
               key={idx}
-              className="text-[11px] px-2 py-0.5 rounded-md bg-slate-800 text-slate-300 border border-slate-700/60 group-hover:border-slate-600 transition-colors"
+              className="text-xs px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-store-line/60 group-hover:border-slate-600 transition-colors font-medium"
             >
               {tag}
             </span>
@@ -166,7 +166,7 @@ export const ExpertCard: React.FC<ExpertCardProps> = ({
 
         {/* Action Button */}
         <div className="flex items-center justify-between pt-1">
-          <span className="text-[11px] text-slate-500 font-mono">
+          <span className="text-[11px] text-store-ink-faint font-mono">
             {t('aihub.experts.card.callsCount', {
               rating: expert.rating.toFixed(1),
               calls: (expert.popularity / 1000).toFixed(1),
@@ -182,7 +182,7 @@ export const ExpertCard: React.FC<ExpertCardProps> = ({
                 onClickCard(expert);
               }
             }}
-            className="flex items-center gap-1 text-xs font-semibold text-indigo-400 hover:text-indigo-300 transition-colors group-hover:translate-x-0.5 duration-200"
+            className="flex items-center gap-1 text-xs font-semibold text-store-brand hover:text-store-brand transition-colors group-hover:translate-x-0.5 duration-200"
           >
             <MessageCircle className="w-3.5 h-3.5" />
             <span>{t('aihub.experts.card.chatWithExpert')}</span>

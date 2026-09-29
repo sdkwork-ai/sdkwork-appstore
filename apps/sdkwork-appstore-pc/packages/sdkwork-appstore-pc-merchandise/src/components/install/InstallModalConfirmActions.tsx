@@ -16,13 +16,13 @@ export const InstallModalConfirmActions: React.FC<InstallModalConfirmActionsProp
     <div className="w-full flex gap-3">
       <button
         onClick={onCancel}
-        className="flex-1 py-3 bg-gray-100 dark:bg-[#2C2C2E] hover:bg-gray-200 dark:hover:bg-[#3C3C3E] text-[#1C1C1E] dark:text-[#F5F5F5] font-bold rounded-xl transition-colors cursor-pointer"
+        className="flex-1 py-3 bg-store-raised hover:bg-store-raised text-store-ink font-medium rounded-store-control transition-colors cursor-pointer text-sm"
       >
         {t('common.actions.cancel')}
       </button>
       <button
         onClick={onConfirm}
-        className="flex-1 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-colors shadow-md shadow-blue-200 dark:shadow-none cursor-pointer"
+        className="flex-1 py-3 bg-store-brand hover:bg-store-brand text-white font-medium rounded-store-control transition-colors shadow-md shadow-blue-200 dark:shadow-none cursor-pointer text-sm"
       >
         {t('common.actions.install')}
       </button>

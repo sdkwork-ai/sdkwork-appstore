@@ -33,11 +33,11 @@ export const TemplateDetailActionButtons: React.FC<TemplateDetailActionButtonsPr
       <button
         onClick={onFork}
         disabled={forking}
-        className="w-full py-3 px-5 rounded-2xl bg-indigo-600 hover:bg-indigo-700 active:scale-[0.98] text-white font-bold text-sm shadow-lg shadow-indigo-600/20 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-70"
+        className="w-full py-3 px-5 rounded-store-control bg-store-brand hover:bg-store-brand active:scale-[0.98] text-white font-medium text-sm shadow-lg shadow-store-brand/20 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-70"
       >
         {forkedSuccess ? (
           <>
-            <Check className="w-4 h-4 text-emerald-300" />
+            <Check className="w-4 h-4 text-store-success" />
             <span>{t('templates.detail.clonedSuccess')}</span>
           </>
         ) : (
@@ -52,27 +52,27 @@ export const TemplateDetailActionButtons: React.FC<TemplateDetailActionButtonsPr
       {relatedApp && (
         <Link
           to={`/app/${relatedApp.id}`}
-          className="w-full py-3 px-5 rounded-2xl bg-slate-900 dark:bg-slate-800 hover:bg-slate-800 dark:hover:bg-slate-700 text-white font-bold text-sm transition-all shadow-sm border border-slate-700/60 flex items-center justify-center gap-2 cursor-pointer group"
+          className="w-full py-3 px-5 rounded-store-card bg-slate-900 dark:bg-slate-800 hover:bg-slate-800 dark:hover:bg-slate-700 text-white font-bold text-sm transition-all shadow-sm border border-store-line/60 flex items-center justify-center gap-2 cursor-pointer group"
         >
-          <LayoutGrid className="w-4 h-4 text-indigo-400" />
+          <LayoutGrid className="w-4 h-4 text-store-brand" />
           <span>{t('templates.card.appDetails')}</span>
-          <ArrowRight className="w-4 h-4 text-slate-400 group-hover:translate-x-1 transition-transform" />
+          <ArrowRight className="w-4 h-4 text-store-ink-faint group-hover:translate-x-1 transition-transform" />
         </Link>
       )}
 
       {/* Quick Copy CLI */}
       <button
         onClick={onCopyCli}
-        className="w-full py-2.5 px-4 rounded-xl bg-slate-100 dark:bg-[#20232d] hover:bg-slate-200 dark:hover:bg-[#282c38] text-slate-700 dark:text-slate-200 font-semibold text-xs transition-colors flex items-center justify-center gap-2 border border-slate-200 dark:border-slate-800 cursor-pointer"
+        className="w-full py-2.5 px-4 rounded-store-control bg-store-subtle hover:bg-store-raised text-store-ink-soft font-medium text-xs transition-colors flex items-center justify-center gap-2 border border-store-line cursor-pointer "
       >
         {copiedCli ? (
           <>
-            <Check className="w-3.5 h-3.5 text-emerald-500" />
-            <span className="text-emerald-600 dark:text-emerald-400">{t('templates.detail.copiedCli')}</span>
+            <Check className="w-3.5 h-3.5 text-store-success" />
+            <span className="text-store-success ">{t('templates.detail.copiedCli')}</span>
           </>
         ) : (
           <>
-            <Terminal className="w-3.5 h-3.5 text-indigo-500" />
+            <Terminal className="w-3.5 h-3.5 text-store-brand" />
             <span>{t('templates.detail.copyCli')}</span>
           </>
         )}
@@ -81,13 +81,13 @@ export const TemplateDetailActionButtons: React.FC<TemplateDetailActionButtonsPr
       {/* Star button */}
       <button
         onClick={onStar}
-        className={`w-full py-2.5 px-4 rounded-xl border text-xs font-semibold transition-all flex items-center justify-center gap-2 cursor-pointer ${
+        className={`w-full py-2.5 px-4 rounded-store-control border text-xs font-medium transition-all flex items-center justify-center gap-2 cursor-pointer ${
           starred
-            ? 'bg-amber-500/10 border-amber-500/30 text-amber-600 dark:text-amber-400'
-            : 'border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-[#20232d]'
+            ? 'bg-store-warning/10 border-store-warning/30 text-store-warning '
+            : 'border-store-line text-store-ink-soft hover:bg-store-subtle '
         }`}
       >
-        <Star className={`w-3.5 h-3.5 ${starred ? 'fill-amber-400 text-amber-500' : ''}`} />
+        <Star className={`w-3.5 h-3.5 ${starred ? 'fill-amber-400 text-store-warning' : ''}`} />
         <span>{starred ? t('templates.detail.starred') : t('templates.detail.starBtn')}</span>
       </button>
     </div>

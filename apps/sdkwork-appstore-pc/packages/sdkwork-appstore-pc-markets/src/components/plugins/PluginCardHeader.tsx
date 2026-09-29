@@ -14,16 +14,16 @@ export const PluginCardHeader: React.FC<PluginCardHeaderProps> = ({ plugin }) =>
           <DynamicIcon name={plugin.icon} className="w-6 h-6" />
         </div>
         <div className="min-w-0">
-          <h3 className="font-bold text-sm text-gray-900 dark:text-gray-100 group-hover:text-blue-500 transition-colors truncate">
+          <h3 className="font-bold text-sm text-store-ink group-hover:text-store-brand transition-colors truncate ">
             {plugin.name}
           </h3>
-          <p className="text-xs text-gray-400 truncate mt-0.5">
+          <p className="text-xs text-store-ink-faint truncate mt-0.5">
             v{plugin.version} · {plugin.developer}
           </p>
         </div>
       </div>
 
-      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 shrink-0">
+      <span className="text-xs font-medium px-2.5 py-0.5 rounded-full bg-store-brand/10 text-store-brand shrink-0 ">
         {plugin.apiSchemaType}
       </span>
     </div>

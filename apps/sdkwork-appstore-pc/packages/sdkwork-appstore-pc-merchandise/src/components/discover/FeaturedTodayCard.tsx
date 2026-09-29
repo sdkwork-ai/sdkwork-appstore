@@ -30,58 +30,58 @@ export function FeaturedTodayCard({ app }: FeaturedTodayCardProps) {
   return (
     <div className="flex flex-col h-full">
       <div className="flex items-center justify-between mb-3">
-        <span className="text-sm font-bold text-gray-900 dark:text-gray-100">
+        <span className="text-sm font-bold text-store-ink ">
           {t('discover.sections.featuredToday')}
         </span>
       </div>
 
       <Link 
         to={`/app/${app.id}`}
-        className="group relative flex-1 flex flex-col justify-between rounded-2xl overflow-hidden p-6 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-[#151821] border border-slate-200 dark:border-slate-800 shadow-lg hover:border-slate-300 dark:hover:border-slate-700 transition-all cursor-pointer min-h-[260px]"
+        className="group relative flex-1 flex flex-col justify-between rounded-store-card overflow-hidden p-6 bg-gradient-to-br from-store-subtle to-store-subtle border border-store-line shadow-lg hover:border-store-line-strong transition-all cursor-pointer min-h-[260px] "
       >
         {/* Top Badges */}
         <div className="flex items-center justify-between z-10">
-          <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-semibold">
+          <div className="flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-store-brand/10 border border-store-brand/20 text-store-brand text-xs font-medium">
             <Sparkles className="w-3.5 h-3.5" />
             <span>{t('discover.sections.aiSpotlight', 'AI 焦点')}</span>
           </div>
-          <div className="p-2 rounded-lg bg-slate-100 text-slate-600 group-hover:bg-blue-600 group-hover:text-white transition-colors dark:bg-slate-800 dark:text-slate-300">
+          <div className="p-2 rounded-store-control bg-store-subtle text-store-ink-soft group-hover:bg-store-brand group-hover:text-white transition-colors ">
             <ArrowUpRight className="w-4 h-4" />
           </div>
         </div>
 
         {/* Center Visual & Title */}
         <div className="my-4 flex items-center gap-4 z-10">
-          <div className="w-16 h-16 rounded-2xl bg-blue-600 flex items-center justify-center text-white shadow-md ring-1 ring-white/10 shrink-0">
+          <div className="w-16 h-16 rounded-store-card bg-store-brand flex items-center justify-center text-white shadow-md ring-1 ring-white/10 shrink-0">
             <Cpu className="w-8 h-8" />
           </div>
           <div>
-            <span className="text-[11px] text-slate-500 dark:text-slate-400 font-semibold uppercase tracking-wider">{app.developer}</span>
-            <h3 className="text-lg md:text-xl font-bold text-slate-900 group-hover:text-blue-600 transition-colors dark:text-white dark:group-hover:text-blue-300">
+            <span className="text-[11px] text-store-ink-faint font-semibold uppercase tracking-wider ">{app.developer}</span>
+            <h3 className="text-lg md:text-xl font-bold text-store-ink group-hover:text-store-brand transition-colors  ">
               {app.name}
             </h3>
-            <p className="text-xs text-slate-600/90 dark:text-slate-300/80 mt-1 line-clamp-2 max-w-xs leading-relaxed">
+            <p className="text-xs text-store-ink-soft/90 dark:text-slate-300/80 mt-1 line-clamp-2 max-w-xs leading-relaxed">
               {app.description}
             </p>
           </div>
         </div>
 
         {/* Bottom CTA Bar */}
-        <div className="flex items-center justify-between pt-4 border-t border-slate-200 dark:border-slate-800 z-10">
+        <div className="flex items-center justify-between pt-4 border-t border-store-line z-10 ">
           <div className="flex flex-col gap-1">
-            <span className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">{t('common.labels.rating')}: {app.rating} ★</span>
-            <span className="text-xs font-semibold text-slate-700 dark:text-slate-200">{app.category}</span>
+            <span className="text-[11px] text-store-ink-faint font-medium ">{t('common.labels.rating')}: {app.rating} ★</span>
+            <span className="text-xs font-semibold text-store-ink-soft ">{app.category}</span>
             <PlatformBadges platforms={app.platforms} max={3} />
           </div>
 
           <button
             onClick={handleAction}
-            className={`px-5 py-2 rounded-lg text-xs font-bold transition-all shadow-sm ${
+            className={`px-5 py-2 rounded-store-control text-xs font-medium transition-all shadow-sm ${
               installed
-                ? "bg-emerald-600 text-white hover:bg-emerald-500"
+                ? "bg-store-success text-white hover:bg-store-success"
                 : downloading
-                ? "bg-amber-600 text-white"
-                : "bg-blue-600 text-white hover:bg-blue-500"
+                ? "bg-store-warning text-white"
+                : "bg-store-brand text-white hover:bg-store-brand"
             }`}
           >
             {downloading ? `${t('common.actions.downloading')} (${Math.round(progress)}%)` : installed ? t('common.actions.open') : t('common.actions.downloadFree')}

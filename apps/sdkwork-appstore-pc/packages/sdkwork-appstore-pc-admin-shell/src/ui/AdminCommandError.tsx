@@ -63,12 +63,12 @@ export function AdminCommandError({ error }: AdminCommandErrorProps) {
   return (
     <div
       role="alert"
-      className="flex items-start gap-2 rounded-xl border border-rose-200 bg-rose-50/70 px-3 py-2 text-xs dark:border-rose-900/60 dark:bg-rose-950/30"
+      className="flex items-start gap-2 rounded-store-control border border-store-danger-soft bg-store-danger-soft px-3 py-2 text-xs "
     >
-      <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-rose-500" />
+      <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-store-danger" />
       <div className="min-w-0">
-        <p className="font-medium text-rose-700 dark:text-rose-300">{title}</p>
-        <p className="mt-0.5 leading-5 text-rose-600/90 dark:text-rose-300/80">{description}</p>
+        <p className="font-medium text-store-danger ">{title}</p>
+        <p className="mt-0.5 leading-5 text-store-danger/90 dark:text-store-danger/80">{description}</p>
         {error.fieldErrors.length > 0 ? (
           <ul className="mt-1 space-y-0.5">
             {error.fieldErrors.map((field) => (
@@ -80,7 +80,7 @@ export function AdminCommandError({ error }: AdminCommandErrorProps) {
           </ul>
         ) : null}
         {diagnostics.length > 0 ? (
-          <p className="mt-1 font-mono text-[10px] text-rose-500/80 dark:text-rose-400/70">
+          <p className="mt-1 font-mono text-[10px] text-store-danger/80 dark:text-store-danger/70">
             {diagnostics.join(' · ')}
           </p>
         ) : null}

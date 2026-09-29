@@ -47,7 +47,7 @@ export function PlatformBadges({ platforms, max = 3, className }: PlatformBadges
         )
       })}
       {overflow > 0 && (
-        <span className="rounded-full border border-gray-300/60 bg-gray-100 px-1.5 py-px text-[10px] font-semibold leading-tight text-gray-500 dark:border-gray-700 dark:bg-[#252832] dark:text-gray-400">
+        <span className="rounded-full border border-store-line-strong/60 bg-store-subtle px-1.5 py-px text-[10px] font-semibold leading-tight text-store-ink-faint dark:border-store-line ">
           +{overflow}
         </span>
       )}

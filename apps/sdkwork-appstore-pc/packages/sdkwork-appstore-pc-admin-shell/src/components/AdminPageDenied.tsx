@@ -13,14 +13,14 @@ export interface AdminPageDeniedProps {
 export function AdminPageDenied({ requiredPermissions = [] }: AdminPageDeniedProps) {
   const { t } = useTranslation();
   return (
-    <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-300 px-6 py-16 text-center dark:border-[#2a2e3a]">
-      <span className="text-gray-400 dark:text-gray-500">
+    <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-store-line-strong px-6 py-16 text-center ">
+      <span className="text-store-ink-faint ">
         <Ban className="h-6 w-6" />
       </span>
-      <h2 className="mt-2 text-sm font-semibold text-gray-800 dark:text-gray-100">
+      <h2 className="mt-2 text-sm font-semibold text-store-ink ">
         {t('adminShell.pageDenied.title')}
       </h2>
-      <p className="mt-1 max-w-md text-xs leading-5 text-gray-500 dark:text-gray-400">
+      <p className="mt-1 max-w-md text-xs leading-5 text-store-ink-faint ">
         {t('adminShell.pageDenied.description')}
       </p>
       {requiredPermissions.length > 0 ? (
@@ -28,7 +28,7 @@ export function AdminPageDenied({ requiredPermissions = [] }: AdminPageDeniedPro
           {requiredPermissions.map((code) => (
             <li
               key={code}
-              className="rounded-md bg-gray-100 px-2 py-0.5 font-mono text-[11px] text-gray-600 dark:bg-[#20232c] dark:text-gray-300"
+              className="rounded-full bg-store-subtle px-2.5 py-0.5 font-mono text-xs text-store-ink-soft font-medium"
             >
               {code}
             </li>

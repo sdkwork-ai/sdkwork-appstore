@@ -25,40 +25,40 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({ review }) => {
   };
 
   return (
-    <div className="bg-gray-50 dark:bg-[#1C1C1E] p-4 md:p-5 rounded-2xl border border-gray-100 dark:border-[#2C2C2E] flex flex-col justify-between transition-colors space-y-2">
+    <div className="bg-store-subtle p-4 md:p-5 rounded-store-card border border-store-line-soft flex flex-col justify-between transition-colors space-y-2 ">
       <div>
         <div className="flex justify-between items-center mb-1">
-          <span className="text-xs font-bold truncate pr-2 text-[#1C1C1E] dark:text-[#F5F5F5]">
+          <span className="text-xs font-bold truncate pr-2 text-store-ink ">
             {review.title}
           </span>
-          <span className="text-[10px] text-gray-400 dark:text-gray-500 font-bold shrink-0">
+          <span className="text-[10px] text-store-ink-faint font-bold shrink-0 ">
             {review.date}
           </span>
         </div>
-        <div className="text-yellow-400 text-xs mb-1.5 flex gap-0.5">
+        <div className="text-store-warning text-xs mb-1.5 flex gap-0.5">
           {Array.from({ length: 5 }).map((_, i) => (
             <span
               key={i}
-              className={i < review.rating ? 'text-yellow-400' : 'text-gray-300 dark:text-gray-600'}
+              className={i < review.rating ? 'text-store-warning' : 'text-store-ink-faint '}
             >
               ★
             </span>
           ))}
         </div>
-        <p className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed line-clamp-3">
+        <p className="text-xs text-store-ink-soft leading-relaxed line-clamp-3 ">
           {review.comment}
         </p>
       </div>
 
-      <div className="pt-2 flex items-center justify-between border-t border-gray-200/50 dark:border-gray-800 text-[11px] text-gray-400">
+      <div className="pt-2 flex items-center justify-between border-t border-store-line/50 dark:border-store-line text-[11px] text-store-ink-faint">
         <span>{t('appDetail.reviews.userLabel', { user: review.user })}</span>
         <button
           onClick={handleLike}
           disabled={liked}
-          className={`flex items-center gap-1.5 text-xs font-medium px-2 py-1 rounded-lg transition-colors cursor-pointer ${
+          className={`flex items-center gap-1.5 text-xs font-medium px-2 py-1 rounded-store-control transition-colors cursor-pointer ${
             liked
-              ? 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/40'
-              : 'text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-800'
+              ? 'text-store-brand bg-blue-50 dark:bg-blue-950/40 '
+              : 'text-store-ink-faint hover:text-store-brand hover:bg-store-subtle '
           }`}
         >
           <ThumbsUp className={`w-3.5 h-3.5 ${liked ? 'fill-current' : ''}`} />

@@ -18,14 +18,14 @@ export const AISandboxModelSelector: React.FC<AISandboxModelSelectorProps> = ({
 
   return (
     <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
-      <span className="text-[11px] text-gray-500 dark:text-gray-400 font-medium flex items-center gap-1 shrink-0">
-        <Cpu className="w-3.5 h-3.5 text-teal-500" />
+      <span className="text-[11px] text-store-ink-faint font-medium flex items-center gap-1 shrink-0 ">
+        <Cpu className="w-3.5 h-3.5 text-store-info" />
         {t('aihub.sandbox.testEngine')}
       </span>
       <select
         value={selectedModelId}
         onChange={(e) => onModelChange(e.target.value)}
-        className="bg-white dark:bg-[#20232b] text-gray-800 dark:text-gray-200 border border-gray-200 dark:border-[#2d313c] rounded-lg text-xs px-2 py-1 outline-none focus:border-teal-500 font-medium cursor-pointer"
+        className="bg-store-field text-store-ink border border-store-line rounded-store-control text-sm px-3 outline-none focus:border-store-brand font-medium cursor-pointer h-9 placeholder:text-store-ink-faint transition-colors focus:ring-2 focus:ring-store-brand/25"
       >
         {models.map((m) => (
           <option key={m.id} value={m.id}>

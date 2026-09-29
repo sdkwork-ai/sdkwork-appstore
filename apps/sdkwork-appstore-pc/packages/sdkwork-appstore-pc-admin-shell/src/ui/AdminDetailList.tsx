@@ -33,7 +33,7 @@ export function AdminDetailList({ columns = 2, entries }: AdminDetailListProps) 
           key={entry.label}
           className={entry.wide ? 'sm:col-span-2 lg:col-span-3' : undefined}
         >
-          <dt className="text-[11px] font-medium uppercase tracking-wide text-gray-400 dark:text-gray-500">
+          <dt className="text-[11px] font-medium uppercase tracking-wide text-store-ink-faint ">
             {entry.label}
           </dt>
           <dd

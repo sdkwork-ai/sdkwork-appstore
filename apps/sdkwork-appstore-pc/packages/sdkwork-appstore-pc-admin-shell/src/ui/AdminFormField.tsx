@@ -27,23 +27,33 @@ export function AdminFormField({
     <div className={layout === 'inline' ? 'min-w-[10rem]' : 'w-full'}>
       <label
         htmlFor={htmlFor}
-        className="mb-1 block text-[11px] font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400"
+        className="mb-1 block text-xs font-medium text-store-ink-soft"
       >
         {label}
-        {required ? <span className="ml-0.5 text-rose-500">*</span> : null}
+        {required ? <span className="ml-0.5 text-store-danger">*</span> : null}
       </label>
       {children}
       {error ? (
-        <p className="mt-1 text-[11px] text-rose-600 dark:text-rose-400" role="alert">
+        <p className="mt-1 text-xs text-store-danger" role="alert">
           {error}
         </p>
       ) : hint ? (
-        <p className="mt-1 text-[11px] text-gray-400 dark:text-gray-500">{hint}</p>
+        <p className="mt-1 text-xs text-store-ink-faint">{hint}</p>
       ) : null}
     </div>
   );
 }
 
-/** Shared control styling for operator inputs, selects, and textareas. */
+/** Shared control styling for operator inputs, selects, and textareas.
+ *
+ *  The same skin as the shared `commons` field primitive — literally the same
+ *  tokens, kept as a literal rather than imported because `admin-shell` does
+ *  not depend on `commons`, and asserted equal to it by
+ *  `scripts/check-control-shape.mjs` so the two copies can never drift.
+ *
+ *  It carries both shape deltas of the primitive because one string serves all
+ *  three elements: `h-9` fixes the single-line height (and a textarea's
+ *  `min-h-*` overrides it), while `py-2` supplies the vertical padding a
+ *  textarea cannot get from a fixed height. */
 export const ADMIN_INPUT_CLASS =
-  'w-full rounded-lg border border-gray-300 bg-white px-2.5 py-1.5 text-sm text-gray-800 outline-none transition-colors placeholder:text-gray-400 focus:border-gray-400 disabled:cursor-not-allowed disabled:bg-gray-50 dark:border-[#2f3442] dark:bg-[#181a20] dark:text-gray-100 dark:placeholder:text-gray-500 dark:focus:border-[#3a4050]';
+  'w-full rounded-store-control bg-store-field border border-store-line px-3 text-sm text-store-ink placeholder:text-store-ink-faint outline-none transition-colors focus:border-store-brand focus:ring-2 focus:ring-store-brand/25 disabled:cursor-not-allowed disabled:opacity-50 h-9 py-2';

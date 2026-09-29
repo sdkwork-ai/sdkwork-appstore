@@ -19,7 +19,7 @@ export const LibraryAppCard: React.FC<LibraryAppCardProps> = ({
   const { t } = useTranslation();
 
   return (
-    <div className="p-4 bg-gray-100/60 dark:bg-[#181a20] border border-gray-200 dark:border-[#22252e] rounded-2xl flex items-center justify-between gap-3 hover:border-gray-300 dark:hover:border-[#2f3342] transition-all">
+    <div className="p-4 bg-store-subtle/60 dark:bg-store-surface border border-store-line rounded-store-card flex items-center justify-between gap-3 hover:border-store-line-strong transition-all ">
       <div className="flex items-center gap-3 min-w-0">
         <Link to={`/app/${app.id}`}>
           <div
@@ -30,11 +30,11 @@ export const LibraryAppCard: React.FC<LibraryAppCardProps> = ({
         </Link>
         <div className="min-w-0">
           <Link to={`/app/${app.id}`}>
-            <h4 className="text-xs font-bold text-gray-900 dark:text-gray-100 truncate hover:underline">
+            <h4 className="text-xs font-bold text-store-ink truncate hover:underline ">
               {app.name}
             </h4>
           </Link>
-          <p className="text-[11px] text-gray-500 dark:text-gray-400 truncate">
+          <p className="text-[11px] text-store-ink-faint truncate ">
             {app.developer} · v{app.whatsNew?.version || '1.0.0'}
           </p>
         </div>
@@ -43,7 +43,7 @@ export const LibraryAppCard: React.FC<LibraryAppCardProps> = ({
       <div className="flex items-center gap-1.5 shrink-0">
         <button
           onClick={() => onOpenApp(app)}
-          className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition-all shadow-sm flex items-center gap-1 cursor-pointer"
+          className="px-3 py-1.5 bg-store-brand hover:bg-store-brand text-white rounded-store-control text-xs font-medium transition-all shadow-sm flex items-center gap-1 cursor-pointer"
         >
           <span>{t('updates.library.open')}</span>
           <ExternalLink className="w-3 h-3" />
@@ -51,7 +51,7 @@ export const LibraryAppCard: React.FC<LibraryAppCardProps> = ({
         <button
           onClick={() => onUninstallApp(app.id)}
           title={t('updates.library.uninstallTooltip')}
-          className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all cursor-pointer"
+          className="p-2 text-store-ink-faint hover:text-store-danger hover:bg-store-danger/10 rounded-store-control transition-all cursor-pointer text-xs font-medium"
         >
           <Trash2 className="w-4 h-4" />
         </button>

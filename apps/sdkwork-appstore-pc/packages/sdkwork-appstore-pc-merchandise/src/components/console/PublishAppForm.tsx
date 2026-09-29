@@ -39,9 +39,9 @@ export const PublishAppForm: React.FC<PublishAppFormProps> = ({
   ];
 
   return (
-    <div className="bg-gray-100/50 dark:bg-[#181a20] border border-gray-200 dark:border-[#22252e] rounded-2xl p-5 shadow-sm">
-      <h2 className="text-sm font-bold text-gray-900 dark:text-gray-100 mb-4 flex items-center gap-2">
-        <Plus className="w-4 h-4 text-blue-500" />
+    <div className="bg-store-subtle/50 dark:bg-store-surface border border-store-line rounded-store-card p-5 shadow-sm ">
+      <h2 className="text-sm font-bold text-store-ink mb-4 flex items-center gap-2 ">
+        <Plus className="w-4 h-4 text-store-brand" />
         {t('console.tabs.publish')}
       </h2>
 
@@ -80,7 +80,7 @@ export const PublishAppForm: React.FC<PublishAppFormProps> = ({
         <div className="flex justify-end pt-2">
           <button
             type="submit"
-            className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition-all shadow-sm cursor-pointer"
+            className="px-5 py-2 bg-store-brand hover:bg-store-brand text-white rounded-store-control text-xs font-medium transition-all shadow-sm cursor-pointer"
           >
             {t('console.form.submit')}
           </button>

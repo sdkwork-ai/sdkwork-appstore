@@ -10,9 +10,9 @@ export const InstallModalSuccessState: React.FC = () => {
     <motion.div
       initial={{ scale: 0.5, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
-      className="flex flex-col items-center justify-center py-2 text-green-500"
+      className="flex flex-col items-center justify-center py-2 text-store-success"
     >
-      <div className="w-12 h-12 bg-green-100 dark:bg-green-500/20 rounded-full flex items-center justify-center mb-2">
+      <div className="w-12 h-12 bg-store-success-soft rounded-full flex items-center justify-center mb-2 ">
         <Check className="w-6 h-6" />
       </div>
       <span className="font-bold text-sm">{t('install.modal.completed')}</span>

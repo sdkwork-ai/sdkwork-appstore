@@ -17,14 +17,14 @@ export const SidebarBrand: React.FC<SidebarBrandProps> = ({
 
   return (
     <div className="px-3 py-2 mb-4 flex items-center gap-2.5">
-      <div className="w-7 h-7 bg-blue-600 rounded-md flex items-center justify-center text-white shadow-sm">
+      <div className="w-7 h-7 bg-store-brand rounded-store-control flex items-center justify-center text-white shadow-sm">
         <Home className="w-4 h-4" />
       </div>
       <div className="flex flex-col">
-        <span className="font-bold text-sm tracking-tight text-gray-900 dark:text-gray-100">
+        <span className="font-bold text-sm tracking-tight text-store-ink ">
           {displayTitle}
         </span>
-        <span className="text-[10px] text-gray-400 font-medium">{displaySubtitle}</span>
+        <span className="text-[10px] text-store-ink-faint font-medium">{displaySubtitle}</span>
       </div>
     </div>
   );

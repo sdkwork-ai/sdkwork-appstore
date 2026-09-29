@@ -5,21 +5,142 @@
 @source "../src";
 @source "../../../../sdkwork-iam/apps/sdkwork-iam-pc/packages/sdkwork-auth-pc-react/src";
 @source "../../../../sdkwork-iam/apps/sdkwork-iam-pc/packages/sdkwork-iam-react/src";
-@custom-variant dark (&:is(.dark *));
 
-@theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --color-primary-50: #eff6ff;
-  --color-primary-100: #dbeafe;
-  --color-primary-200: #bfdbfe;
-  --color-primary-300: #93c5fd;
-  --color-primary-400: #60a5fa;
-  --color-primary-500: #2563eb;
-  --color-primary-600: #1d4ed8;
-  --color-primary-700: #1e40af;
-  --color-primary-900: #1e3a8a;
+/**
+ * App Store PC: the single token definition file for this application.
+ *
+ * Structure follows `THEME_DARKMODE_SPEC.md` (v2.0):
+ *
+ *   1. Primitive / reference values live only here (§2 layer 1).
+ *   2. `--sdk-color-*` are the semantic aliases every surface consumes
+ *      (§2.1), declared twice — light and dark — under their mode roots
+ *      (§2.2). No component may resolve mode or pick a palette value itself.
+ *   3. `@theme` projects those aliases into Tailwind utilities
+ *      (`bg-store-surface`, `border-store-line`, `text-store-ink-muted`, …)
+ *      per §4, so component code names a role instead of a colour.
+ *
+ * Host integration (§7): the surface is composed into a harness host whose
+ * brand is the DeepSeek ramp. The brand roles therefore resolve from the host
+ * tokens when the host defines them and fall back to this application's own
+ * ramp when it runs standalone — the same projection `apps/web/src/index.css`
+ * applies to the other SDKWork surfaces. The type scale follows the host the
+ * same way. Neutral surfaces, text and borders deliberately stay local: they
+ * are the store's own design language, not the host chrome.
+ */
+
+/* `:is` (not `:where`) keeps the `.dark` class specificity, so a dark variant
+   beats a plain light utility from any sibling sheet that loads later; the
+   embedded document carries several such sheets. The element itself is matched
+   too, because the embedded surface root carries both `dark` and
+   `data-sdk-color-mode`. */
+@custom-variant dark (&:is(.dark, .dark *));
+
+/**
+ * `inline` is load-bearing, not cosmetic. A plain `@theme` emits
+ *
+ *     :root { --color-store-raised: var(--sdk-color-surface-elevated) }
+ *
+ * and CSS substitutes `var()` inside a custom property **on the element that
+ * declares it** — here `:root`. The alias is therefore resolved once against
+ * `:root`'s light value and inherited as a fixed colour, so `.dark` on any
+ * descendant has no effect on the utility. Measured: 14 of 16 role fixtures
+ * rendered identically in both modes.
+ *
+ * `@theme inline` copies the value into each utility instead, so
+ * `background-color: var(--sdk-color-surface-elevated)` resolves on the element
+ * that carries the mode, which is what makes the whole layer follow the mode.
+ * (It also means the host's brand var is read per element rather than frozen at
+ * the document root.) Nothing in this application reads `--color-store-*`
+ * directly, so nothing loses a variable it depended on.
+ */
+@theme inline {
+  /* Host-aware type scale: the store follows the host's family when embedded
+     and keeps its own stack when standalone. */
+  --font-sans: var(--dsw-font-family, "Inter", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif);
+
+  /* Brand ramp (11 steps, §5.1). The host's static DeepSeek ramp wins when
+     present so an embedded store carries the host brand; the fallbacks are the
+     store's own blue. Every step is declared because a partial ramp cannot
+     derive its own hovers and soft fills (F7). Each value is a `var()` chain,
+     so re-branding stays a custom-property swap (§5.3) and never rewrites a
+     utility class. */
+  --color-primary-50: var(--dsw-static-deepseek-50, #eff6ff);
+  --color-primary-100: var(--dsw-static-deepseek-100, #dbeafe);
+  --color-primary-200: var(--dsw-static-deepseek-200, #bfdbfe);
+  --color-primary-300: var(--dsw-static-deepseek-300, #93c5fd);
+  --color-primary-400: var(--dsw-static-deepseek-400, #60a5fa);
+  --color-primary-500: var(--dsw-static-deepseek-500, #2563eb);
+  --color-primary-600: var(--dsw-static-deepseek-600, #1d4ed8);
+  --color-primary-700: var(--dsw-static-deepseek-700-delete, #1e40af);
+  --color-primary-800: var(--dsw-static-deepseek-800, #1e3a8a);
+  --color-primary-900: var(--dsw-static-deepseek-900, #172554);
+  --color-primary-950: var(--dsw-static-deepseek-950, #0b1120);
+
+  /* Semantic projection (§4). These read the `--sdk-color-*` aliases declared
+     below, so switching mode or brand stays a variable swap on an existing
+     root (§1 — no remount, no stylesheet reload, no class rewrite). */
+  --color-store-canvas: var(--sdk-color-surface-canvas);
+  --color-store-surface: var(--sdk-color-surface-panel);
+  --color-store-subtle: var(--sdk-color-surface-panel-muted);
+  --color-store-raised: var(--sdk-color-surface-elevated);
+  --color-store-overlay: var(--sdk-color-surface-overlay);
+  --color-store-field: var(--sdk-color-surface-field);
+
+  --color-store-line-soft: var(--sdk-color-border-subtle);
+  --color-store-line: var(--sdk-color-border-default);
+  --color-store-line-strong: var(--sdk-color-border-strong);
+
+  --color-store-ink: var(--sdk-color-text-primary);
+  --color-store-ink-soft: var(--sdk-color-text-secondary);
+  --color-store-ink-faint: var(--sdk-color-text-muted);
+  --color-store-ink-inverse: var(--sdk-color-text-inverse);
+  --color-store-on-brand: var(--sdk-color-text-on-brand);
+
+  --color-store-brand: var(--sdk-color-brand-primary);
+  --color-store-brand-hover: var(--sdk-color-brand-primary-hover);
+  --color-store-brand-soft: var(--sdk-color-brand-primary-soft);
+  --color-store-brand-accent: var(--sdk-color-brand-accent);
+
+  --color-store-success: var(--sdk-color-state-success);
+  --color-store-warning: var(--sdk-color-state-warning);
+  --color-store-danger: var(--sdk-color-state-danger);
+  --color-store-info: var(--sdk-color-state-info);
+
+  /* Status surfaces. A status chip needs three roles, not one: the tinted
+     fill, its border, and the label. Without the extra two, a chip written as
+     `border-emerald-200 bg-emerald-50/70 text-emerald-700 dark:…` can only be
+     half-converted, which looks worse than leaving it alone. Each role is one
+     token for both modes, so the light/dark halves collapse. */
+  --color-store-success-soft: var(--sdk-color-state-success-soft);
+  --color-store-success-line: var(--sdk-color-state-success-line);
+  --color-store-warning-soft: var(--sdk-color-state-warning-soft);
+  --color-store-warning-line: var(--sdk-color-state-warning-line);
+  --color-store-danger-soft: var(--sdk-color-state-danger-soft);
+  --color-store-danger-line: var(--sdk-color-state-danger-line);
+  --color-store-info-soft: var(--sdk-color-state-info-soft);
+  --color-store-info-line: var(--sdk-color-state-info-line);
+  /* Hover shades. Without these, `bg-teal-600 hover:bg-teal-700` folds to the
+     same token twice and the button loses its hover feedback entirely. */
+  --color-store-success-hover: var(--sdk-color-state-success-hover);
+  --color-store-warning-hover: var(--sdk-color-state-warning-hover);
+  --color-store-danger-hover: var(--sdk-color-state-danger-hover);
+  --color-store-info-hover: var(--sdk-color-state-info-hover);
+
+  /* Shape scale (§2.1, mode-agnostic). Controls, cards and modals pick from
+     this scale instead of an ad-hoc `rounded-lg`/`rounded-xl`/`rounded-2xl`
+     mix, which is what made the same control round differently per page. */
+  --radius-store-control: var(--sdk-radius-control);
+  --radius-store-card: var(--sdk-radius-card);
+  --radius-store-modal: var(--sdk-radius-modal);
 }
 
+/**
+ * Layer-1 leftovers that are mode-independent: the auth shell and the
+ * sidebar's accent fills read them as `rgb(var(--…-rgb) / a)`. They are this
+ * application's own names (no host consumer), kept as plain declarations on
+ * `:root` so the sign-in dialog — which renders outside the auth shell
+ * element — can still resolve them.
+ */
 :root {
   color-scheme: light;
   --sdkwork-sidebar-accent-rgb: 37 99 235;
@@ -31,7 +152,145 @@ html.dark {
   color-scheme: dark;
 }
 
-/* Global scrollbar styling matching light and dark theme background colors */
+/**
+ * Semantic aliases, light mode (§2.2). `:root` is the document default; the
+ * attribute selector lets an embedded host hand this surface a mode of its own
+ * without touching the document root.
+ */
+:root,
+[data-sdk-color-mode='light'] {
+  --sdk-color-surface-canvas: #f2f2f7;
+  --sdk-color-surface-panel: #ffffff;
+  --sdk-color-surface-panel-muted: #f7f8fa;
+  --sdk-color-surface-elevated: #ffffff;
+  --sdk-color-surface-overlay: rgb(0 0 0 / 0.4);
+  --sdk-color-surface-field: #ffffff;
+
+  --sdk-color-border-subtle: rgb(0 0 0 / 0.04);
+  --sdk-color-border-default: rgb(0 0 0 / 0.08);
+  --sdk-color-border-strong: rgb(0 0 0 / 0.16);
+
+  --sdk-color-text-primary: #1d1d1f;
+  --sdk-color-text-secondary: #6e6e73;
+  --sdk-color-text-muted: #8e8e93;
+  --sdk-color-text-inverse: #ffffff;
+  /* Ink for text sitting on a brand fill. Unlike `text-inverse` this does not
+     flip with the mode: the brand fill is mid-tone blue in both, so its label
+     stays light. */
+  --sdk-color-text-on-brand: #ffffff;
+
+  --sdk-color-brand-primary: var(--dsw-static-deepseek-500, #0071e3);
+  --sdk-color-brand-primary-hover: var(--dsw-static-deepseek-600, #0077ed);
+  --sdk-color-brand-accent: var(--dsw-static-deepseek-500, #0071e3);
+  /* Low-alpha fills derive from the brand itself, so a brand swap cannot leave
+     a stale tint behind (§5.1 soft fills). */
+  --sdk-color-brand-primary-soft: color-mix(in oklab, var(--sdk-color-brand-primary) 12%, transparent);
+
+  --sdk-color-state-success: #34c759;
+  --sdk-color-state-warning: #ff9500;
+  --sdk-color-state-danger: #ff3b30;
+  --sdk-color-state-info: var(--dsw-static-deepseek-500, #0071e3);
+
+  /* Status chip roles: a 12 % wash of the state hue, a 30 % border of it, and
+     the hue itself for the label. Derived from the hue so a state colour
+     change cannot leave a stale tint behind (§5.1). */
+  --sdk-color-state-success-soft: color-mix(in oklab, var(--sdk-color-state-success) 12%, transparent);
+  --sdk-color-state-success-line: color-mix(in oklab, var(--sdk-color-state-success) 30%, transparent);
+  --sdk-color-state-warning-soft: color-mix(in oklab, var(--sdk-color-state-warning) 12%, transparent);
+  --sdk-color-state-warning-line: color-mix(in oklab, var(--sdk-color-state-warning) 30%, transparent);
+  --sdk-color-state-danger-soft: color-mix(in oklab, var(--sdk-color-state-danger) 12%, transparent);
+  --sdk-color-state-danger-line: color-mix(in oklab, var(--sdk-color-state-danger) 30%, transparent);
+  --sdk-color-state-info-soft: color-mix(in oklab, var(--sdk-color-state-info) 12%, transparent);
+  --sdk-color-state-info-line: color-mix(in oklab, var(--sdk-color-state-info) 30%, transparent);
+  /* Hover deepens the hue against a light surface. */
+  --sdk-color-state-success-hover: color-mix(in oklab, var(--sdk-color-state-success) 86%, #000000);
+  --sdk-color-state-warning-hover: color-mix(in oklab, var(--sdk-color-state-warning) 86%, #000000);
+  --sdk-color-state-danger-hover: color-mix(in oklab, var(--sdk-color-state-danger) 86%, #000000);
+  --sdk-color-state-info-hover: color-mix(in oklab, var(--sdk-color-state-info) 86%, #000000);
+
+  /* Shape scale (§2.1, mode-agnostic). Three tiers, and each tier projects the
+     host's own radius scale where the host defines one — so an embedded surface
+     rounds exactly like the chrome it sits in and falls back to this
+     application's design values when it runs standalone, the same
+     `var(host-value, fallback)` shape the brand ramp uses above.
+       control → `--dsw-radius-md` (12px): the host's control radius, and the
+                 value `UI_DESIGN_SPEC.md` §2.3 names for buttons.
+       card    → `--dsw-radius-lg` (16px): the lower bound of the spec's 16–24px
+                 card range — the previous 14px sat outside it.
+       modal   → `--dsw-radius-xl` (20px): the host's large-surface tier, inside
+                 the spec's card range and one step above a card.
+     These stay outside `@theme` on purpose: the host declares `--dsw-radius-*`
+     on `:root` as well, and a `var()` is substituted on the element that
+     declares the property — declaring the bridge on the same root is what lets
+     the host value win instead of being frozen into a utility. */
+  --sdk-radius-control: var(--dsw-radius-md, 12px);
+  --sdk-radius-card: var(--dsw-radius-lg, 16px);
+  --sdk-radius-modal: var(--dsw-radius-xl, 20px);
+}
+
+/**
+ * Semantic aliases, dark mode (§2.2). Only tokens are restyled here, never
+ * components. The `.dark` selectors are the ones Tailwind's variant and the
+ * harness `SdkworkHostThemeSurface` publish; `html.dark` is the standalone
+ * root. State colours are one tonal step lighter so they keep contrast on a
+ * dark surface (§2.2).
+ *
+ * `--sdk-color-text-muted` deviates from the design spec's `#636366`: that
+ * value is about 3.2:1 on the panel surface and fails the spec's own AA
+ * requirement for body copy. It follows the iOS secondary-label value instead
+ * (about 5:1).
+ */
+[data-sdk-color-mode='dark'],
+html.dark,
+.dark {
+  --sdk-color-surface-canvas: #000000;
+  --sdk-color-surface-panel: #1c1c1e;
+  --sdk-color-surface-panel-muted: #17181c;
+  --sdk-color-surface-elevated: #2c2c2e;
+  --sdk-color-surface-overlay: rgb(0 0 0 / 0.6);
+  --sdk-color-surface-field: #202124;
+
+  --sdk-color-border-subtle: rgb(255 255 255 / 0.06);
+  --sdk-color-border-default: rgb(255 255 255 / 0.1);
+  --sdk-color-border-strong: rgb(255 255 255 / 0.18);
+
+  --sdk-color-text-primary: #f5f5f7;
+  --sdk-color-text-secondary: #aeaeb2;
+  --sdk-color-text-muted: #98989d;
+  --sdk-color-text-inverse: #1d1d1f;
+  --sdk-color-text-on-brand: #ffffff;
+
+  --sdk-color-brand-primary: var(--dsw-static-deepseek-500, #0a84ff);
+  --sdk-color-brand-primary-hover: var(--dsw-static-deepseek-400, #409cff);
+  --sdk-color-brand-accent: var(--dsw-static-deepseek-500, #0a84ff);
+  --sdk-color-brand-primary-soft: color-mix(in oklab, var(--sdk-color-brand-primary) 18%, transparent);
+
+  --sdk-color-state-success: #30d158;
+  --sdk-color-state-warning: #ff9f0a;
+  --sdk-color-state-danger: #ff453a;
+  --sdk-color-state-info: var(--dsw-static-deepseek-400, #0a84ff);
+
+  /* Same derivations; a slight lift keeps a tint visible on a dark surface. */
+  --sdk-color-state-success-soft: color-mix(in oklab, var(--sdk-color-state-success) 18%, transparent);
+  --sdk-color-state-success-line: color-mix(in oklab, var(--sdk-color-state-success) 36%, transparent);
+  --sdk-color-state-warning-soft: color-mix(in oklab, var(--sdk-color-state-warning) 18%, transparent);
+  --sdk-color-state-warning-line: color-mix(in oklab, var(--sdk-color-state-warning) 36%, transparent);
+  --sdk-color-state-danger-soft: color-mix(in oklab, var(--sdk-color-state-danger) 18%, transparent);
+  --sdk-color-state-danger-line: color-mix(in oklab, var(--sdk-color-state-danger) 36%, transparent);
+  --sdk-color-state-info-soft: color-mix(in oklab, var(--sdk-color-state-info) 18%, transparent);
+  --sdk-color-state-info-line: color-mix(in oklab, var(--sdk-color-state-info) 36%, transparent);
+  /* Hover lifts the hue against a dark surface. */
+  --sdk-color-state-success-hover: color-mix(in oklab, var(--sdk-color-state-success) 86%, #ffffff);
+  --sdk-color-state-warning-hover: color-mix(in oklab, var(--sdk-color-state-warning) 86%, #ffffff);
+  --sdk-color-state-danger-hover: color-mix(in oklab, var(--sdk-color-state-danger) 86%, #ffffff);
+  --sdk-color-state-info-hover: color-mix(in oklab, var(--sdk-color-state-info) 86%, #ffffff);
+}
+
+/* Scrollbar chrome. These selectors are element-wide, so as a *page* sheet of
+   the standalone application they are correct; the host compile contains them
+   inside a cascade layer, and the harness shell's own unlayered scrollbar
+   styles (packages/client/ui-theme) therefore still win in the host document.
+   Feature sheets under `packages/<package>/src` must not repeat them (§7.3). */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -83,15 +342,24 @@ html.dark * {
   }
 }
 
+/**
+ * The application canvas. This sheet is the *page* sheet of the standalone
+ * application, so owning `body` is correct here; the host compile neutralizes
+ * these document-level rules by wrapping the whole sheet in a cascade layer
+ * (`packages/client/tsdown.client.ts`, `embedAppStylesheetInLayer`), which is
+ * the "neutralized when compiled for embedding" branch of §7.3. Feature sheets
+ * under `packages/<package>/src` must not repeat them.
+ */
 body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #F2F2F7;
-}
-
-html.dark body {
-  background-color: #000000;
+  background-color: var(--sdk-color-surface-canvas);
+  /* Measured gap: without this the page inherits the UA default (`black`), so
+     every element that does not name a text token — a bare tab label, a
+     divider's sibling, an icon wrapper — stayed black in dark mode. Naming the
+     ink role here is what makes the default itself mode-aware. */
+  color: var(--sdk-color-text-primary);
 }
 
 html.sdkwork-appstore-auth-active,
@@ -173,6 +441,11 @@ html.light-mode .sdkwork-appstore-auth-shell {
   position: relative;
 }
 
+/* These two win against the sdkwork-iam auth surface's own sheet, which is
+   compiled from the `@source` rows above and lands in the same
+   `utilities` layer. The ownership fix (order the IAM sheet so no `!important`
+   is needed) is tracked in the conformance matrix as an open F8 item rather
+   than being forced here. */
 .sdkwork-appstore-auth-shell .sdkwork-iam-auth-routes {
   background: transparent !important;
   height: 100%;

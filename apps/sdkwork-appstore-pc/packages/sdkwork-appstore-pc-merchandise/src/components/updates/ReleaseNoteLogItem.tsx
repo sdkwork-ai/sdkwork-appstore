@@ -12,10 +12,10 @@ export const ReleaseNoteLogItem: React.FC<ReleaseNoteLogItemProps> = ({
 }) => {
   return (
     <div className="flex items-start gap-3">
-      <CheckCircle2 className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />
+      <CheckCircle2 className="w-4 h-4 text-store-success mt-0.5 shrink-0" />
       <div>
-        <h4 className="text-xs font-bold text-gray-900 dark:text-gray-100">{title}</h4>
-        <p className="text-[11px] text-gray-500 dark:text-gray-400">{description}</p>
+        <h4 className="text-xs font-bold text-store-ink ">{title}</h4>
+        <p className="text-[11px] text-store-ink-faint ">{description}</p>
       </div>
     </div>
   );

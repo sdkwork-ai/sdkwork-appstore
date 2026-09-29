@@ -28,14 +28,14 @@ export function InstallModal({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+        className="absolute inset-0 bg-store-overlay backdrop-blur-sm"
         onClick={onCancel}
       />
       <motion.div
         initial={{ scale: 0.95, opacity: 0, y: 20 }}
         animate={{ scale: 1, opacity: 1, y: 0 }}
         exit={{ scale: 0.95, opacity: 0, y: 20 }}
-        className="relative bg-white dark:bg-[#1C1C1E] rounded-3xl w-full max-w-sm p-6 shadow-2xl overflow-hidden border border-gray-100 dark:border-[#2C2C2E]"
+        className="relative bg-store-surface rounded-store-modal w-full max-w-sm p-6 shadow-2xl overflow-hidden border border-store-line-soft "
       >
         <div className="flex flex-col items-center text-center">
           <div
@@ -43,11 +43,11 @@ export function InstallModal({
           >
             <DynamicIcon name={app.icon} className="text-white w-10 h-10" />
           </div>
-          <h3 className="text-xl font-bold text-[#1C1C1E] dark:text-[#F5F5F5]">{app.name}</h3>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 mb-6">{app.developer}</p>
+          <h3 className="text-xl font-bold text-store-ink ">{app.name}</h3>
+          <p className="text-sm text-store-ink-faint mt-1 mb-6 ">{app.developer}</p>
 
           {error && (
-            <p className="text-sm text-red-500 dark:text-red-400 mb-4" role="alert">
+            <p className="text-sm text-store-danger mb-4 " role="alert">
               {error}
             </p>
           )}

@@ -50,53 +50,53 @@ export default function PublisherCreateApp() {
     <div className="p-6 md:p-8 w-full max-w-2xl transition-colors duration-200 select-none space-y-6">
       <Link
         to="/publisher"
-        className="inline-flex items-center gap-1.5 text-xs font-bold text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+        className="inline-flex items-center gap-1.5 text-xs font-bold text-store-ink-faint hover:text-store-brand transition-colors  "
       >
         <ArrowLeft className="w-3.5 h-3.5" />
         {t('publisher.createApp.back')}
       </Link>
 
       <div>
-        <h1 className="text-xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
+        <h1 className="text-xl font-bold tracking-tight text-store-ink ">
           {t('publisher.createApp.title')}
         </h1>
-        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+        <p className="text-xs text-store-ink-faint mt-1 ">
           {t('publisher.createApp.subtitle')}
         </p>
       </div>
 
-      <div className="rounded-3xl p-6 bg-gray-100/60 dark:bg-[#181a20] border border-gray-200 dark:border-[#22252e] space-y-4">
+      <div className="rounded-store-card p-6 bg-store-subtle/60 dark:bg-store-surface border border-store-line space-y-4 ">
         <div>
-          <label className="block text-[11px] font-bold text-gray-600 dark:text-gray-300 mb-1.5">
+          <label className="block text-[11px] font-bold text-store-ink-soft mb-1.5 ">
             {t('publisher.createApp.name')} *
           </label>
           <input
             value={form.name}
             onChange={(event) => setForm((prev) => ({ ...prev, name: event.target.value }))}
             placeholder={t('publisher.createApp.name')}
-            className="w-full px-3 py-2 rounded-xl bg-white dark:bg-[#20222a] border border-gray-200 dark:border-gray-800 text-xs text-gray-900 dark:text-gray-100 placeholder-gray-400 outline-none focus:border-blue-500 transition-colors"
+            className="w-full px-3 rounded-store-control bg-store-field border border-store-line text-sm text-store-ink placeholder:text-store-ink-faint outline-none focus:border-store-brand transition-colors h-9 focus:ring-2 focus:ring-store-brand/25"
           />
         </div>
         <div>
-          <label className="block text-[11px] font-bold text-gray-600 dark:text-gray-300 mb-1.5">
+          <label className="block text-[11px] font-bold text-store-ink-soft mb-1.5 ">
             {t('publisher.createApp.subtitleLabel')}
           </label>
           <input
             value={form.subtitle}
             onChange={(event) => setForm((prev) => ({ ...prev, subtitle: event.target.value }))}
             placeholder={t('publisher.createApp.subtitleLabel')}
-            className="w-full px-3 py-2 rounded-xl bg-white dark:bg-[#20222a] border border-gray-200 dark:border-gray-800 text-xs text-gray-900 dark:text-gray-100 placeholder-gray-400 outline-none focus:border-blue-500 transition-colors"
+            className="w-full px-3 rounded-store-control bg-store-field border border-store-line text-sm text-store-ink placeholder:text-store-ink-faint outline-none focus:border-store-brand transition-colors h-9 focus:ring-2 focus:ring-store-brand/25"
           />
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-[11px] font-bold text-gray-600 dark:text-gray-300 mb-1.5">
+            <label className="block text-[11px] font-bold text-store-ink-soft mb-1.5 ">
               {t('publisher.createApp.category')}
             </label>
             <select
               value={form.category}
               onChange={(event) => setForm((prev) => ({ ...prev, category: event.target.value }))}
-              className="w-full px-3 py-2 rounded-xl bg-white dark:bg-[#20222a] border border-gray-200 dark:border-gray-800 text-xs text-gray-900 dark:text-gray-100 outline-none focus:border-blue-500 transition-colors"
+              className="w-full px-3 rounded-store-control bg-store-field border border-store-line text-sm text-store-ink outline-none focus:border-store-brand transition-colors h-9 placeholder:text-store-ink-faint focus:ring-2 focus:ring-store-brand/25"
             >
               {categories.map((category) => (
                 <option key={category.id} value={category.name}>
@@ -106,13 +106,13 @@ export default function PublisherCreateApp() {
             </select>
           </div>
           <div>
-            <label className="block text-[11px] font-bold text-gray-600 dark:text-gray-300 mb-1.5">
+            <label className="block text-[11px] font-bold text-store-ink-soft mb-1.5 ">
               {t('publisher.createApp.pricing')}
             </label>
             <select
               value={form.pricing}
               onChange={(event) => setForm((prev) => ({ ...prev, pricing: event.target.value }))}
-              className="w-full px-3 py-2 rounded-xl bg-white dark:bg-[#20222a] border border-gray-200 dark:border-gray-800 text-xs text-gray-900 dark:text-gray-100 outline-none focus:border-blue-500 transition-colors"
+              className="w-full px-3 rounded-store-control bg-store-field border border-store-line text-sm text-store-ink outline-none focus:border-store-brand transition-colors h-9 placeholder:text-store-ink-faint focus:ring-2 focus:ring-store-brand/25"
             >
               <option value="FREE">{t('publisher.createApp.pricingFree')}</option>
               <option value="PAID">{t('publisher.createApp.pricingPaid')}</option>
@@ -120,19 +120,19 @@ export default function PublisherCreateApp() {
           </div>
         </div>
         <div>
-          <label className="block text-[11px] font-bold text-gray-600 dark:text-gray-300 mb-1.5">
+          <label className="block text-[11px] font-bold text-store-ink-soft mb-1.5 ">
             {t('publisher.createApp.keywords')}
           </label>
           <input
             value={form.keywords}
             onChange={(event) => setForm((prev) => ({ ...prev, keywords: event.target.value }))}
             placeholder={t('publisher.createApp.keywords')}
-            className="w-full px-3 py-2 rounded-xl bg-white dark:bg-[#20222a] border border-gray-200 dark:border-gray-800 text-xs text-gray-900 dark:text-gray-100 placeholder-gray-400 outline-none focus:border-blue-500 transition-colors"
+            className="w-full px-3 rounded-store-control bg-store-field border border-store-line text-sm text-store-ink placeholder:text-store-ink-faint outline-none focus:border-store-brand transition-colors h-9 focus:ring-2 focus:ring-store-brand/25"
           />
         </div>
 
         {error && (
-          <div className="px-4 py-3 rounded-2xl bg-red-500/10 text-red-600 dark:text-red-400 text-xs font-bold">
+          <div className="px-4 py-3 rounded-store-card bg-store-danger/10 text-store-danger text-xs font-bold ">
             {t('publisher.manage.error.loadFailed')}
           </div>
         )}
@@ -140,7 +140,7 @@ export default function PublisherCreateApp() {
         <button
           onClick={handleSubmit}
           disabled={submitting || !form.name.trim()}
-          className="px-5 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white rounded-full text-xs font-bold transition-colors cursor-pointer"
+          className="px-5 py-2 bg-store-brand hover:bg-store-brand disabled:opacity-50 text-white rounded-full text-xs font-medium transition-colors cursor-pointer"
         >
           {submitting ? t('publisher.createApp.submitting') : t('publisher.createApp.submit')}
         </button>

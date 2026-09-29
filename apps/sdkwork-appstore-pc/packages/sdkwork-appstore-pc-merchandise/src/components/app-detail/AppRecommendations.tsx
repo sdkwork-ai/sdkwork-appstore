@@ -89,21 +89,21 @@ export function AppRecommendations({ currentApp, allApps, similarApps = [] }: Ap
   if (recommendedApps.length === 0) return null;
 
   return (
-    <div className="pt-8 border-t border-gray-200 dark:border-[#2C2C2E] mt-10 space-y-4">
+    <div className="pt-8 border-t border-store-line mt-10 space-y-4 ">
       {/* 推荐组件 Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <div className={`p-2 rounded-xl text-white ${isBoardGame ? 'bg-amber-500' : 'bg-blue-600'}`}>
+          <div className={`p-2 rounded-store-control text-white ${isBoardGame ? 'bg-store-warning' : 'bg-store-brand'}`}>
             {isBoardGame ? <Club className="w-5 h-5" /> : <Sparkles className="w-5 h-5" />}
           </div>
           <div>
-            <h3 className="text-lg md:text-xl font-bold text-[#1C1C1E] dark:text-[#F5F5F5] flex items-center gap-2">
+            <h3 className="text-lg md:text-xl font-bold text-store-ink flex items-center gap-2 ">
               <span>{isBoardGame ? t('appDetail.recommendations.boardGameTitle') : t('appDetail.recommendations.similarTitle')}</span>
-              <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 font-bold">
+              <span className="text-xs px-2.5 py-0.5 rounded-full bg-store-warning/10 text-store-warning border border-store-warning/20 font-medium ">
                 {t('appDetail.recommendations.badge')}
               </span>
             </h3>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+            <p className="text-xs text-store-ink-faint mt-0.5 ">
               {isBoardGame
                 ? t('appDetail.recommendations.boardGameSubtitle', { name: currentApp.name })
                 : t('appDetail.recommendations.similarSubtitle', { name: currentApp.name })}
@@ -114,7 +114,7 @@ export function AppRecommendations({ currentApp, allApps, similarApps = [] }: Ap
         {isBoardGame && (
           <button
             onClick={() => navigate('/games')}
-            className="text-xs font-bold text-amber-600 dark:text-amber-400 hover:underline flex items-center gap-0.5 cursor-pointer"
+            className="text-xs font-bold text-store-warning hover:underline flex items-center gap-0.5 cursor-pointer "
           >
             <span>{t('appDetail.recommendations.hall')}</span>
             <ChevronRight className="w-3.5 h-3.5" />

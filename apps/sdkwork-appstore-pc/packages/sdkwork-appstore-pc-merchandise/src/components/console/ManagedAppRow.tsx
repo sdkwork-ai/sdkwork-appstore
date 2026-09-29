@@ -17,18 +17,18 @@ export const ManagedAppRow: React.FC<ManagedAppRowProps> = ({ app }) => {
   };
 
   return (
-    <div className="flex items-center justify-between p-3.5 bg-white dark:bg-[#20232b] rounded-xl border border-gray-200/60 dark:border-[#2b2f3a] hover:border-gray-300 dark:hover:border-[#3a3f4e] transition-colors">
+    <div className="flex items-center justify-between p-3.5 bg-store-surface rounded-store-control border border-store-line/60 dark:border-store-line hover:border-store-line-strong transition-colors ">
       <div>
-        <h3 className="font-bold text-xs text-gray-900 dark:text-gray-100">{app.name}</h3>
-        <p className="text-[11px] text-gray-400 mt-0.5">
+        <h3 className="font-bold text-xs text-store-ink ">{app.name}</h3>
+        <p className="text-[11px] text-store-ink-faint mt-0.5">
           {t('console.managed.version', '版本')} v{app.version} • {t('console.managed.downloads', '下载量')} {app.downloads}
         </p>
       </div>
       <span
-        className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${
+        className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${
           isLive
-            ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20'
-            : 'bg-amber-500/10 text-amber-500 border border-amber-500/20'
+            ? 'bg-store-success/10 text-store-success border border-store-success/20'
+            : 'bg-store-warning/10 text-store-warning border border-store-warning/20'
         }`}
       >
         {formatStatus(app.status)}

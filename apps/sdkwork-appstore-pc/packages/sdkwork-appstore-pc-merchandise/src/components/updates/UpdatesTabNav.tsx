@@ -20,13 +20,13 @@ export const UpdatesTabNav: React.FC<UpdatesTabNavProps> = ({
   const { t } = useTranslation();
 
   return (
-    <div className="flex items-center gap-2 border-b border-gray-200 dark:border-[#22252e] pb-3">
+    <div className="flex items-center gap-2 border-b border-store-line pb-3 ">
       <button
         onClick={() => onSelectTab('downloads')}
-        className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all relative cursor-pointer ${
+        className={`flex items-center gap-2 px-4 py-2 rounded-store-control text-xs font-medium transition-all relative cursor-pointer ${
           currentTab === 'downloads'
-            ? 'bg-blue-600 text-white shadow-sm'
-            : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200/60 dark:hover:bg-[#20232c]'
+            ? 'bg-store-brand text-white shadow-sm'
+            : 'text-store-ink-soft hover:bg-store-raised/60 dark:hover:bg-store-surface '
         }`}
       >
         <Download className="w-4 h-4" />
@@ -34,7 +34,7 @@ export const UpdatesTabNav: React.FC<UpdatesTabNavProps> = ({
         {pendingUpdatesCount > 0 && (
           <span
             className={`px-1.5 py-0.2 text-[10px] rounded-full font-bold ${
-              currentTab === 'downloads' ? 'bg-white text-blue-600' : 'bg-blue-600 text-white'
+              currentTab === 'downloads' ? 'bg-store-surface text-store-brand' : 'bg-store-brand text-white'
             }`}
           >
             {pendingUpdatesCount}
@@ -44,10 +44,10 @@ export const UpdatesTabNav: React.FC<UpdatesTabNavProps> = ({
 
       <button
         onClick={() => onSelectTab('library')}
-        className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+        className={`flex items-center gap-2 px-4 py-2 rounded-store-control text-xs font-medium transition-all cursor-pointer ${
           currentTab === 'library'
-            ? 'bg-blue-600 text-white shadow-sm'
-            : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200/60 dark:hover:bg-[#20232c]'
+            ? 'bg-store-brand text-white shadow-sm'
+            : 'text-store-ink-soft hover:bg-store-raised/60 dark:hover:bg-store-surface '
         }`}
       >
         <FolderHeart className="w-4 h-4" />
@@ -55,8 +55,8 @@ export const UpdatesTabNav: React.FC<UpdatesTabNavProps> = ({
         <span
           className={`px-1.5 py-0.2 text-[10px] rounded-full font-bold ${
             currentTab === 'library'
-              ? 'bg-white text-blue-600'
-              : 'bg-gray-200 dark:bg-[#2c303c] text-gray-700 dark:text-gray-300'
+              ? 'bg-store-surface text-store-brand'
+              : 'bg-store-raised text-store-ink-soft '
           }`}
         >
           {installedAppsCount}
@@ -65,10 +65,10 @@ export const UpdatesTabNav: React.FC<UpdatesTabNavProps> = ({
 
       <button
         onClick={() => onSelectTab('new')}
-        className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+        className={`flex items-center gap-2 px-4 py-2 rounded-store-control text-xs font-medium transition-all cursor-pointer ${
           currentTab === 'new'
-            ? 'bg-blue-600 text-white shadow-sm'
-            : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200/60 dark:hover:bg-[#20232c]'
+            ? 'bg-store-brand text-white shadow-sm'
+            : 'text-store-ink-soft hover:bg-store-raised/60 dark:hover:bg-store-surface '
         }`}
       >
         <Sparkle className="w-4 h-4" />

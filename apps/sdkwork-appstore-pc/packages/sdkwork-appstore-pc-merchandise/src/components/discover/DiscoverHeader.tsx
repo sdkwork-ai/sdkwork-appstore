@@ -16,10 +16,10 @@ export function DiscoverHeader({ dateString }: DiscoverHeaderProps) {
 
   return (
     <header>
-      <h1 className="text-3xl font-extrabold tracking-tight mb-1 text-[#1C1C1E] dark:text-[#F5F5F5]">
+      <h1 className="text-3xl font-extrabold tracking-tight mb-1 text-store-ink ">
         {t('discover.header.title')}
       </h1>
-      <p className="text-gray-500 dark:text-gray-400 text-sm font-medium">
+      <p className="text-store-ink-faint text-sm font-medium ">
         {formattedDate}
       </p>
     </header>

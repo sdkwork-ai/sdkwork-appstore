@@ -49,21 +49,21 @@ export const TemplateModalFooter: React.FC<TemplateModalFooterProps> = ({
   };
 
   return (
-    <div className="mt-6 pt-4 border-t border-gray-100 dark:border-[#262933] flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+    <div className="mt-6 pt-4 border-t border-store-line-soft flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 ">
       <div className="flex items-center gap-3 text-xs font-medium">
         <button
           onClick={handleStar}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border transition-all cursor-pointer ${
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-store-control border transition-all cursor-pointer text-xs${
             starred
-              ? 'bg-amber-500/10 border-amber-500 text-amber-500 font-bold'
-              : 'border-gray-200 dark:border-[#2a2d39] text-gray-600 dark:text-gray-300 hover:border-amber-500'
+              ? 'bg-store-warning/10 border-store-warning text-store-warning font-medium'
+              : 'border-store-line text-store-ink-soft hover:border-store-warning '
           }`}
         >
           <Star className={`w-3.5 h-3.5 ${starred ? 'fill-amber-500' : ''}`} />
           <span>{stars} Stars</span>
         </button>
 
-        <span className="flex items-center gap-1 text-gray-500 dark:text-gray-400">
+        <span className="flex items-center gap-1 text-store-ink-faint ">
           <GitFork className="w-3.5 h-3.5" />
           {forks} Forks
         </span>
@@ -71,7 +71,7 @@ export const TemplateModalFooter: React.FC<TemplateModalFooterProps> = ({
 
       <div className="flex items-center gap-2">
         {successMsg && (
-          <span className="text-xs text-emerald-500 font-bold flex items-center gap-1">
+          <span className="text-xs text-store-success font-bold flex items-center gap-1">
             <Check className="w-3.5 h-3.5" />
             {successMsg}
           </span>
@@ -79,18 +79,18 @@ export const TemplateModalFooter: React.FC<TemplateModalFooterProps> = ({
 
         <button
           onClick={handleGoToAppDetail}
-          className="px-4 py-2.5 rounded-xl bg-slate-900 dark:bg-slate-800 hover:bg-slate-800 dark:hover:bg-slate-700 text-white text-xs font-bold border border-slate-700/60 shadow-sm transition-all flex items-center justify-center gap-1.5 cursor-pointer group"
+          className="px-4 py-2.5 rounded-store-control bg-slate-900 dark:bg-slate-800 hover:bg-slate-800 dark:hover:bg-slate-700 text-white text-xs font-medium border border-store-line/60 shadow-sm transition-all flex items-center justify-center gap-1.5 cursor-pointer group"
           title={t('templates.modal.goToAppDetail')}
         >
-          <LayoutGrid className="w-3.5 h-3.5 text-indigo-400" />
+          <LayoutGrid className="w-3.5 h-3.5 text-store-brand" />
           <span>{t('templates.modal.goToAppDetail')}</span>
-          <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:translate-x-0.5 transition-transform" />
+          <ArrowRight className="w-3.5 h-3.5 text-store-ink-faint group-hover:translate-x-0.5 transition-transform" />
         </button>
 
         <button
           onClick={handleFork}
           disabled={creating || forked}
-          className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-md transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
+          className="px-5 py-2.5 rounded-store-control bg-store-brand hover:bg-store-brand text-white text-xs font-medium shadow-md transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
         >
           {creating ? (
             <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />

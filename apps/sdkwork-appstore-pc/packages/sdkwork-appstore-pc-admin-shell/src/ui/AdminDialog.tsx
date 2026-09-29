@@ -54,7 +54,7 @@ export function AdminDialog({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 p-4 sm:items-center"
+      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-store-overlay p-4 sm:items-center"
       role="presentation"
       onClick={onClose}
     >
@@ -62,28 +62,28 @@ export function AdminDialog({
         role="dialog"
         aria-modal="true"
         aria-label={title}
-        className={`w-full ${SIZE_CLASSES[size]} rounded-2xl border border-gray-200 bg-white shadow-xl dark:border-[#22252e] dark:bg-[#14161c]`}
+        className={`w-full ${SIZE_CLASSES[size]} rounded-store-modal border border-store-line bg-store-surface shadow-xl`}
         onClick={(event) => event.stopPropagation()}
       >
-        <header className="flex items-start justify-between gap-3 border-b border-gray-100 px-4 py-3 dark:border-[#1f232c]">
+        <header className="flex items-start justify-between gap-3 border-b border-store-line-soft px-4 py-3 ">
           <div className="min-w-0">
-            <h2 className="text-sm font-semibold text-gray-900 dark:text-gray-50">{title}</h2>
+            <h2 className="text-sm font-semibold text-store-ink ">{title}</h2>
             {description ? (
-              <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">{description}</p>
+              <p className="mt-0.5 text-xs text-store-ink-faint ">{description}</p>
             ) : null}
           </div>
           <button
             type="button"
             onClick={onClose}
             aria-label={t('adminShell.common.close')}
-            className="rounded-lg p-1 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-[#1d2028]"
+            className="rounded-store-control p-1 text-store-ink-faint transition-colors hover:bg-store-subtle hover:text-store-ink-soft text-xs font-medium"
           >
             <X className="h-4 w-4" />
           </button>
         </header>
         <div className="max-h-[70vh] overflow-y-auto px-4 py-4">{children}</div>
         {footer ? (
-          <footer className="flex items-center justify-end gap-2 border-t border-gray-100 px-4 py-3 dark:border-[#1f232c]">
+          <footer className="flex items-center justify-end gap-2 border-t border-store-line-soft px-4 py-3 ">
             {footer}
           </footer>
         ) : null}

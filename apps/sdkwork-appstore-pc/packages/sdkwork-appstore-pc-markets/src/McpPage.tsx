@@ -102,21 +102,21 @@ export function McpPage() {
         </div>
         <button
           onClick={() => setIsAddOpen(true)}
-          className="px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded-2xl text-xs font-bold transition-all shadow-sm shrink-0 flex items-center justify-center gap-1.5 cursor-pointer"
+          className="px-4 py-2 bg-store-info hover:bg-store-info-hover text-white rounded-store-control text-xs font-medium transition-all shadow-sm shrink-0 flex items-center justify-center gap-1.5 cursor-pointer"
         >
           <Plus className="w-4 h-4" />
           <span>{t('mcp.header.deployBtn')}</span>
         </button>
       </div>
       {actionError && (
-        <p role="alert" className="text-xs text-cyan-700 dark:text-cyan-300">
+        <p role="alert" className="text-xs text-store-info ">
           {actionError}
         </p>
       )}
 
       {/* MCP Grid — container-query driven, up to 4 columns on wide screens */}
       {loading ? (
-        <div className="py-20 text-center text-xs text-gray-400">{t('mcp.loading')}</div>
+        <div className="py-20 text-center text-xs text-store-ink-faint">{t('mcp.loading')}</div>
       ) : (
         <CardGrid>
           {servers.map((server) => (

@@ -14,7 +14,7 @@ interface MobileNavProps {
 
 export function MobileNav({ tabs }: MobileNavProps) {
   return (
-    <nav className="md:hidden fixed bottom-0 w-full bg-[#F2F2F7]/90 dark:bg-[#1C1C1E]/90 backdrop-blur-md border-t border-gray-200 dark:border-[#2C2C2E] z-50 pb-safe">
+    <nav className="md:hidden fixed bottom-0 w-full bg-store-raised/90 backdrop-blur-md border-t border-store-line z-50 pb-safe ">
       <ul className="flex justify-around items-center h-16 px-4">
         {tabs.map((tab) => (
           <li key={tab.name}>
@@ -24,7 +24,7 @@ export function MobileNav({ tabs }: MobileNavProps) {
               className={({ isActive }) =>
                 cn(
                   "flex flex-col items-center justify-center w-16 gap-1 text-[10px] font-medium transition-colors",
-                  isActive ? "text-blue-600 dark:text-[#0A84FF]" : "text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200"
+                  isActive ? "text-store-brand " : "text-store-ink-faint hover:text-store-ink  "
                 )
               }
             >

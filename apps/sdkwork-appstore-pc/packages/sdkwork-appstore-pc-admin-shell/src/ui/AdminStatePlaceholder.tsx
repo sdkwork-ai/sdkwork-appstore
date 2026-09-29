@@ -51,12 +51,12 @@ export function AdminStatePlaceholder({
     <div
       className={`flex flex-col items-center justify-center rounded-2xl border border-dashed text-center ${
         inline ? 'gap-1 px-4 py-8' : 'gap-2 px-6 py-16'
-      } border-gray-300 dark:border-[#2a2e3a]`}
+      } border-store-line`}
       role={kind === 'loading' ? undefined : 'status'}
     >
-      <span className="text-gray-400 dark:text-gray-500">{resolved.icon}</span>
-      <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-100">{resolved.title}</h3>
-      <p className="max-w-md text-xs leading-5 text-gray-500 dark:text-gray-400">
+      <span className="text-store-ink-faint ">{resolved.icon}</span>
+      <h3 className="text-sm font-semibold text-store-ink ">{resolved.title}</h3>
+      <p className="max-w-md text-xs leading-5 text-store-ink-faint ">
         {resolved.description}
       </p>
       {children}
@@ -64,7 +64,7 @@ export function AdminStatePlaceholder({
         <button
           type="button"
           onClick={onRetry}
-          className="mt-2 rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-100 dark:border-[#2f3442] dark:text-gray-200 dark:hover:bg-[#1d2028]"
+          className="mt-2 rounded-store-control border border-store-line-strong px-3 py-1.5 text-xs font-medium text-store-ink-soft transition-colors hover:bg-store-subtle "
         >
           {t('adminShell.state.retry')}
         </button>
@@ -163,11 +163,11 @@ function AdminErrorDiagnostics({ error }: { error: AppstoreAdminServiceError }) 
     return null;
   }
   return (
-    <dl className="mt-3 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 font-mono text-[11px] text-gray-400 dark:text-gray-500">
+    <dl className="mt-3 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 font-mono text-[11px] text-store-ink-faint ">
       {entries.map((entry) => (
         <div key={`${entry.label}:${entry.value}`} className="flex items-center gap-1">
           <dt>{entry.label}</dt>
-          <dd className="text-gray-500 dark:text-gray-400">{entry.value}</dd>
+          <dd className="text-store-ink-faint ">{entry.value}</dd>
         </div>
       ))}
     </dl>

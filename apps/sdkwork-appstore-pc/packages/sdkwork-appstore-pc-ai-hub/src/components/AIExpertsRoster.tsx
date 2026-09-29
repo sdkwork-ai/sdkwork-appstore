@@ -99,19 +99,19 @@ export const AIExpertsRoster: React.FC<AIExpertsRosterProps> = ({
           <h3 className="text-xl font-bold text-slate-100 flex items-center gap-2">
             <span>{t('aihub.experts.rosterTitle')}</span>
           </h3>
-          <span className="text-xs px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-400 font-medium">
+          <span className="text-xs px-2.5 py-0.5 rounded-full bg-slate-800 text-store-ink-faint font-medium">
             {t('aihub.experts.rosterCount', { count: filteredExperts.length })}
           </span>
         </div>
 
-        <div className="flex items-center gap-1.5 bg-slate-900/90 p-1 rounded-xl border border-slate-800 shrink-0">
+        <div className="flex items-center gap-1.5 bg-slate-900/90 p-1 rounded-store-control border border-store-line shrink-0">
           <button
             type="button"
             onClick={() => setSortType('comprehensive')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+            className={`px-3 py-1.5 rounded-store-control text-xs font-medium transition-all ${
               sortType === 'comprehensive'
-                ? 'bg-indigo-600 text-white shadow-sm'
-                : 'text-slate-400 hover:text-slate-200'
+                ? 'bg-store-brand text-white shadow-sm'
+                : 'text-store-ink-faint hover:text-slate-200'
             }`}
           >
             {t('aihub.experts.sort.comprehensive')}
@@ -119,10 +119,10 @@ export const AIExpertsRoster: React.FC<AIExpertsRosterProps> = ({
           <button
             type="button"
             onClick={() => setSortType('hottest')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+            className={`px-3 py-1.5 rounded-store-control text-xs font-medium transition-all ${
               sortType === 'hottest'
-                ? 'bg-indigo-600 text-white shadow-sm'
-                : 'text-slate-400 hover:text-slate-200'
+                ? 'bg-store-brand text-white shadow-sm'
+                : 'text-store-ink-faint hover:text-slate-200'
             }`}
           >
             {t('aihub.experts.sort.hottest')}
@@ -130,10 +130,10 @@ export const AIExpertsRoster: React.FC<AIExpertsRosterProps> = ({
           <button
             type="button"
             onClick={() => setSortType('newest')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+            className={`px-3 py-1.5 rounded-store-control text-xs font-medium transition-all ${
               sortType === 'newest'
-                ? 'bg-indigo-600 text-white shadow-sm'
-                : 'text-slate-400 hover:text-slate-200'
+                ? 'bg-store-brand text-white shadow-sm'
+                : 'text-store-ink-faint hover:text-slate-200'
             }`}
           >
             {t('aihub.experts.sort.newest')}
@@ -141,7 +141,7 @@ export const AIExpertsRoster: React.FC<AIExpertsRosterProps> = ({
         </div>
       </div>
 
-      <div className="flex items-center gap-1.5 overflow-x-auto pb-2 scrollbar-none text-xs font-medium border-b border-slate-800/80">
+      <div className="flex items-center gap-1.5 overflow-x-auto pb-2 scrollbar-none text-xs font-medium border-b border-store-line/80">
         {FILTER_TAG_KEYS.map(({ value, key }) => {
           const active = selectedTag === value;
           return (
@@ -149,10 +149,10 @@ export const AIExpertsRoster: React.FC<AIExpertsRosterProps> = ({
               key={value}
               type="button"
               onClick={() => setSelectedTag(value)}
-              className={`px-3 py-1.5 rounded-xl whitespace-nowrap transition-all border shrink-0 ${
+              className={`px-3 py-1.5 rounded-store-control whitespace-nowrap transition-all border shrink-0 text-xs${
                 active
-                  ? 'bg-slate-100 text-slate-900 border-white font-bold shadow-sm'
-                  : 'bg-slate-900/80 text-slate-400 border-slate-800 hover:bg-slate-800 hover:text-slate-200'
+                  ? 'bg-store-subtle text-store-ink border-white font-medium shadow-sm'
+                  : 'bg-slate-900/80 text-store-ink-faint border-store-line hover:bg-slate-800 hover:text-slate-200'
               }`}
             >
               {t(key)}
@@ -162,14 +162,14 @@ export const AIExpertsRoster: React.FC<AIExpertsRosterProps> = ({
       </div>
 
       {filteredExperts.length === 0 ? (
-        <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-10 text-center space-y-3">
-          <p className="text-slate-400 text-sm">{t('common.noData')}</p>
+        <div className="bg-slate-900/60 border border-store-line rounded-store-card p-10 text-center space-y-3">
+          <p className="text-store-ink-faint text-sm">{t('common.noData')}</p>
           <button
             type="button"
             onClick={() => {
               setSelectedTag(ALL_TAG_VALUE);
             }}
-            className="text-xs text-indigo-400 hover:underline"
+            className="text-xs text-store-brand hover:underline"
           >
             {t('aihub.experts.resetFilters')}
           </button>

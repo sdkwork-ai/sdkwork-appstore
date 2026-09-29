@@ -11,14 +11,14 @@ interface CollectionGridSectionProps {
 
 export function CollectionGridSection({ title, categoryQuery, apps }: CollectionGridSectionProps) {
   return (
-    <div className="flex flex-col bg-white dark:bg-[#181a20] border border-gray-200 dark:border-gray-800/80 rounded-2xl p-4 transition-all shadow-sm">
+    <div className="flex flex-col bg-store-surface border border-store-line dark:border-store-line/80 rounded-store-card p-4 transition-all shadow-sm ">
       <div className="flex items-center justify-between mb-3.5">
         <Link 
           to={`/search?category=${encodeURIComponent(categoryQuery)}`} 
-          className="flex items-center gap-1.5 group text-sm font-bold text-gray-900 dark:text-gray-100 hover:text-blue-500 transition-colors"
+          className="flex items-center gap-1.5 group text-sm font-bold text-store-ink hover:text-store-brand transition-colors "
         >
           <span>{title}</span>
-          <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-blue-500 transition-colors" />
+          <ChevronRight className="w-4 h-4 text-store-ink-faint group-hover:text-store-brand transition-colors" />
         </Link>
       </div>
 

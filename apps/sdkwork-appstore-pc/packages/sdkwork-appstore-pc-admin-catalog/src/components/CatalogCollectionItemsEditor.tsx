@@ -182,7 +182,7 @@ export function CatalogCollectionItemsEditor() {
 
         <div className="flex flex-wrap items-center justify-end gap-3">
           {rows.length === 0 ? (
-            <p className="text-[11px] text-gray-400 dark:text-gray-500">
+            <p className="text-[11px] text-store-ink-faint ">
               {t('adminCatalog.collections.items.emptySubmitHint')}
             </p>
           ) : null}

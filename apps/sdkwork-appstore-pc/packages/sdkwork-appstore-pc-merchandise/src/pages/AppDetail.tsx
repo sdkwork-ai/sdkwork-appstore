@@ -73,10 +73,10 @@ export default function AppDetail() {
   if (!app) {
     return (
       <div className="p-8 text-center flex flex-col items-center justify-center h-full flex-1">
-        <h2 className="text-2xl font-bold mb-4 text-[#1C1C1E] dark:text-[#F5F5F5]">{t('appDetail.notFound')}</h2>
+        <h2 className="text-2xl font-bold mb-4 text-store-ink ">{t('appDetail.notFound')}</h2>
         <button 
           onClick={() => navigate(-1)}
-          className="text-blue-600 dark:text-[#0A84FF] font-medium hover:underline cursor-pointer"
+          className="text-store-brand font-medium hover:underline cursor-pointer "
         >
           {t('appDetail.goBack')}
         </button>

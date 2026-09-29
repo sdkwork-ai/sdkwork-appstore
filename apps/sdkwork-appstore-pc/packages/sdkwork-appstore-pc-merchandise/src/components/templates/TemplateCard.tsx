@@ -29,7 +29,7 @@ export const TemplateCard: React.FC<TemplateCardProps> = ({ template, onSelect }
   return (
     <div
       onClick={handleGoToTemplateDetail}
-      className="group bg-white dark:bg-[#191b22] border border-gray-200/80 dark:border-[#262933] hover:border-indigo-500/50 dark:hover:border-indigo-500/50 p-4 rounded-2xl cursor-pointer transition-all duration-200 hover:shadow-xl flex flex-col justify-between"
+      className="group bg-store-surface border border-store-line/80 dark:border-store-line hover:border-store-brand/50 p-4 rounded-store-card cursor-pointer transition-all duration-200 hover:shadow-xl flex flex-col justify-between "
     >
       <div>
         {/* Subcomponent: Card Header */}
@@ -45,7 +45,7 @@ export const TemplateCard: React.FC<TemplateCardProps> = ({ template, onSelect }
           isOfficial={template.isOfficial}
         />
 
-        <p className="text-xs text-gray-600 dark:text-gray-300 mt-2 line-clamp-2 leading-relaxed">
+        <p className="text-xs text-store-ink-soft mt-2 line-clamp-2 leading-relaxed ">
           {template.description}
         </p>
 

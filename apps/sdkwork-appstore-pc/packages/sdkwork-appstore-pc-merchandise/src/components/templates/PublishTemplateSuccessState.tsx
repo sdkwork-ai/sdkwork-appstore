@@ -7,9 +7,9 @@ export const PublishTemplateSuccessState: React.FC = () => {
 
   return (
     <div className="py-12 text-center space-y-3">
-      <CheckCircle2 className="w-12 h-12 text-emerald-500 mx-auto animate-bounce" />
+      <CheckCircle2 className="w-12 h-12 text-store-success mx-auto animate-bounce" />
       <h3 className="text-lg font-bold">{t('templates.success.title')}</h3>
-      <p className="text-xs text-gray-400">{t('templates.success.subtitle')}</p>
+      <p className="text-xs text-store-ink-faint">{t('templates.success.subtitle')}</p>
     </div>
   );
 };

@@ -57,14 +57,14 @@ export const FeaturedScenariosSection: React.FC<FeaturedScenariosSectionProps> =
     <div className="space-y-3.5">
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-bold text-slate-100 flex items-center gap-2">
-          <Sparkles className="w-4 h-4 text-amber-400" />
+          <Sparkles className="w-4 h-4 text-store-warning" />
           <span>{t('aihub.experts.featuredScenarios')}</span>
         </h3>
         {selectedScenario && (
           <button
             type="button"
             onClick={() => onSelectScenario(null)}
-            className="text-xs text-indigo-400 hover:text-indigo-300 font-medium transition-colors"
+            className="text-xs text-store-brand hover:text-store-brand font-medium transition-colors"
           >
             {t('common.actions.clear')}
           </button>
@@ -82,28 +82,28 @@ export const FeaturedScenariosSection: React.FC<FeaturedScenariosSectionProps> =
             <div
               key={scen.id}
               onClick={() => onSelectScenario(isSelected ? null : scen.title)}
-              className={`group relative cursor-pointer rounded-2xl border p-4 transition-all duration-200 overflow-hidden ${
+              className={`group relative cursor-pointer rounded-store-card border p-4 transition-all duration-200 overflow-hidden ${
                 isSelected
-                  ? 'bg-slate-800/95 border-indigo-500 shadow-lg shadow-indigo-500/10 ring-1 ring-indigo-500'
-                  : 'bg-slate-900/80 hover:bg-slate-800/80 border-slate-800/80 hover:border-slate-700/80'
+                  ? 'bg-slate-800/95 border-store-brand shadow-lg shadow-store-brand/10 ring-1 ring-store-brand'
+                  : 'bg-slate-900/80 hover:bg-slate-800/80 border-store-line/80 hover:border-store-line/80'
               }`}
             >
               {/* Header of Scenario Card */}
-              <div className="flex items-center justify-between mb-3 border-b border-slate-800/60 pb-2.5">
+              <div className="flex items-center justify-between mb-3 border-b border-store-line/60 pb-2.5">
                 <div className="flex items-center gap-2.5">
-                  <div className={`p-2 rounded-xl bg-gradient-to-br ${scen.color} border border-slate-700/50 shadow-inner`}>
+                  <div className={`p-2 rounded-store-control bg-gradient-to-br ${scen.color} border border-slate-700/50 shadow-inner`}>
                     <IconComp className="w-4 h-4" />
                   </div>
                   <div>
-                    <h4 className="text-sm font-bold text-slate-100 group-hover:text-indigo-300 transition-colors">
+                    <h4 className="text-sm font-bold text-slate-100 group-hover:text-store-brand transition-colors">
                       {scenarioTitle}
                     </h4>
-                    <span className="text-[11px] text-slate-400">
+                    <span className="text-[11px] text-store-ink-faint">
                       {t('aihub.experts.scenarioExpertCount', { count: scen.expertCount })}
                     </span>
                   </div>
                 </div>
-                <ChevronRight className="w-4 h-4 text-slate-500 group-hover:text-slate-300 group-hover:translate-x-0.5 transition-all" />
+                <ChevronRight className="w-4 h-4 text-store-ink-faint group-hover:text-slate-300 group-hover:translate-x-0.5 transition-all" />
               </div>
 
               {/* List of 3 Featured Experts in this scenario */}
@@ -117,14 +117,14 @@ export const FeaturedScenariosSection: React.FC<FeaturedScenariosSectionProps> =
                         onSelectExpertByName(exp.name);
                       }
                     }}
-                    className="flex items-center gap-2 py-1 px-2 rounded-lg hover:bg-slate-800/90 transition-colors text-xs text-slate-300 hover:text-white group/item"
+                    className="flex items-center gap-2 py-0.5 px-2.5 rounded-full hover:bg-slate-800/90 transition-colors text-xs text-slate-300 hover:text-white group/item font-medium"
                   >
-                    <div className="w-5 h-5 rounded-full bg-indigo-950 border border-indigo-500/30 flex items-center justify-center text-[10px] font-bold text-indigo-300 shrink-0">
+                    <div className="w-5 h-5 rounded-full bg-store-brand border border-store-brand/30 flex items-center justify-center text-[10px] font-bold text-store-brand shrink-0">
                       {exp.name.slice(0, 1)}
                     </div>
                     <span className="truncate font-medium flex-1">{exp.name}</span>
                     {exp.nickname && (
-                      <span className="text-[10px] text-slate-500 group-hover/item:text-slate-400 truncate max-w-[80px]">
+                      <span className="text-[10px] text-store-ink-faint group-hover/item:text-store-ink-faint truncate max-w-[80px]">
                         {exp.nickname}
                       </span>
                     )}

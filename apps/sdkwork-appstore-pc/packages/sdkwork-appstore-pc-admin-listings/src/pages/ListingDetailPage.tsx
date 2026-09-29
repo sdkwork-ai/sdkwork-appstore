@@ -149,7 +149,7 @@ function ListingMetricsSection({ listingId }: { listingId: string }) {
       key: 'date',
       header: t('adminListings.metrics.columns.date'),
       render: (point) => (
-        <span className="font-mono text-[11px] text-gray-500 dark:text-gray-400">
+        <span className="font-mono text-[11px] text-store-ink-faint ">
           {point.date || t('adminShell.common.notAvailable')}
         </span>
       ),

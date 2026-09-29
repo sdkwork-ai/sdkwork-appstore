@@ -37,24 +37,24 @@ export const RegisterPluginFormFields: React.FC<RegisterPluginFormFieldsProps> =
   return (
     <form onSubmit={onSubmit} className="space-y-4 mt-4 text-xs">
       <div>
-        <label className="block text-gray-700 dark:text-gray-300 font-semibold mb-1">{t('plugins.form.nameLabel')}</label>
+        <label className="block text-store-ink-soft font-semibold mb-1 ">{t('plugins.form.nameLabel')}</label>
         <input
           type="text"
           value={newPlugName}
           onChange={(e) => onNameChange(e.target.value)}
           placeholder={t('plugins.form.namePlaceholder')}
           required
-          className="w-full px-3 py-2 bg-gray-50 dark:bg-[#20232d] border border-gray-200 dark:border-[#2a2d39] rounded-xl text-gray-900 dark:text-gray-100 outline-none focus:border-indigo-500"
+          className="w-full px-3 bg-store-field border border-store-line rounded-store-control text-store-ink outline-none focus:border-store-brand h-9 text-sm placeholder:text-store-ink-faint transition-colors focus:ring-2 focus:ring-store-brand/25"
         />
       </div>
 
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="block text-gray-700 dark:text-gray-300 font-semibold mb-1">{t('plugins.form.categoryLabel')}</label>
+          <label className="block text-store-ink-soft font-semibold mb-1 ">{t('plugins.form.categoryLabel')}</label>
           <select
             value={newPlugCategory}
             onChange={(e) => onCategoryChange(e.target.value)}
-            className="w-full px-3 py-2 bg-gray-50 dark:bg-[#20232d] border border-gray-200 dark:border-[#2a2d39] rounded-xl text-gray-900 dark:text-gray-100 outline-none focus:border-indigo-500"
+            className="w-full px-3 bg-store-field border border-store-line rounded-store-control text-store-ink outline-none focus:border-store-brand h-9 text-sm placeholder:text-store-ink-faint transition-colors focus:ring-2 focus:ring-store-brand/25"
           >
             {filteredCategories.map((cat) => (
               <option key={cat} value={cat}>
@@ -65,11 +65,11 @@ export const RegisterPluginFormFields: React.FC<RegisterPluginFormFieldsProps> =
         </div>
 
         <div>
-          <label className="block text-gray-700 dark:text-gray-300 font-semibold mb-1">{t('plugins.form.schemaTypeLabel')}</label>
+          <label className="block text-store-ink-soft font-semibold mb-1 ">{t('plugins.form.schemaTypeLabel')}</label>
           <select
             value={newPlugSchemaType}
             onChange={(e) => onSchemaTypeChange(e.target.value as any)}
-            className="w-full px-3 py-2 bg-gray-50 dark:bg-[#20232d] border border-gray-200 dark:border-[#2a2d39] rounded-xl text-gray-900 dark:text-gray-100 outline-none focus:border-indigo-500"
+            className="w-full px-3 bg-store-field border border-store-line rounded-store-control text-store-ink outline-none focus:border-store-brand h-9 text-sm placeholder:text-store-ink-faint transition-colors focus:ring-2 focus:ring-store-brand/25"
           >
             <option value="OpenAPI">OpenAPI 3.0</option>
             <option value="GraphQL">GraphQL</option>
@@ -80,24 +80,24 @@ export const RegisterPluginFormFields: React.FC<RegisterPluginFormFieldsProps> =
       </div>
 
       <div>
-        <label className="block text-gray-700 dark:text-gray-300 font-semibold mb-1">{t('plugins.form.capabilitiesLabel')}</label>
+        <label className="block text-store-ink-soft font-semibold mb-1 ">{t('plugins.form.capabilitiesLabel')}</label>
         <input
           type="text"
           value={newPlugCapabilities}
           onChange={(e) => onCapabilitiesChange(e.target.value)}
           placeholder={t('plugins.form.capabilitiesPlaceholder')}
-          className="w-full px-3 py-2 bg-gray-50 dark:bg-[#20232d] border border-gray-200 dark:border-[#2a2d39] rounded-xl text-gray-900 dark:text-gray-100 outline-none focus:border-indigo-500"
+          className="w-full px-3 bg-store-field border border-store-line rounded-store-control text-store-ink outline-none focus:border-store-brand h-9 text-sm placeholder:text-store-ink-faint transition-colors focus:ring-2 focus:ring-store-brand/25"
         />
       </div>
 
       <div>
-        <label className="block text-gray-700 dark:text-gray-300 font-semibold mb-1">{t('plugins.form.descLabel')}</label>
+        <label className="block text-store-ink-soft font-semibold mb-1 ">{t('plugins.form.descLabel')}</label>
         <textarea
           value={newPlugDesc}
           onChange={(e) => onDescChange(e.target.value)}
           placeholder={t('plugins.form.descPlaceholder')}
           rows={3}
-          className="w-full px-3 py-2 bg-gray-50 dark:bg-[#20232d] border border-gray-200 dark:border-[#2a2d39] rounded-xl text-gray-900 dark:text-gray-100 outline-none focus:border-indigo-500 resize-none"
+          className="w-full px-3 py-2 bg-store-field border border-store-line rounded-store-control text-store-ink outline-none focus:border-store-brand resize-none text-sm placeholder:text-store-ink-faint transition-colors focus:ring-2 focus:ring-store-brand/25"
         />
       </div>
 
@@ -105,13 +105,13 @@ export const RegisterPluginFormFields: React.FC<RegisterPluginFormFieldsProps> =
         <button
           type="button"
           onClick={onCancel}
-          className="px-4 py-2 rounded-xl bg-gray-100 dark:bg-[#22252e] text-gray-600 dark:text-gray-300 hover:bg-gray-200 cursor-pointer font-medium"
+          className="px-4 py-2 rounded-store-control bg-store-subtle text-store-ink-soft hover:bg-store-raised cursor-pointer font-medium text-sm"
         >
           {t('common.actions.cancel')}
         </button>
         <button
           type="submit"
-          className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold cursor-pointer"
+          className="px-4 py-2 rounded-store-control bg-store-brand hover:bg-store-brand text-white font-medium cursor-pointer text-sm"
         >
           {t('plugins.form.submitBtn')}
         </button>

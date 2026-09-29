@@ -34,7 +34,7 @@ export function DashboardSearchTermTable({ items, loading }: DashboardSearchTerm
       key: 'term',
       header: t('adminDashboard.search.columns.term'),
       render: (item) => (
-        <span className="font-medium text-gray-900 dark:text-gray-50">{item.term}</span>
+        <span className="font-medium text-store-ink ">{item.term}</span>
       ),
     },
     {
@@ -43,7 +43,7 @@ export function DashboardSearchTermTable({ items, loading }: DashboardSearchTerm
       width: 'w-28',
       align: 'right',
       render: (item) => (
-        <span className="tabular-nums text-xs text-gray-600 dark:text-gray-300">
+        <span className="tabular-nums text-xs text-store-ink-soft ">
           {item.searchCount}
         </span>
       ),
@@ -54,7 +54,7 @@ export function DashboardSearchTermTable({ items, loading }: DashboardSearchTerm
       width: 'w-28',
       align: 'right',
       render: (item) => (
-        <span className="tabular-nums text-xs text-gray-600 dark:text-gray-300">
+        <span className="tabular-nums text-xs text-store-ink-soft ">
           {item.resultCount}
         </span>
       ),
@@ -66,7 +66,7 @@ export function DashboardSearchTermTable({ items, loading }: DashboardSearchTerm
       align: 'right',
       hideBelowLarge: true,
       render: (item) => (
-        <span className="tabular-nums text-xs text-gray-500 dark:text-gray-400">
+        <span className="tabular-nums text-xs text-store-ink-faint ">
           {formatRatio(item.zeroResultRatio)}
         </span>
       ),
@@ -78,7 +78,7 @@ export function DashboardSearchTermTable({ items, loading }: DashboardSearchTerm
       align: 'right',
       hideBelowLarge: true,
       render: (item) => (
-        <span className="tabular-nums text-xs text-gray-500 dark:text-gray-400">
+        <span className="tabular-nums text-xs text-store-ink-faint ">
           {formatRatio(item.clickThroughRatio)}
         </span>
       ),
@@ -89,7 +89,7 @@ export function DashboardSearchTermTable({ items, loading }: DashboardSearchTerm
       hideBelowLarge: true,
       render: (item) => (
         <div className="min-w-0">
-          <p className="truncate text-gray-700 dark:text-gray-200">
+          <p className="truncate text-store-ink-soft ">
             {item.topListingName || t('adminShell.common.notAvailable')}
           </p>
         </div>

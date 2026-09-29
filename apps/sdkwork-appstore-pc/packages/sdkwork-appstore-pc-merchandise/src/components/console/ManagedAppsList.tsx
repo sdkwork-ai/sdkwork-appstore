@@ -18,8 +18,8 @@ export const ManagedAppsList: React.FC<ManagedAppsListProps> = ({ apps }) => {
   const { t } = useTranslation();
 
   return (
-    <div className="bg-gray-100/50 dark:bg-[#181a20] border border-gray-200 dark:border-[#22252e] rounded-2xl p-5 shadow-sm">
-      <h2 className="text-sm font-bold text-gray-900 dark:text-gray-100 mb-4">
+    <div className="bg-store-subtle/50 dark:bg-store-surface border border-store-line rounded-store-card p-5 shadow-sm ">
+      <h2 className="text-sm font-bold text-store-ink mb-4 ">
         {t('console.managed.titleCount', { count: apps.length, defaultValue: `已管理应用列表 (${apps.length})` })}
       </h2>
       <div className="space-y-2.5">

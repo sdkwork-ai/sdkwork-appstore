@@ -14,8 +14,8 @@ export const MiniGamesSection: React.FC<MiniGamesSectionProps> = ({ games }) => 
 
   return (
     <section className="space-y-3">
-      <div className="flex items-center gap-2 text-sm font-bold text-gray-900 dark:text-gray-100">
-        <Flame className="w-4 h-4 text-amber-500" />
+      <div className="flex items-center gap-2 text-sm font-bold text-store-ink ">
+        <Flame className="w-4 h-4 text-store-warning" />
         <span>{t('games.sections.miniGames', '热门微信小游戏')}</span>
       </div>
       <MiniGamesCarousel apps={games} />

@@ -55,11 +55,11 @@ export function DesktopHeader({ pendingUpdatesCount: initialCount = 0, showActio
   };
 
   return (
-    <header className="hidden md:flex h-14 items-center justify-between gap-3 px-3 xl:px-6 border-b border-gray-200 dark:border-[#22252c] bg-white/95 dark:bg-[#181a20]/95 backdrop-blur-md shrink-0 transition-colors duration-200 z-20">
+    <header className="hidden md:flex h-14 items-center justify-between gap-3 px-3 xl:px-6 border-b border-store-line bg-store-surface/95 backdrop-blur-md shrink-0 transition-colors duration-200 z-20 ">
       {/* Brand / Title or Left Indicator */}
       <div className="hidden xl:flex items-center gap-3 shrink-0">
-        <span className="text-xs font-semibold tracking-wide text-gray-500 dark:text-gray-400 flex items-center gap-1.5">
-          <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
+        <span className="text-xs font-semibold tracking-wide text-store-ink-faint flex items-center gap-1.5 ">
+          <span className="w-2 h-2 rounded-full bg-store-brand animate-pulse"></span>
           Sdkwork Store
         </span>
       </div>

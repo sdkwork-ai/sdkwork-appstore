@@ -15,10 +15,10 @@ export const McpCardHeader: React.FC<McpCardHeaderProps> = ({ server }) => {
           <DynamicIcon name={server.icon} className="w-6 h-6" />
         </div>
         <div className="min-w-0">
-          <h3 className="font-bold text-sm text-gray-900 dark:text-gray-100 group-hover:text-cyan-500 transition-colors truncate">
+          <h3 className="font-bold text-sm text-store-ink group-hover:text-store-info transition-colors truncate ">
             {server.name}
           </h3>
-          <p className="text-xs text-gray-400 truncate mt-0.5">
+          <p className="text-xs text-store-ink-faint truncate mt-0.5">
             {server.publisher} · {server.transportType.toUpperCase()}
           </p>
         </div>

@@ -37,16 +37,16 @@ export function AdminPaginationBar({
   const canReset = cursorApplied && Boolean(onReset);
 
   return (
-    <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-gray-500 dark:text-gray-400">
+    <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-store-ink-faint ">
       <div className="flex items-center gap-3">
         <span>{t('adminShell.common.totalItems', { total: loadedCount })}</span>
         {pageInfo.pageSize ? (
-          <span className="font-mono text-[11px] text-gray-400 dark:text-gray-500">
+          <span className="font-mono text-[11px] text-store-ink-faint ">
             pageSize={pageInfo.pageSize}
           </span>
         ) : null}
         {pageInfo.mode === 'cursor' ? (
-          <span className="rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-gray-500 dark:bg-[#20232c] dark:text-gray-400">
+          <span className="rounded-full bg-store-subtle px-2.5 py-0.5 text-xs font-medium uppercase tracking-wide text-store-ink-faint ">
             cursor
           </span>
         ) : null}
@@ -56,7 +56,7 @@ export function AdminPaginationBar({
           type="button"
           onClick={canReset ? onReset : undefined}
           disabled={!canReset || loading}
-          className="inline-flex items-center gap-1 rounded-lg border border-gray-300 px-2.5 py-1.5 font-medium text-gray-600 transition-colors enabled:hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40 dark:border-[#2f3442] dark:text-gray-300 dark:enabled:hover:bg-[#1d2028]"
+          className="inline-flex items-center gap-1 rounded-store-control border border-store-line-strong px-2.5 py-1.5 font-medium text-store-ink-soft transition-colors enabled:hover:bg-store-subtle disabled:cursor-not-allowed disabled:opacity-40 text-xs"
         >
           <ChevronLeft className="h-3.5 w-3.5" />
           {t('adminShell.common.previousPage')}
@@ -65,7 +65,7 @@ export function AdminPaginationBar({
           type="button"
           onClick={canPageForward ? () => onNext?.(nextCursor) : undefined}
           disabled={!canPageForward || loading}
-          className="inline-flex items-center gap-1 rounded-lg border border-gray-300 px-2.5 py-1.5 font-medium text-gray-600 transition-colors enabled:hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40 dark:border-[#2f3442] dark:text-gray-300 dark:enabled:hover:bg-[#1d2028]"
+          className="inline-flex items-center gap-1 rounded-store-control border border-store-line-strong px-2.5 py-1.5 font-medium text-store-ink-soft transition-colors enabled:hover:bg-store-subtle disabled:cursor-not-allowed disabled:opacity-40 text-xs"
         >
           {t('adminShell.common.nextPage')}
           <ChevronRight className="h-3.5 w-3.5" />

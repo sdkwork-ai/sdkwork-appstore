@@ -6,28 +6,28 @@ export function UpdatesEmptyState() {
   const { t } = useTranslation();
 
   return (
-    <div className="py-12 px-6 flex flex-col items-center justify-center text-center bg-gray-100/50 dark:bg-[#181a20] rounded-2xl border border-gray-200 dark:border-[#22252e]">
-      <div className="w-16 h-16 mb-4 rounded-2xl bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-500 flex items-center justify-center shadow-inner">
+    <div className="py-12 px-6 flex flex-col items-center justify-center text-center bg-store-subtle/50 dark:bg-store-surface rounded-store-card border border-store-line ">
+      <div className="w-16 h-16 mb-4 rounded-store-card bg-store-success/10 dark:bg-store-success/20 text-store-success flex items-center justify-center shadow-inner">
         <CheckCircle2 className="w-8 h-8" />
       </div>
-      <h3 className="text-base font-bold text-gray-900 dark:text-gray-100 mb-1">
+      <h3 className="text-base font-bold text-store-ink mb-1 ">
         {t('updates.emptyState.title')}
       </h3>
-      <p className="text-xs text-gray-500 dark:text-gray-400 max-w-sm mb-6">
+      <p className="text-xs text-store-ink-faint max-w-sm mb-6 ">
         {t('updates.emptyState.subtitle')}
       </p>
 
       <div className="flex items-center gap-3">
         <Link
           to="/"
-          className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition-all shadow-sm flex items-center gap-1.5"
+          className="px-4 py-2 bg-store-brand hover:bg-store-brand text-white rounded-store-control text-xs font-bold transition-all shadow-sm flex items-center gap-1.5"
         >
           <Sparkles className="w-3.5 h-3.5" />
           <span>{t('updates.emptyState.exploreApps')}</span>
         </Link>
         <Link
           to="/apps"
-          className="px-4 py-2 bg-gray-200 dark:bg-[#252834] text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-[#2d313f] rounded-xl text-xs font-bold transition-all flex items-center gap-1.5"
+          className="px-4 py-2 bg-store-raised text-store-ink-soft hover:bg-gray-300 dark:hover:bg-store-raised rounded-store-control text-xs font-bold transition-all flex items-center gap-1.5 "
         >
           <Download className="w-3.5 h-3.5" />
           <span>{t('updates.emptyState.browseMarket')}</span>

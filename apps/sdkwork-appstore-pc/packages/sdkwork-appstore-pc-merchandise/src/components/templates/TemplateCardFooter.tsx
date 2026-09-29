@@ -16,9 +16,9 @@ export const TemplateCardFooter: React.FC<TemplateCardFooterProps> = ({
   const { t } = useTranslation();
 
   return (
-    <div className="flex items-center justify-between mt-4 pt-3 border-t border-gray-100 dark:border-[#222530]">
-      <div className="flex items-center gap-3 text-xs text-gray-400 font-medium">
-        <span className="flex items-center gap-1 text-amber-500 font-semibold">
+    <div className="flex items-center justify-between mt-4 pt-3 border-t border-store-line-soft ">
+      <div className="flex items-center gap-3 text-xs text-store-ink-faint font-medium">
+        <span className="flex items-center gap-1 text-store-warning font-semibold">
           <Star className="w-3.5 h-3.5 fill-amber-500" />
           {stars}
         </span>
@@ -34,7 +34,7 @@ export const TemplateCardFooter: React.FC<TemplateCardFooterProps> = ({
             e.stopPropagation();
             if (onAppDetailClick) onAppDetailClick(e);
           }}
-          className="px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-[12px] font-bold transition-all shadow-sm cursor-pointer flex items-center gap-1"
+          className="px-3 py-1.5 rounded-store-control bg-store-brand hover:bg-store-brand text-white text-xs font-medium transition-all shadow-sm cursor-pointer flex items-center gap-1"
           title={t('templates.card.appDetails')}
         >
           <LayoutGrid className="w-3.5 h-3.5 text-white" />

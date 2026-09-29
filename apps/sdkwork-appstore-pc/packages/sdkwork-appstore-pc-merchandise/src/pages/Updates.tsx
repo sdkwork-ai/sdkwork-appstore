@@ -139,7 +139,7 @@ export default function Updates() {
 
           {/* Pending Updates List */}
           <section className="space-y-4">
-            <h3 className="text-sm font-bold tracking-tight text-gray-900 dark:text-gray-100 flex items-center justify-between">
+            <h3 className="text-sm font-bold tracking-tight text-store-ink flex items-center justify-between ">
               <span>{t('updates.pendingList.title', { count: appsWithUpdates.length, defaultValue: `待更新软件列表 (${appsWithUpdates.length})` })}</span>
             </h3>
 

@@ -55,8 +55,8 @@ export default function Event() {
   if (!event) {
     return (
       <div className="p-6 md:p-8 w-full max-w-full">
-        <div className="flex flex-col items-center justify-center py-16 text-center gap-2 rounded-2xl border border-dashed border-gray-300 dark:border-gray-700">
-          <h3 className="text-sm font-bold text-gray-900 dark:text-gray-100">
+        <div className="flex flex-col items-center justify-center py-16 text-center gap-2 rounded-2xl border border-dashed border-store-line-strong ">
+          <h3 className="text-sm font-bold text-store-ink ">
             {t('events.grid.empty')}
           </h3>
         </div>
@@ -66,7 +66,7 @@ export default function Event() {
 
   return (
     <div className="p-6 md:p-8 w-full max-w-full transition-colors duration-200 select-none space-y-6">
-      <div className="rounded-3xl p-8 text-white bg-gradient-to-r from-violet-600 via-fuchsia-600 to-rose-600">
+      <div className="rounded-store-card p-8 text-white bg-gradient-to-r from-violet-600 via-fuchsia-600 to-store-danger">
         <p className="text-xs font-bold text-fuchsia-200 uppercase tracking-wider">
           {t('events.header.subtitle')}
         </p>
@@ -80,7 +80,7 @@ export default function Event() {
           {event.startsAt && <span>{t('events.meta.startsAt', { date: event.startsAt })}</span>}
           {event.endsAt && <span>{t('events.meta.endsAt', { date: event.endsAt })}</span>}
           {event.status && (
-            <span className="px-2 py-0.5 rounded-full bg-white/20">
+            <span className="px-2 py-0.5 rounded-full bg-store-surface/20">
               {event.status === 'active' ? t('events.meta.active') : t('events.meta.endsSoon')}
             </span>
           )}
@@ -88,7 +88,7 @@ export default function Event() {
       </div>
 
       <section className="space-y-4">
-        <h3 className="text-sm font-bold tracking-tight text-gray-900 dark:text-gray-100">
+        <h3 className="text-sm font-bold tracking-tight text-store-ink ">
           {t('events.grid.title', { count: apps.length })}
         </h3>
         {apps.length > 0 ? (
@@ -98,8 +98,8 @@ export default function Event() {
             ))}
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center py-16 text-center gap-2 rounded-2xl border border-dashed border-gray-300 dark:border-gray-700">
-            <h3 className="text-sm font-bold text-gray-900 dark:text-gray-100">
+          <div className="flex flex-col items-center justify-center py-16 text-center gap-2 rounded-2xl border border-dashed border-store-line-strong ">
+            <h3 className="text-sm font-bold text-store-ink ">
               {t('events.grid.empty')}
             </h3>
           </div>

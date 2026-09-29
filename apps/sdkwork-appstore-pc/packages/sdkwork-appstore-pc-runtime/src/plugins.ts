@@ -106,11 +106,11 @@ function mapPluginRecord(record: Record<string, unknown>): PluginItem {
 
 const categoryVisuals: Record<string, { icon: string; color: string }> = {
   '代码与开发': { icon: 'Terminal', color: 'bg-slate-800' },
-  '搜索与信息': { icon: 'Search', color: 'bg-cyan-600' },
-  '数据处理': { icon: 'FileJson', color: 'bg-emerald-600' },
-  '数据与存储': { icon: 'Database', color: 'bg-blue-700' },
+  '搜索与信息': { icon: 'Search', color: 'bg-store-info' },
+  '数据处理': { icon: 'FileJson', color: 'bg-store-success' },
+  '数据与存储': { icon: 'Database', color: 'bg-store-brand' },
   '图像与识别': { icon: 'ScanText', color: 'bg-violet-600' },
-  '支付与电商': { icon: 'CreditCard', color: 'bg-amber-600' },
+  '支付与电商': { icon: 'CreditCard', color: 'bg-store-warning' },
   default: { icon: 'Plug', color: 'bg-slate-600' },
 };
 

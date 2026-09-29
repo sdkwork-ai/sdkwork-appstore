@@ -17,8 +17,8 @@ export const SkillModalHeader: React.FC<SkillModalHeaderProps> = ({ skill }) => 
       </div>
       <div>
         <h2 className="text-xl font-bold">{skill.name}</h2>
-        <p className="text-xs text-gray-400 mt-1">
-          {t('skills.modal.author', '作者')}: <span className="text-gray-700 dark:text-gray-300 font-medium">{skill.author}</span> · {t('skills.modal.category', '类别')}: {skill.category} · {t('skills.modal.version', '版本')}: v{skill.version}
+        <p className="text-xs text-store-ink-faint mt-1">
+          {t('skills.modal.author', '作者')}: <span className="text-store-ink-soft font-medium ">{skill.author}</span> · {t('skills.modal.category', '类别')}: {skill.category} · {t('skills.modal.version', '版本')}: v{skill.version}
         </p>
       </div>
     </div>

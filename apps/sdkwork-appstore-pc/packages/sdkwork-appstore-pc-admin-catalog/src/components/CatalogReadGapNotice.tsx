@@ -20,12 +20,12 @@ export function CatalogReadGapNotice({ description, title }: CatalogReadGapNotic
   return (
     <div
       role="note"
-      className="flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50/70 px-3 py-2 text-xs dark:border-amber-900/60 dark:bg-amber-950/30"
+      className="flex items-start gap-2 rounded-store-control border border-store-warning-soft bg-store-warning-soft px-3 py-2 text-xs "
     >
-      <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-500" />
+      <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-store-warning" />
       <div className="min-w-0">
-        <p className="font-medium text-amber-700 dark:text-amber-300">{title}</p>
-        <p className="mt-0.5 leading-5 text-amber-600/90 dark:text-amber-300/80">{description}</p>
+        <p className="font-medium text-store-warning ">{title}</p>
+        <p className="mt-0.5 leading-5 text-store-warning/90 dark:text-store-warning/80">{description}</p>
       </div>
     </div>
   );

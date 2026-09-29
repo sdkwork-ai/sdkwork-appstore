@@ -91,7 +91,7 @@ export function DesktopSidebar() {
   };
 
   return (
-    <aside className="hidden md:flex flex-col w-56 bg-[#f7f8fa] dark:bg-[#131418] border-r border-gray-200 dark:border-[#20232b] py-4 px-3 sticky top-0 h-screen shrink-0 transition-colors duration-200 select-none">
+    <aside className="hidden md:flex flex-col w-56 bg-store-raised border-r border-store-line py-4 px-3 sticky top-0 h-screen shrink-0 transition-colors duration-200 select-none ">
       {/* Sub-component: Brand Header */}
       <SidebarBrand />
 
@@ -127,7 +127,7 @@ export function DesktopSidebar() {
       </div>
 
       {/* Sub-component: Bottom Tools */}
-      <div className="pt-3 border-t border-gray-200 dark:border-[#20232b]">
+      <div className="pt-3 border-t border-store-line ">
         <SidebarNavGroup
           items={bottomTabs}
           isTabActive={isTabActive}

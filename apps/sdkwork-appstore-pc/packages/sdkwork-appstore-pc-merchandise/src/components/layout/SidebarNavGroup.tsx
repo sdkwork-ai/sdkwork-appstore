@@ -25,7 +25,7 @@ export const SidebarNavGroup: React.FC<SidebarNavGroupProps> = ({
   return (
     <div>
       {title && (
-        <div className="px-3 mb-1.5 text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">
+        <div className="px-3 mb-1.5 text-[10px] font-bold text-store-ink-faint uppercase tracking-wider ">
           {title}
         </div>
       )}
@@ -37,14 +37,14 @@ export const SidebarNavGroup: React.FC<SidebarNavGroupProps> = ({
               key={tab.name}
               to={tab.path}
               className={cn(
-                "flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium transition-all",
+                "flex items-center gap-3 px-3 py-2 rounded-store-control text-xs font-medium transition-all",
                 variant === 'bottom'
                   ? active
-                    ? "bg-blue-600/15 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400 font-semibold"
-                    : "text-gray-500 hover:bg-gray-200/60 dark:text-gray-400 dark:hover:bg-[#20232c]"
+                    ? "bg-store-brand/15 text-store-brand dark:bg-store-brand/20 font-semibold "
+                    : "text-store-ink-faint hover:bg-store-raised/60 dark:hover:bg-store-surface "
                   : active
-                    ? "bg-blue-600 text-white shadow-sm font-semibold"
-                    : "text-gray-600 hover:bg-gray-200/60 dark:text-gray-300 dark:hover:bg-[#20232c]"
+                    ? "bg-store-brand text-white shadow-sm font-semibold"
+                    : "text-store-ink-soft hover:bg-store-raised/60 dark:hover:bg-store-surface "
               )}
             >
               <tab.icon className="w-4 h-4 shrink-0" />

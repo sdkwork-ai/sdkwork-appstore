@@ -66,10 +66,10 @@ export const ReviewForm: React.FC<ReviewFormProps> = ({
   return (
     <form
       onSubmit={handleSubmit}
-      className="mb-8 p-5 bg-gray-50 dark:bg-[#181a20] rounded-2xl border border-gray-200 dark:border-[#22252e] space-y-4 animate-fadeIn"
+      className="mb-8 p-5 bg-store-subtle rounded-store-card border border-store-line space-y-4 animate-fadeIn "
     >
       <div className="flex items-center justify-between">
-        <h4 className="text-sm font-bold text-gray-900 dark:text-gray-100">
+        <h4 className="text-sm font-bold text-store-ink ">
           {t('appDetail.reviews.formTitle')}
         </h4>
         <StarRatingInput
@@ -84,14 +84,14 @@ export const ReviewForm: React.FC<ReviewFormProps> = ({
           placeholder={t('appDetail.reviews.namePlaceholder')}
           value={userName}
           onChange={(e) => setUserName(e.target.value)}
-          className="px-3.5 py-2 text-xs rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#22252e] text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500"
+          className="px-3 text-sm rounded-store-control border border-store-line bg-store-field text-store-ink focus:outline-none focus:border-store-brand h-9 placeholder:text-store-ink-faint outline-none transition-colors focus:ring-2 focus:ring-store-brand/25"
         />
         <input
           type="text"
           placeholder={t('appDetail.reviews.titlePlaceholder')}
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          className="px-3.5 py-2 text-xs rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#22252e] text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500"
+          className="px-3 text-sm rounded-store-control border border-store-line bg-store-field text-store-ink focus:outline-none focus:border-store-brand h-9 placeholder:text-store-ink-faint outline-none transition-colors focus:ring-2 focus:ring-store-brand/25"
         />
       </div>
 
@@ -101,18 +101,18 @@ export const ReviewForm: React.FC<ReviewFormProps> = ({
         placeholder={t('appDetail.reviews.commentPlaceholder')}
         value={comment}
         onChange={(e) => setComment(e.target.value)}
-        className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#22252e] text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500"
+        className="w-full px-3 py-2.5 text-sm rounded-store-control border border-store-line bg-store-field text-store-ink focus:outline-none focus:border-store-brand placeholder:text-store-ink-faint outline-none transition-colors focus:ring-2 focus:ring-store-brand/25"
       />
 
       <div className="flex justify-end gap-2">
         <button
           type="submit"
           disabled={isSubmitting || !comment.trim()}
-          className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition-all disabled:opacity-50 flex items-center gap-1.5 shadow-sm cursor-pointer"
+          className="px-5 py-2 bg-store-brand hover:bg-store-brand text-white rounded-store-control text-xs font-medium transition-all disabled:opacity-50 flex items-center gap-1.5 shadow-sm cursor-pointer"
         >
           {submitSuccess ? (
             <>
-              <Check className="w-4 h-4 text-emerald-300" />
+              <Check className="w-4 h-4 text-store-success" />
               <span>{t('appDetail.reviews.submitSuccess')}</span>
             </>
           ) : isSubmitting ? (

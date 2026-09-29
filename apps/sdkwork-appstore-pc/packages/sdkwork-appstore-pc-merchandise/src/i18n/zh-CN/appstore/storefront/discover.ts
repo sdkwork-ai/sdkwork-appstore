@@ -21,6 +21,11 @@ export const discover = {
     recommended: '为你推荐',
     events: '限时活动'
   },
+  empty: {
+    title: '暂无精选内容',
+    subtitle: '应用商店正在准备上架内容。您可以先前往软件大厅浏览全部应用，或稍后再回来看看。',
+    action: '前往软件大厅'
+  },
   miniGamesBanner: {
     playInClient: '无需下载 · 即点即玩'
   },

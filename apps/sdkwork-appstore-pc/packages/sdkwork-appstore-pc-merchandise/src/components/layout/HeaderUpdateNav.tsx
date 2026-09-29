@@ -15,17 +15,17 @@ export const HeaderUpdateNav: React.FC<HeaderUpdateNavProps> = ({ pendingUpdates
     <NavLink 
       to="/updates" 
       className={({ isActive }) => 
-        cn("flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-colors", 
+        cn("flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium transition-colors", 
           isActive 
-            ? "bg-blue-50 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400" 
-            : "text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-[#22252c]"
+            ? "bg-blue-50 text-store-brand dark:bg-store-brand/20 " 
+            : "text-store-ink-soft hover:bg-store-subtle "
         )
       }
     >
       <Download className="w-3.5 h-3.5" />
       <span className="hidden xl:inline">{t('updates.tabs.updates')}</span>
       {pendingUpdatesCount > 0 && (
-        <span className="px-1.5 py-0.2 text-[10px] font-bold bg-blue-600 text-white rounded-full">
+        <span className="px-1.5 py-0.2 text-[10px] font-bold bg-store-brand text-white rounded-full">
           {pendingUpdatesCount}
         </span>
       )}

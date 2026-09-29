@@ -17,10 +17,10 @@ export function CategoryList({ categories }: CategoryListProps) {
   return (
     <section className="pb-8">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-2xl font-bold tracking-tight text-[#1C1C1E] dark:text-[#F5F5F5]">
+        <h2 className="text-2xl font-bold tracking-tight text-store-ink ">
           {t('discover.categories.browseTitle')}
         </h2>
-        <button className="text-blue-600 dark:text-[#0A84FF] text-sm font-medium hover:underline cursor-pointer">
+        <button className="text-store-brand text-sm font-medium hover:underline cursor-pointer ">
           {t('discover.categories.seeAll')}
         </button>
       </div>

@@ -24,7 +24,10 @@
     "check:cors-standard": "node ../sdkwork-specs/tools/check-cors-standard.mjs --root .",
     "check:app-sdk-consumers": "node ../sdkwork-specs/tools/check-app-sdk-consumer-imports.mjs --workspace .",
     "check:pagination": "node ../sdkwork-specs/tools/check-pagination.mjs --workspace .",
-    "check:tailwind-integration": "node ../sdkwork-specs/tools/check-tailwind-integration.mjs --workspace .",
+    "check:tailwind-integration": "node ../sdkwork-specs/tools/check-tailwind-integration.mjs --workspace ..",
+    "check:theme-tokens": "node scripts/check-theme-tokens.mjs --root apps/sdkwork-appstore-pc",
+    "check:theme": "node scripts/run-theme-checks.mjs",
+    "check:theme:report": "node scripts/run-theme-checks.mjs --all",
     "api:materialize": "node scripts/sdkwork-command.mjs api:materialize",
     "api:materialize:check": "node scripts/sdkwork-command.mjs api:materialize:check",
     "api:check": "node scripts/sdkwork-command.mjs api:check",
@@ -82,7 +85,11 @@
     "build:pc:test:cloud": "node ../sdkwork-specs/tools/build-browser-client.mjs --root . --architecture pc --environment test --deployment-profile cloud",
     "build:pc:staging:cloud": "node ../sdkwork-specs/tools/build-browser-client.mjs --root . --architecture pc --environment staging --deployment-profile cloud",
     "build:pc:demo:cloud": "node ../sdkwork-specs/tools/build-browser-client.mjs --root . --architecture pc --environment demo --deployment-profile cloud",
-    "build:pc:prod:cloud": "node ../sdkwork-specs/tools/build-browser-client.mjs --root . --architecture pc --environment prod --deployment-profile cloud"
+    "build:pc:prod:cloud": "node ../sdkwork-specs/tools/build-browser-client.mjs --root . --architecture pc --environment prod --deployment-profile cloud",
+    "check:token-utilities": "node scripts/check-token-utilities.mjs --root apps/sdkwork-appstore-pc",
+    "check:control-shape": "node scripts/check-control-shape.mjs --root apps/sdkwork-appstore-pc",
+    "test:jsx-class-scan": "node scripts/dev/jsx-class-scan.test.mjs",
+    "migrate:control-shape": "node scripts/migrate-control-shape.mjs"
   },
   "exports": {
     ".": {

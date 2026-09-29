@@ -22,39 +22,39 @@ export const ApiCredentialRow: React.FC<ApiCredentialRowProps> = ({
 
   return (
     <div
-      className={`p-3 rounded-xl border transition-all ${
+      className={`p-3 rounded-store-control border transition-all ${
         cred.status === 'revoked'
-          ? 'bg-gray-100/30 dark:bg-[#1c1e26] border-gray-200 dark:border-[#282c38] opacity-60'
-          : 'bg-white dark:bg-[#20232b] border border-gray-200 dark:border-[#2d313c]'
+          ? 'bg-store-subtle/30 dark:bg-store-surface border-store-line opacity-60 '
+          : 'bg-store-surface border border-store-line '
       }`}
     >
       <div className="flex items-center justify-between mb-1 text-xs">
-        <span className="font-bold text-gray-800 dark:text-gray-200">{cred.name}</span>
+        <span className="font-bold text-store-ink ">{cred.name}</span>
         <span
-          className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
+          className={`text-xs px-2.5 py-0.5 rounded-full font-medium ${
             cred.status === 'active'
-              ? 'bg-emerald-500/10 text-emerald-500'
-              : 'bg-rose-500/10 text-rose-500'
+              ? 'bg-store-success/10 text-store-success'
+              : 'bg-store-danger/10 text-store-danger'
           }`}
         >
           {cred.status === 'active' ? t('console.apiKeys.active', '已生效') : t('console.apiKeys.revoked', '已作废')}
         </span>
       </div>
 
-      <div className="flex items-center justify-between font-mono text-[11px] text-gray-600 dark:text-gray-300">
+      <div className="flex items-center justify-between font-mono text-[11px] text-store-ink-soft ">
         <span className="truncate max-w-[200px]">{secretText.substring(0, 22)}...</span>
         <div className="flex items-center gap-1.5">
           <button
             onClick={() => onCopy(cred.id, secretText)}
-            className="p-1 hover:text-amber-500 text-gray-400 cursor-pointer"
+            className="p-1 hover:text-store-warning text-store-ink-faint cursor-pointer text-xs font-medium"
             title={t('console.apiKeys.copyKey', '复制 Key')}
           >
-            {isCopied ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
+            {isCopied ? <Check className="w-3.5 h-3.5 text-store-success" /> : <Copy className="w-3.5 h-3.5" />}
           </button>
           {cred.status === 'active' && (
             <button
               onClick={() => onRevokeKey(cred.id)}
-              className="p-1 hover:text-rose-500 text-gray-400 cursor-pointer"
+              className="p-1 hover:text-store-danger text-store-ink-faint cursor-pointer text-xs font-medium"
               title={t('console.apiKeys.revoke', '作废密钥')}
             >
               <Trash2 className="w-3.5 h-3.5" />
@@ -63,7 +63,7 @@ export const ApiCredentialRow: React.FC<ApiCredentialRowProps> = ({
         </div>
       </div>
       {isCopied && (
-        <p className="text-[10px] text-emerald-500 font-bold mt-1">{t('common.actions.copied', '已复制')}</p>
+        <p className="text-[10px] text-store-success font-bold mt-1">{t('common.actions.copied', '已复制')}</p>
       )}
     </div>
   );

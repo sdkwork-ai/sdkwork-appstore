@@ -12,11 +12,11 @@ export const PluginOverviewTab: React.FC<PluginOverviewTabProps> = ({ plugin }) 
 
   return (
     <div className="space-y-4 my-4">
-      <div className="p-4 rounded-2xl bg-gray-50 dark:bg-[#20232d] border border-gray-200/60 dark:border-[#2a2d39]">
-        <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">
+      <div className="p-4 rounded-store-card bg-store-subtle border border-store-line/60 dark:border-store-line ">
+        <h4 className="text-xs font-bold text-store-ink-faint uppercase tracking-wider mb-1">
           {t('plugins.modal.descriptionLabel')}
         </h4>
-        <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-200">
+        <p className="text-sm leading-relaxed text-store-ink-soft ">
           {plugin.description}
         </p>
       </div>

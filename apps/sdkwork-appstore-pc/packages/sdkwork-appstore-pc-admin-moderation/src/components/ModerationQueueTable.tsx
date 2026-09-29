@@ -35,8 +35,8 @@ export function ModerationQueueTable({
       header: t('adminModeration.queue.columns.listing'),
       render: (item) => (
         <div className="min-w-0">
-          <p className="truncate font-medium text-gray-900 dark:text-gray-50">{item.listingName}</p>
-          <p className="truncate font-mono text-[11px] text-gray-400 dark:text-gray-500">
+          <p className="truncate font-medium text-store-ink ">{item.listingName}</p>
+          <p className="truncate font-mono text-[11px] text-store-ink-faint ">
             {item.listingId || t('adminShell.common.notAvailable')}
           </p>
         </div>
@@ -48,7 +48,7 @@ export function ModerationQueueTable({
       width: 'w-32',
       hideBelowLarge: true,
       render: (item) => (
-        <span className="font-mono text-[11px] text-gray-500 dark:text-gray-400">
+        <span className="font-mono text-[11px] text-store-ink-faint ">
           {item.submissionType}
         </span>
       ),
@@ -65,7 +65,7 @@ export function ModerationQueueTable({
       width: 'w-40',
       hideBelowLarge: true,
       render: (item) => (
-        <span className="font-mono text-[11px] text-gray-500 dark:text-gray-400">
+        <span className="font-mono text-[11px] text-store-ink-faint ">
           {item.assignedTo || t('adminModeration.queue.assignedUnassigned')}
         </span>
       ),
@@ -76,7 +76,7 @@ export function ModerationQueueTable({
       width: 'w-32',
       hideBelowLarge: true,
       render: (item) => (
-        <span className="text-xs text-gray-500 dark:text-gray-400">
+        <span className="text-xs text-store-ink-faint ">
           {item.submittedDate || t('adminShell.common.notAvailable')}
         </span>
       ),

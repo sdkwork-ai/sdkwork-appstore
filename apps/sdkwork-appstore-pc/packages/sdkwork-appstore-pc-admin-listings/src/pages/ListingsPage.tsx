@@ -65,8 +65,8 @@ export function ListingsPage() {
       header: t('adminListings.list.columns.listing'),
       render: (item) => (
         <div className="min-w-0">
-          <p className="truncate font-medium text-gray-900 dark:text-gray-50">{item.displayName}</p>
-          <p className="truncate font-mono text-[11px] text-gray-400 dark:text-gray-500">
+          <p className="truncate font-medium text-store-ink ">{item.displayName}</p>
+          <p className="truncate font-mono text-[11px] text-store-ink-faint ">
             {item.listingId || t('adminShell.common.notAvailable')}
           </p>
         </div>
@@ -78,7 +78,7 @@ export function ListingsPage() {
       width: 'w-40',
       hideBelowLarge: true,
       render: (item) => (
-        <span className="font-mono text-[11px] text-gray-500 dark:text-gray-400">
+        <span className="font-mono text-[11px] text-store-ink-faint ">
           {item.listingCode || t('adminShell.common.notAvailable')}
         </span>
       ),
@@ -102,10 +102,10 @@ export function ListingsPage() {
       hideBelowLarge: true,
       render: (item) => (
         <div className="min-w-0">
-          <p className="truncate text-xs text-gray-600 dark:text-gray-300">
+          <p className="truncate text-xs text-store-ink-soft ">
             {item.publisherName || t('adminShell.common.notAvailable')}
           </p>
-          <p className="truncate font-mono text-[11px] text-gray-400 dark:text-gray-500">
+          <p className="truncate font-mono text-[11px] text-store-ink-faint ">
             {item.publisherId || t('adminShell.common.notAvailable')}
           </p>
         </div>
@@ -117,7 +117,7 @@ export function ListingsPage() {
       width: 'w-32',
       hideBelowLarge: true,
       render: (item) => (
-        <span className="text-xs text-gray-500 dark:text-gray-400">
+        <span className="text-xs text-store-ink-faint ">
           {item.updatedDate || t('adminShell.common.notAvailable')}
         </span>
       ),

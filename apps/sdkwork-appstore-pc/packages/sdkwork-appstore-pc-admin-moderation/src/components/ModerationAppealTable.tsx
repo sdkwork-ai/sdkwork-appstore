@@ -28,7 +28,7 @@ export function ModerationAppealTable({
       key: 'appeal',
       header: t('adminModeration.appeals.columns.appeal'),
       render: (item) => (
-        <span className="font-mono text-[11px] text-gray-600 dark:text-gray-300">
+        <span className="font-mono text-[11px] text-store-ink-soft ">
           {item.appealId}
         </span>
       ),
@@ -38,7 +38,7 @@ export function ModerationAppealTable({
       header: t('adminModeration.appeals.columns.review'),
       hideBelowLarge: true,
       render: (item) => (
-        <span className="font-mono text-[11px] text-gray-500 dark:text-gray-400">
+        <span className="font-mono text-[11px] text-store-ink-faint ">
           {item.reviewId || t('adminShell.common.notAvailable')}
         </span>
       ),
@@ -48,7 +48,7 @@ export function ModerationAppealTable({
       header: t('adminModeration.appeals.columns.listing'),
       hideBelowLarge: true,
       render: (item) => (
-        <span className="font-mono text-[11px] text-gray-500 dark:text-gray-400">
+        <span className="font-mono text-[11px] text-store-ink-faint ">
           {item.listingId || t('adminShell.common.notAvailable')}
         </span>
       ),
@@ -65,7 +65,7 @@ export function ModerationAppealTable({
       width: 'w-32',
       hideBelowLarge: true,
       render: (item) => (
-        <span className="text-xs text-gray-500 dark:text-gray-400">
+        <span className="text-xs text-store-ink-faint ">
           {item.decision || t('adminShell.common.notAvailable')}
         </span>
       ),
@@ -76,7 +76,7 @@ export function ModerationAppealTable({
       width: 'w-32',
       hideBelowLarge: true,
       render: (item) => (
-        <span className="text-xs text-gray-500 dark:text-gray-400">
+        <span className="text-xs text-store-ink-faint ">
           {item.submittedDate || t('adminShell.common.notAvailable')}
         </span>
       ),

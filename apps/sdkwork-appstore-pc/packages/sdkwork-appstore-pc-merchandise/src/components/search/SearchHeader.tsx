@@ -6,10 +6,10 @@ export const SearchHeader: React.FC = () => {
 
   return (
     <div className="mb-5">
-      <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
+      <h1 className="text-2xl font-bold tracking-tight text-store-ink ">
         {t('search.header.title')}
       </h1>
-      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 font-medium">
+      <p className="text-xs text-store-ink-faint mt-1 font-medium ">
         {t('search.header.subtitle', '全站搜索 AI 智能体、游戏与应用软件')}
       </p>
     </div>

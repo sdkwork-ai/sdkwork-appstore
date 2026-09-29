@@ -123,7 +123,7 @@ function mapTemplateRecord(record: Record<string, unknown>): TemplateItem {
       '开发者工具',
     description: readString(record, 'description') || '',
     icon: 'Boxes',
-    iconColor: 'bg-indigo-600',
+    iconColor: 'bg-store-brand',
     stars: readNumber(record, 'starCount', 'star_count') ?? 0,
     forks: readNumber(record, 'forkCount', 'fork_count') ?? 0,
     tags: readStringArray(meta, metaKeys.tags),

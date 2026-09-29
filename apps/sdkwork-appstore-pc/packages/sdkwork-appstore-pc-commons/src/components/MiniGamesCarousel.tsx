@@ -27,21 +27,21 @@ export function MiniGamesCarousel({ apps }: MiniGamesCarouselProps) {
       <div className="flex items-center justify-between mb-3">
         <Link
           to="/search?category=miniGames"
-          className="flex items-center gap-1.5 group text-sm font-bold text-gray-900 dark:text-gray-100 hover:text-blue-500 transition-colors"
+          className="flex items-center gap-1.5 group text-sm font-bold text-store-ink hover:text-store-brand transition-colors "
         >
           <span>{t('discover.sections.miniGames')}</span>
-          <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-blue-500 transition-colors" />
+          <ChevronRight className="w-4 h-4 text-store-ink-faint group-hover:text-store-brand transition-colors" />
         </Link>
         <div className="flex items-center gap-1">
           <button
             onClick={scrollLeft}
-            className="p-1 rounded-full text-gray-400 hover:text-gray-200 hover:bg-gray-200 dark:hover:bg-[#252832] transition-colors"
+            className="p-1 rounded-full text-store-ink-faint hover:text-gray-200 hover:bg-store-raised transition-colors text-xs font-medium"
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
           <button
             onClick={scrollRight}
-            className="p-1 rounded-full text-gray-400 hover:text-gray-200 hover:bg-gray-200 dark:hover:bg-[#252832] transition-colors"
+            className="p-1 rounded-full text-store-ink-faint hover:text-gray-200 hover:bg-store-raised transition-colors text-xs font-medium"
           >
             <ChevronRight className="w-4 h-4" />
           </button>

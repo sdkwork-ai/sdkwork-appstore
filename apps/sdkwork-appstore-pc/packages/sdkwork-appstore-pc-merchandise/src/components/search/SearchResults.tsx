@@ -25,7 +25,7 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
 
   return (
     <section>
-      <h2 className="text-xl font-bold tracking-tight mb-4 text-[#1C1C1E] dark:text-[#F5F5F5]">
+      <h2 className="text-xl font-bold tracking-tight mb-4 text-store-ink ">
         {t('search.header.resultsCount', { count: results.length, query })}
       </h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-1">

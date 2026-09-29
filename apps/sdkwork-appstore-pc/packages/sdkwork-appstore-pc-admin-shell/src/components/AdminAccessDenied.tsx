@@ -26,23 +26,23 @@ export function AdminAccessDenied({
   const { t } = useTranslation();
   return (
     <section className="flex min-h-screen flex-col items-center justify-center px-6 py-16 text-center">
-      <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-rose-50 text-rose-500 dark:bg-rose-950/40 dark:text-rose-400">
+      <span className="flex h-12 w-12 items-center justify-center rounded-store-card bg-store-danger-soft text-store-danger ">
         <ShieldAlert className="h-6 w-6" />
       </span>
-      <h1 className="mt-4 text-xl font-semibold text-gray-900 dark:text-gray-50">{t(titleKey)}</h1>
-      <p className="mt-2 max-w-lg text-sm leading-6 text-gray-600 dark:text-gray-400">
+      <h1 className="mt-4 text-xl font-semibold text-store-ink ">{t(titleKey)}</h1>
+      <p className="mt-2 max-w-lg text-sm leading-6 text-store-ink-soft ">
         {t(descriptionKey)}
       </p>
       {requiredPermissions.length > 0 ? (
         <div className="mt-5 max-w-xl">
-          <p className="text-[11px] font-medium uppercase tracking-wide text-gray-400 dark:text-gray-500">
+          <p className="text-[11px] font-medium uppercase tracking-wide text-store-ink-faint ">
             {t('adminShell.accessDenied.requiredPermission')}
           </p>
           <ul className="mt-2 flex flex-wrap justify-center gap-1.5">
             {requiredPermissions.map((code) => (
               <li
                 key={code}
-                className="rounded-md bg-gray-100 px-2 py-0.5 font-mono text-[11px] text-gray-600 dark:bg-[#20232c] dark:text-gray-300"
+                className="rounded-full bg-store-subtle px-2.5 py-0.5 font-mono text-xs text-store-ink-soft font-medium"
               >
                 {code}
               </li>

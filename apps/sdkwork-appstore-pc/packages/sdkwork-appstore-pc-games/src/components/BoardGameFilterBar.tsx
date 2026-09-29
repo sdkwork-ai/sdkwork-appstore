@@ -22,10 +22,10 @@ export const BoardGameFilterBar: React.FC<BoardGameFilterBarProps> = ({
         <button
           key={item.name}
           onClick={() => onSelectFilter(item.filter)}
-          className={`px-3 py-1 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer ${
+          className={`px-3 py-1 rounded-store-control text-xs font-medium transition-all shrink-0 cursor-pointer ${
             activeFilter === item.filter
-              ? 'bg-amber-600 text-white shadow-sm'
-              : 'bg-white/80 dark:bg-[#1a1c23] text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-[#252834]'
+              ? 'bg-store-warning text-white shadow-sm'
+              : 'bg-store-surface/80 dark:bg-store-surface text-store-ink-soft hover:bg-store-raised '
           }`}
         >
           {item.name}

@@ -10,7 +10,7 @@ export const TemplateCardTags: React.FC<TemplateCardTagsProps> = ({ tags }) => {
       {tags.map((tag, idx) => (
         <span
           key={idx}
-          className="text-[10px] font-medium px-2 py-0.5 rounded-md bg-indigo-500/10 text-indigo-600 dark:text-indigo-300"
+          className="text-xs font-medium px-2.5 py-0.5 rounded-full bg-store-brand/10 text-store-brand "
         >
           #{tag}
         </span>

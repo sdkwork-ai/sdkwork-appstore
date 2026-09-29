@@ -28,9 +28,9 @@ export const TemplateScreenshotsTab: React.FC<TemplateScreenshotsTabProps> = ({
 
   return (
     <div className="space-y-3 animate-fade-in text-xs">
-      <div className="flex items-center justify-between bg-gray-50 dark:bg-[#20232d] p-2 rounded-xl border border-gray-200/60 dark:border-[#2a2d39]">
-        <div className="flex items-center gap-1.5 text-gray-500 font-medium">
-          <ImageIcon className="w-3.5 h-3.5 text-indigo-500" />
+      <div className="flex items-center justify-between bg-store-subtle p-2 rounded-store-control border border-store-line/60 dark:border-store-line ">
+        <div className="flex items-center gap-1.5 text-store-ink-faint font-medium">
+          <ImageIcon className="w-3.5 h-3.5 text-store-brand" />
           <span>
             {t('templates.detail.screenshots.previewTitle', {
               current: selectedIdx + 1,
@@ -39,13 +39,13 @@ export const TemplateScreenshotsTab: React.FC<TemplateScreenshotsTabProps> = ({
           </span>
         </div>
 
-        <div className="flex items-center gap-1 bg-white dark:bg-[#181a21] p-0.5 rounded-lg border border-gray-200 dark:border-[#2a2d39]">
+        <div className="flex items-center gap-1 bg-store-surface p-0.5 rounded-store-control border border-store-line ">
           <button
             onClick={() => setDeviceMode('desktop')}
-            className={`px-2.5 py-1 rounded-md flex items-center gap-1 text-[11px] font-medium transition-colors cursor-pointer ${
+            className={`px-2.5 py-1 rounded-store-control flex items-center gap-1 text-xs font-medium transition-colors cursor-pointer ${
               deviceMode === 'desktop'
-                ? 'bg-indigo-600 text-white font-bold'
-                : 'text-gray-500 hover:text-gray-900 dark:hover:text-gray-200'
+                ? 'bg-store-brand text-white font-medium'
+                : 'text-store-ink-faint hover:text-store-ink '
             }`}
           >
             <Monitor className="w-3 h-3" />
@@ -53,10 +53,10 @@ export const TemplateScreenshotsTab: React.FC<TemplateScreenshotsTabProps> = ({
           </button>
           <button
             onClick={() => setDeviceMode('mobile')}
-            className={`px-2.5 py-1 rounded-md flex items-center gap-1 text-[11px] font-medium transition-colors cursor-pointer ${
+            className={`px-2.5 py-1 rounded-store-control flex items-center gap-1 text-xs font-medium transition-colors cursor-pointer ${
               deviceMode === 'mobile'
-                ? 'bg-indigo-600 text-white font-bold'
-                : 'text-gray-500 hover:text-gray-900 dark:hover:text-gray-200'
+                ? 'bg-store-brand text-white font-medium'
+                : 'text-store-ink-faint hover:text-store-ink '
             }`}
           >
             <Smartphone className="w-3 h-3" />
@@ -65,26 +65,26 @@ export const TemplateScreenshotsTab: React.FC<TemplateScreenshotsTabProps> = ({
         </div>
       </div>
 
-      <div className="flex justify-center items-center py-2 bg-slate-950 rounded-2xl p-3 border border-slate-800 shadow-inner overflow-hidden">
+      <div className="flex justify-center items-center py-2 bg-slate-950 rounded-store-card p-3 border border-store-line shadow-inner overflow-hidden">
         <div
-          className={`relative transition-all duration-300 rounded-xl overflow-hidden border border-slate-700 shadow-2xl bg-slate-900 group ${
+          className={`relative transition-all duration-300 rounded-store-control overflow-hidden border border-slate-700 shadow-2xl bg-slate-900 group ${
             deviceMode === 'mobile' ? 'w-[280px] h-[480px]' : 'w-full max-w-3xl h-[340px]'
           }`}
         >
-          <div className="h-6 px-3 bg-slate-900 border-b border-slate-800 flex items-center justify-between text-[10px] text-gray-400">
+          <div className="h-6 px-3 bg-slate-900 border-b border-store-line flex items-center justify-between text-[10px] text-store-ink-faint">
             <div className="flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-rose-500 inline-block" />
-              <span className="w-2 h-2 rounded-full bg-amber-500 inline-block" />
-              <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block" />
+              <span className="w-2 h-2 rounded-full bg-store-danger inline-block" />
+              <span className="w-2 h-2 rounded-full bg-store-warning inline-block" />
+              <span className="w-2 h-2 rounded-full bg-store-success inline-block" />
             </div>
-            <span className="font-mono text-[9px] text-slate-400">
+            <span className="font-mono text-[9px] text-store-ink-faint">
               {deviceMode === 'desktop' ? 'app.preview.local' : 'm.preview.local'}
             </span>
             <button
               onClick={() => setLightboxOpen(true)}
               className="hover:text-white transition-colors cursor-pointer flex items-center gap-1 text-[9px]"
             >
-              <ZoomIn className="w-3 h-3 text-indigo-400" />
+              <ZoomIn className="w-3 h-3 text-store-brand" />
               <span>{t('templates.detail.screenshots.zoom')}</span>
             </button>
           </div>
@@ -103,9 +103,9 @@ export const TemplateScreenshotsTab: React.FC<TemplateScreenshotsTabProps> = ({
           <button
             key={i}
             onClick={() => setSelectedIdx(i)}
-            className={`relative rounded-xl overflow-hidden h-16 border-2 transition-all cursor-pointer ${
+            className={`relative rounded-store-control overflow-hidden h-16 border-2 transition-all cursor-pointer text-sm font-medium${
               selectedIdx === i
-                ? 'border-indigo-600 scale-105 shadow-md'
+                ? 'border-store-brand scale-105 shadow-md'
                 : 'border-transparent opacity-60 hover:opacity-100'
             }`}
           >
@@ -117,7 +117,7 @@ export const TemplateScreenshotsTab: React.FC<TemplateScreenshotsTabProps> = ({
       {lightboxOpen && (
         <div
           onClick={() => setLightboxOpen(false)}
-          className="fixed inset-0 z-[200] bg-black/90 backdrop-blur-md flex items-center justify-center p-4 cursor-zoom-out animate-fade-in"
+          className="fixed inset-0 z-[200] bg-store-overlay backdrop-blur-md flex items-center justify-center p-4 cursor-zoom-out animate-fade-in"
         >
           <div className="max-w-5xl max-h-[90vh] relative">
             <img

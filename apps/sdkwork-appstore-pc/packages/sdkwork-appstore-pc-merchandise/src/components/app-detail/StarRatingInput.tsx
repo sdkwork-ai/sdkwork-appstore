@@ -17,7 +17,7 @@ export const StarRatingInput: React.FC<StarRatingInputProps> = ({
   const starsArray = Array.from({ length: maxStars }, (_, i) => i + 1);
 
   return (
-    <div className="flex gap-1 text-gray-300 dark:text-gray-600">
+    <div className="flex gap-1 text-store-ink-faint ">
       {starsArray.map((star) => (
         <button
           type="button"
@@ -30,8 +30,8 @@ export const StarRatingInput: React.FC<StarRatingInputProps> = ({
           <Star
             className={`w-6 h-6 transition-colors ${
               star <= (hoverRating || value)
-                ? 'text-yellow-400 fill-yellow-400'
-                : 'text-gray-300 dark:text-gray-600'
+                ? 'text-store-warning fill-yellow-400'
+                : 'text-store-ink-faint '
             }`}
           />
         </button>

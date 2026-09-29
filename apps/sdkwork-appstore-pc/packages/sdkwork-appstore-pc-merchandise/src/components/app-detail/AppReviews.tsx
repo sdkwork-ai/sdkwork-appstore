@@ -39,14 +39,14 @@ export function AppReviews({
   };
 
   return (
-    <div className="flex-1 flex flex-col mb-10 pt-8 border-t border-gray-100 dark:border-[#2C2C2E]">
+    <div className="flex-1 flex flex-col mb-10 pt-8 border-t border-store-line-soft ">
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-xl md:text-2xl font-extrabold text-[#1C1C1E] dark:text-[#F5F5F5]">
+        <h3 className="text-xl md:text-2xl font-extrabold text-store-ink ">
           {t('appDetail.reviews.title')}
         </h3>
         <button
           onClick={() => setShowReviewForm(!showReviewForm)}
-          className="text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-50 dark:bg-blue-500/10 border border-blue-500/20 cursor-pointer"
+          className="text-xs font-medium text-store-brand hover:underline flex items-center gap-1.5 px-3 py-1.5 rounded-store-control bg-blue-50 dark:bg-store-brand/10 border border-store-brand/20 cursor-pointer "
         >
           <MessageSquarePlus className="w-4 h-4" />
           <span>{showReviewForm ? t('appDetail.reviews.cancelReview') : t('appDetail.reviews.writeReview')}</span>
@@ -76,7 +76,7 @@ export function AppReviews({
         ))}
 
         {reviewsList.length === 0 && (
-          <div className="col-span-1 md:col-span-2 text-center text-gray-500 dark:text-gray-400 py-8">
+          <div className="col-span-1 md:col-span-2 text-center text-store-ink-faint py-8 ">
             {t('appDetail.reviews.noReviews')}
           </div>
         )}

@@ -82,7 +82,7 @@ export function TemplatesPage() {
 
       {/* Template Grid — container-query driven, up to 4 columns on wide screens */}
       {loading ? (
-        <div className="py-20 text-center text-xs text-gray-400">{t('templates.loading')}</div>
+        <div className="py-20 text-center text-xs text-store-ink-faint">{t('templates.loading')}</div>
       ) : (
         <CardGrid>
           {templates.map((template) => (

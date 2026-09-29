@@ -104,13 +104,13 @@ export function HeroCarousel({ collections, apps }: HeroCarouselProps) {
                 <p className="text-sm opacity-90 leading-snug">{currentCollection.subtitle}</p>
                 
                 {currentCollection.ctaText && (
-                  <button className="mt-4 bg-blue-600 hover:bg-blue-500 text-white font-semibold px-4 py-2 rounded-lg text-xs shadow-sm transition-colors pointer-events-auto">
+                  <button className="mt-4 bg-store-brand hover:bg-store-brand text-white font-medium px-4 py-2 rounded-store-control text-xs shadow-sm transition-colors pointer-events-auto">
                     {currentCollection.ctaText}
                   </button>
                 )}
               </div>
               
-              <div className="relative z-10 mt-6 space-y-3 bg-slate-800/80 p-4 rounded-xl border border-slate-700 pointer-events-auto">
+              <div className="relative z-10 mt-6 space-y-3 bg-slate-800/80 p-4 rounded-store-control border border-store-line pointer-events-auto">
                 {collectionApps.map(app => (
                   <HeroCarouselAppItem key={app.id} app={app} onInstall={installApp} />
                 ))}

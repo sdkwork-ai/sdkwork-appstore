@@ -15,8 +15,8 @@ export const HandheldGamesSection: React.FC<HandheldGamesSectionProps> = ({ game
 
   return (
     <section className="space-y-3">
-      <div className="flex items-center gap-2 text-sm font-bold text-gray-900 dark:text-gray-100">
-        <Trophy className="w-4 h-4 text-amber-500" />
+      <div className="flex items-center gap-2 text-sm font-bold text-store-ink ">
+        <Trophy className="w-4 h-4 text-store-warning" />
         <span>{t('games.sections.mobileGames', '精品手游合集')}</span>
       </div>
       <HandheldGamesGrid apps={games} />

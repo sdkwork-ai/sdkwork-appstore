@@ -137,8 +137,8 @@ export function InstallProvider({ children }: { children: React.ReactNode }) {
     >
       {children}
       {runningAppNotice && (
-        <div className="fixed bottom-6 right-6 z-50 px-4 py-3 bg-gray-900/90 text-white dark:bg-gray-100/90 dark:text-gray-900 rounded-2xl shadow-xl border border-gray-700/50 dark:border-gray-300/50 backdrop-blur-md text-xs font-semibold flex items-center gap-2 animate-bounce">
-          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+        <div className="fixed bottom-6 right-6 z-50 px-4 py-3 bg-gray-900/90 text-white dark:bg-store-subtle/90 dark:text-store-ink rounded-store-card shadow-xl border border-store-line/50 backdrop-blur-md text-xs font-semibold flex items-center gap-2 animate-bounce ">
+          <span className="w-2 h-2 rounded-full bg-store-success animate-ping" />
           <span>{runningAppNotice}</span>
         </div>
       )}

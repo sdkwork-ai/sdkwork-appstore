@@ -77,23 +77,23 @@ export function CategoryItemsDialog({ isOpen, onClose, category, onItemRemoved }
         {loading ? (
           <LoadingSpinner />
         ) : rows.length === 0 ? (
-          <p className="text-xs text-gray-400 text-center py-8">{t('userStore.items.empty')}</p>
+          <p className="text-xs text-store-ink-faint text-center py-8">{t('userStore.items.empty')}</p>
         ) : (
           <div className="max-h-80 overflow-y-auto space-y-2">
             {rows.map((row) => (
               <div
                 key={row.item.id}
-                className="flex items-center gap-3 p-3 rounded-2xl bg-gray-50 dark:bg-[#222530] border border-gray-200 dark:border-[#262933]"
+                className="flex items-center gap-3 p-3 rounded-store-card bg-store-subtle border border-store-line "
               >
-                <div className="w-10 h-10 rounded-xl bg-indigo-600/10 dark:bg-indigo-500/15 text-indigo-500 flex items-center justify-center shrink-0 overflow-hidden">
+                <div className="w-10 h-10 rounded-store-control bg-store-brand/10 dark:bg-store-brand/15 text-store-brand flex items-center justify-center shrink-0 overflow-hidden">
                   <Store className="w-5 h-5" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm font-medium truncate text-gray-900 dark:text-gray-100">
+                  <p className="text-sm font-medium truncate text-store-ink ">
                     {row.listingCard?.displayName ?? row.item.listingId}
                   </p>
                   {row.listingCard?.subtitle && (
-                    <p className="text-[11px] text-gray-400 truncate">{row.listingCard.subtitle}</p>
+                    <p className="text-[11px] text-store-ink-faint truncate">{row.listingCard.subtitle}</p>
                   )}
                 </div>
                 <button
@@ -101,7 +101,7 @@ export function CategoryItemsDialog({ isOpen, onClose, category, onItemRemoved }
                   disabled={busyItemId === row.item.id}
                   onClick={() => void handleRemove(row)}
                   aria-label={t('userStore.actions.remove')}
-                  className="p-1.5 rounded-full text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 disabled:opacity-50 transition-colors cursor-pointer"
+                  className="p-1.5 rounded-full text-store-ink-faint hover:text-store-danger hover:bg-store-danger-soft disabled:opacity-50 transition-colors cursor-pointer text-xs font-medium"
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
@@ -109,7 +109,7 @@ export function CategoryItemsDialog({ isOpen, onClose, category, onItemRemoved }
             ))}
           </div>
         )}
-        {error && <p className="text-xs text-red-500">{error}</p>}
+        {error && <p className="text-xs text-store-danger">{error}</p>}
       </div>
     </ModalShell>
   );

@@ -74,7 +74,7 @@ function mapMcpServerRecord(record: McpServerRecord): McpServerItem {
     connected: false,
     description: record.description ?? '',
     icon: 'Server',
-    iconColor: 'bg-cyan-600',
+    iconColor: 'bg-store-info',
     id: record.id,
     name: record.name,
     protocolVersion: 'MCP',

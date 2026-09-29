@@ -72,10 +72,10 @@ export const AISandboxAssistant: React.FC<AISandboxAssistantProps> = ({
   };
 
   return (
-    <div className="p-5 bg-gray-100/60 dark:bg-[#181a20] border border-gray-200 dark:border-[#22252e] rounded-2xl shadow-sm space-y-3.5">
+    <div className="p-5 bg-store-subtle/60 dark:bg-store-surface border border-store-line rounded-store-card shadow-sm space-y-3.5 ">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-        <h3 className="text-xs font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2">
-          <Zap className="w-4 h-4 text-amber-500 shrink-0" />
+        <h3 className="text-xs font-bold text-store-ink flex items-center gap-2 ">
+          <Zap className="w-4 h-4 text-store-warning shrink-0" />
           <span>{t('aihub.sandbox.title')}</span>
         </h3>
         

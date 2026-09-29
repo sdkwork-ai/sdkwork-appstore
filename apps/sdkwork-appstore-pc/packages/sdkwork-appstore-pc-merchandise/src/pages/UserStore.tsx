@@ -100,10 +100,10 @@ export default function UserStore() {
     <div className="p-6 md:p-8 w-full max-w-full transition-colors duration-200 select-none space-y-6">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
+          <h1 className="text-xl font-bold tracking-tight text-store-ink ">
             {t('userStore.header.title')}
           </h1>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+          <p className="text-xs text-store-ink-faint mt-1 ">
             {t('userStore.header.subtitle')}
           </p>
         </div>
@@ -112,14 +112,14 @@ export default function UserStore() {
             type="button"
             onClick={() => void load()}
             aria-label={t('userStore.actions.refresh')}
-            className="p-2.5 rounded-full text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-[#222530] transition-colors cursor-pointer"
+            className="p-2.5 rounded-full text-store-ink-faint hover:text-store-ink-soft hover:bg-store-subtle transition-colors cursor-pointer text-xs font-medium"
           >
             <RefreshCw className="w-4 h-4" />
           </button>
           <button
             type="button"
             onClick={() => setCreateOpen(true)}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium transition-colors cursor-pointer"
+            className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-store-brand hover:bg-store-brand text-white text-sm font-medium transition-colors cursor-pointer"
           >
             <FolderPlus className="w-4 h-4" />
             {t('userStore.actions.createCategory')}
@@ -128,7 +128,7 @@ export default function UserStore() {
       </div>
 
       {error && (
-        <p className="text-xs text-red-500 px-1">{error}</p>
+        <p className="text-xs text-store-danger px-1">{error}</p>
       )}
 
       {categories.length > 0 ? (

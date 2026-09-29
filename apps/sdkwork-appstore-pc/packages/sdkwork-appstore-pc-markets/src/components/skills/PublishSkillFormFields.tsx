@@ -37,24 +37,24 @@ export const PublishSkillFormFields: React.FC<PublishSkillFormFieldsProps> = ({
   return (
     <form onSubmit={onSubmit} className="space-y-4 mt-4 text-xs">
       <div>
-        <label className="block text-gray-700 dark:text-gray-300 font-semibold mb-1">{t('skills.form.skillName')}</label>
+        <label className="block text-store-ink-soft font-semibold mb-1 ">{t('skills.form.skillName')}</label>
         <input
           type="text"
           value={newSkillName}
           onChange={(e) => onNameChange(e.target.value)}
           placeholder={t('skills.form.skillNamePlaceholder')}
           required
-          className="w-full px-3 py-2 bg-gray-50 dark:bg-[#20232d] border border-gray-200 dark:border-[#2a2d39] rounded-xl text-gray-900 dark:text-gray-100 outline-none focus:border-amber-500"
+          className="w-full px-3 bg-store-field border border-store-line rounded-store-control text-store-ink outline-none focus:border-store-brand h-9 text-sm placeholder:text-store-ink-faint transition-colors focus:ring-2 focus:ring-store-brand/25"
         />
       </div>
 
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="block text-gray-700 dark:text-gray-300 font-semibold mb-1">{t('skills.form.category')}</label>
+          <label className="block text-store-ink-soft font-semibold mb-1 ">{t('skills.form.category')}</label>
           <select
             value={newSkillCategory}
             onChange={(e) => onCategoryChange(e.target.value)}
-            className="w-full px-3 py-2 bg-gray-50 dark:bg-[#20232d] border border-gray-200 dark:border-[#2a2d39] rounded-xl text-gray-900 dark:text-gray-100 outline-none focus:border-amber-500"
+            className="w-full px-3 bg-store-field border border-store-line rounded-store-control text-store-ink outline-none focus:border-store-brand h-9 text-sm placeholder:text-store-ink-faint transition-colors focus:ring-2 focus:ring-store-brand/25"
           >
             {filteredCategories.map((cat) => (
               <option key={cat} value={cat}>
@@ -65,36 +65,36 @@ export const PublishSkillFormFields: React.FC<PublishSkillFormFieldsProps> = ({
         </div>
 
         <div>
-          <label className="block text-gray-700 dark:text-gray-300 font-semibold mb-1">{t('skills.form.triggersLabel')}</label>
+          <label className="block text-store-ink-soft font-semibold mb-1 ">{t('skills.form.triggersLabel')}</label>
           <input
             type="text"
             value={newSkillTriggers}
             onChange={(e) => onTriggersChange(e.target.value)}
             placeholder={t('skills.form.triggersPlaceholder')}
-            className="w-full px-3 py-2 bg-gray-50 dark:bg-[#20232d] border border-gray-200 dark:border-[#2a2d39] rounded-xl text-gray-900 dark:text-gray-100 outline-none focus:border-amber-500"
+            className="w-full px-3 bg-store-field border border-store-line rounded-store-control text-store-ink outline-none focus:border-store-brand h-9 text-sm placeholder:text-store-ink-faint transition-colors focus:ring-2 focus:ring-store-brand/25"
           />
         </div>
       </div>
 
       <div>
-        <label className="block text-gray-700 dark:text-gray-300 font-semibold mb-1">{t('skills.form.systemPromptLabel')}</label>
+        <label className="block text-store-ink-soft font-semibold mb-1 ">{t('skills.form.systemPromptLabel')}</label>
         <textarea
           value={newSkillPrompt}
           onChange={(e) => onPromptChange(e.target.value)}
           placeholder={t('skills.form.systemPromptPlaceholder')}
           rows={3}
-          className="w-full px-3 py-2 bg-gray-50 dark:bg-[#20232d] border border-gray-200 dark:border-[#2a2d39] rounded-xl text-gray-900 dark:text-gray-100 outline-none focus:border-amber-500 resize-none font-mono text-[11px]"
+          className="w-full px-3 py-2 bg-store-field border border-store-line rounded-store-control text-store-ink outline-none focus:border-store-brand resize-none font-mono text-sm placeholder:text-store-ink-faint transition-colors focus:ring-2 focus:ring-store-brand/25"
         />
       </div>
 
       <div>
-        <label className="block text-gray-700 dark:text-gray-300 font-semibold mb-1">{t('skills.form.specLabel')}</label>
+        <label className="block text-store-ink-soft font-semibold mb-1 ">{t('skills.form.specLabel')}</label>
         <textarea
           value={newSkillMarkdown}
           onChange={(e) => onMarkdownChange(e.target.value)}
           placeholder={t('skills.form.specPlaceholder')}
           rows={3}
-          className="w-full px-3 py-2 bg-gray-50 dark:bg-[#20232d] border border-gray-200 dark:border-[#2a2d39] rounded-xl text-gray-900 dark:text-gray-100 outline-none focus:border-amber-500 resize-none font-mono text-[11px]"
+          className="w-full px-3 py-2 bg-store-field border border-store-line rounded-store-control text-store-ink outline-none focus:border-store-brand resize-none font-mono text-sm placeholder:text-store-ink-faint transition-colors focus:ring-2 focus:ring-store-brand/25"
         />
       </div>
 
@@ -102,13 +102,13 @@ export const PublishSkillFormFields: React.FC<PublishSkillFormFieldsProps> = ({
         <button
           type="button"
           onClick={onCancel}
-          className="px-4 py-2 rounded-xl bg-gray-100 dark:bg-[#22252e] text-gray-600 dark:text-gray-300 hover:bg-gray-200 cursor-pointer font-medium"
+          className="px-4 py-2 rounded-store-control bg-store-subtle text-store-ink-soft hover:bg-store-raised cursor-pointer font-medium text-sm"
         >
           {t('common.actions.cancel')}
         </button>
         <button
           type="submit"
-          className="px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold cursor-pointer"
+          className="px-4 py-2 rounded-store-control bg-store-warning hover:bg-store-warning text-white font-medium cursor-pointer text-sm"
         >
           {t('skills.form.submitBtn')}
         </button>

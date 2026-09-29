@@ -45,6 +45,7 @@ export const publisher = {
   manage: {
     back: '返回开发者中心',
     tabs: {
+      label: '分区',
       overview: '概览',
       releases: '版本与发布',
       members: '成员'

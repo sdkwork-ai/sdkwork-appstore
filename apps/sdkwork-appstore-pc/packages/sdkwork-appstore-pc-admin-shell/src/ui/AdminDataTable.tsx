@@ -57,12 +57,12 @@ export function AdminDataTable<TRow>({
   const cellPadding = dense ? 'px-3 py-2' : 'px-4 py-3';
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white dark:border-[#22252e] dark:bg-[#14161c]">
+    <div className="overflow-hidden rounded-store-card border border-store-line bg-store-surface ">
       <div className="overflow-x-auto">
         <table className="min-w-full border-collapse text-sm">
           {caption ? <caption className="sr-only">{caption}</caption> : null}
           <thead>
-            <tr className="border-b border-gray-200 bg-gray-50/70 dark:border-[#22252e] dark:bg-[#191c23]">
+            <tr className="border-b border-store-line bg-store-subtle/70 dark:bg-store-surface ">
               {columns.map((column) => (
                 <th
                   key={column.key}
@@ -96,9 +96,9 @@ export function AdminDataTable<TRow>({
                 <tr
                   key={rowKey(row, index)}
                   onClick={onRowClick ? () => onRowClick(row) : undefined}
-                  className={`border-b border-gray-100 last:border-b-0 dark:border-[#1f232c] ${
+                  className={`border-b border-store-line-soft last:border-b-0 ${
                     onRowClick
-                      ? 'cursor-pointer transition-colors hover:bg-gray-50 dark:hover:bg-[#191c23]'
+                      ? 'cursor-pointer transition-colors hover:bg-store-subtle '
                       : ''
                   }`}
                 >

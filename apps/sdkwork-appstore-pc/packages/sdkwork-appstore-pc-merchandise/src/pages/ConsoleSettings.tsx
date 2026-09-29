@@ -89,7 +89,7 @@ export default function ConsoleSettings() {
       <ConsoleNotificationAlert message={successMsg} />
 
       {loading ? (
-        <div className="py-20 text-center text-xs text-gray-400">{t('console.loading')}</div>
+        <div className="py-20 text-center text-xs text-store-ink-faint">{t('console.loading')}</div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left 2 Cols: Submit App & List */}

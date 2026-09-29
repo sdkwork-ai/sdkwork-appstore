@@ -16,14 +16,14 @@ export const TemplateCardHeader: React.FC<TemplateCardHeaderProps> = ({ template
         </div>
         <div className="min-w-0">
           <div className="flex items-center gap-1.5">
-            <h3 className="font-bold text-sm text-gray-900 dark:text-gray-100 group-hover:text-indigo-500 transition-colors truncate">
+            <h3 className="font-bold text-sm text-store-ink group-hover:text-store-brand transition-colors truncate ">
               {template.title}
             </h3>
             {template.isOfficial && (
-              <CheckCircle2 className="w-4 h-4 text-blue-500 shrink-0" />
+              <CheckCircle2 className="w-4 h-4 text-store-brand shrink-0" />
             )}
           </div>
-          <p className="text-xs text-gray-400 truncate mt-0.5">
+          <p className="text-xs text-store-ink-faint truncate mt-0.5">
             {template.author} · {template.framework}
           </p>
         </div>

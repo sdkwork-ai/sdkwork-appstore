@@ -19,16 +19,16 @@ export const PluginSchemaTab: React.FC<PluginSchemaTabProps> = ({
 
   return (
     <div className="my-4 space-y-2">
-      <div className="flex items-center justify-between text-xs text-gray-500">
+      <div className="flex items-center justify-between text-xs text-store-ink-faint">
         <span>
           {t('plugins.modal.schemaStd')}: <strong>{apiSchemaType} 3.0</strong>
         </span>
         <button
           onClick={onCopySchema}
-          className="flex items-center gap-1 text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer font-medium"
+          className="flex items-center gap-1 text-store-brand hover:underline cursor-pointer font-medium "
         >
           {copiedSchema ? (
-            <Check className="w-3.5 h-3.5 text-emerald-500" />
+            <Check className="w-3.5 h-3.5 text-store-success" />
           ) : (
             <Copy className="w-3.5 h-3.5" />
           )}
@@ -37,7 +37,7 @@ export const PluginSchemaTab: React.FC<PluginSchemaTabProps> = ({
           </span>
         </button>
       </div>
-      <pre className="p-4 rounded-2xl bg-gray-900 text-green-400 font-mono text-[11px] overflow-x-auto max-h-60 leading-relaxed border border-gray-800 select-text">
+      <pre className="p-4 rounded-store-card bg-gray-900 text-store-success font-mono text-[11px] overflow-x-auto max-h-60 leading-relaxed border border-store-line select-text">
         {schemaText}
       </pre>
     </div>

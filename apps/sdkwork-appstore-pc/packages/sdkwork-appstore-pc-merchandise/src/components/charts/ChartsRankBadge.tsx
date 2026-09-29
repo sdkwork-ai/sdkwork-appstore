@@ -12,10 +12,10 @@ export const ChartsRankBadge: React.FC<ChartsRankBadgeProps> = ({ rank }) => {
   if (rank === 1) {
     return (
       <div
-        className="w-6 h-6 rounded-full bg-amber-500/15 border border-amber-500/30 flex items-center justify-center shrink-0 shadow-sm"
+        className="w-6 h-6 rounded-full bg-store-warning/15 border border-store-warning/30 flex items-center justify-center shrink-0 shadow-sm"
         title={t('charts.rank.first')}
       >
-        <Trophy className="w-3.5 h-3.5 text-amber-500" />
+        <Trophy className="w-3.5 h-3.5 text-store-warning" />
       </div>
     );
   }
@@ -26,7 +26,7 @@ export const ChartsRankBadge: React.FC<ChartsRankBadgeProps> = ({ rank }) => {
         className="w-6 h-6 rounded-full bg-slate-300/20 border border-slate-400/30 flex items-center justify-center shrink-0 shadow-sm"
         title={t('charts.rank.second')}
       >
-        <Medal className="w-3.5 h-3.5 text-slate-400" />
+        <Medal className="w-3.5 h-3.5 text-store-ink-faint" />
       </div>
     );
   }
@@ -34,16 +34,16 @@ export const ChartsRankBadge: React.FC<ChartsRankBadgeProps> = ({ rank }) => {
   if (rank === 3) {
     return (
       <div
-        className="w-6 h-6 rounded-full bg-amber-700/15 border border-amber-700/30 flex items-center justify-center shrink-0 shadow-sm"
+        className="w-6 h-6 rounded-full bg-store-warning/15 border border-store-warning/30 flex items-center justify-center shrink-0 shadow-sm"
         title={t('charts.rank.third')}
       >
-        <Medal className="w-3.5 h-3.5 text-amber-700 dark:text-amber-600" />
+        <Medal className="w-3.5 h-3.5 text-store-warning " />
       </div>
     );
   }
 
   return (
-    <span className="text-xs font-bold text-gray-400 dark:text-gray-500 w-6 text-center shrink-0">
+    <span className="text-xs font-bold text-store-ink-faint w-6 text-center shrink-0 ">
       {rank}
     </span>
   );

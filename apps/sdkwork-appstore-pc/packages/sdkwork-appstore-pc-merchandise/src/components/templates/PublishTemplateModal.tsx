@@ -39,7 +39,7 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({
       category,
       description: description || 'AI architecture & code template.',
       icon: 'Boxes',
-      iconColor: 'bg-indigo-600',
+      iconColor: 'bg-store-brand',
       stars: 1,
       forks: 0,
       tags: tags.split(',').map((t) => t.trim()).filter(Boolean),
@@ -56,22 +56,22 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
-      <div className="relative w-full max-w-xl bg-white dark:bg-[#181a20] border border-gray-200 dark:border-[#262933] rounded-3xl shadow-2xl overflow-hidden p-6 text-gray-900 dark:text-gray-100">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-store-overlay backdrop-blur-sm animate-fade-in">
+      <div className="relative w-full max-w-xl bg-store-surface border border-store-line rounded-store-modal shadow-2xl overflow-hidden p-6 text-store-ink ">
         <button
           onClick={onClose}
-          className="absolute top-5 right-5 p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 bg-gray-100 dark:bg-[#222530] rounded-full transition-colors cursor-pointer"
+          className="absolute top-5 right-5 p-2 text-store-ink-faint hover:text-store-ink-soft bg-store-subtle rounded-full transition-colors cursor-pointer text-xs font-medium"
         >
           <X className="w-5 h-5" />
         </button>
 
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center shadow-md">
+          <div className="w-10 h-10 rounded-store-control bg-store-brand text-white flex items-center justify-center shadow-md">
             <UploadCloud className="w-5 h-5" />
           </div>
           <div>
             <h2 className="text-lg font-bold">{t('templates.publishModal.title')}</h2>
-            <p className="text-xs text-gray-400">{t('templates.publishModal.subtitle')}</p>
+            <p className="text-xs text-store-ink-faint">{t('templates.publishModal.subtitle')}</p>
           </div>
         </div>
 

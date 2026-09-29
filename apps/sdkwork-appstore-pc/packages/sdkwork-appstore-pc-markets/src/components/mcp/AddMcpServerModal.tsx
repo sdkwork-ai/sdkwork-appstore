@@ -51,12 +51,12 @@ export const AddMcpServerModal: React.FC<AddMcpServerModalProps> = ({
 
   return (
     <ModalShell onClose={onClose} maxWidthClass="max-w-md">
-      <div className="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-[#282c38]">
-        <h3 className="text-sm font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2">
-          <Server className="w-4 h-4 text-cyan-500" />
+      <div className="flex items-center justify-between pb-3 border-b border-store-line-soft ">
+        <h3 className="text-sm font-bold text-store-ink flex items-center gap-2 ">
+          <Server className="w-4 h-4 text-store-info" />
           <span>{t('mcp.form.addTitle')}</span>
         </h3>
-        <button onClick={onClose} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer">
+        <button onClick={onClose} className="text-store-ink-faint hover:text-store-ink-soft cursor-pointer ">
           <X className="w-4 h-4" />
         </button>
       </div>

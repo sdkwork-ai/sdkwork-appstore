@@ -86,7 +86,7 @@ export function AppstoreAdminShell({
   ];
 
   return (
-    <div className="flex min-h-screen bg-gray-50 text-gray-900 dark:bg-[#0e1015] dark:text-gray-100">
+    <div className="flex min-h-screen bg-store-subtle text-store-ink ">
       <AdminSidebar
         entries={navigation}
         isPlatformAdministrator={access.isPlatformAdministrator}
@@ -98,7 +98,7 @@ export function AppstoreAdminShell({
         <AdminTopbar
           breadcrumb={breadcrumb}
           trailing={
-            <span className="rounded-full bg-gray-100 px-2 py-0.5 font-mono text-[10px] uppercase tracking-wide text-gray-500 dark:bg-[#20232c] dark:text-gray-400">
+            <span className="rounded-full bg-store-subtle px-2.5 py-0.5 font-mono text-xs uppercase tracking-wide text-store-ink-faint font-medium">
               {platform}
             </span>
           }

@@ -17,8 +17,8 @@ export const HeroCarouselPagination: React.FC<HeroCarouselPaginationProps> = ({
         <button 
           key={idx}
           onClick={() => onSelect(idx)}
-          className={`h-1.5 rounded-full transition-all duration-300 pointer-events-auto cursor-pointer ${
-            idx === currentIndex ? 'w-4 bg-white' : 'w-1.5 bg-white/40 hover:bg-white/60'
+          className={`h-1.5 rounded-full transition-all duration-300 pointer-events-auto cursor-pointer text-sm font-medium${
+            idx === currentIndex ? 'w-4 bg-store-surface' : 'w-1.5 bg-store-surface/40 hover:bg-store-surface/60'
           }`}
           aria-label={`Go to slide ${idx + 1}`}
         />

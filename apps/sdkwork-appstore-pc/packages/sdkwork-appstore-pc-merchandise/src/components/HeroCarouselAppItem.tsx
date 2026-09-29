@@ -22,7 +22,7 @@ export const HeroCarouselAppItem: React.FC<HeroCarouselAppItemProps> = ({ app, o
         <p className="text-xs text-white/70">{app.category}</p>
       </div>
       <button 
-        className="text-[11px] font-semibold text-white bg-blue-600 hover:bg-blue-500 px-3 py-1 rounded-md transition-colors cursor-pointer shrink-0"
+        className="text-xs font-medium text-white bg-store-brand hover:bg-store-brand px-3 py-1 rounded-store-control transition-colors cursor-pointer shrink-0"
         onClick={(e) => { e.preventDefault(); e.stopPropagation(); onInstall(app); }}
       >
         {t('common.actions.install')}

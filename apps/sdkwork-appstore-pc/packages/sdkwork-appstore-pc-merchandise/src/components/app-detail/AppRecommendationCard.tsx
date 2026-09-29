@@ -20,7 +20,7 @@ export const AppRecommendationCard: React.FC<AppRecommendationCardProps> = ({ ap
   return (
     <div
       onClick={() => navigate(`/app/${app.id}`)}
-      className="group p-3.5 bg-gray-100/60 dark:bg-[#1C1C1E] border border-gray-200/80 dark:border-[#2C2C2E] hover:border-amber-500/50 dark:hover:border-amber-500/50 rounded-2xl cursor-pointer transition-all duration-200 hover:shadow-md relative overflow-hidden flex flex-col justify-between"
+      className="group p-3.5 bg-store-subtle/60 dark:bg-store-surface border border-store-line/80 dark:border-store-line hover:border-store-warning/50 rounded-store-card cursor-pointer transition-all duration-200 hover:shadow-md relative overflow-hidden flex flex-col justify-between "
     >
       <div>
         <div className="flex items-start justify-between gap-3">
@@ -29,27 +29,27 @@ export const AppRecommendationCard: React.FC<AppRecommendationCardProps> = ({ ap
               <DynamicIcon name={app.icon} className="text-white w-6 h-6" />
             </div>
             <div className="min-w-0">
-              <h4 className="font-bold text-xs md:text-sm text-[#1C1C1E] dark:text-[#F5F5F5] truncate group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
+              <h4 className="font-bold text-xs md:text-sm text-store-ink truncate group-hover:text-store-warning transition-colors  ">
                 {app.name}
               </h4>
-              <p className="text-[11px] text-gray-500 dark:text-gray-400 truncate mt-0.5">
+              <p className="text-[11px] text-store-ink-faint truncate mt-0.5 ">
                 {app.category} · ★ {app.rating}
               </p>
             </div>
           </div>
 
-          <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400 shrink-0">
+          <span className="text-xs font-medium px-2.5 py-0.5 rounded-full bg-store-warning/10 text-store-warning shrink-0 ">
             {t('appDetail.recommendations.matchPercent', { percent: matchPercent })}
           </span>
         </div>
 
-        <p className="text-[11px] text-gray-600 dark:text-gray-300 line-clamp-2 mt-2.5 leading-relaxed">
+        <p className="text-[11px] text-store-ink-soft line-clamp-2 mt-2.5 leading-relaxed ">
           {app.description}
         </p>
       </div>
 
-      <div className="mt-3 pt-2.5 border-t border-gray-200/60 dark:border-[#28282A] flex items-center justify-between">
-        <span className="text-[10px] text-gray-400 font-medium">
+      <div className="mt-3 pt-2.5 border-t border-store-line/60 dark:border-store-line flex items-center justify-between">
+        <span className="text-[10px] text-store-ink-faint font-medium">
           {app.reviewsCount > 100000 
             ? t('appDetail.recommendations.playersTenThousand', { count: (app.reviewsCount / 10000).toFixed(1) })
             : t('appDetail.recommendations.playersExact', { count: app.reviewsCount })}
@@ -64,10 +64,10 @@ export const AppRecommendationCard: React.FC<AppRecommendationCardProps> = ({ ap
               installApp(app);
             }
           }}
-          className={`px-3 py-1 rounded-xl text-xs font-bold transition-all shadow-sm cursor-pointer ${
+          className={`px-3 py-1 rounded-store-control text-xs font-medium transition-all shadow-sm cursor-pointer ${
             installed
-              ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
-              : 'bg-amber-500 hover:bg-amber-600 text-white'
+              ? 'bg-store-success hover:bg-store-success text-white'
+              : 'bg-store-warning hover:bg-store-warning text-white'
           }`}
         >
           {installed ? t('appDetail.recommendations.open') : t('appDetail.recommendations.get')}

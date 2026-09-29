@@ -49,8 +49,8 @@ export const APP_PLATFORM_GROUPS: readonly AppPlatformGroupMeta[] = [
     codePrefixes: [],
     icon: 'Smartphone',
     badgeClass:
-      'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20',
-    dotClass: 'bg-emerald-500',
+      'bg-store-success/10 text-store-success border-store-success/20 ',
+    dotClass: 'bg-store-success',
   },
   {
     key: 'ios',
@@ -59,7 +59,7 @@ export const APP_PLATFORM_GROUPS: readonly AppPlatformGroupMeta[] = [
     codePrefixes: [],
     icon: 'Apple',
     badgeClass:
-      'bg-gray-500/10 text-gray-600 dark:text-gray-300 border-gray-500/20',
+      'bg-gray-500/10 text-store-ink-soft border-gray-500/20 ',
     dotClass: 'bg-gray-500',
   },
   {
@@ -69,8 +69,8 @@ export const APP_PLATFORM_GROUPS: readonly AppPlatformGroupMeta[] = [
     codePrefixes: [],
     icon: 'Smartphone',
     badgeClass:
-      'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20',
-    dotClass: 'bg-rose-500',
+      'bg-store-danger/10 text-store-danger border-store-danger/20 ',
+    dotClass: 'bg-store-danger',
   },
   {
     key: 'pcDesktop',
@@ -79,8 +79,8 @@ export const APP_PLATFORM_GROUPS: readonly AppPlatformGroupMeta[] = [
     codePrefixes: [],
     icon: 'Monitor',
     badgeClass:
-      'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-500/20',
-    dotClass: 'bg-indigo-500',
+      'bg-store-brand/10 text-store-brand border-store-brand/20 ',
+    dotClass: 'bg-store-brand',
   },
   {
     key: 'pcWeb',
@@ -89,8 +89,8 @@ export const APP_PLATFORM_GROUPS: readonly AppPlatformGroupMeta[] = [
     codePrefixes: [],
     icon: 'Globe',
     badgeClass:
-      'bg-sky-500/10 text-sky-600 dark:text-sky-400 border-sky-500/20',
-    dotClass: 'bg-sky-500',
+      'bg-store-info/10 text-store-info border-store-info/20 ',
+    dotClass: 'bg-store-info',
   },
   {
     key: 'h5Web',
@@ -99,8 +99,8 @@ export const APP_PLATFORM_GROUPS: readonly AppPlatformGroupMeta[] = [
     codePrefixes: [],
     icon: 'Globe',
     badgeClass:
-      'bg-teal-500/10 text-teal-600 dark:text-teal-400 border-teal-500/20',
-    dotClass: 'bg-teal-500',
+      'bg-store-info/10 text-store-info border-store-info/20 ',
+    dotClass: 'bg-store-info',
   },
   {
     key: 'miniprogram',
@@ -119,8 +119,8 @@ export const APP_PLATFORM_GROUPS: readonly AppPlatformGroupMeta[] = [
     codePrefixes: ['browser-extension-'],
     icon: 'Puzzle',
     badgeClass:
-      'bg-amber-500/10 text-amber-600 dark:text-amber-500 border-amber-500/20',
-    dotClass: 'bg-amber-500',
+      'bg-store-warning/10 text-store-warning border-store-warning/20 ',
+    dotClass: 'bg-store-warning',
   },
 ] as const;
 

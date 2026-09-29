@@ -23,7 +23,7 @@ export const UpdateItemNotes: React.FC<UpdateItemNotesProps> = ({
 
   return (
     <div className="mt-3">
-      <div className="flex justify-between items-center mb-1 text-xs text-gray-500 dark:text-gray-400 font-semibold">
+      <div className="flex justify-between items-center mb-1 text-xs text-store-ink-faint font-semibold ">
         <span>{t('updates.item.version', { version })}</span>
         <span>{dateText}</span>
       </div>
@@ -38,7 +38,7 @@ export const UpdateItemNotes: React.FC<UpdateItemNotesProps> = ({
         {!isExpanded && notes && notes.length > 100 && (
           <span
             onClick={() => onToggleExpand(appId)}
-            className="inline-block mt-1 text-blue-600 dark:text-blue-400 cursor-pointer hover:underline text-xs font-semibold"
+            className="inline-block mt-1 text-store-brand cursor-pointer hover:underline text-xs font-semibold "
           >
             {t('updates.item.showMore')}
           </span>

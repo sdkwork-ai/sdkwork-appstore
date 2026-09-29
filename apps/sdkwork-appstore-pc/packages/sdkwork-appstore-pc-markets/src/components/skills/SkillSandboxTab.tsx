@@ -22,7 +22,7 @@ export const SkillSandboxTab: React.FC<SkillSandboxTabProps> = ({
   return (
     <div className="space-y-3 text-xs">
       <div>
-        <label className="block text-gray-700 dark:text-gray-300 font-semibold mb-1">
+        <label className="block text-store-ink-soft font-semibold mb-1 ">
           {t('skills.modal.testInput')}
         </label>
         <textarea
@@ -30,14 +30,14 @@ export const SkillSandboxTab: React.FC<SkillSandboxTabProps> = ({
           onChange={(e) => onTestInputChange(e.target.value)}
           placeholder={t('skills.modal.testInputPlaceholder')}
           rows={3}
-          className="w-full px-3 py-2 bg-gray-50 dark:bg-[#20232d] border border-gray-200 dark:border-[#2a2d39] rounded-xl text-gray-900 dark:text-gray-100 outline-none resize-none font-mono text-xs"
+          className="w-full px-3 py-2 bg-store-field border border-store-line rounded-store-control text-store-ink outline-none resize-none font-mono text-sm placeholder:text-store-ink-faint transition-colors focus:border-store-brand focus:ring-2 focus:ring-store-brand/25"
         />
       </div>
 
       <button
         onClick={onRunSandbox}
         disabled={running}
-        className="w-full py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-bold flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 transition-colors"
+        className="w-full py-2 bg-store-warning hover:bg-store-warning text-white rounded-store-control font-medium flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 transition-colors text-sm"
       >
         {running ? (
           <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -49,13 +49,13 @@ export const SkillSandboxTab: React.FC<SkillSandboxTabProps> = ({
 
       {output && (
         <div className="mt-3">
-          <div className="flex justify-between text-[11px] text-gray-500 mb-1">
+          <div className="flex justify-between text-[11px] text-store-ink-faint mb-1">
             <span>{t('skills.modal.outputResult')}</span>
             <span>
               Tokens: <strong>{output.tokensUsed}</strong>
             </span>
           </div>
-          <pre className="p-3 rounded-xl bg-gray-900 text-amber-300 font-mono text-[11px] overflow-x-auto max-h-48 leading-relaxed border border-gray-800 whitespace-pre-wrap select-text">
+          <pre className="p-3 rounded-store-control bg-gray-900 text-store-warning font-mono text-[11px] overflow-x-auto max-h-48 leading-relaxed border border-store-line whitespace-pre-wrap select-text">
             {output.output}
           </pre>
         </div>

@@ -49,16 +49,16 @@ export default function Wishlist() {
   return (
     <div className="p-6 md:p-8 w-full max-w-full transition-colors duration-200 select-none space-y-6">
       <div>
-        <h1 className="text-xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
+        <h1 className="text-xl font-bold tracking-tight text-store-ink ">
           {t('wishlist.header.title')}
         </h1>
-        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+        <p className="text-xs text-store-ink-faint mt-1 ">
           {t('wishlist.header.subtitle')}
         </p>
       </div>
 
       <section className="space-y-4">
-        <h3 className="text-sm font-bold tracking-tight text-gray-900 dark:text-gray-100">
+        <h3 className="text-sm font-bold tracking-tight text-store-ink ">
           {t('wishlist.grid.title', { count: items.length })}
         </h3>
         {items.length > 0 ? (

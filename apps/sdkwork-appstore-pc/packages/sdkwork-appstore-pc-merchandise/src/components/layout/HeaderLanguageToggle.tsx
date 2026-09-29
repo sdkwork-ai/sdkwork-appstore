@@ -16,10 +16,10 @@ export const HeaderLanguageToggle: React.FC = () => {
   return (
     <button
       onClick={toggleLanguage}
-      className="flex items-center gap-1.5 px-2 xl:px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors border border-slate-200/80 dark:border-slate-700/80 whitespace-nowrap"
+      className="flex items-center gap-1.5 px-2 xl:px-2.5 py-1.5 rounded-store-control text-xs font-medium text-store-ink-soft hover:bg-store-subtle transition-colors border border-store-line/80 whitespace-nowrap "
       title={isZh ? t('common.language.switchToEn') : t('common.language.switchToZh')}
     >
-      <Languages className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+      <Languages className="w-3.5 h-3.5 text-store-brand " />
       <span className="hidden xl:inline">{isZh ? t('common.language.labelZh') : t('common.language.labelEn')}</span>
     </button>
   );

@@ -19,13 +19,13 @@ export const TemplateModalHeader: React.FC<TemplateModalHeaderProps> = ({ templa
         <div className="flex items-center gap-2">
           <h2 className="text-xl font-bold">{template.title}</h2>
           {template.isOfficial && (
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-500">
+            <span className="text-xs font-medium px-2.5 py-0.5 rounded-full bg-store-brand/10 text-store-brand">
               {t('templates.official')}
             </span>
           )}
         </div>
-        <p className="text-xs text-gray-400 mt-1">
-          {t('templates.modal.author')}: <span className="text-gray-700 dark:text-gray-300 font-medium">{template.author}</span> · {template.framework}
+        <p className="text-xs text-store-ink-faint mt-1">
+          {t('templates.modal.author')}: <span className="text-store-ink-soft font-medium ">{template.author}</span> · {template.framework}
         </p>
       </div>
     </div>

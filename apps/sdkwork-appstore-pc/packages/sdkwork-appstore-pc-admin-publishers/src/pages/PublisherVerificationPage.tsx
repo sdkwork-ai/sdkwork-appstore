@@ -128,7 +128,7 @@ export function PublisherVerificationPage() {
             </AdminFormField>
           </div>
 
-          <p className="text-xs leading-5 text-gray-500 dark:text-gray-400">
+          <p className="text-xs leading-5 text-store-ink-faint ">
             {t('adminPublishers.verification.auditable')}
           </p>
 
@@ -150,10 +150,10 @@ export function PublisherVerificationPage() {
           <div className="mt-4 space-y-3">
             <div
               role="status"
-              className="flex items-start gap-2 rounded-xl border border-emerald-200 bg-emerald-50/70 px-3 py-2 text-xs dark:border-emerald-900/60 dark:bg-emerald-950/30"
+              className="flex items-start gap-2 rounded-store-control border border-store-success-soft bg-store-success-soft px-3 py-2 text-xs "
             >
-              <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-500" />
-              <p className="font-medium text-emerald-700 dark:text-emerald-300">
+              <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-store-success" />
+              <p className="font-medium text-store-success ">
                 {t('adminPublishers.verification.success')}
               </p>
             </div>

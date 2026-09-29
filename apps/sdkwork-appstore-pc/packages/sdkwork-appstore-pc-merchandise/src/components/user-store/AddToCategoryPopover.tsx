@@ -92,27 +92,27 @@ export function AddToCategoryPopover({ listingId }: AddToCategoryPopoverProps) {
         type="button"
         aria-label={t('userStore.actions.addToCategory')}
         onClick={() => setOpen((v) => !v)}
-        className={`p-2 rounded-full transition-colors cursor-pointer ${
+        className={`p-2 rounded-full transition-colors cursor-pointer text-xs font-medium${
           open
-            ? 'bg-indigo-500/10 text-indigo-500'
-            : 'bg-gray-100 dark:bg-[#2C2C2E] text-gray-500 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-[#3C3C3E]'
+            ? 'bg-store-brand/10 text-store-brand'
+            : 'bg-store-raised text-store-ink-faint hover:bg-store-raised '
         }`}
       >
         <FolderPlus className="w-5 h-5" />
       </button>
 
       {open && (
-        <div className="absolute right-0 top-11 z-40 w-72 rounded-2xl bg-white dark:bg-[#181a20] border border-gray-200 dark:border-[#262933] shadow-xl p-3 text-sm">
-          <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 px-1 pb-2">
+        <div className="absolute right-0 top-11 z-40 w-72 rounded-store-card bg-store-surface border border-store-line shadow-xl p-3 text-sm ">
+          <p className="text-xs font-semibold text-store-ink-faint px-1 pb-2 ">
             {t('userStore.actions.addToCategory')}
           </p>
 
           {loading ? (
             <div className="flex justify-center py-4">
-              <Loader2 className="w-4 h-4 animate-spin text-indigo-500" />
+              <Loader2 className="w-4 h-4 animate-spin text-store-brand" />
             </div>
           ) : categories.length === 0 ? (
-            <p className="text-[11px] text-gray-400 px-1 py-2">{t('userStore.items.pickEmpty')}</p>
+            <p className="text-[11px] text-store-ink-faint px-1 py-2">{t('userStore.items.pickEmpty')}</p>
           ) : (
             <div className="max-h-48 overflow-y-auto space-y-1">
               {categories.map((category) => (
@@ -121,24 +121,24 @@ export function AddToCategoryPopover({ listingId }: AddToCategoryPopoverProps) {
                   type="button"
                   disabled={addingId !== null}
                   onClick={() => void handleAdd(category)}
-                  className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-left hover:bg-gray-50 dark:hover:bg-[#222530] disabled:opacity-60 transition-colors cursor-pointer"
+                  className="w-full flex items-center gap-2 px-3 py-2 rounded-store-control text-left hover:bg-store-subtle disabled:opacity-60 transition-colors cursor-pointer text-sm font-medium"
                 >
-                  <span className="truncate flex-1 text-xs text-gray-700 dark:text-gray-200">
+                  <span className="truncate flex-1 text-xs text-store-ink-soft ">
                     {category.name}
                   </span>
                   {addedId === category.id ? (
-                    <Check className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                    <Check className="w-3.5 h-3.5 text-store-success shrink-0" />
                   ) : addingId === category.id ? (
-                    <Loader2 className="w-3.5 h-3.5 animate-spin text-indigo-500 shrink-0" />
+                    <Loader2 className="w-3.5 h-3.5 animate-spin text-store-brand shrink-0" />
                   ) : (
-                    <span className="text-[11px] text-gray-400 shrink-0">{category.itemCount}</span>
+                    <span className="text-[11px] text-store-ink-faint shrink-0">{category.itemCount}</span>
                   )}
                 </button>
               ))}
             </div>
           )}
 
-          <div className="mt-2 pt-2 border-t border-gray-100 dark:border-[#262933]">
+          <div className="mt-2 pt-2 border-t border-store-line-soft ">
             <div className="flex gap-1.5">
               <input
                 type="text"
@@ -149,20 +149,20 @@ export function AddToCategoryPopover({ listingId }: AddToCategoryPopoverProps) {
                 }}
                 maxLength={64}
                 placeholder={t('userStore.category.namePlaceholder')}
-                className="flex-1 min-w-0 px-3 py-1.5 rounded-xl bg-gray-50 dark:bg-[#222530] border border-gray-200 dark:border-[#262933] text-xs outline-none focus:border-indigo-400 transition-colors"
+                className="flex-1 min-w-0 px-3 rounded-store-control bg-store-field border border-store-line text-sm outline-none focus:border-store-brand transition-colors h-9 text-store-ink placeholder:text-store-ink-faint focus:ring-2 focus:ring-store-brand/25"
               />
               <button
                 type="button"
                 disabled={creating || !newName.trim()}
                 onClick={() => void handleCreate()}
-                className="px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white text-xs font-medium transition-colors cursor-pointer"
+                className="px-3 py-1.5 rounded-store-control bg-store-brand hover:bg-store-brand disabled:opacity-50 text-white text-xs font-medium transition-colors cursor-pointer"
               >
                 {t('userStore.items.createAndAdd')}
               </button>
             </div>
           </div>
 
-          {error && <p className="text-[11px] text-red-500 px-1 pt-2">{error}</p>}
+          {error && <p className="text-[11px] text-store-danger px-1 pt-2">{error}</p>}
         </div>
       )}
     </div>

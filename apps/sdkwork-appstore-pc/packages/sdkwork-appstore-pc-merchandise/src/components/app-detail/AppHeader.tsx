@@ -19,7 +19,7 @@ export function AppHeader({ app }: AppHeaderProps) {
       <div className="mb-6 md:hidden">
         <button 
           onClick={() => navigate(-1)}
-          className="text-blue-600 dark:text-[#0A84FF] flex items-center gap-1 font-medium hover:opacity-80 cursor-pointer"
+          className="text-store-brand flex items-center gap-1 font-medium hover:opacity-80 cursor-pointer "
         >
           <ChevronLeft className="w-5 h-5" />
           <span>{t('appDetail.header.back')}</span>
@@ -33,11 +33,11 @@ export function AppHeader({ app }: AppHeaderProps) {
         
         <div className="flex-1 flex flex-col pt-1 md:pt-2 w-full">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-0">
-            <h1 className="text-3xl font-extrabold tracking-tight text-[#1C1C1E] dark:text-[#F5F5F5]">{app.name}</h1>
+            <h1 className="text-3xl font-extrabold tracking-tight text-store-ink ">{app.name}</h1>
             {/* Sub-component: Install & Share Actions */}
             <AppHeaderActions app={app} />
           </div>
-          <p className="text-xl text-gray-400 dark:text-gray-500 font-medium mb-4 mt-1 md:mt-0">{app.category}</p>
+          <p className="text-xl text-store-ink-faint font-medium mb-4 mt-1 md:mt-0 ">{app.category}</p>
           
           {/* Sub-component: Stats bar */}
           <AppHeaderStatsBar app={app} />

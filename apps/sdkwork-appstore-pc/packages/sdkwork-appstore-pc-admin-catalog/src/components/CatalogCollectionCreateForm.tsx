@@ -68,7 +68,7 @@ export function CatalogCollectionCreateForm() {
               message={t('adminCatalog.collections.create.success')}
               tone="success"
             />
-            <p className="font-mono text-[11px] text-gray-500 dark:text-gray-400">
+            <p className="font-mono text-[11px] text-store-ink-faint ">
               {createdId
                 ? t('adminCatalog.createResult.id', { id: createdId })
                 : t('adminCatalog.createResult.idUnavailable')}

@@ -16,12 +16,12 @@ export const McpCard: React.FC<McpCardProps> = ({
   onOpenConfig,
 }) => {
   return (
-    <div className="group bg-white dark:bg-[#191b22] border border-gray-200/80 dark:border-[#262933] hover:border-cyan-500/50 dark:hover:border-cyan-500/50 p-4 rounded-2xl transition-all duration-200 hover:shadow-lg flex flex-col justify-between">
+    <div className="group bg-store-surface border border-store-line/80 dark:border-store-line hover:border-store-info/50 p-4 rounded-store-card transition-all duration-200 hover:shadow-lg flex flex-col justify-between ">
       <div>
         {/* Subcomponent: MCP Card Header */}
         <McpCardHeader server={server} />
 
-        <p className="text-xs text-gray-600 dark:text-gray-300 mt-3 line-clamp-2 leading-relaxed">
+        <p className="text-xs text-store-ink-soft mt-3 line-clamp-2 leading-relaxed ">
           {server.description}
         </p>
 

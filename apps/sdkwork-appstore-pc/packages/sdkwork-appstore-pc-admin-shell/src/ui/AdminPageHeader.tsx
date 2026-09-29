@@ -27,15 +27,15 @@ export function AdminPageHeader({
   return (
     <header
       className={`flex flex-col gap-3 pb-4 sm:flex-row sm:items-start sm:justify-between${
-        bordered ? ' mb-5 border-b border-gray-200 dark:border-[#22252e]' : ''
+        bordered ? 'mb-5 border-b border-store-line  ' : ''
       }`}
     >
       <div className="min-w-0">
-        <h1 className="truncate text-lg font-semibold text-gray-900 dark:text-gray-50">{title}</h1>
+        <h1 className="truncate text-lg font-semibold text-store-ink ">{title}</h1>
         {description ? (
-          <p className="mt-1 text-xs leading-5 text-gray-500 dark:text-gray-400">{description}</p>
+          <p className="mt-1 text-xs leading-5 text-store-ink-faint ">{description}</p>
         ) : null}
-        {meta ? <div className="mt-1 text-xs text-gray-400 dark:text-gray-500">{meta}</div> : null}
+        {meta ? <div className="mt-1 text-xs text-store-ink-faint ">{meta}</div> : null}
       </div>
       {actions ? <div className="flex shrink-0 items-center gap-2">{actions}</div> : null}
     </header>

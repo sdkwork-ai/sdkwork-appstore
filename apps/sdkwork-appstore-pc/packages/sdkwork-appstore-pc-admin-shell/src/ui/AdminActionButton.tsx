@@ -15,13 +15,13 @@ export interface AdminActionButtonProps {
 
 const VARIANT_CLASSES: Record<NonNullable<AdminActionButtonProps['variant']>, string> = {
   primary:
-    'bg-gray-900 text-white enabled:hover:bg-gray-800 dark:bg-gray-100 dark:text-gray-900 dark:enabled:hover:bg-white',
+    'bg-gray-900 text-white enabled:hover:bg-gray-800 dark:bg-store-subtle dark:text-store-ink dark:enabled:hover:bg-store-surface',
   secondary:
-    'border border-gray-300 text-gray-700 enabled:hover:bg-gray-100 dark:border-[#2f3442] dark:text-gray-200 dark:enabled:hover:bg-[#1d2028]',
+    'border border-store-line-strong text-store-ink-soft enabled:hover:bg-store-subtle   ',
   danger:
-    'border border-rose-300 text-rose-600 enabled:hover:bg-rose-50 dark:border-rose-900 dark:text-rose-400 dark:enabled:hover:bg-rose-950/30',
+    'border border-store-danger-soft text-store-danger enabled:hover:bg-store-danger-soft   ',
   ghost:
-    'text-gray-600 enabled:hover:bg-gray-100 dark:text-gray-300 dark:enabled:hover:bg-[#1d2028]',
+    'text-store-ink-soft enabled:hover:bg-store-subtle  ',
 };
 
 const SIZE_CLASSES: Record<NonNullable<AdminActionButtonProps['size']>, string> = {

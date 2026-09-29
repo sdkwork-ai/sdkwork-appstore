@@ -23,37 +23,37 @@ export const ExpertCard: React.FC<ExpertCardProps> = ({ expert, onSelect }) => {
   return (
     <div
       onClick={handleOpenInLab}
-      className="group w-full h-full bg-white dark:bg-[#191b22] border border-gray-200/80 dark:border-[#262933] hover:border-blue-500/50 dark:hover:border-blue-500/50 p-4 rounded-2xl cursor-pointer transition-all duration-200 hover:shadow-lg flex flex-col justify-between"
+      className="group w-full h-full bg-store-surface border border-store-line/80 dark:border-store-line hover:border-store-brand/50 p-4 rounded-store-card cursor-pointer transition-all duration-200 hover:shadow-lg flex flex-col justify-between "
     >
       <div>
         {/* Subcomponent: Card Header */}
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
-            <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-blue-600/10 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400 shrink-0">
+            <div className="w-12 h-12 rounded-store-control flex items-center justify-center bg-store-brand/10 text-store-brand dark:bg-store-brand/20 shrink-0 ">
               <DynamicIcon name={expert.avatarIcon || 'Bot'} className="w-6 h-6" />
             </div>
             <div className="min-w-0">
               <div className="flex items-center gap-1.5">
-                <h3 className="font-bold text-sm text-gray-900 dark:text-gray-100 group-hover:text-blue-500 transition-colors truncate">
+                <h3 className="font-bold text-sm text-store-ink group-hover:text-store-brand transition-colors truncate ">
                   {expert.name}
                 </h3>
                 {expert.isOfficial && (
-                  <CheckCircle2 className="w-4 h-4 text-blue-500 shrink-0" />
+                  <CheckCircle2 className="w-4 h-4 text-store-brand shrink-0" />
                 )}
               </div>
-              <p className="text-xs text-gray-400 truncate mt-0.5">
+              <p className="text-xs text-store-ink-faint truncate mt-0.5">
                 {expert.nickname} · {expert.filterTag}
               </p>
             </div>
           </div>
           {expert.badge && (
-            <span className="shrink-0 text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400">
+            <span className="shrink-0 text-xs font-medium px-2.5 py-0.5 rounded-full bg-store-brand/10 text-store-brand ">
               {expert.badge}
             </span>
           )}
         </div>
 
-        <p className="text-xs text-gray-600 dark:text-gray-300 mt-3 line-clamp-2 leading-relaxed">
+        <p className="text-xs text-store-ink-soft mt-3 line-clamp-2 leading-relaxed ">
           {expert.description}
         </p>
 
@@ -62,13 +62,13 @@ export const ExpertCard: React.FC<ExpertCardProps> = ({ expert, onSelect }) => {
           {expert.tags.slice(0, 3).map((tag, idx) => (
             <span
               key={idx}
-              className="text-[10px] font-medium px-2 py-0.5 rounded-md bg-gray-100 dark:bg-[#222530] text-gray-600 dark:text-gray-400"
+              className="text-xs font-medium px-2.5 py-0.5 rounded-full bg-store-subtle text-store-ink-soft "
             >
               {tag}
             </span>
           ))}
           {expert.tags.length > 3 && (
-            <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-md bg-gray-100 dark:bg-[#222530] text-gray-400">
+            <span className="text-xs font-medium px-2.5 py-0.5 rounded-full bg-store-subtle text-store-ink-faint ">
               +{expert.tags.length - 3}
             </span>
           )}
@@ -76,9 +76,9 @@ export const ExpertCard: React.FC<ExpertCardProps> = ({ expert, onSelect }) => {
       </div>
 
       {/* Subcomponent: Footer Actions */}
-      <div className="flex items-center justify-between mt-4 pt-3 border-t border-gray-100 dark:border-[#222530]">
-        <div className="flex items-center gap-2 text-xs text-gray-400 font-medium">
-          <span className="flex items-center gap-1 text-amber-500 font-semibold">
+      <div className="flex items-center justify-between mt-4 pt-3 border-t border-store-line-soft ">
+        <div className="flex items-center gap-2 text-xs text-store-ink-faint font-medium">
+          <span className="flex items-center gap-1 text-store-warning font-semibold">
             <Star className="w-3.5 h-3.5 fill-amber-500" />
             {expert.rating.toFixed(1)}
           </span>
@@ -92,7 +92,7 @@ export const ExpertCard: React.FC<ExpertCardProps> = ({ expert, onSelect }) => {
               e.stopPropagation();
               handleOpenInLab(e);
             }}
-            className="px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-all shadow-sm cursor-pointer flex items-center gap-1"
+            className="px-3 py-1.5 rounded-store-control bg-store-brand hover:bg-store-brand text-white text-xs font-medium transition-all shadow-sm cursor-pointer flex items-center gap-1"
             title={t('experts.card.tryInLab')}
           >
             <span>{t('experts.card.tryInLab')}</span>

@@ -55,8 +55,8 @@ export default function Collection() {
   if (!collection) {
     return (
       <div className="p-6 md:p-8 w-full max-w-full">
-        <div className="flex flex-col items-center justify-center py-16 text-center gap-2 rounded-2xl border border-dashed border-gray-300 dark:border-gray-700">
-          <h3 className="text-sm font-bold text-gray-900 dark:text-gray-100">
+        <div className="flex flex-col items-center justify-center py-16 text-center gap-2 rounded-2xl border border-dashed border-store-line-strong ">
+          <h3 className="text-sm font-bold text-store-ink ">
             {t('collection.grid.empty')}
           </h3>
         </div>
@@ -66,20 +66,20 @@ export default function Collection() {
 
   return (
     <div className="p-6 md:p-8 w-full max-w-full transition-colors duration-200 select-none space-y-6">
-      <div className="rounded-3xl p-8 text-white bg-gradient-to-br from-indigo-600 via-purple-600 to-fuchsia-600">
-        <p className="text-xs font-bold text-indigo-200 uppercase tracking-wider">
+      <div className="rounded-store-card p-8 text-white bg-gradient-to-br from-store-brand via-purple-600 to-fuchsia-600">
+        <p className="text-xs font-bold text-store-brand uppercase tracking-wider">
           {t('collection.header.subtitle')}
         </p>
         <h1 className="text-2xl font-bold tracking-tight mt-2">
           {t('collection.header.title', { title: collection.title })}
         </h1>
         {collection.subtitle && (
-          <p className="text-sm text-indigo-100 mt-2 max-w-xl">{collection.subtitle}</p>
+          <p className="text-sm text-store-brand mt-2 max-w-xl">{collection.subtitle}</p>
         )}
       </div>
 
       <section className="space-y-4">
-        <h3 className="text-sm font-bold tracking-tight text-gray-900 dark:text-gray-100">
+        <h3 className="text-sm font-bold tracking-tight text-store-ink ">
           {t('collection.grid.title', { count: apps.length })}
         </h3>
         {apps.length > 0 ? (
@@ -89,8 +89,8 @@ export default function Collection() {
             ))}
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center py-16 text-center gap-2 rounded-2xl border border-dashed border-gray-300 dark:border-gray-700">
-            <h3 className="text-sm font-bold text-gray-900 dark:text-gray-100">
+          <div className="flex flex-col items-center justify-center py-16 text-center gap-2 rounded-2xl border border-dashed border-store-line-strong ">
+            <h3 className="text-sm font-bold text-store-ink ">
               {t('collection.grid.empty')}
             </h3>
           </div>

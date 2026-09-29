@@ -74,14 +74,14 @@ export default function PublicUserStore() {
   if (error || !view) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] px-4 text-center">
-        <div className="w-14 h-14 rounded-2xl bg-gray-100 dark:bg-[#222530] text-gray-400 flex items-center justify-center mb-4">
+        <div className="w-14 h-14 rounded-store-card bg-store-subtle text-store-ink-faint flex items-center justify-center mb-4 ">
           {error === 'expired'
             ? <Clock className="w-7 h-7" />
             : error === 'revoked'
               ? <ShieldOff className="w-7 h-7" />
               : <Globe className="w-7 h-7" />}
         </div>
-        <p className="text-sm text-gray-500 dark:text-gray-400">
+        <p className="text-sm text-store-ink-faint ">
           {t(error === 'expired'
             ? 'userStore.public.expired'
             : error === 'revoked'
@@ -90,7 +90,7 @@ export default function PublicUserStore() {
         </p>
         <a
           href="/"
-          className="mt-6 px-6 py-2.5 rounded-full bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium transition-colors"
+          className="mt-6 px-6 py-2.5 rounded-full bg-store-brand hover:bg-store-brand text-white text-sm font-medium transition-colors"
         >
           {t('userStore.public.backHome')}
         </a>
@@ -106,17 +106,17 @@ export default function PublicUserStore() {
   return (
     <div className="p-6 md:p-8 w-full max-w-full transition-colors duration-200 select-none space-y-6">
       {/* Store header */}
-      <div className="flex flex-col items-center text-center py-6 rounded-3xl bg-white dark:bg-[#181a20] border border-gray-200 dark:border-[#262933]">
-        <div className="w-16 h-16 rounded-3xl bg-indigo-600 text-white flex items-center justify-center shadow-lg mb-4">
+      <div className="flex flex-col items-center text-center py-6 rounded-store-card bg-store-surface border border-store-line ">
+        <div className="w-16 h-16 rounded-store-card bg-store-brand text-white flex items-center justify-center shadow-lg mb-4">
           <Store className="w-8 h-8" />
         </div>
-        <h1 className="text-lg font-bold tracking-tight text-gray-900 dark:text-gray-100">
+        <h1 className="text-lg font-bold tracking-tight text-store-ink ">
           {view.title}
         </h1>
         {view.description && (
-          <p className="text-xs text-gray-400 mt-1 max-w-md">{view.description}</p>
+          <p className="text-xs text-store-ink-faint mt-1 max-w-md">{view.description}</p>
         )}
-        <p className="text-xs text-gray-400 mt-1">
+        <p className="text-xs text-store-ink-faint mt-1">
           {t('userStore.public.appCount', { count: totalItems })}
         </p>
       </div>
@@ -128,8 +128,8 @@ export default function PublicUserStore() {
           onClick={() => void handleSelectCategory(null)}
           className={`px-4 py-2 rounded-full text-xs font-medium transition-colors cursor-pointer ${
             activeCategoryId === null
-              ? 'bg-indigo-600 text-white'
-              : 'bg-white dark:bg-[#181a20] text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-[#262933] hover:border-indigo-300'
+              ? 'bg-store-brand text-white'
+              : 'bg-store-surface text-store-ink-soft border border-store-line hover:border-store-brand '
           }`}
         >
           {t('userStore.public.categoryAll')}
@@ -141,8 +141,8 @@ export default function PublicUserStore() {
             onClick={() => void handleSelectCategory(category.userCategoryId)}
             className={`px-4 py-2 rounded-full text-xs font-medium transition-colors cursor-pointer ${
               activeCategoryId === category.userCategoryId
-                ? 'bg-indigo-600 text-white'
-                : 'bg-white dark:bg-[#181a20] text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-[#262933] hover:border-indigo-300'
+                ? 'bg-store-brand text-white'
+                : 'bg-store-surface text-store-ink-soft border border-store-line hover:border-store-brand '
             }`}
           >
             {category.name}
@@ -158,16 +158,16 @@ export default function PublicUserStore() {
             <Link
               key={card.listingId}
               to={`/app/${card.listingId}`}
-              className="flex flex-col items-center gap-2 p-4 rounded-3xl bg-white dark:bg-[#181a20] border border-gray-200 dark:border-[#262933] hover:border-indigo-300 dark:hover:border-indigo-500/40 hover:shadow-lg transition-all"
+              className="flex flex-col items-center gap-2 p-4 rounded-store-card bg-store-surface border border-store-line hover:border-store-brand dark:hover:border-store-brand/40 hover:shadow-lg transition-all "
             >
-              <div className="w-14 h-14 rounded-2xl bg-indigo-600/10 dark:bg-indigo-500/15 text-indigo-500 flex items-center justify-center overflow-hidden">
+              <div className="w-14 h-14 rounded-store-card bg-store-brand/10 dark:bg-store-brand/15 text-store-brand flex items-center justify-center overflow-hidden">
                 <Store className="w-6 h-6" />
               </div>
-              <span className="text-xs font-medium text-gray-900 dark:text-gray-100 text-center line-clamp-2">
+              <span className="text-xs font-medium text-store-ink text-center line-clamp-2 ">
                 {card.displayName}
               </span>
               {card.subtitle && (
-                <span className="text-[11px] text-gray-400 truncate max-w-full">
+                <span className="text-[11px] text-store-ink-faint truncate max-w-full">
                   {card.subtitle}
                 </span>
               )}
@@ -175,10 +175,10 @@ export default function PublicUserStore() {
           ))}
         </div>
       ) : (
-        <p className="text-sm text-gray-400 text-center py-12">{t('userStore.public.empty')}</p>
+        <p className="text-sm text-store-ink-faint text-center py-12">{t('userStore.public.empty')}</p>
       )}
 
-      <p className="text-[11px] text-gray-400 text-center pt-4">
+      <p className="text-[11px] text-store-ink-faint text-center pt-4">
         {t('userStore.public.poweredBy')}
       </p>
     </div>

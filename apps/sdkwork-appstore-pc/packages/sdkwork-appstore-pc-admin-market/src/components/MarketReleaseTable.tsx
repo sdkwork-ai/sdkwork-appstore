@@ -33,7 +33,7 @@ export function MarketReleaseTable({
       key: 'marketRelease',
       header: t('adminMarket.releases.columns.marketReleaseId'),
       render: (item) => (
-        <span className="font-mono text-[11px] text-gray-600 dark:text-gray-300">
+        <span className="font-mono text-[11px] text-store-ink-soft ">
           {item.marketReleaseId}
         </span>
       ),
@@ -43,7 +43,7 @@ export function MarketReleaseTable({
       header: t('adminMarket.releases.columns.releaseId'),
       hideBelowLarge: true,
       render: (item) => (
-        <span className="font-mono text-[11px] text-gray-500 dark:text-gray-400">
+        <span className="font-mono text-[11px] text-store-ink-faint ">
           {item.releaseId || notAvailable}
         </span>
       ),
@@ -54,11 +54,11 @@ export function MarketReleaseTable({
       width: 'w-40',
       render: (item) => (
         <div className="min-w-0">
-          <p className="truncate font-mono text-[11px] text-gray-500 dark:text-gray-400">
+          <p className="truncate font-mono text-[11px] text-store-ink-faint ">
             {item.channelId || notAvailable}
           </p>
           {item.channelCode ? (
-            <p className="truncate font-mono text-[11px] text-gray-400 dark:text-gray-500">
+            <p className="truncate font-mono text-[11px] text-store-ink-faint ">
               {item.channelCode}
             </p>
           ) : null}
@@ -70,10 +70,10 @@ export function MarketReleaseTable({
       header: t('adminMarket.releases.columns.listing'),
       render: (item) => (
         <div className="min-w-0">
-          <p className="truncate font-medium text-gray-900 dark:text-gray-50">
+          <p className="truncate font-medium text-store-ink ">
             {item.listingName || notAvailable}
           </p>
-          <p className="truncate font-mono text-[11px] text-gray-400 dark:text-gray-500">
+          <p className="truncate font-mono text-[11px] text-store-ink-faint ">
             {item.listingId || notAvailable}
           </p>
         </div>
@@ -91,7 +91,7 @@ export function MarketReleaseTable({
       width: 'w-40',
       hideBelowLarge: true,
       render: (item) => (
-        <span className="font-mono text-[11px] text-gray-500 dark:text-gray-400">
+        <span className="font-mono text-[11px] text-store-ink-faint ">
           {item.externalReleaseCode || notAvailable}
         </span>
       ),
@@ -102,7 +102,7 @@ export function MarketReleaseTable({
       width: 'w-32',
       hideBelowLarge: true,
       render: (item) => (
-        <span className="text-xs text-gray-500 dark:text-gray-400">
+        <span className="text-xs text-store-ink-faint ">
           {item.lastSyncedDate || notAvailable}
         </span>
       ),

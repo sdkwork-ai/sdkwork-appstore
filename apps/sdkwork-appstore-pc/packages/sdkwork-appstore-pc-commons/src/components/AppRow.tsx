@@ -38,11 +38,11 @@ export function AppRow({ app, showRank, hideButton }: AppRowProps) {
       <motion.div
         whileHover={{ y: -1 }}
         whileTap={{ scale: 0.99 }}
-        className="flex items-center justify-between p-3 rounded-xl bg-gray-50/80 hover:bg-gray-100/80 dark:bg-[#20222a] dark:hover:bg-[#262a34] border border-gray-200/70 dark:border-gray-800 transition-all"
+        className="flex items-center justify-between p-3 rounded-store-control bg-store-subtle/80 hover:bg-store-subtle/80 dark:bg-store-surface dark:hover:bg-store-surface border border-store-line transition-all "
       >
         <div className="flex items-center gap-3 min-w-0 flex-1 pr-2">
           {showRank && app.chartRank && (
-            <span className="text-sm font-bold text-gray-400 dark:text-gray-500 w-5 text-center shrink-0">
+            <span className="text-sm font-bold text-store-ink-faint w-5 text-center shrink-0 ">
               {app.chartRank}
             </span>
           )}
@@ -52,11 +52,11 @@ export function AppRow({ app, showRank, hideButton }: AppRowProps) {
           </div>
 
           <div className="flex-1 min-w-0">
-            <h3 className="font-bold text-xs text-gray-900 dark:text-gray-100 truncate group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-colors">
+            <h3 className="font-bold text-xs text-store-ink truncate group-hover:text-store-brand transition-colors  ">
               {app.name}
             </h3>
             <div className="mt-0.5 flex items-center gap-1.5 min-w-0">
-              <p className="text-[11px] text-gray-500 dark:text-gray-400 truncate">{app.category}</p>
+              <p className="text-[11px] text-store-ink-faint truncate ">{app.category}</p>
               <PlatformBadges platforms={app.platforms} max={2} className="shrink-0" />
             </div>
           </div>
@@ -65,12 +65,12 @@ export function AppRow({ app, showRank, hideButton }: AppRowProps) {
         {!hideButton && (
           <button
             onClick={handleAction}
-            className={`text-[11px] font-medium px-3 py-1 rounded-full shrink-0 transition-all ${
+            className={`text-xs font-medium px-2.5 py-0.5 rounded-full shrink-0 transition-all ${
               installed
-                ? 'bg-blue-600/15 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400 font-semibold hover:bg-blue-600/25'
+                ? 'bg-store-brand/15 text-store-brand dark:bg-store-brand/20 font-medium hover:bg-store-brand/25 '
                 : downloading
-                  ? 'bg-amber-500/20 text-amber-500 font-bold'
-                  : 'text-gray-600 dark:text-gray-300 bg-gray-200 dark:bg-[#2c303c] hover:bg-gray-300 dark:hover:bg-[#383d4c]'
+                  ? 'bg-store-warning/20 text-store-warning font-medium'
+                  : 'text-store-ink-soft bg-store-raised hover:bg-gray-300 dark:hover:bg-store-raised '
             }`}
           >
             {downloading

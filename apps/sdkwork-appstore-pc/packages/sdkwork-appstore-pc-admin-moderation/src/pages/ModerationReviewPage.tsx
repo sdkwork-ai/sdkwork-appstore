@@ -121,11 +121,11 @@ export function ModerationReviewPage() {
 
           <AdminSection title={t('adminModeration.review.attributes')}>
             {Object.keys(review.attributes).length === 0 ? (
-              <p className="text-xs text-gray-500 dark:text-gray-400">
+              <p className="text-xs text-store-ink-faint ">
                 {t('adminModeration.review.attributesEmpty')}
               </p>
             ) : (
-              <pre className="max-h-96 overflow-auto rounded-xl bg-gray-50 p-3 font-mono text-[11px] leading-5 text-gray-700 dark:bg-[#181a20] dark:text-gray-300">
+              <pre className="max-h-96 overflow-auto rounded-store-control bg-store-subtle p-3 font-mono text-[11px] leading-5 text-store-ink-soft ">
                 {JSON.stringify(review.attributes, null, 2)}
               </pre>
             )}

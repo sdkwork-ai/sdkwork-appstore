@@ -97,7 +97,14 @@ export function ThemeProvider({
   }
 
   return (
-    <div className={`flex h-full min-h-0 w-full min-w-0 flex-col${theme === 'dark' ? ' dark' : ''}`} data-sdk-color-mode={theme}>
+    // `text-store-ink` is not decoration: this element is the one that owns the
+    // mode (it carries both `dark` and `data-sdk-color-mode`), so it must also
+    // declare the default ink. `body` alone is not enough — a `body`-level
+    // `color` is resolved against the *host* root, so an embedded surface whose
+    // mode differs from the host's would inherit the host's ink and render
+    // unreadable. Measured in the browser fixture: a mode-pinned subtree whose
+    // ink came from `body` rendered light-on-light.
+    <div className={`flex h-full min-h-0 w-full min-w-0 flex-col text-store-ink${theme === 'dark' ? ' dark' : ''}`} data-sdk-color-mode={theme}>
       {content}
     </div>
   );

@@ -33,8 +33,8 @@ export function PublisherListingTable({
       header: t('adminPublishers.analytics.columns.listing'),
       render: (item) => (
         <div className="min-w-0">
-          <p className="truncate font-medium text-gray-900 dark:text-gray-50">{item.displayName}</p>
-          <p className="truncate font-mono text-[11px] text-gray-400 dark:text-gray-500">
+          <p className="truncate font-medium text-store-ink ">{item.displayName}</p>
+          <p className="truncate font-mono text-[11px] text-store-ink-faint ">
             {item.listingId}
           </p>
         </div>
@@ -53,7 +53,7 @@ export function PublisherListingTable({
       align: 'right',
       hideBelowLarge: true,
       render: (item) => (
-        <span className="text-xs tabular-nums text-gray-600 dark:text-gray-300">
+        <span className="text-xs tabular-nums text-store-ink-soft ">
           {formatPublisherCount(item.impressions)}
         </span>
       ),
@@ -65,7 +65,7 @@ export function PublisherListingTable({
       align: 'right',
       hideBelowLarge: true,
       render: (item) => (
-        <span className="text-xs tabular-nums text-gray-600 dark:text-gray-300">
+        <span className="text-xs tabular-nums text-store-ink-soft ">
           {formatPublisherCount(item.pageViews)}
         </span>
       ),
@@ -76,7 +76,7 @@ export function PublisherListingTable({
       width: 'w-24',
       align: 'right',
       render: (item) => (
-        <span className="text-xs tabular-nums text-gray-600 dark:text-gray-300">
+        <span className="text-xs tabular-nums text-store-ink-soft ">
           {formatPublisherCount(item.installs)}
         </span>
       ),
@@ -88,7 +88,7 @@ export function PublisherListingTable({
       align: 'right',
       hideBelowLarge: true,
       render: (item) => (
-        <span className="text-xs tabular-nums text-gray-600 dark:text-gray-300">
+        <span className="text-xs tabular-nums text-store-ink-soft ">
           {formatPublisherCount(item.uninstalls)}
         </span>
       ),
@@ -100,7 +100,7 @@ export function PublisherListingTable({
       align: 'right',
       hideBelowLarge: true,
       render: (item) => (
-        <span className="text-xs tabular-nums text-gray-600 dark:text-gray-300">
+        <span className="text-xs tabular-nums text-store-ink-soft ">
           {formatPublisherRevenue(item.revenueAmount, item.revenueCurrency)}
         </span>
       ),
@@ -112,7 +112,7 @@ export function PublisherListingTable({
       align: 'right',
       hideBelowLarge: true,
       render: (item) => (
-        <span className="text-xs tabular-nums text-gray-600 dark:text-gray-300">
+        <span className="text-xs tabular-nums text-store-ink-soft ">
           {formatPublisherRating(item.averageRating)}
         </span>
       ),
@@ -123,7 +123,7 @@ export function PublisherListingTable({
       width: 'w-24',
       align: 'right',
       render: (item) => (
-        <span className="text-xs tabular-nums text-gray-600 dark:text-gray-300">
+        <span className="text-xs tabular-nums text-store-ink-soft ">
           {formatAdminPercent(item.conversionRatio)}
         </span>
       ),

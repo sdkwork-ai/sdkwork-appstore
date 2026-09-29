@@ -11,7 +11,7 @@ export function ChartsList({ apps, loading }: ChartsListProps) {
   if (loading) {
     return (
       <div className="flex justify-center py-20">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 dark:border-[#0A84FF]"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-store-brand "></div>
       </div>
     );
   }

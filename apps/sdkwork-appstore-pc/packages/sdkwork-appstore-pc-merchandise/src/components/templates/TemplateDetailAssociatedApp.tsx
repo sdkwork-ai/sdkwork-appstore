@@ -13,19 +13,19 @@ export const TemplateDetailAssociatedApp: React.FC<TemplateDetailAssociatedAppPr
   const { t } = useTranslation();
 
   return (
-    <div className="p-6 md:p-8 rounded-2xl bg-slate-900 dark:bg-[#12141c] text-white shadow-md relative overflow-hidden border border-slate-800">
+    <div className="p-6 md:p-8 rounded-store-card bg-slate-900 dark:bg-store-canvas text-white shadow-md relative overflow-hidden border border-store-line">
       <div className="flex flex-col md:flex-row items-center justify-between gap-6 relative z-10">
         <div className="flex items-center gap-5">
           <div
-            className={`w-16 h-16 rounded-2xl ${
-              relatedApp.iconColor || 'bg-blue-600'
+            className={`w-16 h-16 rounded-store-card ${
+              relatedApp.iconColor || 'bg-store-brand'
             } flex items-center justify-center text-white shadow-md shrink-0`}
           >
             <DynamicIcon name={relatedApp.icon || 'Boxes'} className="w-8 h-8" />
           </div>
           <div className="space-y-1">
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-400 text-[11px] font-semibold border border-blue-500/20">
-              <Sparkles className="w-3 h-3 text-amber-300" />
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-store-brand/10 text-store-brand text-xs font-medium border border-store-brand/20">
+              <Sparkles className="w-3 h-3 text-store-warning" />
               <span>{t('templates.detail.builtFromTemplate', '由此模板构建的应用详情')}</span>
             </div>
             <h3 className="text-xl font-bold text-white">{relatedApp.name}</h3>
@@ -37,7 +37,7 @@ export const TemplateDetailAssociatedApp: React.FC<TemplateDetailAssociatedAppPr
 
         <Link
           to={`/app/${relatedApp.id}`}
-          className="px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-sm shadow-sm transition-all flex items-center gap-2 shrink-0 cursor-pointer group"
+          className="px-6 py-3 rounded-store-control bg-store-brand hover:bg-store-brand text-white font-semibold text-sm shadow-sm transition-all flex items-center gap-2 shrink-0 cursor-pointer group"
         >
           <span>{t('templates.card.appDetails', '查看应用详情')}</span>
           <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />

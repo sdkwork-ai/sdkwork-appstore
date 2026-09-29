@@ -17,38 +17,38 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({
 }) => {
   const variantStyles: Record<StatusVariant, { bg: string; text: string; border: string; dot: string }> = {
     success: {
-      bg: 'bg-emerald-500/10 dark:bg-emerald-500/15',
-      text: 'text-emerald-600 dark:text-emerald-400',
-      border: 'border-emerald-500/20',
-      dot: 'bg-emerald-500',
+      bg: 'bg-store-success/10 dark:bg-store-success/15',
+      text: 'text-store-success ',
+      border: 'border-store-success/20',
+      dot: 'bg-store-success',
     },
     active: {
-      bg: 'bg-emerald-500/10 dark:bg-emerald-500/15',
-      text: 'text-emerald-600 dark:text-emerald-400',
-      border: 'border-emerald-500/20',
-      dot: 'bg-emerald-500 animate-pulse',
+      bg: 'bg-store-success/10 dark:bg-store-success/15',
+      text: 'text-store-success ',
+      border: 'border-store-success/20',
+      dot: 'bg-store-success animate-pulse',
     },
     warning: {
-      bg: 'bg-amber-500/10 dark:bg-amber-500/15',
-      text: 'text-amber-600 dark:text-amber-400',
-      border: 'border-amber-500/20',
-      dot: 'bg-amber-500',
+      bg: 'bg-store-warning/10 dark:bg-store-warning/15',
+      text: 'text-store-warning ',
+      border: 'border-store-warning/20',
+      dot: 'bg-store-warning',
     },
     error: {
-      bg: 'bg-red-500/10 dark:bg-red-500/15',
-      text: 'text-red-600 dark:text-red-400',
-      border: 'border-red-500/20',
-      dot: 'bg-red-500',
+      bg: 'bg-store-danger/10 dark:bg-store-danger/15',
+      text: 'text-store-danger ',
+      border: 'border-store-danger/20',
+      dot: 'bg-store-danger',
     },
     info: {
-      bg: 'bg-blue-500/10 dark:bg-blue-500/15',
-      text: 'text-blue-600 dark:text-blue-400',
-      border: 'border-blue-500/20',
-      dot: 'bg-blue-500',
+      bg: 'bg-store-brand/10 dark:bg-store-brand/15',
+      text: 'text-store-brand ',
+      border: 'border-store-brand/20',
+      dot: 'bg-store-brand',
     },
     neutral: {
       bg: 'bg-gray-500/10 dark:bg-gray-500/15',
-      text: 'text-gray-600 dark:text-gray-400',
+      text: 'text-store-ink-soft ',
       border: 'border-gray-500/20',
       dot: 'bg-gray-400',
     },
@@ -58,7 +58,7 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({
 
   return (
     <span
-      className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold border ${style.bg} ${style.text} ${style.border} ${className}`}
+      className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium border ${style.bg} ${style.text} ${style.border} ${className}`}
     >
       {showDot && <span className={`w-1.5 h-1.5 rounded-full ${style.dot}`} />}
       <span>{status}</span>

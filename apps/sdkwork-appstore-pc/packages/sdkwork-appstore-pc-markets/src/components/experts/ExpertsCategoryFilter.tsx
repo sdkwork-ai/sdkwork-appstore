@@ -27,10 +27,10 @@ export const ExpertsCategoryFilter: React.FC<ExpertsCategoryFilterProps> = ({
         <button
           key={cat}
           onClick={() => onSelectCategory(cat)}
-          className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
+          className={`px-3.5 py-1.5 rounded-store-control text-xs font-medium whitespace-nowrap transition-all cursor-pointer ${
             selectedCategory === cat
-              ? 'bg-blue-600 text-white shadow-sm'
-              : 'bg-white dark:bg-[#1b1e26] text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-[#282c38] hover:bg-gray-100 dark:hover:bg-[#222632]'
+              ? 'bg-store-brand text-white shadow-sm'
+              : 'bg-store-surface text-store-ink-soft border border-store-line hover:bg-store-subtle '
           }`}
         >
           {getCategoryLabel(cat)}

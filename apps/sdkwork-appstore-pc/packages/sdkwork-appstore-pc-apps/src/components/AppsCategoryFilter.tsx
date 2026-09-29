@@ -22,10 +22,10 @@ export const AppsCategoryFilter: React.FC<AppsCategoryFilterProps> = ({
           <button
             key={cat}
             onClick={() => onSelectCategory(cat)}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all shrink-0 ${
+            className={`px-4 py-2 rounded-store-control text-xs font-medium transition-all shrink-0 ${
               selectedCategory === cat
-                ? 'bg-blue-600 text-white shadow-md'
-                : 'bg-gray-200/70 dark:bg-[#1a1c23] text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-[#252834]'
+                ? 'bg-store-brand text-white shadow-md'
+                : 'bg-store-raised/70 dark:bg-store-surface text-store-ink-soft hover:bg-gray-300 dark:hover:bg-store-surface '
             }`}
           >
             {label}

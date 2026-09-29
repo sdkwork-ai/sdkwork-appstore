@@ -84,13 +84,13 @@ export const ExpertDetailModal: React.FC<ExpertDetailModalProps> = ({
   const filterTagLabel = t(filterTagKeyMap[expert.filterTag] ?? '', expert.filterTag);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-fade-in">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-store-overlay backdrop-blur-sm animate-fade-in">
       <div
-        className="bg-slate-900 border border-slate-800 rounded-2xl max-w-2xl w-full text-slate-100 overflow-hidden shadow-2xl flex flex-col max-h-[90vh] animate-scale-up"
+        className="bg-slate-900 border border-store-line rounded-store-modal max-w-2xl w-full text-slate-100 overflow-hidden shadow-2xl flex flex-col max-h-[90vh] animate-scale-up"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Header */}
-        <div className="flex items-start justify-between p-5 md:p-6 border-b border-slate-800 bg-slate-950/50">
+        <div className="flex items-start justify-between p-5 md:p-6 border-b border-store-line bg-slate-950/50">
           <div className="flex items-center gap-3.5 min-w-0">
             <div className={`w-12 h-12 rounded-2xl ${expert.avatarBg} flex items-center justify-center text-white shadow-lg shrink-0`}>
               <Bot className="w-6 h-6" />
@@ -99,12 +99,12 @@ export const ExpertDetailModal: React.FC<ExpertDetailModalProps> = ({
               <div className="flex items-center gap-2 flex-wrap">
                 <h3 className="text-xl font-bold text-white">{expert.name}</h3>
                 {expert.badge && (
-                  <span className="text-xs px-2.5 py-0.5 rounded-full font-medium bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                  <span className="text-xs px-2.5 py-0.5 rounded-full font-medium bg-store-warning/20 text-store-warning border border-store-warning/30">
                     {expert.badge}
                   </span>
                 )}
               </div>
-              <p className="text-xs text-slate-400 mt-0.5 font-medium">
+              <p className="text-xs text-store-ink-faint mt-0.5 font-medium">
                 {expert.nickname} · {scenarioLabel} ({filterTagLabel})
               </p>
             </div>
@@ -114,15 +114,15 @@ export const ExpertDetailModal: React.FC<ExpertDetailModalProps> = ({
             <button
               type="button"
               onClick={() => onToggleMyExpert(expert.id)}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all border ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-store-control text-xs font-medium transition-all border ${
                 isMyExpert
-                  ? 'bg-indigo-600/30 border-indigo-500 text-indigo-300'
-                  : 'bg-slate-800 border-slate-700 text-slate-300 hover:text-white'
+                  ? 'bg-store-brand/30 border-store-brand text-store-brand'
+                  : 'bg-slate-800 border-store-line text-slate-300 hover:text-white'
               }`}
             >
               {isMyExpert ? (
                 <>
-                  <Check className="w-3.5 h-3.5 text-indigo-400" />
+                  <Check className="w-3.5 h-3.5 text-store-brand" />
                   <span>{t('aihub.experts.card.addedToMine')}</span>
                 </>
               ) : (
@@ -135,7 +135,7 @@ export const ExpertDetailModal: React.FC<ExpertDetailModalProps> = ({
             <button
               type="button"
               onClick={onClose}
-              className="p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+              className="p-1.5 rounded-store-control text-store-ink-faint hover:text-white hover:bg-slate-800 transition-colors text-xs font-medium"
             >
               <X className="w-5 h-5" />
             </button>
@@ -146,24 +146,24 @@ export const ExpertDetailModal: React.FC<ExpertDetailModalProps> = ({
         <div className="p-5 md:p-6 overflow-y-auto space-y-5 flex-1">
           {/* Description */}
           <div>
-            <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">
+            <h4 className="text-xs font-semibold text-store-ink-faint uppercase tracking-wider mb-1.5">
               {t('common.description')}
             </h4>
-            <p className="text-sm text-slate-200 leading-relaxed bg-slate-950/60 p-3.5 rounded-xl border border-slate-800">
+            <p className="text-sm text-slate-200 leading-relaxed bg-slate-950/60 p-3.5 rounded-store-control border border-store-line">
               {expert.description}
             </p>
           </div>
 
           {/* Tags */}
           <div>
-            <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
+            <h4 className="text-xs font-semibold text-store-ink-faint uppercase tracking-wider mb-2">
               {t('common.tags')}
             </h4>
             <div className="flex flex-wrap gap-2">
               {expert.tags.map((tag, idx) => (
                 <span
                   key={idx}
-                  className="text-xs px-2.5 py-1 rounded-lg bg-indigo-950/60 text-indigo-300 border border-indigo-800/50 font-medium"
+                  className="text-xs px-2.5 py-0.5 rounded-full bg-store-brand/60 text-store-brand border border-store-brand/50 font-medium"
                 >
                   #{tag}
                 </span>
@@ -175,19 +175,19 @@ export const ExpertDetailModal: React.FC<ExpertDetailModalProps> = ({
           {expert.systemPrompt && (
             <div>
               <div className="flex items-center justify-between mb-2">
-                <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-                  <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
+                <h4 className="text-xs font-semibold text-store-ink-faint uppercase tracking-wider flex items-center gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5 text-store-brand" />
                   <span>{t('aihub.experts.modal.systemPrompt')}</span>
                 </h4>
                 <button
                   type="button"
                   onClick={handleCopySystemPrompt}
-                  className="flex items-center gap-1 text-xs text-indigo-400 hover:text-indigo-300 transition-colors"
+                  className="flex items-center gap-1 text-xs text-store-brand hover:text-store-brand transition-colors"
                 >
                   {copied ? (
                     <>
-                      <Check className="w-3.5 h-3.5 text-emerald-400" />
-                      <span className="text-emerald-400">{t('aihub.experts.modal.promptCopied')}</span>
+                      <Check className="w-3.5 h-3.5 text-store-success" />
+                      <span className="text-store-success">{t('aihub.experts.modal.promptCopied')}</span>
                     </>
                   ) : (
                     <>
@@ -197,16 +197,16 @@ export const ExpertDetailModal: React.FC<ExpertDetailModalProps> = ({
                   )}
                 </button>
               </div>
-              <pre className="text-xs text-slate-300 bg-slate-950 p-4 rounded-xl border border-slate-800 whitespace-pre-wrap font-mono leading-relaxed max-h-40 overflow-y-auto select-text">
+              <pre className="text-xs text-slate-300 bg-slate-950 p-4 rounded-store-control border border-store-line whitespace-pre-wrap font-mono leading-relaxed max-h-40 overflow-y-auto select-text">
                 {expert.systemPrompt}
               </pre>
             </div>
           )}
 
           {/* Sandbox Test Prompt Input */}
-          <div className="space-y-2 pt-2 border-t border-slate-800">
+          <div className="space-y-2 pt-2 border-t border-store-line">
             <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
-              <MessageSquare className="w-3.5 h-3.5 text-indigo-400" />
+              <MessageSquare className="w-3.5 h-3.5 text-store-brand" />
               <span>{t('aihub.experts.modal.testPromptPlaceholder')}</span>
             </label>
             <div className="flex gap-2">
@@ -215,12 +215,12 @@ export const ExpertDetailModal: React.FC<ExpertDetailModalProps> = ({
                 value={testPrompt}
                 onChange={(e) => setTestPrompt(e.target.value)}
                 placeholder={t('aihub.experts.modal.testPromptExample')}
-                className="flex-1 bg-slate-950 text-sm text-slate-100 placeholder-slate-500 px-3.5 py-2.5 rounded-xl border border-slate-800 focus:outline-none focus:border-indigo-500"
+                className="flex-1 bg-store-field text-sm text-store-ink placeholder:text-store-ink-faint px-3 rounded-store-control border border-store-line focus:outline-none focus:border-store-brand h-9 outline-none transition-colors focus:ring-2 focus:ring-store-brand/25"
               />
               <button
                 type="button"
                 onClick={handleExecuteSandbox}
-                className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs transition-colors shadow-md shadow-indigo-600/20 shrink-0"
+                className="flex items-center gap-1.5 px-4 py-2.5 rounded-store-control bg-store-brand hover:bg-store-brand text-white font-medium text-xs transition-colors shadow-md shadow-store-brand/20 shrink-0"
               >
                 <Send className="w-3.5 h-3.5" />
                 <span>{t('aihub.experts.modal.sendToExpert')}</span>
@@ -230,11 +230,11 @@ export const ExpertDetailModal: React.FC<ExpertDetailModalProps> = ({
         </div>
 
         {/* Modal Footer */}
-        <div className="p-4 border-t border-slate-800 bg-slate-950/80 flex justify-end">
+        <div className="p-4 border-t border-store-line bg-slate-950/80 flex justify-end">
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-300 transition-colors"
+            className="px-4 py-2 rounded-store-control bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-300 transition-colors"
           >
             {t('aihub.experts.modal.close')}
           </button>

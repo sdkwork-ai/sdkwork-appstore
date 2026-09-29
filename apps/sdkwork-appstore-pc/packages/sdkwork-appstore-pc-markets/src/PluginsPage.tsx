@@ -78,14 +78,14 @@ export function PluginsPage() {
       </div>
 
       {actionError && (
-        <p role="alert" className="text-xs text-indigo-700 dark:text-indigo-300">
+        <p role="alert" className="text-xs text-store-brand ">
           {actionError}
         </p>
       )}
 
       {/* Plugin Grid — container-query driven, up to 4 columns on wide screens */}
       {loading ? (
-        <div className="py-20 text-center text-xs text-gray-400">{t('plugins.loading')}</div>
+        <div className="py-20 text-center text-xs text-store-ink-faint">{t('plugins.loading')}</div>
       ) : (
         <CardGrid>
           {plugins.map((plugin) => (

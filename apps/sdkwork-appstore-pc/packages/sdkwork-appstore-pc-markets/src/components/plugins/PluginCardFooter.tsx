@@ -12,9 +12,9 @@ export const PluginCardFooter: React.FC<PluginCardFooterProps> = ({ plugin, onTo
   const { t } = useTranslation();
 
   return (
-    <div className="flex items-center justify-between mt-4 pt-3 border-t border-gray-100 dark:border-[#222530]">
-      <div className="flex items-center gap-3 text-xs text-gray-400">
-        <span className="flex items-center gap-1 font-semibold text-amber-500">
+    <div className="flex items-center justify-between mt-4 pt-3 border-t border-store-line-soft ">
+      <div className="flex items-center gap-3 text-xs text-store-ink-faint">
+        <span className="flex items-center gap-1 font-semibold text-store-warning">
           <Star className="w-3.5 h-3.5 fill-amber-500" />
           {plugin.rating}
         </span>
@@ -29,10 +29,10 @@ export const PluginCardFooter: React.FC<PluginCardFooterProps> = ({ plugin, onTo
           e.stopPropagation();
           onToggleEnable(plugin.id);
         }}
-        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all shadow-sm ${
+        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-store-control text-xs font-medium transition-all shadow-sm ${
           plugin.enabled
-            ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
-            : 'bg-gray-100 dark:bg-[#262a36] hover:bg-gray-200 dark:hover:bg-[#303545] text-gray-700 dark:text-gray-200'
+            ? 'bg-store-success hover:bg-store-success text-white'
+            : 'bg-store-subtle hover:bg-store-raised text-store-ink-soft '
         }`}
       >
         {plugin.enabled ? (

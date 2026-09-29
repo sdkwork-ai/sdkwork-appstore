@@ -14,8 +14,8 @@ export const AIAppsGrid: React.FC<AIAppsGridProps> = ({ apps }) => {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-base font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2">
-          <Bot className="w-4 h-4 text-teal-500" />
+        <h2 className="text-base font-bold text-store-ink flex items-center gap-2 ">
+          <Bot className="w-4 h-4 text-store-info" />
           <span>{t('aihub.gridTitleWithCount', { count: apps.length })}</span>
         </h2>
       </div>

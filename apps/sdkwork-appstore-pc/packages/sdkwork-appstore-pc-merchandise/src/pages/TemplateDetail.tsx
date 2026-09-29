@@ -121,10 +121,10 @@ export function TemplateDetailPage() {
   if (!template) {
     return (
       <div className="p-8 text-center flex flex-col items-center justify-center h-full flex-1 min-h-[60vh]">
-        <h2 className="text-2xl font-bold mb-4 text-[#1C1C1E] dark:text-[#F5F5F5]">{t('templates.empty.title')}</h2>
+        <h2 className="text-2xl font-bold mb-4 text-store-ink ">{t('templates.empty.title')}</h2>
         <button
           onClick={() => navigate('/templates')}
-          className="px-4 py-2 rounded-xl bg-indigo-600 text-white font-medium hover:bg-indigo-700 transition-colors cursor-pointer"
+          className="px-4 py-2 rounded-store-control bg-store-brand text-white font-medium hover:bg-store-brand transition-colors cursor-pointer text-sm"
         >
           {t('common.actions.back')}
         </button>
@@ -170,7 +170,7 @@ export function TemplateDetailPage() {
       />
 
       {/* Main Tab Content */}
-      <div className="bg-white dark:bg-[#181a20] rounded-3xl p-6 md:p-8 border border-gray-200/80 dark:border-[#262933] shadow-sm min-h-[380px]">
+      <div className="bg-store-surface rounded-store-card p-6 md:p-8 border border-store-line/80 dark:border-store-line shadow-sm min-h-[380px] ">
         {activeTab === 'overview' && <TemplateOverviewTab template={template} />}
         {activeTab === 'screenshots' && (
           <TemplateScreenshotsTab screenshots={template.screenshots} title={template.title} />

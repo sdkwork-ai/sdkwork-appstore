@@ -189,7 +189,7 @@ export default function AIHubPage() {
           />
 
           {marketActionError && (
-            <p role="alert" className="text-xs text-indigo-700 dark:text-indigo-300">
+            <p role="alert" className="text-xs text-store-brand ">
               {marketActionError}
             </p>
           )}
