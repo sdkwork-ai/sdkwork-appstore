@@ -1,4 +1,5 @@
 import 'package:sdkwork_appstore_flutter_mobile_core/sdkwork_appstore_flutter_mobile_core.dart';
+import 'package:sdkwork_appstore_sdk/sdkwork_appstore_sdk.dart';
 
 typedef SdkClients = AppstoreAppSdkClients;
 
@@ -41,4 +42,10 @@ AppstoreAppSdkClients createSdkClients({
     authToken: authToken,
     accessToken: accessToken,
   );
+}
+
+/// Constructs the open-api client for anonymous public reads
+/// (`/store/v3/api`); the transport base rides the same gateway origin.
+SdkworkAppstoreOpenClient createOpenSdkClient(String transportBaseUrl) {
+  return SdkworkAppstoreOpenClient.withBaseUrl(baseUrl: transportBaseUrl);
 }

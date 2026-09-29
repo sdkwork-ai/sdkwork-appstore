@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:sdkwork_appstore_sdk/sdkwork_appstore_sdk.dart';
 import 'package:sdkwork_appstore_flutter_mobile_apps/sdkwork_appstore_flutter_mobile_apps.dart';
 import 'package:sdkwork_appstore_flutter_mobile_app_detail/sdkwork_appstore_flutter_mobile_app_detail.dart';
 import 'package:sdkwork_appstore_flutter_mobile_ai_hub/sdkwork_appstore_flutter_mobile_ai_hub.dart';
@@ -32,6 +33,7 @@ import 'sdk_clients.dart';
 class AppstoreMobileRuntime {
   AppstoreMobileRuntime({
     required this.sdkClients,
+    required this.openClient,
     required this.routes,
   })  : discoverService = DiscoverService(clients: sdkClients),
         appsService = AppsService(clients: sdkClients),
@@ -46,11 +48,23 @@ class AppstoreMobileRuntime {
         libraryService = LibraryService(clients: sdkClients),
         updatesService = UpdatesService(clients: sdkClients),
         wishlistService = WishlistService(clients: sdkClients),
-        userStoreService = UserStoreService(clients: sdkClients),
+        userStoreService = UserStoreService(clients: sdkClients, openClient: openClient),
         publisherService = PublisherService(clients: sdkClients),
-        settingsService = SettingsService(iamRuntime: getIamRuntime());
+        settingsService = SettingsService(iamRuntime: getIamRuntime()) {
+    getIamRuntime().bindTokenSink((AppstoreSession session) {
+      sdkClients.propagateSessionTokens(
+        authToken: session.authToken,
+        accessToken: session.accessToken,
+      );
+    });
+    sdkClients.propagateSessionTokens(
+      authToken: getIamRuntime().session.authToken,
+      accessToken: getIamRuntime().session.accessToken,
+    );
+  }
 
   final AppstoreAppSdkClients sdkClients;
+  final SdkworkAppstoreOpenClient openClient;
   final List<SdkworkUiRouteContribution> routes;
 
   final DiscoverService discoverService;
@@ -217,6 +231,11 @@ Future<AppstoreMobileRuntime> bootstrap() async {
   createIamRuntime();
   registerHostAdapters();
   final sdkClients = createSdkClients();
+  final openClient = createOpenSdkClient(sdkClients.transportBaseUrl);
   final routes = createRoutes();
-  return AppstoreMobileRuntime(sdkClients: sdkClients, routes: routes);
+  return AppstoreMobileRuntime(
+    sdkClients: sdkClients,
+    openClient: openClient,
+    routes: routes,
+  );
 }

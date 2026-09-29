@@ -53,7 +53,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
       return;
     }
     try {
-      await widget.service.uninstall(entry.listingId);
+      await widget.service.uninstall(entry.libraryItemId);
       _reload();
     } catch (error) {
       if (mounted) {

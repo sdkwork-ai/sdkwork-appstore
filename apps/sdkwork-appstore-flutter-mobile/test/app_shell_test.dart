@@ -22,10 +22,10 @@ void main() {
     expect(find.text('搜索'), findsWidgets);
     expect(find.text('库'), findsWidgets);
 
-    // Discover data is transport-gated: the error state renders, and no demo
-    // content is injected.
-    expect(find.text('加载失败，请稍后重试'), findsOneWidget);
-    expect(find.text('重试'), findsOneWidget);
+    // The store feed rides the generated Dart SDK transport; without a
+    // reachable gateway the per-rail degradation renders the empty-store
+    // state, and no demo content is ever injected.
+    expect(find.text('店铺还没有上架内容，先去应用列表看看吧'), findsOneWidget);
   });
 
   testWidgets('cold-start deep links resolve canonical detail routes', (

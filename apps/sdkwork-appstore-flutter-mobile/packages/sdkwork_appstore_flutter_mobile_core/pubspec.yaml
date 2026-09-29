@@ -9,6 +9,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  sdkwork_appstore_app_sdk:
+    path: ../../../../sdks/sdkwork-appstore-app-sdk/sdkwork-appstore-app-sdk-dart
 
 dev_dependencies:
   flutter_test:

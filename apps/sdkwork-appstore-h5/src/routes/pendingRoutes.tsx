@@ -10,18 +10,16 @@ import {
 import { RoutePlaceholder } from './RoutePlaceholder';
 
 /**
- * Canonical route ids that already render a dedicated H5 screen.
+ * Canonical route ids the application root mounts explicitly in `App.tsx`
+ * under its own screen components.
  *
- * Every entry of the shared route table is covered: the discover/search/detail
- * screens ship in the application root, the ai-hub family under `pages/ai-hub/`,
- * and the console routes under the publisher console package. Keep this list in
- * sync when a route is added to the shared table — an uncovered id renders the
- * `RoutePlaceholder` fallback instead of a silent 404.
+ * Everything NOT listed here is mounted by `pendingRouteElements` below, so a
+ * route added to the shared table but not to `App.tsx` still renders (either
+ * through an override here or as a visible placeholder) instead of silently
+ * 404ing.
  */
-export const IMPLEMENTED_ROUTE_IDS: readonly string[] = [
+export const EXPLICIT_ROUTE_IDS: readonly string[] = [
   'app.store.discover.index',
-  'app.store.apps.index',
-  'app.store.games.index',
   'app.store.charts.index',
   'app.store.category.detail',
   'app.store.collection.detail',
@@ -44,12 +42,11 @@ export const IMPLEMENTED_ROUTE_IDS: readonly string[] = [
   'console.store.publisher.overview',
   'console.store.publisher.app-create',
   'console.store.publisher.app-manage',
-  'console.system.settings.index',
 ];
 
 /**
- * Canonical routes mounted on an existing screen that ships under the same
- * canonical path — no dedicated new screen required.
+ * Canonical routes reused from an existing screen under the same canonical
+ * path — no dedicated new screen required.
  */
 const AppsBrowsePage = lazy(() =>
   import('../pages/BrowsePage').then((module) => ({
@@ -67,6 +64,12 @@ const SettingsPage = lazy(() =>
   })),
 );
 
+export const OVERRIDDEN_ROUTE_IDS: readonly string[] = [
+  'app.store.apps.index',
+  'app.store.games.index',
+  'console.system.settings.index',
+];
+
 const ROUTE_ELEMENT_OVERRIDES: Readonly<Record<string, ReactElement>> = {
   'app.store.apps.index': <AppsBrowsePage />,
   'app.store.games.index': <GamesBrowsePage />,
@@ -74,14 +77,14 @@ const ROUTE_ELEMENT_OVERRIDES: Readonly<Record<string, ReactElement>> = {
 };
 
 /**
- * Canonical route ids that have no dedicated screen yet.
+ * Canonical routes not mounted explicitly by `App.tsx`.
  *
  * Derived from the shared route table, so adding a capability route there and
  * forgetting to implement it shows up as a placeholder instead of a 404.
  */
 export const pendingRouteContributions: readonly SdkworkUiRouteContribution[] =
   listAppstoreRouteIdentities().filter(
-    (entry) => !IMPLEMENTED_ROUTE_IDS.includes(entry.id),
+    (entry) => !EXPLICIT_ROUTE_IDS.includes(entry.id),
   );
 
 /** React Router elements for the remaining canonical routes. */

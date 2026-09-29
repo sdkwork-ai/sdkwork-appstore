@@ -29,7 +29,7 @@ export function AIHubPage() {
         <p className="mt-1 text-sm text-violet-100">专家、AI 应用与沙盒，一站式 AI Lab 入口</p>
       </header>
 
-      <div className="sticky top-0 z-10 bg-[var(--bg-primary)]" style={{ top: '3.5rem' }}>
+      <div className="sticky top-0 z-10 bg-[var(--bg-primary)]">
         <div className="flex" role="tablist" aria-label="AI 中心分区">
           {TABS.map((tab) => {
             const Icon = tab.icon;

@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { listAppstoreRouteIdentities } from '@sdkwork/appstore-h5-core';
-import { IMPLEMENTED_ROUTE_IDS } from '../src/routes/pendingRoutes';
+import {
+  EXPLICIT_ROUTE_IDS,
+  OVERRIDDEN_ROUTE_IDS,
+  pendingRouteContributions,
+} from '../src/routes/pendingRoutes';
 
 /**
  * Cross-architecture route alignment guard
@@ -15,17 +19,25 @@ describe('H5 canonical route alignment', () => {
     expect(routes.length).toBeGreaterThanOrEqual(26);
   });
 
-  it('covers every canonical route with an implemented screen', () => {
-    const missing = routes
-      .map((route) => route.id)
-      .filter((id) => !IMPLEMENTED_ROUTE_IDS.includes(id));
+  it('mounts every canonical route explicitly or through an override', () => {
+    const mounted = new Set<string>([...EXPLICIT_ROUTE_IDS, ...OVERRIDDEN_ROUTE_IDS]);
+    const missing = routes.map((route) => route.id).filter((id) => !mounted.has(id));
     expect(missing).toEqual([]);
   });
 
   it('declares no unknown route ids', () => {
     const known = new Set(routes.map((route) => route.id));
-    const unknown = IMPLEMENTED_ROUTE_IDS.filter((id) => !known.has(id));
+    const unknown = [...EXPLICIT_ROUTE_IDS, ...OVERRIDDEN_ROUTE_IDS].filter(
+      (id) => !known.has(id),
+    );
     expect(unknown).toEqual([]);
+  });
+
+  it('renders no placeholder for any canonical route', () => {
+    const placeholderIds = pendingRouteContributions
+      .map((route) => route.id)
+      .filter((id) => !OVERRIDDEN_ROUTE_IDS.includes(id));
+    expect(placeholderIds).toEqual([]);
   });
 
   it('formats route ids as <surface>.<domain>.<capability>.<screen>', () => {
