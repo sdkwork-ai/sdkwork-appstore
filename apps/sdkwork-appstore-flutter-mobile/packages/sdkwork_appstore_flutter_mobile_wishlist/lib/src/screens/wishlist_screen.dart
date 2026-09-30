@@ -47,7 +47,9 @@ class _WishlistScreenState extends State<WishlistScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text(wishlistMessages['titleZh'] ?? '心愿单')),
-      body: FutureBuilder<List<WishlistEntry>>(
+      body: RefreshIndicator(
+        onRefresh: () async => _reload(),
+        child: FutureBuilder<List<WishlistEntry>>(
         future: _wishlistFuture,
         builder: (
           BuildContext context,
@@ -91,6 +93,7 @@ class _WishlistScreenState extends State<WishlistScreen> {
           );
         },
       ),
+    ),
     );
   }
 }

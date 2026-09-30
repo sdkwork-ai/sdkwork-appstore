@@ -67,7 +67,9 @@ class _LibraryScreenState extends State<LibraryScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text(libraryMessages['titleZh'] ?? '我的库')),
-      body: FutureBuilder<List<LibraryEntry>>(
+      body: RefreshIndicator(
+        onRefresh: () async => _reload(),
+        child: FutureBuilder<List<LibraryEntry>>(
         future: _installedFuture,
         builder: (BuildContext context, AsyncSnapshot<List<LibraryEntry>> snapshot) {
           if (snapshot.connectionState != ConnectionState.done) {
@@ -109,6 +111,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
           );
         },
       ),
+    ),
     );
   }
 }
