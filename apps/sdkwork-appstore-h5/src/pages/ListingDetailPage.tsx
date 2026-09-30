@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { ArrowLeft, Star, Download, Share2, Heart, Shield, ChevronRight, Flag } from 'lucide-react';
+import { ArrowLeft, Star, Download, Share2, Heart, Shield, ChevronRight, Flag, FolderPlus } from 'lucide-react';
 import {
   usePublicListing,
   useApi,
@@ -18,6 +18,10 @@ import {
 } from '@sdkwork/appstore-listing-support-core';
 import { isAuthenticated } from '@/bootstrap/iamRuntime';
 import { getStoreClient } from '@/services/storeClient';
+import {
+  userStoreService,
+  type UserCategory,
+} from '@/services/userStoreClient';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { readRecordString as readString } from '@sdkwork/appstore-h5-commons';
 
@@ -38,6 +42,10 @@ export function ListingDetailPage() {
   const [reportOpen, setReportOpen] = useState(false);
   const [reportReason, setReportReason] = useState('');
   const [reportNotice, setReportNotice] = useState<{ title: string; message: string } | null>(null);
+  const [collectOpen, setCollectOpen] = useState(false);
+  const [collectCategories, setCollectCategories] = useState<UserCategory[]>([]);
+  const [collectLoading, setCollectLoading] = useState(false);
+  const [collectNotice, setCollectNotice] = useState<string | null>(null);
 
   const authed = isAuthenticated();
   const row = (data ?? {}) as unknown as unknown as Record<string, unknown>;
@@ -139,8 +147,43 @@ export function ListingDetailPage() {
     }
   }
 
-  async function handleWishlistToggle() {
+  function openCollectSheet() {
     if (!isAuthenticated()) {
+      navigate('/login', { state: { from: { pathname: `/app/${slug}` } } });
+      return;
+    }
+    setCollectOpen(true);
+    setCollectLoading(true);
+    setCollectNotice(null);
+    userStoreService
+      .listCategories(getStoreClient())
+      .then((categories) => setCollectCategories(categories))
+      .catch(() => setCollectCategories([]))
+      .finally(() => setCollectLoading(false));
+  }
+
+  async function handleCollect(categoryId: string) {
+    setCollectLoading(true);
+    setCollectNotice(null);
+    try {
+      const client = getStoreClient();
+      await userStoreService.addToCategory(client, categoryId, listingId);
+      setCollectNotice('已收录，可在「我的 Appstore」中查看');
+      setCollectCategories((prev) =>
+        prev.map((category) =>
+          category.id === categoryId
+            ? { ...category, itemCount: category.itemCount + 1 }
+            : category,
+        ),
+      );
+    } catch (err) {
+      setCollectNotice(formatApiError(err instanceof Error ? err : new Error(String(err))));
+    } finally {
+      setCollectLoading(false);
+    }
+  }
+
+  async function handleWishlistToggle() {    if (!isAuthenticated()) {
       navigate('/login', { state: { from: { pathname: `/app/${slug}` } } });
       return;
     }
@@ -200,6 +243,14 @@ export function ListingDetailPage() {
               }}
             >
               <Share2 className="h-5 w-5" style={{ color: 'var(--text-secondary)' }} />
+            </button>
+            <button
+              type="button"
+              onClick={openCollectSheet}
+              className="flex h-10 w-10 items-center justify-center"
+              aria-label="收录到个人商店"
+            >
+              <FolderPlus className="h-5 w-5" style={{ color: 'var(--text-secondary)' }} />
             </button>
             <button
               type="button"
@@ -417,6 +468,70 @@ export function ListingDetailPage() {
           </div>
         </section>
       </div>
+
+      {collectOpen ? (
+        <div
+          className="fixed inset-0 z-[60] flex items-end"
+          style={{ backgroundColor: 'color-mix(in srgb, black 40%, transparent)' }}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="collect-title"
+          onClick={() => setCollectOpen(false)}
+        >
+          <div
+            className="w-full rounded-t-3xl p-4 pb-8"
+            style={{ backgroundColor: 'var(--bg-surface)' }}
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="mb-3 flex items-center justify-between px-1">
+              <h3 id="collect-title" className="text-sm font-semibold text-[var(--text-primary)]">
+                收录到我的分类
+              </h3>
+              <button
+                type="button"
+                onClick={() => setCollectOpen(false)}
+                className="text-xs text-[var(--text-tertiary)]"
+              >
+                关闭
+              </button>
+            </div>
+
+            {collectLoading ? (
+              <div className="flex justify-center py-6">
+                <LoadingSpinner />
+              </div>
+            ) : collectCategories.length === 0 ? (
+              <div className="py-4 text-center text-sm text-[var(--text-secondary)]">
+                还没有分类，
+                <Link to="/user-store" className="text-[var(--accent)]" onClick={() => setCollectOpen(false)}>
+                  去创建一个
+                </Link>
+              </div>
+            ) : (
+              <div className="max-h-72 space-y-2 overflow-y-auto">
+                {collectCategories.map((category) => (
+                  <button
+                    key={category.id}
+                    type="button"
+                    disabled={collectLoading}
+                    onClick={() => void handleCollect(category.id)}
+                    className="flex w-full items-center gap-3 rounded-2xl border p-3 text-left"
+                    style={{ borderColor: 'var(--border-subtle)' }}
+                  >
+                    <FolderPlus className="h-4 w-4 flex-shrink-0 text-[var(--accent)]" />
+                    <span className="flex-1 text-sm text-[var(--text-primary)]">{category.name}</span>
+                    <span className="text-xs text-[var(--text-tertiary)]">{category.itemCount} 个应用</span>
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {collectNotice ? (
+              <p className="mt-3 px-1 text-xs text-[var(--accent)]">{collectNotice}</p>
+            ) : null}
+          </div>
+        </div>
+      ) : null}
 
       {reportOpen ? (
         <div

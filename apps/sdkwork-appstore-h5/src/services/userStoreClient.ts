@@ -132,6 +132,14 @@ export const userStoreService = {
       ...toPage(page),
     };
   },
+  /** Adds a listing to one of the user's custom categories. */
+  async addToCategory(
+    client: AppStoreClient,
+    categoryId: string,
+    listingId: string,
+  ): Promise<UserCategoryItemWithCard> {
+    return client.userStore.addCategoryItem(categoryId, { listingId });
+  },
   async removeItem(client: AppStoreClient, categoryId: string, itemId: string): Promise<void> {
     await client.userStore.removeCategoryItem(categoryId, itemId);
   },
