@@ -1,1 +1,14 @@
 @import "../../templates/list.wxss";
+
+.load-more {
+  display: flex;
+  justify-content: center;
+  padding: 16rpx 0 32rpx;
+}
+
+.load-more__button {
+  background-color: #ffffff;
+  border: 1rpx solid #e5e7eb;
+  font-size: 24rpx;
+  color: #374151;
+}

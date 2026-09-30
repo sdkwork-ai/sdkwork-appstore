@@ -2,27 +2,108 @@
   <view class="hero">
     <view class="hero__title">SDKWork 应用商店</view>
     <view class="hero__subtitle">小程序精选应用市场</view>
-  </view>
-
-  <view class="status {{status === 'ready' ? 'status--ready' : 'status--error'}}">
-    <view class="status__dot"></view>
-    <text class="status__text">{{statusLabel}}</text>
-  </view>
-
-  <view class="section-title">能力入口</view>
-  <view class="grid">
-    <view
-      class="grid__item"
-      wx:for="{{capabilities}}"
-      wx:key="key"
-      data-name="{{item.name}}"
-      bindtap="onCapabilityTap"
-      hover-class="grid__item--hover"
-    >
-      <view class="grid__name">{{item.name}}</view>
-      <view class="grid__desc">{{item.desc}}</view>
+    <view class="hero__status hero__status--{{runtimeReady ? 'ready' : 'error'}}">
+      {{runtimeReady ? '运行时就绪' : '运行时未构建'}}
     </view>
   </view>
 
-  <view class="footer">SDKWork App Store · 小程序端</view>
+  <view wx:if="{{loading}}" class="state">首页加载中…</view>
+  <view wx:elif="{{error}}" class="state state--error">
+    <text>{{error}}</text>
+    <button class="state__retry" size="mini" bindtap="onRetry">重试</button>
+  </view>
+
+  <block wx:else>
+    <view class="hero-banner" bindtap="onExploreTap" hover-class="hero-banner--hover">
+      <view class="hero-banner__title">发现精彩应用</view>
+      <view class="hero-banner__subtitle">编辑精选与智能推荐，帮你找到下一款必备应用</view>
+      <view class="hero-banner__cta">立即探索</view>
+    </view>
+
+    <view wx:if="{{categories.length > 0}}" class="chips">
+      <view
+        class="chips__item"
+        wx:for="{{categories}}"
+        wx:key="id"
+        data-id="{{item.id}}"
+        data-name="{{item.name}}"
+        bindtap="onCategoryTap"
+        hover-class="chips__item--hover"
+      >{{item.name}}</view>
+    </view>
+
+    <view wx:if="{{heroApps.length > 0}}" class="section">
+      <view class="section__title">编辑精选</view>
+      <scroll-view class="rail" scroll-x enable-flex>
+        <view
+          class="rail__card"
+          wx:for="{{heroApps}}"
+          wx:key="id"
+          data-id="{{item.id}}"
+          bindtap="onHeroTap"
+          hover-class="rail__card--hover"
+        >
+          <view class="rail__icon">{{item.name[0]}}</view>
+          <view class="rail__name">{{item.name}}</view>
+          <view class="rail__developer">{{item.developer}}</view>
+        </view>
+      </scroll-view>
+    </view>
+
+    <view wx:if="{{events.length > 0}}" class="section">
+      <view class="section__title">限时活动</view>
+      <scroll-view class="rail" scroll-x enable-flex>
+        <view
+          class="event-card"
+          wx:for="{{events}}"
+          wx:key="id"
+          data-id="{{item.id}}"
+          bindtap="onEventTap"
+          hover-class="event-card--hover"
+        >
+          <view class="event-card__title">{{item.title}}</view>
+          <view class="event-card__ends" wx:if="{{item.endsAt}}">截止 {{item.endsAt}}</view>
+        </view>
+      </scroll-view>
+    </view>
+
+    <view wx:if="{{recommendations.length > 0}}" class="section">
+      <view class="section__title">为你推荐</view>
+      <view
+        class="rec-item"
+        wx:for="{{recommendations}}"
+        wx:key="id"
+        data-id="{{item.id}}"
+        bindtap="onRecommendationTap"
+        hover-class="rec-item--hover"
+      >
+        <view class="rec-item__icon">{{item.name[0]}}</view>
+        <view class="rec-item__main">
+          <view class="rec-item__name">{{item.name}}</view>
+          <view class="rec-item__developer">{{item.developer}}</view>
+        </view>
+        <view wx:if="{{item.rating > 0}}" class="rec-item__rating">{{item.rating}}★</view>
+      </view>
+    </view>
+
+    <view class="section">
+      <view class="section__title">全部能力</view>
+      <view class="grid">
+        <view
+          class="grid__item"
+          wx:for="{{capabilities}}"
+          wx:key="key"
+          data-name="{{item.name}}"
+          data-path="{{item.path}}"
+          bindtap="onCapabilityTap"
+          hover-class="grid__item--hover"
+        >
+          <view class="grid__name">{{item.name}}</view>
+          <view class="grid__desc">{{item.desc}}</view>
+        </view>
+      </view>
+    </view>
+
+    <view class="footer">SDKWork App Store · 小程序端</view>
+  </view>
 </view>

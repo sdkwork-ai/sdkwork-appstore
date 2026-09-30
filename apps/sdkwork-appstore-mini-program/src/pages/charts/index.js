@@ -5,6 +5,10 @@ Page({
   onLoad() {
     this.load("free");
   },
+  onPullDownRefresh() {
+    this.load(this.data.tab);
+    wx.stopPullDownRefresh();
+  },
   onTabChange(event) {
     const tab = event.currentTarget.dataset.tab;
     if (tab === this.data.tab) {

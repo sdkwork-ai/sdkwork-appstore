@@ -1,2 +1,7 @@
 <import src="../../templates/list.tpl.wxml"/>
 <template is="listPage" data="{{ loading, error, items, emptyText: '暂无游戏' }}"/>
+<view wx:if="{{nextCursor && !loading && !error}}" class="load-more">
+  <button class="load-more__button" size="mini" loading="{{loadingMore}}" bindtap="loadMore">
+    {{loadingMore ? '加载中…' : '加载更多'}}
+  </button>
+</view>

@@ -101,10 +101,24 @@ function createPageLoaders(client: AppstoreAppClient) {
     q?: string;
     categoryId?: string;
     ids?: string[];
+    cursor?: string;
     limit?: number;
-  }): Promise<ListingRow[]> {
+  }): Promise<{ rows: ListingRow[]; nextCursor?: string }> {
     const page = await client.catalog.searchListings(params);
-    return listingRows(page?.items);
+    const pageInfo = (page ?? {}) as {
+      pageInfo?: { nextCursor?: string | null };
+    };
+    return {
+      rows: listingRows(page?.items),
+      nextCursor: pageInfo.pageInfo?.nextCursor ?? undefined,
+    };
+  }
+
+  function localizedRecordName(
+    record: Record<string, unknown>,
+    fallback: string,
+  ): string {
+    return localizedField(record, 'displayName', fallback);
   }
 
   return {
@@ -123,8 +137,8 @@ function createPageLoaders(client: AppstoreAppClient) {
             : '',
         )
         .filter((id) => id !== '');
-      const rows = await searchListings({ ids: rankedIds, limit: rankedIds.length });
-      const bySlug = new Map(rows.map((row) => [row.id, row]));
+      const page = await searchListings({ ids: rankedIds, limit: rankedIds.length });
+      const bySlug = new Map(page.rows.map((row) => [row.id, row]));
       const entries: Array<ListingRow & { rank: number }> = [];
       for (let index = 0; index < rankedIds.length; index++) {
         const row = bySlug.get(rankedIds[index]);
@@ -135,19 +149,99 @@ function createPageLoaders(client: AppstoreAppClient) {
       return entries;
     },
 
-    /** Apps browse: keyword listing page (PC/H5 browse pattern). */
-    apps(): Promise<ListingRow[]> {
-      return searchListings({ q: '应用', limit: 50 });
+    /** Apps browse: keyword listing page with keyset pagination. */
+    async apps(cursor?: string): Promise<{
+      rows: ListingRow[];
+      nextCursor?: string;
+    }> {
+      const page = await searchListings({ q: '应用', cursor, limit: 50 });
+      return { rows: page.rows, nextCursor: page.nextCursor };
     },
 
-    /** Games browse: keyword listing page. */
-    games(): Promise<ListingRow[]> {
-      return searchListings({ q: '游戏', limit: 50 });
+    /** Games browse: keyword listing page with keyset pagination. */
+    async games(cursor?: string): Promise<{
+      rows: ListingRow[];
+      nextCursor?: string;
+    }> {
+      const page = await searchListings({ q: '游戏', cursor, limit: 50 });
+      return { rows: page.rows, nextCursor: page.nextCursor };
+    },
+
+    /**
+     * Discover feed (home): hero picks, categories, active events, and
+     * recommendations — the mini-program counterpart of the PC/H5 storefront.
+     */
+    async discover(): Promise<{
+      heroApps: Array<{ id: string; name: string; developer: string }>;
+      categories: Array<{ id: string; name: string }>;
+      events: Array<{ id: string; title: string; endsAt: string }>;
+      recommendations: ListingRow[];
+    }> {
+      const [home, categoriesPage, eventsPage, recommendationsPage] =
+        await Promise.all([
+          client.catalog.getHome().catch(() => undefined),
+          client.catalog
+            .listCategories({ limit: 10, locale: 'zh-CN' })
+            .catch(() => undefined),
+          client.catalog
+            .listEvents({ status: 'active', limit: 6 })
+            .catch(() => undefined),
+          client.catalog
+            .listRecommendations({ limit: 8 })
+            .catch(() => undefined),
+        ]);
+      const homeData = (home ?? {}) as unknown as Record<string, unknown>;
+      const featuredSlots = Array.isArray(homeData.featuredSlots)
+        ? homeData.featuredSlots
+        : [];
+      const heroIds = featuredSlots
+        .map((slot) =>
+          slot && typeof slot === 'object'
+            ? String((slot as Record<string, unknown>).listingId ?? '')
+            : '',
+        )
+        .filter((id) => id !== '')
+        .slice(0, 8);
+      const heroPage = await searchListings({ ids: heroIds, limit: heroIds.length }).catch(
+        () => ({ rows: [], nextCursor: undefined }),
+      );
+      const categoriesPageItems = ((categoriesPage?.items ?? []) as unknown) as Array<
+        Record<string, unknown>
+      >;
+      const eventItems = (eventsPage?.items ?? []) as Array<Record<string, unknown>>;
+      return {
+        heroApps: heroPage.rows.map((row) => ({
+          id: row.id,
+          name: row.name,
+          developer: row.developer,
+        })),
+        categories: categoriesPageItems.map((row) => ({
+          id: String(row.id ?? ''),
+          name: localizedRecordName(row, String(row.categoryCode ?? '分类')),
+        })),
+        events: eventItems.map((row) => {
+          const localizations = Array.isArray(row.localizations)
+            ? (row.localizations as Array<Record<string, unknown>>)
+            : [];
+          const preferred =
+            localizations.find(
+              (entry) => entry.locale === 'zh-CN' || entry.locale === 'zh_CN',
+            ) ?? localizations[0];
+          return {
+            id: String(row.id ?? ''),
+            title:
+              String(preferred?.displayName ?? '') || String(row.title ?? '') || '限时活动',
+            endsAt: String(row.endsAt ?? ''),
+          };
+        }),
+        recommendations: listingRows(recommendationsPage?.items),
+      };
     },
 
     /** Search results for a query. */
-    search(query: string): Promise<ListingRow[]> {
-      return searchListings({ q: query.trim(), limit: 50 });
+    async search(query: string): Promise<ListingRow[]> {
+      const page = await searchListings({ q: query.trim(), limit: 50 });
+      return page.rows;
     },
 
     /** Category detail: localized header plus its listing page. */
@@ -160,7 +254,9 @@ function createPageLoaders(client: AppstoreAppClient) {
         unknown
       >;
       const name = localizedField(category, 'displayName', '分类');
-      const apps = await searchListings({ categoryId, limit: 50 }).catch(() => []);
+      const apps = await searchListings({ categoryId, limit: 50 })
+        .then((page) => page.rows)
+        .catch(() => []);
       return { name, apps };
     },
 
@@ -175,7 +271,10 @@ function createPageLoaders(client: AppstoreAppClient) {
       >;
       const name = localizedField(collection, 'displayName', '精选合集');
       const ids = entryListingIds(collection);
-      const apps = ids.length === 0 ? [] : await searchListings({ ids, limit: ids.length });
+      const apps =
+        ids.length === 0
+          ? []
+          : (await searchListings({ ids, limit: ids.length })).rows;
       return { name, apps };
     },
 
@@ -190,7 +289,10 @@ function createPageLoaders(client: AppstoreAppClient) {
       >;
       const name = localizedField(event, 'displayName', '限时活动');
       const ids = entryListingIds(event);
-      const apps = ids.length === 0 ? [] : await searchListings({ ids, limit: ids.length });
+      const apps =
+        ids.length === 0
+          ? []
+          : (await searchListings({ ids, limit: ids.length })).rows;
       return { name, apps };
     },
 
