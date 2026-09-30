@@ -1,0 +1,26 @@
+<!-- Shared list-page skeleton: binds loading / error / items / emptyText. -->
+<template name="listPage">
+  <view class="wp-list-page">
+    <view wx:if="{{loading}}" class="wp-state">加载中…</view>
+    <view wx:elif="{{error}}" class="wp-state wp-state--error">{{error}}</view>
+    <view wx:elif="{{!items || items.length === 0}}" class="wp-state">{{emptyText || '暂无内容'}}</view>
+    <block wx:else>
+      <view
+        class="wp-list-item"
+        wx:for="{{items}}"
+        wx:key="id"
+        data-id="{{item.id}}"
+        bindtap="onItemTap"
+        hover-class="wp-list-item--hover"
+      >
+        <view wx:if="{{item.rank}}" class="wp-item-rank {{item.rank <= 3 ? 'wp-item-rank--top' : ''}}">{{item.rank}}</view>
+        <view class="wp-item-icon">{{item.name[0]}}</view>
+        <view class="wp-item-main">
+          <view class="wp-item-name">{{item.name}}</view>
+          <view class="wp-item-developer">{{item.developer}}</view>
+        </view>
+        <view wx:if="{{item.rating > 0}}" class="wp-item-rating">{{item.rating}}★</view>
+      </view>
+    </block>
+  </view>
+</template>

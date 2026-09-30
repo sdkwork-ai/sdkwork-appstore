@@ -1,8 +1,9 @@
 import {
-  createClient,
-  type SdkworkAppClient as GeneratedAppstoreAppClient,
-  type SdkworkAppConfig,
+  createAppStoreClient,
+  type AppStoreClient,
+  type TokenManager,
 } from "@sdkwork/appstore-app-sdk";
+import { createTokenManager } from "@sdkwork/sdk-common";
 
 import {
   readAppSdkSessionTokens,
@@ -11,23 +12,29 @@ import {
   type AppstoreMpSession,
 } from "../session/session.js";
 
-export type AppstoreAppClient = GeneratedAppstoreAppClient;
-export type AppstoreAppClientConfig = SdkworkAppConfig;
+export type AppstoreAppClient = AppStoreClient;
+
+const APP_API_PREFIX = "/app/v3/api";
 
 let client: AppstoreAppClient | null = null;
+let tokenManager: TokenManager | null = null;
 let configuredBaseUrl: string | null = null;
 let bootstrapAccessToken: string | null = null;
 
-/** Normalize and pin the App Store app-api base URL. */
+/**
+ * Normalize and pin the App Store app-api gateway origin.
+ *
+ * Accepts the origin with or without the `/app/v3/api` suffix and stores the
+ * bare origin: the composed client adds the API prefix per operation path.
+ */
 export function configureAppstoreAppSdkBaseUrl(baseUrl: string): void {
   const normalized = baseUrl.trim().replace(/\/+$/u, "");
   if (normalized.length === 0) {
     throw new Error("SDKWORK_APPSTORE_APP_API_BASE_URL is required");
   }
-  if (!normalized.endsWith("/app/v3/api")) {
-    throw new Error(
-      `app-api base URL must end with /app/v3/api: ${normalized}`,
-    );
+  if (normalized.endsWith(APP_API_PREFIX)) {
+    configuredBaseUrl = normalized.slice(0, -APP_API_PREFIX.length) || "/";
+    return;
   }
   configuredBaseUrl = normalized;
 }
@@ -48,16 +55,14 @@ export function resolveAppstoreAppSdkBaseUrl(): string {
   );
 }
 
-export function createAppstoreAppSdkClientConfig(
-  session?: AppstoreMpSession | null,
-): AppstoreAppClientConfig {
+function resolveSessionTokens(session?: AppstoreMpSession | null): {
+  accessToken?: string;
+  authToken?: string;
+} {
   const current = session ?? readAppSdkSessionTokens();
   return {
-    baseUrl: resolveAppstoreAppSdkBaseUrl(),
-    accessToken:
-      resolveAppSdkAccessToken(current) ?? bootstrapAccessToken ?? undefined,
+    accessToken: resolveAppSdkAccessToken(current),
     authToken: resolveAppSdkAuthToken(current),
-    platform: "mini-program",
   };
 }
 
@@ -68,11 +73,21 @@ export function createAppstoreMpAppSdkClient(config: {
   platform?: string;
 }): AppstoreAppClient {
   configureAppstoreAppSdkBaseUrl(config.baseUrl);
-  client = createClient({
+  if (!tokenManager) {
+    tokenManager = createTokenManager();
+  }
+  const tokens = resolveSessionTokens();
+  const authToken = config.authToken ?? tokens.authToken ?? bootstrapAccessToken ?? undefined;
+  const accessToken = config.accessToken ?? tokens.accessToken ?? undefined;
+  if (authToken) {
+    tokenManager.setAuthToken(authToken);
+  }
+  if (accessToken) {
+    tokenManager.setAccessToken(accessToken);
+  }
+  client = createAppStoreClient({
     baseUrl: resolveAppstoreAppSdkBaseUrl(),
-    accessToken: config.accessToken,
-    authToken: config.authToken,
-    platform: config.platform ?? "mini-program",
+    tokenManager,
   });
   return client;
 }
@@ -85,5 +100,6 @@ export function getAppstoreAppSdkClient(): AppstoreAppClient {
 
 export function resetAppstoreAppSdkClient(): void {
   client = null;
+  tokenManager = null;
   bootstrapAccessToken = null;
 }

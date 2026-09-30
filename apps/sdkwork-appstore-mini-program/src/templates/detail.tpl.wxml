@@ -1,0 +1,45 @@
+<!-- Shared detail-page skeleton: binds loading / error / detail. -->
+<template name="detailPage">
+  <view class="wp-detail-page">
+    <view wx:if="{{loading}}" class="wp-state">加载中…</view>
+    <view wx:elif="{{error}}" class="wp-state wp-state--error">{{error}}</view>
+    <block wx:elif="{{detail}}">
+      <view class="wp-detail-header">
+        <view class="wp-detail-icon">{{detail.name[0]}}</view>
+        <view class="wp-detail-title-wrap">
+          <view class="wp-detail-name">{{detail.name}}</view>
+          <view class="wp-detail-developer">{{detail.developer}}</view>
+          <view wx:if="{{detail.rating > 0}}" class="wp-detail-rating">{{detail.rating}}★</view>
+        </view>
+      </view>
+
+      <view wx:if="{{detail.description}}" class="wp-detail-section">
+        <view class="wp-detail-section-title">关于此应用</view>
+        <text class="wp-detail-description">{{detail.description}}</text>
+      </view>
+
+      <view wx:if="{{detail.whatsNew}}" class="wp-detail-section">
+        <view class="wp-detail-section-title">新功能</view>
+        <text class="wp-detail-description">{{detail.whatsNew}}</text>
+      </view>
+
+      <view wx:if="{{detail.similar.length > 0}}" class="wp-detail-section">
+        <view class="wp-detail-section-title">你可能也会喜欢</view>
+        <view
+          class="wp-list-item"
+          wx:for="{{detail.similar}}"
+          wx:key="id"
+          data-id="{{item.id}}"
+          bindtap="onItemTap"
+          hover-class="wp-list-item--hover"
+        >
+          <view class="wp-item-icon">{{item.name[0]}}</view>
+          <view class="wp-item-main">
+            <view class="wp-item-name">{{item.name}}</view>
+            <view class="wp-item-developer">{{item.developer}}</view>
+          </view>
+        </view>
+      </view>
+    </block>
+  </view>
+</template>

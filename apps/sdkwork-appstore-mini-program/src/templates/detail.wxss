@@ -1,0 +1,62 @@
+/**
+ * Shared detail-page skeleton: binds `loading`, `error`, `detail`.
+ * `detail.similar` rows route through the page's `onItemTap`.
+ */
+.wp-detail-header {
+  display: flex;
+  align-items: center;
+  gap: 28rpx;
+  padding: 48rpx 32rpx;
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  color: #ffffff;
+}
+
+.wp-detail-icon {
+  width: 128rpx;
+  height: 128rpx;
+  border-radius: 32rpx;
+  background-color: rgba(255, 255, 255, 0.2);
+  font-size: 56rpx;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.wp-detail-title-wrap {
+  flex: 1;
+  min-width: 0;
+}
+
+.wp-detail-name {
+  font-size: 38rpx;
+  font-weight: 700;
+}
+
+.wp-detail-developer {
+  margin-top: 8rpx;
+  font-size: 24rpx;
+  opacity: 0.85;
+}
+
+.wp-detail-rating {
+  margin-top: 8rpx;
+  font-size: 24rpx;
+}
+
+.wp-detail-section {
+  padding: 28rpx 32rpx;
+}
+
+.wp-detail-section-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #1d1d1f;
+  margin-bottom: 14rpx;
+}
+
+.wp-detail-description {
+  font-size: 26rpx;
+  line-height: 1.7;
+  color: #374151;
+}

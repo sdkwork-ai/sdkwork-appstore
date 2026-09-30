@@ -1,0 +1,13 @@
+<view class="searchbar">
+  <input
+    class="searchbar__input"
+    placeholder="搜索应用与游戏"
+    value="{{keyword}}"
+    confirm-type="search"
+    bindinput="onKeywordInput"
+    bindconfirm="onSearch"
+  />
+  <button class="searchbar__button" size="mini" bindtap="onSearch">搜索</button>
+</view>
+<import src="../../templates/list.tpl.wxml"/>
+<template is="listPage" data="{{ loading, error, items, emptyText: '输入关键词开始搜索' }}"/>

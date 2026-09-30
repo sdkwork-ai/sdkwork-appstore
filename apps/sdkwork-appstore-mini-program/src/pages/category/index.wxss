@@ -1,0 +1,7 @@
+@import "../../templates/list.wxss";
+.wp-page-header {
+  padding: 28rpx 32rpx;
+  font-size: 34rpx;
+  font-weight: 700;
+  color: #1d1d1f;
+}

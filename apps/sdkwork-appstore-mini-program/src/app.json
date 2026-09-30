@@ -1,11 +1,20 @@
 {
   "pages": [
     "pages/home/index",
-    "pages/shell/index"
+    "pages/shell/index",
+    "pages/apps/index",
+    "pages/games/index",
+    "pages/charts/index",
+    "pages/search/index",
+    "pages/category/index",
+    "pages/collection/index",
+    "pages/events/index",
+    "pages/app-detail/index",
+    "pages/templates/index"
   ],
   "window": {
     "navigationBarTitleText": "SDKWork App Store Mini Program",
-    "navigationBarBackgroundColor": "#0f766e",
+    "navigationBarBackgroundColor": "#4f46e5",
     "navigationBarTextStyle": "white"
   }
 }

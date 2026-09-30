@@ -1,0 +1,23 @@
+@import "../../templates/list.wxss";
+
+.searchbar {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  margin: 24rpx;
+}
+
+.searchbar__input {
+  flex: 1;
+  padding: 16rpx 28rpx;
+  border-radius: 40rpx;
+  background-color: #ffffff;
+  border: 1rpx solid #e5e7eb;
+  font-size: 26rpx;
+}
+
+.searchbar__button {
+  background-color: #4f46e5;
+  color: #ffffff;
+  font-size: 26rpx;
+}

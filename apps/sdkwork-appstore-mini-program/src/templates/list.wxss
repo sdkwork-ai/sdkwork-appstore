@@ -1,0 +1,84 @@
+/**
+ * Shared list-page skeleton for capability pages.
+ *
+ * Pages bind `loading`, `error`, `items`, and optional `emptyText`, and
+ * implement `onItemTap` to route into the app-detail page.
+ */
+.wp-list-item {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  margin: 12rpx 24rpx;
+  padding: 20rpx 24rpx;
+  border-radius: 24rpx;
+  background-color: #ffffff;
+  border: 1rpx solid #ececf0;
+}
+
+.wp-list-item--hover {
+  background-color: #f5f5f7;
+}
+
+.wp-item-rank {
+  width: 48rpx;
+  text-align: center;
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #9ca3af;
+}
+
+.wp-item-rank--top {
+  color: #4f46e5;
+}
+
+.wp-item-icon {
+  width: 84rpx;
+  height: 84rpx;
+  border-radius: 24rpx;
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  color: #ffffff;
+  font-size: 34rpx;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.wp-item-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.wp-item-name {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #1d1d1f;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.wp-item-developer {
+  margin-top: 6rpx;
+  font-size: 22rpx;
+  color: #6e6e73;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.wp-item-rating {
+  font-size: 24rpx;
+  color: #6e6e73;
+}
+
+.wp-state {
+  padding: 96rpx 32rpx;
+  text-align: center;
+  font-size: 26rpx;
+  color: #6e6e73;
+}
+
+.wp-state--error {
+  color: #ef4444;
+}

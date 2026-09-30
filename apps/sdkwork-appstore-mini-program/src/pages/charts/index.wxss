@@ -1,0 +1,24 @@
+@import "../../templates/list.wxss";
+
+.tabbar {
+  display: flex;
+  margin: 24rpx;
+  padding: 8rpx;
+  border-radius: 40rpx;
+  background-color: #ececf0;
+}
+
+.tabbar__item {
+  flex: 1;
+  text-align: center;
+  padding: 16rpx 0;
+  border-radius: 32rpx;
+  font-size: 26rpx;
+  color: #6e6e73;
+}
+
+.tabbar__item--active {
+  background-color: #4f46e5;
+  color: #ffffff;
+  font-weight: 600;
+}

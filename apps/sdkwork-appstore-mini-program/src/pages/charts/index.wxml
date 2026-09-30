@@ -1,0 +1,6 @@
+<view class="tabbar">
+  <view class="tabbar__item {{tab === 'free' ? 'tabbar__item--active' : ''}}" data-tab="free" bindtap="onTabChange">免费榜</view>
+  <view class="tabbar__item {{tab === 'paid' ? 'tabbar__item--active' : ''}}" data-tab="paid" bindtap="onTabChange">付费榜</view>
+</view>
+<import src="../../templates/list.tpl.wxml"/>
+<template is="listPage" data="{{ loading, error, items, emptyText: '榜单暂无内容' }}"/>

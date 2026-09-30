@@ -1,0 +1,3 @@
+<view class="wp-page-header">{{name}}</view>
+<import src="../../templates/list.tpl.wxml"/>
+<template is="listPage" data="{{ loading, error, items, emptyText: '该合集暂无应用' }}"/>

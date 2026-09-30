@@ -1,0 +1,2 @@
+<import src="../../templates/list.tpl.wxml"/>
+<template is="listPage" data="{{ loading, error, items, emptyText: '没有匹配的模板' }}"/>
