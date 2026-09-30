@@ -18,10 +18,8 @@ import {
 } from '@sdkwork/appstore-listing-support-core';
 import { isAuthenticated } from '@/bootstrap/iamRuntime';
 import { getStoreClient } from '@/services/storeClient';
-import {
-  userStoreService,
-  type UserCategory,
-} from '@/services/userStoreClient';
+import { getCommentsClient } from '@/bootstrap/sdkClients';
+import { userStoreService, type UserCategory } from '@/services/userStoreClient';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { readRecordString as readString } from '@sdkwork/appstore-h5-commons';
 
@@ -46,6 +44,12 @@ export function ListingDetailPage() {
   const [collectCategories, setCollectCategories] = useState<UserCategory[]>([]);
   const [collectLoading, setCollectLoading] = useState(false);
   const [collectNotice, setCollectNotice] = useState<string | null>(null);
+  const [devOtherApps, setDevOtherApps] = useState<{ id: string; name: string; developer: string }[]>([]);
+  const [likedComments, setLikedComments] = useState<Set<string>>(new Set());
+  const [reviewRating, setReviewRating] = useState(5);
+  const [reviewBody, setReviewBody] = useState('');
+  const [reviewSubmitting, setReviewSubmitting] = useState(false);
+  const [reviewError, setReviewError] = useState('');
 
   const authed = isAuthenticated();
   const row = (data ?? {}) as unknown as unknown as Record<string, unknown>;
@@ -57,6 +61,57 @@ export function ListingDetailPage() {
   const reviewItems = reviewsApi.data?.items ?? [];
   const ownershipApi = useListingOwnership(listingId, authed);
   const owned = ownershipApi.data === true;
+
+  useEffect(() => {
+    if (!listingId) return;
+    let cancelled = false;
+    getStoreClient().listings.listDeveloperOther(listingId, { limit: 6 }).then((page) => {
+      if (cancelled) return;
+      setDevOtherApps((page?.items ?? []).map((r: any) => ({
+        id: String(r.listingSlug ?? r.id ?? ''),
+        name: String(r.displayName ?? r.title ?? '应用'),
+        developer: String(r.developerName ?? r.publisherName ?? ''),
+      })));
+    }).catch(() => undefined);
+    return () => { cancelled = true; };
+  }, [listingId]);
+
+  function openCollectSheet() {
+    if (!isAuthenticated()) { navigate('/login', { state: { from: { pathname: `/app/${slug}` } } }); return; }
+    setCollectOpen(true); setCollectLoading(true); setCollectNotice(null);
+    userStoreService.listCategories(getStoreClient()).then((cats) => setCollectCategories(cats)).catch(() => setCollectCategories([])).finally(() => setCollectLoading(false));
+  }
+  async function handleCollect(categoryId: string) {
+    setCollectLoading(true); setCollectNotice(null);
+    try {
+      await userStoreService.addToCategory(getStoreClient(), categoryId, listingId);
+      setCollectNotice('已收录');
+      setCollectCategories((prev) => prev.map((c) => c.id === categoryId ? { ...c, itemCount: c.itemCount + 1 } : c));
+    } catch (err) { setCollectNotice(formatApiError(err instanceof Error ? err : new Error(String(err)))); }
+    finally { setCollectLoading(false); }
+  }
+  async function handleReviewSubmit() {
+    const text = reviewBody.trim();
+    if (!text || reviewSubmitting || !commentsThreadId) return;
+    setReviewSubmitting(true); setReviewError('');
+    try {
+      const client = getStoreClient();
+      await client.listings.updateRating(listingId, { rating: reviewRating });
+      await getCommentsClient().comments.comments.create(commentsThreadId, { body: text });
+      setReviewBody(''); setReviewRating(5); reviewsApi.execute();
+    } catch (err) { setReviewError(formatApiError(err instanceof Error ? err : new Error(String(err)))); }
+    finally { setReviewSubmitting(false); }
+  }
+  async function handleReviewLike(commentId: string) {
+    const client = getCommentsClient();
+    if (likedComments.has(commentId)) {
+      await getCommentsClient().engagement.likes.delete('comment', commentId);
+      setLikedComments((prev) => { const s = new Set(prev); s.delete(commentId); return s; });
+    } else {
+      await getCommentsClient().engagement.likes.update('comment', commentId);
+      setLikedComments((prev) => new Set(prev).add(commentId));
+    }
+  }
 
   const mediaApi = useApi(
     () => getStoreClient().listings.listMedia(listingId),
@@ -147,42 +202,6 @@ export function ListingDetailPage() {
     }
   }
 
-  function openCollectSheet() {
-    if (!isAuthenticated()) {
-      navigate('/login', { state: { from: { pathname: `/app/${slug}` } } });
-      return;
-    }
-    setCollectOpen(true);
-    setCollectLoading(true);
-    setCollectNotice(null);
-    userStoreService
-      .listCategories(getStoreClient())
-      .then((categories) => setCollectCategories(categories))
-      .catch(() => setCollectCategories([]))
-      .finally(() => setCollectLoading(false));
-  }
-
-  async function handleCollect(categoryId: string) {
-    setCollectLoading(true);
-    setCollectNotice(null);
-    try {
-      const client = getStoreClient();
-      await userStoreService.addToCategory(client, categoryId, listingId);
-      setCollectNotice('已收录，可在「我的 Appstore」中查看');
-      setCollectCategories((prev) =>
-        prev.map((category) =>
-          category.id === categoryId
-            ? { ...category, itemCount: category.itemCount + 1 }
-            : category,
-        ),
-      );
-    } catch (err) {
-      setCollectNotice(formatApiError(err instanceof Error ? err : new Error(String(err))));
-    } finally {
-      setCollectLoading(false);
-    }
-  }
-
   async function handleWishlistToggle() {    if (!isAuthenticated()) {
       navigate('/login', { state: { from: { pathname: `/app/${slug}` } } });
       return;
@@ -243,6 +262,14 @@ export function ListingDetailPage() {
               }}
             >
               <Share2 className="h-5 w-5" style={{ color: 'var(--text-secondary)' }} />
+            </button>
+            <button
+              type="button"
+              onClick={openCollectSheet}
+              className="flex h-10 w-10 items-center justify-center"
+              aria-label="收录到个人商店"
+            >
+              <FolderPlus className="h-5 w-5" style={{ color: 'var(--text-secondary)' }} />
             </button>
             <button
               type="button"
@@ -377,6 +404,31 @@ export function ListingDetailPage() {
 
         <section className="border-t px-4 py-4" style={{ borderColor: 'var(--border-subtle)' }}>
           <h2 className="section-title mb-3">评分与评价</h2>
+
+          {authed && commentsThreadId ? (
+            <div className="card p-3 mb-3">
+              <div className="flex gap-1" role="radiogroup" aria-label="选择评分">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button key={star} type="button" onClick={() => setReviewRating(star)}
+                    aria-label={`${star} 星`}
+                    className="text-2xl leading-none transition-colors"
+                    style={{ color: star <= reviewRating ? '#fbbf24' : 'var(--border-subtle)' }}
+                  >★</button>
+                ))}
+              </div>
+              <textarea className="mt-2 w-full rounded-xl border p-2 text-sm" rows={3}
+                placeholder="分享你的使用体验…" value={reviewBody}
+                onChange={(e) => setReviewBody(e.target.value)}
+                style={{ borderColor: 'var(--border-subtle)', color: 'var(--text-primary)', backgroundColor: 'var(--bg-surface)' }}
+              />
+              {reviewError && <p className="mt-1 text-xs text-[var(--danger)]">{reviewError}</p>}
+              <button type="button" disabled={reviewSubmitting || !reviewBody.trim()}
+                onClick={() => void handleReviewSubmit()}
+                className="btn-primary mt-2 w-full text-sm"
+              >{reviewSubmitting ? '提交中…' : '提交评价'}</button>
+            </div>
+          ) : null}
+
           {!commentsThreadId ? (
             <p className="text-sm text-[var(--text-tertiary)]">该应用尚未绑定评价线程。</p>
           ) : reviewsApi.loading ? (
@@ -387,17 +439,47 @@ export function ListingDetailPage() {
             <p className="text-sm text-[var(--text-tertiary)]">暂无用户评价，成为首位评价者吧。</p>
           ) : (
             <div className="space-y-3">
-              {reviewItems.map((comment) => (
-                <div key={comment.id} className="card p-3">
-                  <p className="text-xs text-[var(--text-tertiary)] mb-1">
-                    {new Date(comment.createdAt).toLocaleDateString('zh-CN')}
-                  </p>
-                  <p className="text-sm text-[var(--text-secondary)] whitespace-pre-line">{comment.body}</p>
-                </div>
-              ))}
+              {reviewItems.map((raw: unknown) => {
+                const c = (raw ?? {}) as unknown as Record<string, unknown>;
+                const cid = String(c.id ?? '');
+                return (
+                  <div key={cid} className="card p-3">
+                    <div className="flex items-center justify-between">
+                      <p className="text-xs text-[var(--text-tertiary)]">
+                        {c.createdAt ? new Date(String(c.createdAt)).toLocaleDateString('zh-CN') : ''}
+                      </p>
+                      {authed && cid ? (
+                        <button type="button" onClick={() => void handleReviewLike(cid)}
+                          className="text-xs text-[var(--text-tertiary)]"
+                        >♡ 点赞</button>
+                      ) : null}
+                    </div>
+                    <p className="text-sm text-[var(--text-secondary)] whitespace-pre-line">{String(c.body ?? '')}</p>
+                  </div>
+                );
+              })}
             </div>
           )}
         </section>
+
+        {devOtherApps.length > 0 ? (
+          <section className="border-t px-4 py-4" style={{ borderColor: 'var(--border-subtle)' }}>
+            <h2 className="section-title mb-3">开发者的其他应用</h2>
+            <div className="space-y-2">
+              {devOtherApps.map((dev) => (
+                <Link key={dev.id} to={`/app/${dev.id}`} className="card card-press flex items-center gap-3 p-3">
+                  <div className="app-icon flex h-12 w-12 flex-shrink-0 items-center justify-center text-sm font-bold text-white"
+                    style={{ background: 'linear-gradient(135deg, var(--accent), #5856d6)' }}
+                  >{dev.name[0]}</div>
+                  <div className="min-w-0 flex-1">
+                    <h3 className="truncate text-sm font-semibold">{dev.name}</h3>
+                    <p className="truncate text-xs text-[var(--text-tertiary)]">{dev.developer}</p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </section>
+        ) : null}
 
         {similarApps.length > 0 ? (
           <section className="border-t px-4 py-4" style={{ borderColor: 'var(--border-subtle)' }}>
@@ -533,6 +615,45 @@ export function ListingDetailPage() {
         </div>
       ) : null}
 
+      {collectOpen ? (
+        <div className="fixed inset-0 z-[60] flex items-end"
+          style={{ backgroundColor: 'color-mix(in srgb, black 40%, transparent)' }}
+          role="dialog" aria-modal="true" onClick={() => setCollectOpen(false)}
+        >
+          <div className="w-full rounded-t-3xl p-4 pb-8"
+            style={{ backgroundColor: 'var(--bg-surface)' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="mb-3 flex items-center justify-between px-1">
+              <h3 className="text-sm font-semibold text-[var(--text-primary)]">收录到我的分类</h3>
+              <button type="button" onClick={() => setCollectOpen(false)} className="text-xs text-[var(--text-tertiary)]">关闭</button>
+            </div>
+            {collectLoading ? (
+              <div className="flex justify-center py-6"><LoadingSpinner /></div>
+            ) : collectCategories.length === 0 ? (
+              <div className="py-4 text-center text-sm text-[var(--text-secondary)]">
+                还没有分类，<Link to="/user-store" className="text-[var(--accent)]" onClick={() => setCollectOpen(false)}>去创建一个</Link>
+              </div>
+            ) : (
+              <div className="max-h-72 space-y-2 overflow-y-auto">
+                {collectCategories.map((cat) => (
+                  <button key={cat.id} type="button" disabled={collectLoading}
+                    onClick={() => void handleCollect(cat.id)}
+                    className="flex w-full items-center gap-3 rounded-2xl border p-3 text-left"
+                    style={{ borderColor: 'var(--border-subtle)' }}
+                  >
+                    <FolderPlus className="h-4 w-4 flex-shrink-0 text-[var(--accent)]" />
+                    <span className="flex-1 text-sm text-[var(--text-primary)]">{cat.name}</span>
+                    <span className="text-xs text-[var(--text-tertiary)]">{cat.itemCount} 个应用</span>
+                  </button>
+                ))}
+              </div>
+            )}
+            {collectNotice && <p className="mt-3 px-1 text-xs text-[var(--accent)]">{collectNotice}</p>}
+          </div>
+        </div>
+      ) : null}
+
       {reportOpen ? (
         <div
           className="fixed inset-0 z-[60] flex items-end"
@@ -660,3 +781,4 @@ function InfoRow({ label, value }: { label: string; value: string }) {
     </div>
   );
 }
+
