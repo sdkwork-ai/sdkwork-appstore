@@ -10,6 +10,8 @@ dependencies:
   flutter:
     sdk: flutter
   http: ^1.2.0
+  sdkwork_iam_app_sdk:
+    path: ../../../../../sdkwork-iam/sdks/sdkwork-iam-app-sdk/sdkwork-iam-app-sdk-dart
   sdkwork_appstore_app_sdk:
     path: ../../../../sdks/sdkwork-appstore-app-sdk/sdkwork-appstore-app-sdk-dart
 

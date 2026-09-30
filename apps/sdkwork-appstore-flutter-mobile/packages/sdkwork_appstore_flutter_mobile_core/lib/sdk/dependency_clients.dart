@@ -1,8 +1,10 @@
+import 'package:sdkwork_iam_app_sdk/sdkwork_iam_app_sdk.dart';
 import '../../src/vendor/skills/app_client.dart';
 import '../../src/vendor/mcp/app_client.dart';
 
 export '../../src/vendor/skills/app_client.dart' show SdkworkAppClient;
 export '../../src/vendor/mcp/app_client.dart' show SdkworkMcpAppClient;
+export 'package:sdkwork_iam_app_sdk/sdkwork_iam_app_sdk.dart' show SdkworkIamAppClient;
 
 /// Dependency SDK clients (skills / mcp) for the Flutter root.
 ///
@@ -31,6 +33,18 @@ SdkworkMcpAppClient createAppstoreFlutterMcpClient({
   String? accessToken,
 }) {
   return SdkworkMcpAppClient.withBaseUrl(
+    baseUrl: baseUrl,
+    authToken: authToken,
+    accessToken: accessToken,
+  );
+}
+
+SdkworkIamAppClient createAppstoreFlutterIamClient({
+  required String baseUrl,
+  String? authToken,
+  String? accessToken,
+}) {
+  return SdkworkIamAppClient.withBaseUrl(
     baseUrl: baseUrl,
     authToken: authToken,
     accessToken: accessToken,

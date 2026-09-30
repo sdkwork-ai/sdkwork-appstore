@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:sdkwork_iam_app_sdk/sdkwork_iam_app_sdk.dart';
+
 import 'package:sdkwork_appstore_sdk/sdkwork_appstore_sdk.dart';
 import 'package:sdkwork_appstore_flutter_mobile_apps/sdkwork_appstore_flutter_mobile_apps.dart';
 import 'package:sdkwork_appstore_flutter_mobile_app_detail/sdkwork_appstore_flutter_mobile_app_detail.dart';
@@ -34,6 +36,7 @@ class AppstoreMobileRuntime {
   AppstoreMobileRuntime({
     required this.sdkClients,
     required this.openClient,
+    required this.iamClient,
     required this.routes,
   })  : discoverService = DiscoverService(clients: sdkClients),
         appsService = AppsService(clients: sdkClients),
@@ -65,6 +68,7 @@ class AppstoreMobileRuntime {
 
   final AppstoreAppSdkClients sdkClients;
   final SdkworkAppstoreOpenClient openClient;
+  final SdkworkIamAppClient iamClient;
   final List<SdkworkUiRouteContribution> routes;
 
   final DiscoverService discoverService;
@@ -225,6 +229,38 @@ class AppstoreMobileRuntime {
   bool isRouteAuthorized(SdkworkUiRouteContribution route) {
     return getIamRuntime().session.isAuthenticated;
   }
+
+  /// Login via the IAM dart client (password grant), then propagate tokens
+  /// to the appstore SDK client through the session bridge.
+  Future<void> loginWithPassword(String account, String password) async {
+    final response = await iamClient.auth.sessionsCreate(
+      AppbaseSessionCreateCommand(
+        username: account.contains('@') ? null : account,
+        email: account.contains('@') ? account : null,
+        password: password,
+      ),
+    );
+    final data = response?.data;
+    if (data is Map) {
+      final session = AppstoreSession(
+        authToken: data['authToken']?.toString(),
+        accessToken: data['accessToken']?.toString(),
+        refreshToken: data['refreshToken']?.toString(),
+      );
+      getIamRuntime().setSession(session);
+      sdkClients.propagateSessionTokens(
+        authToken: session.authToken,
+        accessToken: session.accessToken,
+      );
+    }
+  }
+
+  /// Logout through the IAM client, then clear the local session.
+  Future<void> logout() async {
+    await iamClient.auth.sessionsCurrentDelete().catchError((Object error) {});
+    getIamRuntime().clearSession();
+    sdkClients.propagateSessionTokens();
+  }
 }
 
 Future<AppstoreMobileRuntime> bootstrap() async {
@@ -232,10 +268,14 @@ Future<AppstoreMobileRuntime> bootstrap() async {
   registerHostAdapters();
   final sdkClients = createSdkClients();
   final openClient = createOpenSdkClient(sdkClients.transportBaseUrl);
+  final iamClient = createAppstoreFlutterIamClient(
+    baseUrl: sdkClients.transportBaseUrl,
+  );
   final routes = createRoutes();
   return AppstoreMobileRuntime(
     sdkClients: sdkClients,
     openClient: openClient,
+    iamClient: iamClient,
     routes: routes,
   );
 }

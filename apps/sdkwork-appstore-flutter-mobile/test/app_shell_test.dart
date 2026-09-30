@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:sdkwork_appstore_flutter_mobile/app.dart';
@@ -50,7 +51,8 @@ void main() {
     await tester.pumpWidget(AppstoreApp(runtime: runtime, initialRoute: '/library'));
     await tester.pumpAndSettle();
 
-    expect(find.text('登录后即可访问该页面'), findsOneWidget);
+    expect(find.byType(TextField), findsNWidgets(2));
+    expect(find.text('登录'), findsWidgets);
   });
 
   testWidgets('unknown routes render the not-found panel', (

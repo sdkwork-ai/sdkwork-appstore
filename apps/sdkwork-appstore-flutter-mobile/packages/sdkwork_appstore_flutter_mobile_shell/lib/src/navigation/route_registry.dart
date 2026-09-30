@@ -16,6 +16,12 @@ typedef AppstoreRouteScreenBuilder = Widget Function(
 /// Authentication check for `auth: required` routes.
 typedef AppstoreRouteAuthGuard = bool Function(SdkworkUiRouteContribution route);
 
+/// Login callback for `auth: required` routes.
+typedef AppstoreRouteLoginHandler = Future<void> Function(
+  String account,
+  String password,
+);
+
 /// Bottom tab specification owned by the root composition.
 class AppstoreTabSpec {
   const AppstoreTabSpec({
@@ -44,11 +50,16 @@ class AppstoreRouteStack {
     required this.screenBuilders,
     required this.tabs,
     this.authGuard,
+    this.loginHandler,
   });
 
   final Map<String, AppstoreRouteScreenBuilder> screenBuilders;
   final List<AppstoreTabSpec> tabs;
   final AppstoreRouteAuthGuard? authGuard;
+
+  /// Async login handler injected by the root; the auth-required screen calls
+  /// this to authenticate and the caller refreshes the navigator.
+  final AppstoreRouteLoginHandler? loginHandler;
 
   Map<String, int> get _tabPaths => <String, int>{
         for (var index = 0; index < tabs.length; index++) tabs[index].path: index,
@@ -68,7 +79,7 @@ class AppstoreRouteStack {
     if (match.route.auth == 'required' && guard != null && !guard(match.route)) {
       return MaterialPageRoute<void>(
         settings: settings,
-        builder: (BuildContext context) => const _AppstoreAuthRequiredScreen(),
+        builder: (BuildContext context) => _AppstoreAuthRequiredScreen(loginHandler: loginHandler),
       );
     }
     final builder = screenBuilders[match.route.id];
@@ -175,16 +186,102 @@ class _AppstoreNotFoundScreen extends StatelessWidget {
   }
 }
 
-class _AppstoreAuthRequiredScreen extends StatelessWidget {
-  const _AppstoreAuthRequiredScreen();
+class _AppstoreAuthRequiredScreen extends StatefulWidget {
+  const _AppstoreAuthRequiredScreen({this.loginHandler});
+
+  final AppstoreRouteLoginHandler? loginHandler;
+
+  @override
+  State<_AppstoreAuthRequiredScreen> createState() =>
+      _AppstoreAuthRequiredScreenState();
+}
+
+class _AppstoreAuthRequiredScreenState
+    extends State<_AppstoreAuthRequiredScreen> {
+  final _accountController = TextEditingController();
+  final _passwordController = TextEditingController();
+  bool _submitting = false;
+  String _error = '';
+
+  @override
+  void dispose() {
+    _accountController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _submit() async {
+    final account = _accountController.text.trim();
+    final password = _passwordController.text;
+    if (account.isEmpty || password.isEmpty || _submitting) return;
+    setState(() => _submitting = true);
+    try {
+      await widget.loginHandler?.call(account, password);
+    } catch (error) {
+      if (mounted) {
+        setState(() =>
+            _error = '登录失败，请检查账号密码后重试');
+      }
+    } finally {
+      if (mounted) setState(() => _submitting = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('需要登录')),
-      body: const AppstoreScreenState(
-        kind: AppstoreScreenStateKind.empty,
-        message: '登录后即可访问该页面',
+      appBar: AppBar(title: const Text('登录')),
+      body: Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(32),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text('登录',
+                  style: Theme.of(context).textTheme.headlineSmall,
+                  textAlign: TextAlign.center),
+              const SizedBox(height: 8),
+              Text('使用 SDKWork 账户登录，同步库、收藏与应用更新。',
+                  style: Theme.of(context).textTheme.bodySmall,
+                  textAlign: TextAlign.center),
+              const SizedBox(height: 24),
+              TextField(
+                controller: _accountController,
+                decoration: InputDecoration(
+                  hintText: '账号 / 邮箱 / 手机号',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              ),
+              if (_error.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: Text(_error,
+                      style: TextStyle(
+                          color: Theme.of(context).colorScheme.error,
+                          fontSize: 12)),
+                ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: _passwordController,
+                obscureText: true,
+                decoration: InputDecoration(
+                  hintText: '密码',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
+              FilledButton(
+                onPressed: _submitting ? null : _submit,
+                child: Text(_submitting ? '登录中…' : '登录'),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
