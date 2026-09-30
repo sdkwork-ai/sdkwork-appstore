@@ -3,18 +3,21 @@ use uuid::Uuid;
 
 use crate::context::AppstoreRequestContext;
 use crate::domain::commands::{
-    AddWishlistItemRequest, ConsumeDownloadGrantRequest, CreateDownloadGrantRequest,
+    AddWishlistItemRequest, CommerceEntitlementCheckRequest, CommerceEntitlementRevokeRequest,
+    CommerceEntitlementSyncRequest, ConsumeDownloadGrantRequest, CreateDownloadGrantRequest,
     LibraryInstallRequest, LibraryUninstallRequest, LibraryUpdatesCheckRequest,
     ListLibraryItemsRequest, ListWishlistItemsRequest, RemoveWishlistItemRequest,
     RetrieveLibraryItemRequest,
 };
 use crate::domain::models::{
-    DownloadGrant, DownloadGrantReason, DownloadGrantStatus, InstallEvent, InstallEventStatus,
-    InstallEventType, InstallSource, LibraryItemId, LibraryStatus, UpdateAvailable,
-    UserLibraryItem, UserWishlistItem, WishlistStatus,
+    CommerceEntitlement, DownloadGrant, DownloadGrantReason, DownloadGrantStatus,
+    EntitlementStatus, EntitlementSubjectType, InstallEvent, InstallEventStatus, InstallEventType,
+    InstallSource, LibraryItemId, LibraryStatus, UpdateAvailable, UserLibraryItem,
+    UserWishlistItem, WishlistStatus,
 };
 use crate::domain::results::{
-    AddWishlistItemResult, ConsumeDownloadGrantResult, CreateDownloadGrantResult,
+    AddWishlistItemResult, CommerceEntitlementCheckResult, CommerceEntitlementRevokeResult,
+    CommerceEntitlementSyncResult, ConsumeDownloadGrantResult, CreateDownloadGrantResult,
     LibraryInstallResult, LibraryUninstallResult, LibraryUpdatesCheckResult,
     ListLibraryItemsResult, ListWishlistItemsResult, RemoveWishlistItemResult,
     RetrieveLibraryItemResult,
@@ -83,6 +86,29 @@ pub trait LibraryOperations {
         context: &AppstoreRequestContext,
         request: ConsumeDownloadGrantRequest,
     ) -> AppstoreServiceResult<ConsumeDownloadGrantResult>;
+
+    /// Commerce-side receiver: idempotently upserts an entitlement snapshot
+    /// pushed by the Order/Payment domain. The store never settles payment.
+    async fn commerce_entitlement_sync(
+        &self,
+        context: &AppstoreRequestContext,
+        request: CommerceEntitlementSyncRequest,
+    ) -> AppstoreServiceResult<CommerceEntitlementSyncResult>;
+
+    /// Answers whether a subject currently holds an active entitlement for
+    /// one app (used by paid install/download gating).
+    async fn commerce_entitlement_check(
+        &self,
+        context: &AppstoreRequestContext,
+        request: CommerceEntitlementCheckRequest,
+    ) -> AppstoreServiceResult<CommerceEntitlementCheckResult>;
+
+    /// Revokes an entitlement (refund/chargeback path).
+    async fn commerce_entitlement_revoke(
+        &self,
+        context: &AppstoreRequestContext,
+        request: CommerceEntitlementRevokeRequest,
+    ) -> AppstoreServiceResult<CommerceEntitlementRevokeResult>;
 }
 
 #[derive(Debug, Clone)]
@@ -550,10 +576,32 @@ where
         context: &AppstoreRequestContext,
         request: CreateDownloadGrantRequest,
     ) -> AppstoreServiceResult<CreateDownloadGrantResult> {
-        if request.artifact_id.trim().is_empty() {
+        let artifact_id = request.artifact_id.trim();
+        if artifact_id.is_empty() {
             return Err(AppstoreServiceError::ValidationFailed(
                 "Artifact ID is required".to_string(),
             ));
+        }
+        let user_id = context.user_id.trim();
+        if user_id.is_empty() {
+            return Err(AppstoreServiceError::ValidationFailed(
+                "Authenticated user id is required to create download grants".to_string(),
+            ));
+        }
+
+        let (listing_id, release_id, artifact_status) = self
+            .repository
+            .find_artifact_context(context, artifact_id)
+            .await?
+            .ok_or_else(|| {
+                AppstoreServiceError::NotFound(format!("Artifact not found: {}", artifact_id))
+            })?;
+
+        if artifact_status != "verified" {
+            return Err(AppstoreServiceError::InvalidState(format!(
+                "Artifact is not verified: {}",
+                artifact_id
+            )));
         }
 
         let now = Utc::now();
@@ -569,10 +617,10 @@ where
                     .next()
                     .unwrap_or_default()
             ),
-            listing_id: String::new(),
-            release_id: String::new(),
-            artifact_id: request.artifact_id,
-            user_id: Some(context.user_id.clone()),
+            listing_id,
+            release_id,
+            artifact_id: artifact_id.to_string(),
+            user_id: Some(user_id.to_string()),
             grant_status: DownloadGrantStatus::Active,
             grant_reason: DownloadGrantReason::FreeDownload,
             expires_at: now + chrono::Duration::hours(24),
@@ -598,61 +646,141 @@ where
         context: &AppstoreRequestContext,
         request: ConsumeDownloadGrantRequest,
     ) -> AppstoreServiceResult<ConsumeDownloadGrantResult> {
-        let mut grant = self
+        let user_id = context.user_id.trim();
+        if user_id.is_empty() {
+            return Err(AppstoreServiceError::ValidationFailed(
+                "Authenticated user id is required to consume download grants".to_string(),
+            ));
+        }
+        let grant_id = request.grant_id.trim();
+        if grant_id.is_empty() {
+            return Err(AppstoreServiceError::ValidationFailed(
+                "Grant ID is required".to_string(),
+            ));
+        }
+
+        // Single-statement CAS: guards on owner, active status, remaining
+        // quota, and expiry, so concurrent consumers cannot double-spend.
+        if let Some(grant) = self
             .repository
-            .find_download_grant_by_id(context, &request.grant_id)
+            .consume_download_grant_atomically(context, grant_id, user_id)
             .await?
-            .ok_or_else(|| {
-                AppstoreServiceError::NotFound(format!(
-                    "Download grant not found: {}",
-                    request.grant_id
-                ))
-            })?;
-
-        if grant.grant_status != DownloadGrantStatus::Active {
-            return Err(AppstoreServiceError::InvalidState(format!(
-                "Download grant is not active: {}",
-                grant.grant_status.as_str()
-            )));
-        }
-
-        if grant.expires_at < Utc::now() {
-            grant.grant_status = DownloadGrantStatus::Expired;
-            grant.updated_at = Utc::now();
-            self.repository
-                .update_download_grant(context, &grant)
-                .await?;
-            return Err(AppstoreServiceError::InvalidState(
-                "Download grant has expired".to_string(),
+        {
+            return Ok(ConsumeDownloadGrantResult::consumed(
+                "appstore.downloadGrants.consume",
+                grant,
             ));
         }
 
-        if grant.download_count >= grant.max_download_count {
-            grant.grant_status = DownloadGrantStatus::Consumed;
-            grant.updated_at = Utc::now();
-            self.repository
-                .update_download_grant(context, &grant)
-                .await?;
-            return Err(AppstoreServiceError::InvalidState(
+        // The atomic guard rejected the consumption; classify the reason for
+        // the caller. The lookup is owner-scoped, so foreign grants surface
+        // as not found instead of leaking their existence.
+        let grant = self
+            .repository
+            .find_download_grant_by_id(context, grant_id)
+            .await?
+            .filter(|grant| grant.user_id.as_deref() == Some(user_id));
+
+        match grant {
+            None => Err(AppstoreServiceError::NotFound(format!(
+                "Download grant not found: {}",
+                grant_id
+            ))),
+            Some(grant) if grant.grant_status != DownloadGrantStatus::Active => {
+                Err(AppstoreServiceError::InvalidState(format!(
+                    "Download grant is not active: {}",
+                    grant.grant_status.as_str()
+                )))
+            }
+            Some(grant) if grant.expires_at <= Utc::now() => Err(
+                AppstoreServiceError::InvalidState("Download grant has expired".to_string()),
+            ),
+            Some(_) => Err(AppstoreServiceError::InvalidState(
                 "Download grant already fully consumed".to_string(),
-            ));
+            )),
         }
+    }
 
+    async fn commerce_entitlement_sync(
+        &self,
+        context: &AppstoreRequestContext,
+        request: CommerceEntitlementSyncRequest,
+    ) -> AppstoreServiceResult<CommerceEntitlementSyncResult> {
+        let status = EntitlementStatus::from_str(&request.entitlement_status).ok_or_else(|| {
+            AppstoreServiceError::ValidationFailed(format!(
+                "Unknown entitlement status: {}",
+                request.entitlement_status
+            ))
+        })?;
+        let subject_type = EntitlementSubjectType::User;
         let now = Utc::now();
-        grant.download_count += 1;
-        if grant.download_count >= grant.max_download_count {
-            grant.grant_status = DownloadGrantStatus::Consumed;
-            grant.consumed_at = Some(now);
-        }
-        grant.updated_at = now;
-
+        let entitlement = CommerceEntitlement {
+            id: Uuid::new_v4().to_string(),
+            tenant_id: context.tenant_id.clone(),
+            organization_id: context.organization_id.clone(),
+            app_id: request.app_id,
+            listing_id: request.listing_id,
+            subject_type,
+            subject_id: request.subject_id,
+            entitlement_type: request.entitlement_type,
+            source_type: request.source_type,
+            entitlement_status: status,
+            starts_at: request.starts_at,
+            expires_at: request.expires_at,
+            grant_snapshot_json: request.grant_snapshot_json,
+            revoked_at: None,
+            created_at: now,
+            updated_at: now,
+        };
         self.repository
-            .update_download_grant(context, &grant)
+            .upsert_entitlement(context, &entitlement)
             .await?;
+        Ok(CommerceEntitlementSyncResult::accepted(
+            "appstore.commerce.entitlement.sync",
+        ))
+    }
 
-        Ok(ConsumeDownloadGrantResult::consumed(
-            "appstore.downloadGrants.consume",
-            grant,
+    async fn commerce_entitlement_check(
+        &self,
+        context: &AppstoreRequestContext,
+        request: CommerceEntitlementCheckRequest,
+    ) -> AppstoreServiceResult<CommerceEntitlementCheckResult> {
+        let entitlement = self
+            .repository
+            .find_active_entitlement(context, &request.app_id, &request.subject_id)
+            .await?;
+        match entitlement {
+            Some(entitlement) if entitlement.is_active(Utc::now()) => {
+                Ok(CommerceEntitlementCheckResult::granted(
+                    "appstore.commerce.entitlement.check",
+                    Some(entitlement.entitlement_type),
+                    entitlement.expires_at,
+                ))
+            }
+            _ => Ok(CommerceEntitlementCheckResult::denied(
+                "appstore.commerce.entitlement.check",
+            )),
+        }
+    }
+
+    async fn commerce_entitlement_revoke(
+        &self,
+        context: &AppstoreRequestContext,
+        request: CommerceEntitlementRevokeRequest,
+    ) -> AppstoreServiceResult<CommerceEntitlementRevokeResult> {
+        let revoked = self
+            .repository
+            .revoke_entitlement(
+                context,
+                &request.app_id,
+                &request.subject_id,
+                &request.entitlement_type,
+                Utc::now(),
+            )
+            .await?;
+        Ok(CommerceEntitlementRevokeResult::revoked(
+            "appstore.commerce.entitlement.revoke",
+            revoked,
         ))
     }
 }

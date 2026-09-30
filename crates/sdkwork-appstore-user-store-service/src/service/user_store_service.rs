@@ -34,6 +34,7 @@ const MAX_ACTIVE_SHARES_PER_USER: i64 = 20;
 const MAX_NAME_LENGTH: usize = 64;
 const MAX_TITLE_LENGTH: usize = 128;
 
+#[async_trait::async_trait]
 pub trait UserStoreOperations {
     async fn category_create(
         &self,
@@ -249,22 +250,9 @@ impl<R> UserStoreService<R> {
                 .collect(),
         }
     }
-
-    fn encode_cursor(sort_order: i32, id: &str) -> String {
-        format!("{sort_order}:{id}")
-    }
-
-    fn decode_cursor(cursor: &str) -> AppstoreServiceResult<(i32, String)> {
-        let (order, id) = cursor
-            .split_once(':')
-            .ok_or_else(|| AppstoreServiceError::ValidationFailed("Invalid cursor".to_string()))?;
-        let sort_order: i32 = order
-            .parse()
-            .map_err(|_| AppstoreServiceError::ValidationFailed("Invalid cursor".to_string()))?;
-        Ok((sort_order, id.to_string()))
-    }
 }
 
+#[async_trait::async_trait]
 impl<R> UserStoreOperations for UserStoreService<R>
 where
     R: UserStoreRepositoryPort + Send + Sync,
@@ -337,9 +325,7 @@ where
 
         let has_more = categories.len() > limit as usize;
         let next_cursor = if has_more {
-            categories
-                .get(limit as usize - 1)
-                .map(|c| Self::encode_cursor(c.sort_order, &c.id))
+            categories.last().map(|c| c.id.clone())
         } else {
             None
         };
@@ -582,9 +568,7 @@ where
 
         let has_more = items.len() > limit as usize;
         let next_cursor = if has_more {
-            items
-                .get(limit as usize - 1)
-                .map(|i| Self::encode_cursor(i.sort_order, &i.id))
+            items.last().map(|i| i.id.clone())
         } else {
             None
         };
@@ -916,9 +900,7 @@ where
 
         let has_more = items.len() > limit as usize;
         let next_cursor = if has_more {
-            items
-                .get(limit as usize - 1)
-                .map(|i| Self::encode_cursor(i.sort_order, &i.id))
+            items.last().map(|i| i.id.clone())
         } else {
             None
         };

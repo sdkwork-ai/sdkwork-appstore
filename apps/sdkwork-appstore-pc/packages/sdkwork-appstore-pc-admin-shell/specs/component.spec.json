@@ -48,22 +48,22 @@
     ],
     "providedPorts": [
       {
-        "port": "appstore.pc.admin.shell",
-        "description": "Renders the /admin chrome (navigation, breadcrumb, access gate) and the aggregated operator route tree."
+        "name": "appstorePcAdminShell",
+        "export": "."
       },
       {
-        "port": "appstore.pc.admin.i18n-registration",
-        "description": "Registers the admin surface locale fragments into the single application i18n provider."
+        "name": "appstorePcAdminI18nRegistration",
+        "export": "."
       }
     ],
     "requiredPorts": [
       {
-        "port": "appstore.pc.admin.routes",
-        "description": "Route and capability-module descriptors from @sdkwork/appstore-pc-admin-core."
+        "name": "appstorePcAdminRoutes",
+        "export": "."
       },
       {
-        "port": "appstore.pc.admin.access",
-        "description": "Backend-admin access evaluation and the headless route guard from @sdkwork/appstore-pc-admin-core."
+        "name": "appstorePcAdminAccess",
+        "export": "."
       }
     ],
     "sdkDependencies": [],

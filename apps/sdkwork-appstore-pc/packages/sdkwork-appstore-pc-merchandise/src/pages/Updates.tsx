@@ -39,7 +39,7 @@ export default function Updates() {
       try {
         const [updatesData, appsData] = await Promise.all([
           AppStoreService.getPendingUpdates(),
-          AppStoreService.getAllApps()
+          AppStoreService.getInstalledApps()
         ]);
         setAppsWithUpdates(updatesData);
         setAllApps(appsData);

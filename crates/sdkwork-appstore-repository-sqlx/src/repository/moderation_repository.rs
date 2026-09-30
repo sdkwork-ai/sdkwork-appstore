@@ -244,16 +244,18 @@ impl sdkwork_appstore_moderation_service::ports::repository::ModerationRepositor
         &self,
         context: &AppstoreRequestContext,
         review: &ModerationReview,
-    ) -> Result<(), sdkwork_appstore_moderation_service::error::AppstoreServiceError> {
+        expected_updated_at: chrono::DateTime<chrono::Utc>,
+    ) -> Result<bool, sdkwork_appstore_moderation_service::error::AppstoreServiceError> {
         let (review_status, priority, queue_code) = map_moderation_review_domain_to_row(review);
 
-        self.db
+        let result = self
+            .db
             .query(
                 r#"
             UPDATE appstore_moderation_review
             SET review_status = ?, priority = ?, assigned_to = ?, queue_code = ?,
                 sla_due_at = ?, started_at = ?, completed_at = ?, updated_at = ?
-            WHERE id = ? AND tenant_id = ?
+            WHERE id = ? AND tenant_id = ? AND updated_at = ?
             "#,
             )
             .bind(&review_status)
@@ -266,11 +268,100 @@ impl sdkwork_appstore_moderation_service::ports::repository::ModerationRepositor
             .bind(review.updated_at)
             .bind(review.id.as_str())
             .bind(&context.tenant_id)
+            .bind(expected_updated_at)
             .execute_unified(&self.db)
             .await
             .map_err(|e| AppstoreServiceError::Internal(format!("Database error: {}", e)))?;
 
-        Ok(())
+        Ok(result.rows_affected() > 0)
+    }
+
+    async fn record_decision_with_review(
+        &self,
+        context: &AppstoreRequestContext,
+        decision: &ModerationDecision,
+        review: &ModerationReview,
+        expected_review_updated_at: chrono::DateTime<chrono::Utc>,
+    ) -> Result<bool, sdkwork_appstore_moderation_service::error::AppstoreServiceError> {
+        let (decision_type, decision_status, reason_code, payload_snapshot_json) =
+            map_moderation_decision_domain_to_row(decision);
+        let (review_status, priority, queue_code) = map_moderation_review_domain_to_row(review);
+
+        let mut transaction = self
+            .db
+            .begin()
+            .await
+            .map_err(|e| AppstoreServiceError::Internal(format!("Database error: {e}")))?;
+
+        self.db
+            .query(
+                r#"
+            INSERT INTO appstore_moderation_decision (
+                id, tenant_id, organization_id, review_id, decision_no, decision_type,
+                decision_status, reason_code, reason_detail, policy_reference, decided_by,
+                decided_at, payload_snapshot_json, created_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            "#,
+            )
+            .bind(decision.id.as_str())
+            .bind(&context.tenant_id)
+            .bind(&context.organization_id)
+            .bind(decision.review_id.as_str())
+            .bind(&decision.decision_no)
+            .bind(&decision_type)
+            .bind(&decision_status)
+            .bind(&reason_code)
+            .bind(&decision.reason_detail)
+            .bind(&decision.policy_reference)
+            .bind(&decision.decided_by)
+            .bind(decision.decided_at)
+            .bind(&payload_snapshot_json)
+            .bind(decision.created_at)
+            .execute_tx(&mut transaction)
+            .await
+            .map_err(|e| AppstoreServiceError::Internal(format!("Database error: {e}")))?;
+
+        let result = self
+            .db
+            .query(
+                r#"
+            UPDATE appstore_moderation_review
+            SET review_status = ?, priority = ?, assigned_to = ?, queue_code = ?,
+                sla_due_at = ?, started_at = ?, completed_at = ?, updated_at = ?
+            WHERE id = ? AND tenant_id = ? AND updated_at = ?
+            "#,
+            )
+            .bind(&review_status)
+            .bind(&priority)
+            .bind(&review.assigned_to)
+            .bind(&queue_code)
+            .bind(review.sla_due_at)
+            .bind(review.started_at)
+            .bind(review.completed_at)
+            .bind(review.updated_at)
+            .bind(review.id.as_str())
+            .bind(&context.tenant_id)
+            .bind(expected_review_updated_at)
+            .execute_tx(&mut transaction)
+            .await
+            .map_err(|e| AppstoreServiceError::Internal(format!("Database error: {e}")))?;
+
+        if result.rows_affected() == 0 {
+            // The review changed concurrently; roll the decision back so no
+            // half-applied state survives.
+            transaction
+                .rollback()
+                .await
+                .map_err(|e| AppstoreServiceError::Internal(format!("Database error: {e}")))?;
+            return Ok(false);
+        }
+
+        transaction
+            .commit()
+            .await
+            .map_err(|e| AppstoreServiceError::Internal(format!("Database error: {e}")))?;
+
+        Ok(true)
     }
 
     async fn find_decision_by_id(
@@ -331,45 +422,6 @@ impl sdkwork_appstore_moderation_service::ports::repository::ModerationRepositor
             .map(map_moderation_decision_row_to_domain)
             .collect::<Result<Vec<_>, _>>()
             .map_err(AppstoreServiceError::Internal)
-    }
-
-    async fn insert_decision(
-        &self,
-        context: &AppstoreRequestContext,
-        decision: &ModerationDecision,
-    ) -> Result<(), sdkwork_appstore_moderation_service::error::AppstoreServiceError> {
-        let (decision_type, decision_status, reason_code, payload_snapshot_json) =
-            map_moderation_decision_domain_to_row(decision);
-
-        self.db
-            .query(
-                r#"
-            INSERT INTO appstore_moderation_decision (
-                id, tenant_id, organization_id, review_id, decision_no, decision_type,
-                decision_status, reason_code, reason_detail, policy_reference, decided_by,
-                decided_at, payload_snapshot_json, created_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            "#,
-            )
-            .bind(decision.id.as_str())
-            .bind(&context.tenant_id)
-            .bind(&context.organization_id)
-            .bind(decision.review_id.as_str())
-            .bind(&decision.decision_no)
-            .bind(&decision_type)
-            .bind(&decision_status)
-            .bind(&reason_code)
-            .bind(&decision.reason_detail)
-            .bind(&decision.policy_reference)
-            .bind(&decision.decided_by)
-            .bind(decision.decided_at)
-            .bind(&payload_snapshot_json)
-            .bind(decision.created_at)
-            .execute_unified(&self.db)
-            .await
-            .map_err(|e| AppstoreServiceError::Internal(format!("Database error: {}", e)))?;
-
-        Ok(())
     }
 
     async fn find_appeal_by_id(
@@ -531,14 +583,16 @@ impl sdkwork_appstore_moderation_service::ports::repository::ModerationRepositor
         &self,
         context: &AppstoreRequestContext,
         appeal: &ModerationAppeal,
-    ) -> Result<(), sdkwork_appstore_moderation_service::error::AppstoreServiceError> {
-        self.db
+        expected_updated_at: chrono::DateTime<chrono::Utc>,
+    ) -> Result<bool, sdkwork_appstore_moderation_service::error::AppstoreServiceError> {
+        let result = self
+            .db
             .query(
                 r#"
             UPDATE appstore_moderation_appeal
             SET appeal_status = ?, decided_by = ?, decision_note = ?,
                 decided_at = ?, updated_at = ?
-            WHERE id = ? AND tenant_id = ?
+            WHERE id = ? AND tenant_id = ? AND updated_at = ?
             "#,
             )
             .bind(appeal.appeal_status.as_str())
@@ -548,11 +602,12 @@ impl sdkwork_appstore_moderation_service::ports::repository::ModerationRepositor
             .bind(appeal.updated_at)
             .bind(appeal.id.as_str())
             .bind(&context.tenant_id)
+            .bind(expected_updated_at)
             .execute_unified(&self.db)
             .await
             .map_err(|e| AppstoreServiceError::Internal(format!("Database error: {e}")))?;
 
-        Ok(())
+        Ok(result.rows_affected() > 0)
     }
 
     async fn find_submission_listing_id(

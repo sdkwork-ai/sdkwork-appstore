@@ -5,8 +5,8 @@ import type { SdkWorkPageData } from '../types';
 
 
 export interface MetricsAppstoreMetricsListingsRetrieveParams {
-  fromDate?: string;
-  toDate?: string;
+  dateFrom?: string;
+  dateTo?: string;
 }
 
 export class MetricsAppstoreMetricsListingsApi {
@@ -20,8 +20,8 @@ export class MetricsAppstoreMetricsListingsApi {
 /** Retrieve listing metrics */
   async retrieve(listingId: string, params?: MetricsAppstoreMetricsListingsRetrieveParams, requestOptions?: ApiRequestOptions): Promise<SdkWorkPageData> {
     const query = buildQueryString([
-      { name: 'fromDate', value: params?.fromDate, style: 'form', explode: true, allowReserved: false },
-      { name: 'toDate', value: params?.toDate, style: 'form', explode: true, allowReserved: false },
+      { name: 'date_from', value: params?.dateFrom, style: 'form', explode: true, allowReserved: false },
+      { name: 'date_to', value: params?.dateTo, style: 'form', explode: true, allowReserved: false },
     ]);
     return this.client.request<SdkWorkPageData>(appendQueryString(backendApiPath(`/metrics/listings/${serializePathParameter(listingId, { name: 'listingId', style: 'simple', explode: false })}`), query), { ...(requestOptions?.signal !== undefined ? { signal: requestOptions.signal } : {}), ...(requestOptions?.timeout !== undefined ? { timeout: requestOptions.timeout } : {}), method: 'GET' as any, sdkworkUnwrapKind: 'page' });
   }

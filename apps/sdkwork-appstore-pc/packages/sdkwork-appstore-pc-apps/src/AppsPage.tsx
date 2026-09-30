@@ -10,16 +10,17 @@ import { AppsGrid } from './components/AppsGrid';
 export default function AppsPage() {
   const { t } = useTranslation();
   const [apps, setApps] = useState<AppItem[]>([]);
+  const [cursor, setCursor] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [selectedSubCategory, setSelectedSubCategory] = useState<string>('all');
 
   useEffect(() => {
     async function loadApps() {
       try {
-        const all = await AppStoreService.getAllApps();
-        // 过滤非游戏的应用
-        const pureApps = all.filter(a => a.category !== '微信小游戏' && a.category !== '精品手游');
-        setApps(pureApps);
+        const page = await AppStoreService.listAppsPage({ limit: 50 });
+        setApps(page.items);
+        setCursor(page.nextCursor);
       } catch (err) {
         console.error('Failed to load apps page data', err);
       } finally {
@@ -29,6 +30,22 @@ export default function AppsPage() {
     loadApps();
   }, []);
 
+  async function loadMore() {
+    if (!cursor || loadingMore) {
+      return;
+    }
+    setLoadingMore(true);
+    try {
+      const page = await AppStoreService.listAppsPage({ cursor, limit: 50 });
+      setApps((prev) => [...prev, ...page.items]);
+      setCursor(page.nextCursor);
+    } catch (err) {
+      console.error('Failed to load more apps', err);
+    } finally {
+      setLoadingMore(false);
+    }
+  }
+
   if (loading) {
     return <LoadingSpinner />;
   }
@@ -36,6 +53,7 @@ export default function AppsPage() {
   const subCategories = ['all', 'productivity', 'utilities', 'development', 'design'];
 
   const filteredApps = apps.filter(app => {
+    if (app.category === '微信小游戏' || app.category === '精品手游') return false;
     if (selectedSubCategory === 'all') return true;
     if (selectedSubCategory === 'development' || selectedSubCategory === 'design') {
       return app.category.includes('开发') || app.category.includes('设计');
@@ -62,6 +80,19 @@ export default function AppsPage() {
         apps={filteredApps}
         title={t('apps.stats.filteredApps', { count: filteredApps.length })}
       />
+
+      {cursor ? (
+        <div className="flex justify-center">
+          <button
+            type="button"
+            onClick={loadMore}
+            disabled={loadingMore}
+            className="px-4 py-2 rounded-full text-sm font-medium bg-store-brand text-white disabled:opacity-50"
+          >
+            {loadingMore ? t('common.loading', '加载中…') : t('common.loadMore', '加载更多')}
+          </button>
+        </div>
+      ) : null}
     </div>
   );
 }

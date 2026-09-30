@@ -22,6 +22,27 @@ impl AnalyticsProjectionRepository {
         Self { database }
     }
 
+    /// Discovers every tenant that has analytics source data, so scheduled
+    /// projections cover all tenants instead of a single configured one.
+    pub async fn find_active_tenant_ids(&self) -> Result<Vec<String>, String> {
+        let rows = self
+            .database
+            .query_as::<(String,)>(
+                r#"
+            SELECT DISTINCT tenant_id FROM appstore_install_event
+            UNION
+            SELECT DISTINCT tenant_id FROM appstore_catalog_search_history
+            UNION
+            SELECT DISTINCT tenant_id FROM appstore_listing_metric_snapshot
+            ORDER BY tenant_id
+            "#,
+            )
+            .fetch_all(&self.database)
+            .await
+            .map_err(|e| format!("discover active tenants failed: {e}"))?;
+        Ok(rows.into_iter().map(|(tenant_id,)| tenant_id).collect())
+    }
+
     /// Aggregates install events into daily listing metric snapshots.
     pub async fn project_listing_metrics(
         &self,

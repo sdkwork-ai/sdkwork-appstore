@@ -2,14 +2,14 @@
 -- id: 0002_appstore_platform_evolution
 -- engine: postgres
 -- module: sdkwork-appstore
--- purpose: Fix baseline structural defects (package_format type bug, version
---   ordering, rating numerics, counter widths, library uniqueness) and make
---   distribution platform a first-class entity aligned with App Store
---   Connect / Google Play / Microsoft Store / AppGallery / browser extension
---   stores / mini program platforms: platform dictionary, per-app platform
---   packages, per-platform release tracks with force-update and kill-switch,
---   signing credential registry, review lifecycle, regional pricing, promo
---   codes, tester groups, search read model, and unified daily analytics.
+-- purpose: Make distribution platform a first-class entity aligned with App
+--   Store Connect / Google Play / Microsoft Store / AppGallery / browser
+--   extension stores / mini program platforms: platform dictionary, per-app
+--   platform packages, per-platform release tracks with force-update and
+--   kill-switch, signing credential registry, review lifecycle, regional
+--   pricing, promo codes, tester groups, search read model, and unified
+--   analytics. Also reconciles baseline counter widths and library uniqueness
+--   for pre-fold environments (idempotent; see Part 1 notes).
 -- reversible: false
 -- rollback: forward-fix (all changes are additive; rollback is achieved by
 --   not consuming the new columns/tables, no data is dropped)
@@ -42,38 +42,23 @@ BEGIN;
 -- legacy TEXT-JSON columns in existing tables are left untouched for compatibility.
 
 -- ---------------------------------------------------------------------------
--- Part 1 — Structural defect fixes
+-- Part 1 — Structural defect fixes (superseded by the folded baseline)
+-- ---------------------------------------------------------------------------
+-- The original 0002 carried five defect fixes. They are now folded directly
+-- into database/ddl/baseline/postgres/0001_appstore_baseline.sql:
+--   * FIX-1 (package_format TEXT)        -> folded; CREATE TABLE declares TEXT.
+--   * FIX-2 (version_code_numeric)       -> withdrawn entirely; the column had
+--     no repository readers or writers and its index could never order fresh
+--     inserts. Update checks order by published_at instead.
+--   * FIX-3 (rating averages NUMERIC)    -> withdrawn; it broke the PostgreSQL
+--     runtime because repository rows/bindings are String end to end. Averages
+--     stay TEXT in both engines; aggregation happens on INTEGER rating columns.
+--   * FIX-4 / FIX-5 remain below as idempotent reconciliation statements.
 -- ---------------------------------------------------------------------------
 
--- FIX-1 (P0): 0004_appstore_timestamps_timestamptz.up.sql wrongly converted
--- appstore_release_artifact.package_format (a package format token such as
--- ipa/apk/hap/msix/dmg/crx/xpi/zip) to TIMESTAMPTZ. Restore it to TEXT.
-ALTER TABLE appstore_release_artifact
-  ALTER COLUMN package_format TYPE TEXT
-  USING NULLIF(COALESCE(package_format::text, ''), '')::text;
-
--- FIX-2 (P1): appstore_release.version_code is TEXT and cannot be ordered
--- numerically for "latest version" / force-update checks. Add a numeric
--- mirror column. version_code MUST be a monotonic integer build code
--- (Android versionCode, App Store build number, mini program version code).
-ALTER TABLE appstore_release ADD COLUMN IF NOT EXISTS version_code_numeric BIGINT;
-UPDATE appstore_release
-   SET version_code_numeric = NULLIF(regexp_replace(version_code, '[^0-9]', '', 'g'), '')::bigint
- WHERE version_code_numeric IS NULL;
-
--- FIX-3 (P1): rating averages stored as TEXT prevent numeric aggregation and
--- interval filters. Convert to NUMERIC with a NULL-safe USING clause. The
--- TEXT default ('0') cannot be cast automatically by PostgreSQL, so drop it
--- before the type change and re-apply a numeric default afterwards.
-ALTER TABLE appstore_app
-  ALTER COLUMN rating_avg DROP DEFAULT,
-  ALTER COLUMN rating_avg TYPE NUMERIC(4,2) USING NULLIF(rating_avg, '')::numeric,
-  ALTER COLUMN rating_avg SET DEFAULT 0;
-ALTER TABLE appstore_listing
-  ALTER COLUMN average_rating TYPE NUMERIC(4,2) USING NULLIF(average_rating, '')::numeric;
-
 -- FIX-4 (P1): hot-row counters as INTEGER will overflow at scale (App Store /
--- Play scale catalogs). Widen to BIGINT.
+-- Play scale catalogs). Widen to BIGINT. Idempotent: columns are already
+-- BIGINT in the folded baseline.
 ALTER TABLE appstore_app ALTER COLUMN download_count TYPE BIGINT;
 ALTER TABLE appstore_listing ALTER COLUMN download_count TYPE BIGINT;
 ALTER TABLE appstore_listing_metric_snapshot
@@ -86,11 +71,22 @@ ALTER TABLE appstore_listing_metric_snapshot
 -- FIX-5 (P1): appstore_user_library_item uniqueness was scoped to
 -- (user, app_key, platform), which collides when one app has multiple
 -- listings (regional/alt storefronts). Scope to listing identity instead.
+-- The folded baseline already declares this constraint inline; the guard
+-- keeps the migration replayable on both old and fresh databases.
 ALTER TABLE appstore_user_library_item
   DROP CONSTRAINT IF EXISTS appstore_user_library_item_tenant_id_user_id_app_key_platform_key;
-ALTER TABLE appstore_user_library_item
-  ADD CONSTRAINT appstore_user_library_item_uk
-  UNIQUE (tenant_id, user_id, listing_id, platform);
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint
+    WHERE conname = 'appstore_user_library_item_uk'
+      AND conrelid = 'appstore_user_library_item'::regclass
+  ) THEN
+    ALTER TABLE appstore_user_library_item
+      ADD CONSTRAINT appstore_user_library_item_uk
+      UNIQUE (tenant_id, user_id, listing_id, platform);
+  END IF;
+END $$;
 
 -- ---------------------------------------------------------------------------
 -- Part 2 — Platform as first-class entity
@@ -435,8 +431,4 @@ CREATE TABLE IF NOT EXISTS appstore_analytics_metric_daily (
 );
 CREATE INDEX IF NOT EXISTS idx_appstore_analytics_metric_daily_subject
   ON appstore_analytics_metric_daily (tenant_id, subject_type, subject_id, snapshot_date DESC);
-
--- Numerical "latest version" lookup using the FIX-2 numeric mirror.
-CREATE INDEX IF NOT EXISTS idx_appstore_release_update_check_numeric
-  ON appstore_release (tenant_id, listing_id, release_status, version_code_numeric DESC);
 COMMIT;

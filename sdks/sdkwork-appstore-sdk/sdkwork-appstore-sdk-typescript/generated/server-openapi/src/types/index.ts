@@ -1,4 +1,8 @@
 export * from './common';
+export type { PublicUserStoreCategorySummary } from './public-user-store-category-summary';
+export type { PublicUserStoreListingCard } from './public-user-store-listing-card';
+export type { PublicUserStoreViewResponse } from './public-user-store-view-response';
+export type { PublicUserStoreItemsResponse } from './public-user-store-items-response';
 export type { ReleaseCheckUpdateRequest } from './release-check-update-request';
 export type { ReleaseCheckUpdateResponse } from './release-check-update-response';
 export type { ArtifactResolveDownloadRequest } from './artifact-resolve-download-request';

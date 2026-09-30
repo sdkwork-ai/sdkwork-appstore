@@ -44,24 +44,29 @@
   ],
   "contracts": {
     "publicExports": [
-      "."
+      ".",
+      "./sdk",
+      "./modules",
+      "./host",
+      "./session",
+      "./composition"
     ],
     "providedPorts": [
       {
-        "port": "appstore.pc.admin.sdk-client",
-        "description": "Single legal construction point for the generated App Store backend SDK inside the backend-admin surface."
+        "name": "appstorePcAdminSdkClient",
+        "export": "./sdk"
       },
       {
-        "port": "appstore.pc.admin.service-ports",
-        "description": "One backend-admin service port per backend domain namespace (dashboard, moderation, listings, catalog, publishers, market)."
+        "name": "appstorePcAdminServicePorts",
+        "export": "."
       },
       {
-        "port": "appstore.pc.admin.access",
-        "description": "Backend-admin permission catalog, permission evaluation, and the headless route access guard."
+        "name": "appstorePcAdminAccess",
+        "export": "."
       },
       {
-        "port": "appstore.pc.admin.routes",
-        "description": "Route and capability-module descriptor contracts consumed by pc-admin-shell and implemented by every pc-admin-* capability package."
+        "name": "appstorePcAdminRoutes",
+        "export": "."
       }
     ],
     "requiredPorts": [],

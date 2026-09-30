@@ -26,8 +26,10 @@ export default function Event() {
           setLoading(false);
           return;
         }
-        const allApps = await AppStoreService.getAllApps();
-        const byId = new Map(allApps.map((app) => [app.id, app]));
+        // Exact bounded resolution of the event's listing ids; the previous
+        // client-side filter over a wide catalog page dropped items silently.
+        const resolved = await AppStoreService.getAppsByIds(detail.apps);
+        const byId = new Map(resolved.map((app) => [app.id, app]));
         const items = detail.apps
           .map((appId) => byId.get(appId))
           .filter((app): app is AppItem => Boolean(app));

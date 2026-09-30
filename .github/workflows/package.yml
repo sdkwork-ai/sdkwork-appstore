@@ -39,40 +39,76 @@ on:
         required: true
         default: false
         type: boolean
-      sdkwork_web_framework_ref:
-        description: sdkwork-web-framework commit/ref.
+      sdkwork_agents_ref:
+        description: sdkwork-agents commit/ref.
         required: false
         default: main
-      sdkwork_database_ref:
-        description: sdkwork-database commit/ref.
+      sdkwork_app_topology_ref:
+        description: sdkwork-app-topology commit/ref.
         required: false
         default: main
-      sdkwork_iam_ref:
-        description: sdkwork-iam commit/ref.
-        required: false
-        default: main
-      sdkwork_utils_ref:
-        description: sdkwork-utils commit/ref.
-        required: false
-        default: main
-      sdkwork_drive_ref:
-        description: sdkwork-drive commit/ref.
-        required: false
-        default: main
-      sdkwork_comments_ref:
-        description: sdkwork-comments commit/ref.
+      sdkwork_appbase_ref:
+        description: sdkwork-appbase commit/ref.
         required: false
         default: main
       sdkwork_cloudrouter_ref:
         description: sdkwork-cloudrouter commit/ref.
         required: false
         default: main
-      sdkwork_search_ref:
-        description: sdkwork-search commit/ref.
+      sdkwork_comments_ref:
+        description: sdkwork-comments commit/ref.
+        required: false
+        default: main
+      sdkwork_core_ref:
+        description: sdkwork-core commit/ref.
+        required: false
+        default: main
+      sdkwork_database_ref:
+        description: sdkwork-database commit/ref.
+        required: false
+        default: main
+      sdkwork_drive_ref:
+        description: sdkwork-drive commit/ref.
+        required: false
+        default: main
+      sdkwork_iam_ref:
+        description: sdkwork-iam commit/ref.
+        required: false
+        default: main
+      sdkwork_id_ref:
+        description: sdkwork-id commit/ref.
+        required: false
+        default: main
+      sdkwork_mcp_ref:
+        description: sdkwork-mcp commit/ref.
         required: false
         default: main
       sdkwork_platform_ref:
         description: sdkwork-platform commit/ref.
+        required: false
+        default: main
+      sdkwork_sdk_commons_ref:
+        description: sdkwork-sdk-commons commit/ref.
+        required: false
+        default: main
+      sdkwork_search_ref:
+        description: sdkwork-search commit/ref.
+        required: false
+        default: main
+      sdkwork_skills_ref:
+        description: sdkwork-skills commit/ref.
+        required: false
+        default: main
+      sdkwork_ui_ref:
+        description: sdkwork-ui commit/ref.
+        required: false
+        default: main
+      sdkwork_utils_ref:
+        description: sdkwork-utils commit/ref.
+        required: false
+        default: main
+      sdkwork_web_framework_ref:
+        description: sdkwork-web-framework commit/ref.
         required: false
         default: main
 
@@ -101,14 +137,23 @@ jobs:
       framework_ref: b0829529b9277a3da32b90c2d36ff34ff09fa832
       dependency_refs_json: >-
         {
-          "SDKWORK_WEB_FRAMEWORK_REF": "${{ github.event.inputs.sdkwork_web_framework_ref || vars.SDKWORK_WEB_FRAMEWORK_REF }}",
-          "SDKWORK_DATABASE_REF": "${{ github.event.inputs.sdkwork_database_ref || vars.SDKWORK_DATABASE_REF }}",
-          "SDKWORK_IAM_REF": "${{ github.event.inputs.sdkwork_iam_ref || vars.SDKWORK_IAM_REF }}",
-          "SDKWORK_UTILS_REF": "${{ github.event.inputs.sdkwork_utils_ref || vars.SDKWORK_UTILS_REF }}",
-          "SDKWORK_DRIVE_REF": "${{ github.event.inputs.sdkwork_drive_ref || vars.SDKWORK_DRIVE_REF }}",
-          "SDKWORK_COMMENTS_REF": "${{ github.event.inputs.sdkwork_comments_ref || vars.SDKWORK_COMMENTS_REF }}",
+          "SDKWORK_AGENTS_REF": "${{ github.event.inputs.sdkwork_agents_ref || vars.SDKWORK_AGENTS_REF }}",
+          "SDKWORK_APP_TOPOLOGY_REF": "${{ github.event.inputs.sdkwork_app_topology_ref || vars.SDKWORK_APP_TOPOLOGY_REF }}",
+          "SDKWORK_APPBASE_REF": "${{ github.event.inputs.sdkwork_appbase_ref || vars.SDKWORK_APPBASE_REF }}",
           "SDKWORK_CLOUDROUTER_REF": "${{ github.event.inputs.sdkwork_cloudrouter_ref || vars.SDKWORK_CLOUDROUTER_REF }}",
+          "SDKWORK_COMMENTS_REF": "${{ github.event.inputs.sdkwork_comments_ref || vars.SDKWORK_COMMENTS_REF }}",
+          "SDKWORK_CORE_REF": "${{ github.event.inputs.sdkwork_core_ref || vars.SDKWORK_CORE_REF }}",
+          "SDKWORK_DATABASE_REF": "${{ github.event.inputs.sdkwork_database_ref || vars.SDKWORK_DATABASE_REF }}",
+          "SDKWORK_DRIVE_REF": "${{ github.event.inputs.sdkwork_drive_ref || vars.SDKWORK_DRIVE_REF }}",
+          "SDKWORK_IAM_REF": "${{ github.event.inputs.sdkwork_iam_ref || vars.SDKWORK_IAM_REF }}",
+          "SDKWORK_ID_REF": "${{ github.event.inputs.sdkwork_id_ref || vars.SDKWORK_ID_REF }}",
+          "SDKWORK_MCP_REF": "${{ github.event.inputs.sdkwork_mcp_ref || vars.SDKWORK_MCP_REF }}",
+          "SDKWORK_PLATFORM_REF": "${{ github.event.inputs.sdkwork_platform_ref || vars.SDKWORK_PLATFORM_REF }}",
+          "SDKWORK_SDK_COMMONS_REF": "${{ github.event.inputs.sdkwork_sdk_commons_ref || vars.SDKWORK_SDK_COMMONS_REF }}",
           "SDKWORK_SEARCH_REF": "${{ github.event.inputs.sdkwork_search_ref || vars.SDKWORK_SEARCH_REF }}",
-          "SDKWORK_PLATFORM_REF": "${{ github.event.inputs.sdkwork_platform_ref || vars.SDKWORK_PLATFORM_REF }}"
+          "SDKWORK_SKILLS_REF": "${{ github.event.inputs.sdkwork_skills_ref || vars.SDKWORK_SKILLS_REF }}",
+          "SDKWORK_UI_REF": "${{ github.event.inputs.sdkwork_ui_ref || vars.SDKWORK_UI_REF }}",
+          "SDKWORK_UTILS_REF": "${{ github.event.inputs.sdkwork_utils_ref || vars.SDKWORK_UTILS_REF }}",
+          "SDKWORK_WEB_FRAMEWORK_REF": "${{ github.event.inputs.sdkwork_web_framework_ref || vars.SDKWORK_WEB_FRAMEWORK_REF }}"
         }
     secrets: inherit

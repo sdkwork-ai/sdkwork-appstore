@@ -9,6 +9,7 @@ import type { AppItem, EditorialCollection, EventItem, Review } from '../types';
 /** Bounded storefront page for catalog grid views (PAGINATION_SPEC §3: max 200,
  * keep interactive surfaces small). */
 const storefrontPageSize = 50;
+const catalogPageMax = 200;
 const reviewPageSize = 20;
 
 interface CategoryRef {
@@ -227,9 +228,9 @@ export function createAppStoreServicePort(
       newAndNoteworthy: AppItem[];
       secondaryEditorial: AppItem[];
     }> {
-      const [home, allApps] = await Promise.all([
+      const [home, firstPage] = await Promise.all([
         client.catalog.getHome(),
-        this.getAllApps(),
+        this.listAppsPage({ limit: 8 }),
       ]);
       const homeRow = (home ?? {}) as unknown as Record<string, unknown>;
       const featuredSlots = readArray(homeRow, 'featuredSlots', 'featured_slots');
@@ -241,7 +242,13 @@ export function createAppStoreServicePort(
         .flatMap((collection) => readCollectionListingIds(collection))
         .slice(0, 6);
 
-      const byId = new Map(allApps.map((app) => [app.id, app]));
+      // Resolve exactly the editorial ids through the bounded ids query
+      // instead of pulling a wide catalog page and filtering client-side.
+      const wantedIds = Array.from(
+        new Set([...featuredListingIds, ...collectionListingIds]),
+      ).slice(0, catalogPageMax);
+      const resolved = wantedIds.length ? await this.getAppsByIds(wantedIds) : [];
+      const byId = new Map(resolved.map((app) => [app.id, app]));
       const editorial = featuredListingIds
         .map((id) => byId.get(id))
         .filter((app): app is AppItem => Boolean(app))
@@ -250,12 +257,14 @@ export function createAppStoreServicePort(
         .map((id) => byId.get(id))
         .filter((app): app is AppItem => Boolean(app))
         .slice(0, 6);
-      const newAndNoteworthy = allApps.slice(0, 8);
+      const newAndNoteworthy = firstPage.items.slice(0, 8);
 
       return {
-        editorial: editorial.length ? editorial : allApps.slice(0, 6),
+        editorial: editorial.length ? editorial : firstPage.items.slice(0, 6),
         newAndNoteworthy,
-        secondaryEditorial: secondaryEditorial.length ? secondaryEditorial : allApps.slice(2, 8),
+        secondaryEditorial: secondaryEditorial.length
+          ? secondaryEditorial
+          : firstPage.items.slice(2, 8),
       };
     },
 
@@ -266,8 +275,28 @@ export function createAppStoreServicePort(
       );
     },
 
-    async getAllApps(): Promise<AppItem[]> {
-      const response = await client.catalog.searchListings({ limit: storefrontPageSize });
+    async listAppsPage(params?: {
+      cursor?: string;
+      limit?: number;
+    }): Promise<{ items: AppItem[]; nextCursor: string | null }> {
+      const response = await client.catalog.searchListings({
+        cursor: params?.cursor || undefined,
+        limit: Math.min(Math.max(params?.limit ?? storefrontPageSize, 1), catalogPageMax),
+      });
+      return {
+        items: readPageItems<Record<string, unknown>>(response).map((item) =>
+          mapListingSummary(item),
+        ),
+        nextCursor: readNextCursor(response),
+      };
+    },
+
+    async getAppsByIds(ids: string[]): Promise<AppItem[]> {
+      const unique = Array.from(new Set(ids)).filter(Boolean).slice(0, catalogPageMax);
+      if (unique.length === 0) {
+        return [];
+      }
+      const response = await client.catalog.searchListings({ ids: unique, limit: unique.length });
       return readPageItems<Record<string, unknown>>(response).map((item) =>
         mapListingSummary(item),
       );
@@ -721,6 +750,17 @@ function readPageItems<T>(value: unknown): T[] {
     return [];
   }
   return (value as Record<string, unknown>).items as T[];
+}
+
+/** Reads the keyset continuation cursor from a paged response envelope. */
+function readNextCursor(value: unknown): string | null {
+  if (!value || typeof value !== 'object') {
+    return null;
+  }
+  const row = value as Record<string, unknown>;
+  const pageInfo = (row.pageInfo ?? row.page) as Record<string, unknown> | undefined;
+  const cursor = readString(pageInfo, 'nextCursor', 'next_cursor');
+  return cursor || null;
 }
 
 function readArray(record: Record<string, unknown>, ...keys: string[]): Record<string, unknown>[] {

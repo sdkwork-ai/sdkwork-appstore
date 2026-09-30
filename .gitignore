@@ -129,3 +129,6 @@ __pycache__/
 
 # Dart local build caches
 .dart_tool/
+
+# Local one-off truth-table scratch dump (never committed)
+/tmp_truth_tables.json

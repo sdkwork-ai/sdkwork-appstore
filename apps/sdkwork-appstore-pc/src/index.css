@@ -441,13 +441,15 @@ html.light-mode .sdkwork-appstore-auth-shell {
   position: relative;
 }
 
-/* These two win against the sdkwork-iam auth surface's own sheet, which is
-   compiled from the `@source` rows above and lands in the same
-   `utilities` layer. The ownership fix (order the IAM sheet so no `!important`
-   is needed) is tracked in the conformance matrix as an open F8 item rather
-   than being forced here. */
+/* These two win against the sdkwork-iam auth surface's own background
+   utilities (`bg-zinc-100 dark:bg-zinc-950` on the slots). No `!important`
+   is needed: those utilities compile into the `utilities` cascade layer via
+   the `@source` rows above, while these top-level rules are unlayered —
+   and unlayered declarations always beat layered ones regardless of
+   specificity. Keeping the overrides unlayered is the ownership fix; do
+   not reintroduce `!important` to win a cascade fight (F8). */
 .sdkwork-appstore-auth-shell .sdkwork-iam-auth-routes {
-  background: transparent !important;
+  background: transparent;
   height: 100%;
   min-height: 0;
   overflow: hidden;
@@ -455,14 +457,14 @@ html.light-mode .sdkwork-appstore-auth-shell {
 
 .sdkwork-appstore-auth-background,
 .sdkwork-appstore-auth-page {
-  background: transparent !important;
+  background: transparent;
 }
 
 .sdkwork-appstore-auth-shell .sdkwork-auth-surface {
   box-sizing: border-box;
   height: 100%;
   max-height: 100%;
-  min-height: 0 !important;
+  min-height: 0;
   overflow-x: hidden;
   overflow-y: auto;
 }

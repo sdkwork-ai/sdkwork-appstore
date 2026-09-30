@@ -33,11 +33,31 @@ pub trait ModerationRepositoryPort: Send + Sync {
         review: &ModerationReview,
     ) -> AppstoreServiceResult<()>;
 
+    /// Persists review mutations guarded by the review's prior `updated_at`.
+    ///
+    /// Returns `Ok(false)` when the guard rejects the write (the review was
+    /// modified concurrently), leaving the stored row untouched; the caller
+    /// maps that to a conflict instead of silently overwriting another
+    /// moderator's changes.
     async fn update_review(
         &self,
         context: &AppstoreRequestContext,
         review: &ModerationReview,
-    ) -> AppstoreServiceResult<()>;
+        expected_updated_at: chrono::DateTime<chrono::Utc>,
+    ) -> AppstoreServiceResult<bool>;
+
+    /// Records a moderation decision and the resulting review-state
+    /// transition inside a single database transaction.
+    ///
+    /// Returns `Ok(false)` when the review's optimistic guard rejected the
+    /// transition (nothing is persisted, the transaction rolls back).
+    async fn record_decision_with_review(
+        &self,
+        context: &AppstoreRequestContext,
+        decision: &ModerationDecision,
+        review: &ModerationReview,
+        expected_review_updated_at: chrono::DateTime<chrono::Utc>,
+    ) -> AppstoreServiceResult<bool>;
 
     async fn find_decision_by_id(
         &self,
@@ -50,12 +70,6 @@ pub trait ModerationRepositoryPort: Send + Sync {
         context: &AppstoreRequestContext,
         review_id: &ModerationReviewId,
     ) -> AppstoreServiceResult<Vec<ModerationDecision>>;
-
-    async fn insert_decision(
-        &self,
-        context: &AppstoreRequestContext,
-        decision: &ModerationDecision,
-    ) -> AppstoreServiceResult<()>;
 
     async fn find_appeal_by_id(
         &self,
@@ -77,11 +91,14 @@ pub trait ModerationRepositoryPort: Send + Sync {
         appeal: &ModerationAppeal,
     ) -> AppstoreServiceResult<()>;
 
+    /// Persists appeal mutations guarded by the appeal's prior `updated_at`.
+    /// Returns `Ok(false)` when the guard rejects the write.
     async fn update_appeal(
         &self,
         context: &AppstoreRequestContext,
         appeal: &ModerationAppeal,
-    ) -> AppstoreServiceResult<()>;
+        expected_updated_at: chrono::DateTime<chrono::Utc>,
+    ) -> AppstoreServiceResult<bool>;
 
     /// Resolves the owning listing of a submission.
     async fn find_submission_listing_id(

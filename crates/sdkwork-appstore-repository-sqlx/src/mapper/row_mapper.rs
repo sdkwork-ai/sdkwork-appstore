@@ -6,14 +6,14 @@ use crate::db::rows::{
     AppTemplateRow, AppTemplateUsageRow, CatalogChartSnapshotRow, CatalogCollectionItemRow,
     CatalogCollectionLocalizationRow, CatalogCollectionRow, CatalogFeaturedSlotRow,
     CatalogSearchHistoryRow, CatalogTrendingTermRow, CategoryLocalizationRow, CategoryRow,
-    CompliancePermissionDisclosureRow, ComplianceProfileRow, DownloadGrantRow, FeedbackRow,
-    InstallEventRow, ListingCategoryBindingRow, ListingLocalizationRow, ListingMediaRow,
-    ListingMetricSnapshotRow, ListingRatingRow, ListingRow, ListingSearchRow, ListingSubmissionRow,
-    MarketChannelRow, MarketReleaseRow, ModerationDecisionRow, ModerationReviewRow,
-    PublisherMemberRow, PublisherRow, PublisherVerificationRow, RegionalAvailabilityRow,
-    ReleaseArtifactRow, ReleaseChannelRow, ReleaseNoteLocalizationRow, ReleaseRolloutRow,
-    ReleaseRow, UserCategoryItemRow, UserCategoryRow, UserLibraryItemRow, UserStoreShareRow,
-    UserWishlistItemRow,
+    CompliancePermissionDisclosureRow, ComplianceProfileRow, DownloadGrantRow, EntitlementRow,
+    FeedbackRow, InstallEventRow, ListingCategoryBindingRow, ListingLocalizationRow,
+    ListingMediaRow, ListingMetricSnapshotRow, ListingRatingRow, ListingRow, ListingSearchRow,
+    ListingSubmissionRow, MarketChannelRow, MarketReleaseRow, ModerationDecisionRow,
+    ModerationReviewRow, PublisherMemberRow, PublisherRow, PublisherVerificationRow,
+    RegionalAvailabilityRow, ReleaseArtifactRow, ReleaseChannelRow, ReleaseNoteLocalizationRow,
+    ReleaseRolloutRow, ReleaseRow, UserCategoryItemRow, UserCategoryRow, UserLibraryItemRow,
+    UserStoreShareRow, UserWishlistItemRow,
 };
 use sdkwork_appstore_catalog_service::domain::models::{
     AppTemplate, AppTemplateUsage, AppTemplateUsageKind, AudienceScope as CatalogAudienceScope,
@@ -27,7 +27,8 @@ use sdkwork_appstore_compliance_service::domain::models::{
     DisclosureStatus,
 };
 use sdkwork_appstore_library_service::domain::models::{
-    DownloadGrant as LibraryDownloadGrant, DownloadGrantReason, DownloadGrantStatus, InstallEvent,
+    CommerceEntitlement, DownloadGrant as LibraryDownloadGrant, DownloadGrantReason,
+    DownloadGrantStatus, EntitlementStatus, EntitlementSubjectType, InstallEvent,
     InstallEventStatus, InstallEventType, InstallSource, LibraryItemId, LibraryStatus,
     UserLibraryItem, UserWishlistItem, WishlistStatus,
 };
@@ -1364,4 +1365,30 @@ pub fn map_user_store_share_domain_to_share_columns(
         share.status.as_str().to_string(),
         share.expires_at,
     ))
+}
+
+pub fn map_entitlement_row_to_domain(row: EntitlementRow) -> Result<CommerceEntitlement, String> {
+    let subject_type = EntitlementSubjectType::from_str(&row.subject_type)
+        .ok_or_else(|| format!("Invalid entitlement subject type: {}", row.subject_type))?;
+    let entitlement_status = EntitlementStatus::from_str(&row.entitlement_status)
+        .ok_or_else(|| format!("Invalid entitlement status: {}", row.entitlement_status))?;
+
+    Ok(CommerceEntitlement {
+        id: row.id,
+        tenant_id: row.tenant_id,
+        organization_id: row.organization_id,
+        app_id: row.app_id,
+        listing_id: row.listing_id,
+        subject_type,
+        subject_id: row.subject_id,
+        entitlement_type: row.entitlement_type,
+        source_type: row.source_type,
+        entitlement_status,
+        starts_at: row.starts_at,
+        expires_at: row.expires_at,
+        grant_snapshot_json: row.grant_snapshot_json,
+        revoked_at: row.revoked_at,
+        created_at: row.created_at,
+        updated_at: row.updated_at,
+    })
 }

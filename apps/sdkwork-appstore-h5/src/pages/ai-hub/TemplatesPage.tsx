@@ -31,7 +31,7 @@ export function TemplatesPage() {
         </div>
       </header>
 
-      <div className="grid grid-cols-1 gap-3 px-4 py-4">
+      <div className="grid grid-cols-1 gap-3 px-4 py-4 sm:grid-cols-2">
         {error ? (
           <div className="card p-8 text-center">
             <p className="text-sm text-[var(--text-secondary)]">模板加载失败，请稍后重试</p>

@@ -28,7 +28,7 @@ export function TabBar({ items }: TabBarProps) {
     <nav className="tab-bar" aria-label="主导航">
       <div
         className="tab-bar__row"
-        style={{ maxWidth: '30rem', marginLeft: 'auto', marginRight: 'auto' }}
+        style={{ maxWidth: '42rem', marginLeft: 'auto', marginRight: 'auto' }}
       >
         {items.map((item) => (
           <NavLink

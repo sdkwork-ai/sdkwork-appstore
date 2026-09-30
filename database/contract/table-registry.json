@@ -385,6 +385,66 @@
       "owner": "appstore-platform",
       "compliance_level": "L2",
       "lifecycle_status": "active"
+    },
+    {
+      "table_name": "appstore_user_category",
+      "owner": "appstore-user-store",
+      "compliance_level": "L2",
+      "lifecycle_status": "active"
+    },
+    {
+      "table_name": "appstore_user_category_item",
+      "owner": "appstore-user-store",
+      "compliance_level": "L2",
+      "lifecycle_status": "active"
+    },
+    {
+      "table_name": "appstore_user_store_share",
+      "owner": "appstore-user-store",
+      "compliance_level": "L2",
+      "lifecycle_status": "active"
+    },
+    {
+      "table_name": "appstore_app_sku",
+      "owner": "appstore-platform",
+      "compliance_level": "L2",
+      "lifecycle_status": "active"
+    },
+    {
+      "table_name": "appstore_app_sku_attribute",
+      "owner": "appstore-platform",
+      "compliance_level": "L2",
+      "lifecycle_status": "active"
+    },
+    {
+      "table_name": "appstore_app_sku_model",
+      "owner": "appstore-platform",
+      "compliance_level": "L2",
+      "lifecycle_status": "active"
+    },
+    {
+      "table_name": "appstore_app_sku_contributor",
+      "owner": "appstore-platform",
+      "compliance_level": "L2",
+      "lifecycle_status": "active"
+    },
+    {
+      "table_name": "appstore_app_deployment_binding",
+      "owner": "appstore-platform",
+      "compliance_level": "L2",
+      "lifecycle_status": "active"
+    },
+    {
+      "table_name": "appstore_web_rate_limit_bucket",
+      "owner": "appstore-platform",
+      "compliance_level": "L2",
+      "lifecycle_status": "active"
+    },
+    {
+      "table_name": "appstore_web_idempotency_entry",
+      "owner": "appstore-platform",
+      "compliance_level": "L2",
+      "lifecycle_status": "active"
     }
   ]
 }

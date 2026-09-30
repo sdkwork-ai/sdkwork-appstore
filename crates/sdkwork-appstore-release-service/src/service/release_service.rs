@@ -252,15 +252,23 @@ where
         }
 
         // Deterministic percentage bucketing keyed on the client device.
+        // Uses SHA-256, which is stable across process restarts and cluster
+        // nodes; the standard DefaultHasher is randomly seeded per process
+        // and would reshuffle buckets on every restart and disagree between
+        // nodes, flapping a device in and out of the rollout.
         let bucket_input = request
             .device_id
             .as_deref()
             .or(Some(request.architecture.as_deref().unwrap_or("")))
             .unwrap_or_default();
-        let mut hasher = std::collections::hash_map::DefaultHasher::new();
-        use std::hash::{Hash, Hasher};
-        (release.id.as_str(), bucket_input).hash(&mut hasher);
-        let bucket = (hasher.finish() % 100) as i32;
+        let mut material = Vec::with_capacity(release.id.as_str().len() + 1 + bucket_input.len());
+        material.extend_from_slice(release.id.as_str().as_bytes());
+        material.push(0);
+        material.extend_from_slice(bucket_input.as_bytes());
+        let digest = sdkwork_utils_rust::crypto::sha256_digest(&material);
+        let bucket =
+            (u64::from_be_bytes(digest[..8].try_into().expect("sha256 digest is 32 bytes")) % 100)
+                as i32;
         Ok(bucket < rollout.target_percentage)
     }
 
@@ -1130,6 +1138,28 @@ where
             return Err(AppstoreServiceError::ValidationFailed(
                 "Artifact does not belong to this release".to_string(),
             ));
+        }
+
+        // Paid-content gate: the store never settles payment, so a download
+        // grant for paid listings requires an active commerce entitlement
+        // synced from the Order/Payment domain. Without this guard the grant
+        // reason string would be the only "protection".
+        let pricing_model = self
+            .repository
+            .find_listing_pricing_model(context, &release.listing_id)
+            .await?
+            .unwrap_or_else(|| "free".to_string());
+        let is_free = pricing_model.eq_ignore_ascii_case("free");
+        if !is_free {
+            let entitled = self
+                .repository
+                .has_active_entitlement(context, release.listing_id.as_str(), &user_id)
+                .await?;
+            if !entitled {
+                return Err(AppstoreServiceError::InvalidState(
+                    "An active entitlement is required to download paid content".to_string(),
+                ));
+            }
         }
 
         let now = Utc::now();

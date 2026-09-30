@@ -822,6 +822,31 @@ impl ReleaseRepositoryPort for SqlxReleaseRepository {
         Ok(row.map(|(pricing_model,)| pricing_model))
     }
 
+    async fn has_active_entitlement(
+        &self,
+        context: &AppstoreRequestContext,
+        listing_id: &str,
+        subject_id: &str,
+    ) -> Result<bool, AppstoreServiceError> {
+        // Expiry stays a caller-side decision so the SQL shape is identical
+        // across the SQLite TEXT and Postgres TIMESTAMPTZ dialects.
+        let row: Option<(i64,)> = self
+            .db
+            .query_as::<(i64,)>(
+                r#"SELECT 1 FROM appstore_entitlement
+                WHERE tenant_id = ? AND listing_id = ? AND subject_type = 'user'
+                  AND subject_id = ? AND entitlement_status = 'active'
+                LIMIT 1"#,
+            )
+            .bind(&context.tenant_id)
+            .bind(listing_id)
+            .bind(subject_id)
+            .fetch_optional(&self.db)
+            .await
+            .map_err(|e| AppstoreServiceError::Internal(format!("Database error: {}", e)))?;
+        Ok(row.is_some())
+    }
+
     async fn find_publisher_member_role(
         &self,
         context: &AppstoreRequestContext,

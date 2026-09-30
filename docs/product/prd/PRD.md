@@ -868,7 +868,7 @@ Backend Admin
 
 ## 14. 数据模型概要
 
-完整 47 张表定义见 [TECH_ARCHITECTURE.md](../../architecture/tech/TECH_ARCHITECTURE.md) §4。核心实体关系：
+完整 74 张表定义见 [TECH_ARCHITECTURE.md](../../architecture/tech/TECH_ARCHITECTURE.md) §4。核心实体关系：
 
 | 域 | 核心表 | 说明 |
 | --- | --- | --- |

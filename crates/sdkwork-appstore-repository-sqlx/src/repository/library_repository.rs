@@ -1,22 +1,24 @@
 use crate::pool::AppstoreSqlxDb;
 
 use crate::db::columns::{
-    columns_csv, APPSTORE_DOWNLOAD_GRANT_COLUMNS, APPSTORE_USER_LIBRARY_ITEM_COLUMNS,
-    APPSTORE_USER_WISHLIST_ITEM_COLUMNS,
+    columns_csv, APPSTORE_DOWNLOAD_GRANT_COLUMNS, APPSTORE_ENTITLEMENT_COLUMNS,
+    APPSTORE_USER_LIBRARY_ITEM_COLUMNS, APPSTORE_USER_WISHLIST_ITEM_COLUMNS,
 };
 use crate::db::rows::{
-    DownloadGrantRow, ReleaseArtifactRow, ReleaseRow, UserLibraryItemRow, UserWishlistItemRow,
+    DownloadGrantRow, EntitlementRow, ReleaseArtifactRow, ReleaseRow, UserLibraryItemRow,
+    UserWishlistItemRow,
 };
 use crate::mapper::row_mapper::{
-    map_install_event_domain_to_row, map_library_download_grant_domain_to_row,
-    map_library_download_grant_row_to_domain, map_library_item_domain_to_row,
-    map_library_item_row_to_domain, map_wishlist_item_domain_to_row,
-    map_wishlist_item_row_to_domain,
+    map_entitlement_row_to_domain, map_install_event_domain_to_row,
+    map_library_download_grant_domain_to_row, map_library_download_grant_row_to_domain,
+    map_library_item_domain_to_row, map_library_item_row_to_domain,
+    map_wishlist_item_domain_to_row, map_wishlist_item_row_to_domain,
 };
 
 use sdkwork_appstore_library_service::context::AppstoreRequestContext;
 use sdkwork_appstore_library_service::domain::models::{
-    DownloadGrant, InstallEvent, LibraryItemId, UserLibraryItem, UserWishlistItem,
+    CommerceEntitlement, DownloadGrant, EntitlementSubjectType, InstallEvent, LibraryItemId,
+    UserLibraryItem, UserWishlistItem,
 };
 use sdkwork_appstore_library_service::error::AppstoreServiceError;
 use sdkwork_appstore_library_service::ports::repository::LibraryRepositoryPort;
@@ -409,6 +411,74 @@ impl LibraryRepositoryPort for SqlxLibraryRepository {
             .map_err(AppstoreServiceError::Internal)
     }
 
+    async fn consume_download_grant_atomically(
+        &self,
+        context: &AppstoreRequestContext,
+        grant_id: &str,
+        user_id: &str,
+    ) -> Result<Option<DownloadGrant>, AppstoreServiceError> {
+        let now = chrono::Utc::now();
+        let result = self
+            .db
+            .query(
+                r#"UPDATE appstore_download_grant SET
+                download_count = download_count + 1,
+                grant_status = CASE
+                    WHEN download_count + 1 >= max_download_count THEN 'consumed'
+                    ELSE grant_status
+                END,
+                consumed_at = CASE
+                    WHEN download_count + 1 >= max_download_count THEN ?
+                    ELSE consumed_at
+                END,
+                updated_at = ?
+            WHERE id = ? AND tenant_id = ?
+              AND user_id = ?
+              AND grant_status = 'active'
+              AND download_count < max_download_count
+              AND expires_at > ?"#,
+            )
+            .bind(now)
+            .bind(now)
+            .bind(grant_id)
+            .bind(&context.tenant_id)
+            .bind(user_id)
+            .bind(now)
+            .execute_unified(&self.db)
+            .await
+            .map_err(|e| AppstoreServiceError::Internal(format!("Database error: {}", e)))?;
+
+        if result.rows_affected() == 0 {
+            return Ok(None);
+        }
+
+        self.find_download_grant_by_id(context, grant_id).await
+    }
+
+    async fn find_artifact_context(
+        &self,
+        context: &AppstoreRequestContext,
+        artifact_id: &str,
+    ) -> Result<Option<(String, String, String)>, AppstoreServiceError> {
+        let row: Option<(String, String, String)> = self
+            .db
+            .query_as::<(String, String, String)>(
+                r#"SELECT r.listing_id, r.id, a.artifact_status
+                FROM appstore_release_artifact a
+                JOIN appstore_release r
+                    ON r.id = a.release_id AND r.tenant_id = a.tenant_id
+                WHERE a.id = ? AND a.tenant_id = ?
+                LIMIT 1"#,
+            )
+            .bind(artifact_id)
+            .bind(&context.tenant_id)
+            .fetch_optional(&self.db)
+            .await
+            .map_err(|e| AppstoreServiceError::Internal(format!("Database error: {}", e)))?;
+
+        Ok(row)
+    }
+
     async fn insert_download_grant(
         &self,
         context: &AppstoreRequestContext,
@@ -440,36 +510,6 @@ impl LibraryRepositoryPort for SqlxLibraryRepository {
             .bind(grant.max_download_count)
             .bind(grant.created_at)
             .bind(grant.updated_at)
-            .execute_unified(&self.db)
-            .await
-            .map_err(|e| AppstoreServiceError::Internal(format!("Database error: {}", e)))?;
-
-        Ok(())
-    }
-
-    async fn update_download_grant(
-        &self,
-        context: &AppstoreRequestContext,
-        grant: &DownloadGrant,
-    ) -> Result<(), AppstoreServiceError> {
-        let (grant_status, grant_reason) = map_library_download_grant_domain_to_row(grant);
-
-        self.db
-            .query(
-                r#"UPDATE appstore_download_grant SET
-                grant_status = ?, grant_reason = ?, expires_at = ?, consumed_at = ?,
-                download_count = ?, max_download_count = ?, updated_at = ?
-            WHERE id = ? AND tenant_id = ?"#,
-            )
-            .bind(&grant_status)
-            .bind(&grant_reason)
-            .bind(grant.expires_at)
-            .bind(grant.consumed_at)
-            .bind(grant.download_count)
-            .bind(grant.max_download_count)
-            .bind(grant.updated_at)
-            .bind(&grant.id)
-            .bind(&context.tenant_id)
             .execute_unified(&self.db)
             .await
             .map_err(|e| AppstoreServiceError::Internal(format!("Database error: {}", e)))?;
@@ -607,5 +647,132 @@ impl LibraryRepositoryPort for SqlxLibraryRepository {
         .map_err(|e| AppstoreServiceError::Internal(format!("Database error: {}", e)))?;
 
         Ok(row.map(|(app_key,)| app_key))
+    }
+
+    async fn upsert_entitlement(
+        &self,
+        context: &AppstoreRequestContext,
+        entitlement: &CommerceEntitlement,
+    ) -> Result<(), AppstoreServiceError> {
+        self.upsert_entitlement_inner(context, entitlement).await
+    }
+
+    async fn find_active_entitlement(
+        &self,
+        context: &AppstoreRequestContext,
+        app_id: &str,
+        subject_id: &str,
+    ) -> Result<Option<CommerceEntitlement>, AppstoreServiceError> {
+        // Expiry filtering stays in the service layer (`is_active(now)`) so a
+        // single SQL shape works across SQLite TEXT and Postgres TIMESTAMPTZ.
+        let sql = format!(
+            r#"SELECT {} FROM appstore_entitlement
+            WHERE tenant_id = ? AND app_id = ? AND subject_type = ? AND subject_id = ?
+              AND entitlement_status = 'active'
+            ORDER BY updated_at DESC
+            LIMIT 1"#,
+            columns_csv(APPSTORE_ENTITLEMENT_COLUMNS)
+        );
+        let row = self
+            .db
+            .query_as::<EntitlementRow>(&sql)
+            .bind(&context.tenant_id)
+            .bind(app_id)
+            .bind(EntitlementSubjectType::User.as_str())
+            .bind(subject_id)
+            .fetch_optional(&self.db)
+            .await
+            .map_err(|e| AppstoreServiceError::Internal(format!("Database error: {}", e)))?;
+        row.map(map_entitlement_row_to_domain)
+            .transpose()
+            .map_err(AppstoreServiceError::Internal)
+    }
+
+    async fn revoke_entitlement(
+        &self,
+        context: &AppstoreRequestContext,
+        app_id: &str,
+        subject_id: &str,
+        entitlement_type: &str,
+        revoked_at: chrono::DateTime<chrono::Utc>,
+    ) -> Result<bool, AppstoreServiceError> {
+        // Guard on the active status so a replayed revoke is a no-op and a
+        // revoked row can never flip back to active.
+        let sql = self.db.adapt_sql(
+            r#"
+            UPDATE appstore_entitlement
+            SET entitlement_status = 'revoked', revoked_at = ?, updated_at = ?
+            WHERE tenant_id = ? AND app_id = ? AND subject_type = ? AND subject_id = ?
+              AND entitlement_type = ? AND entitlement_status = 'active'
+            "#,
+        );
+        let result = self
+            .db
+            .query(&sql)
+            .bind(revoked_at)
+            .bind(revoked_at)
+            .bind(&context.tenant_id)
+            .bind(app_id)
+            .bind(EntitlementSubjectType::User.as_str())
+            .bind(subject_id)
+            .bind(entitlement_type)
+            .execute_unified(&self.db)
+            .await
+            .map_err(|e| AppstoreServiceError::Internal(format!("Database error: {}", e)))?;
+        Ok(result.rows_affected > 0)
+    }
+}
+
+impl SqlxLibraryRepository {
+    /// Entitlement upsert is idempotent on the commerce natural key; replayed
+    /// sync events refresh the snapshot instead of creating duplicates.
+    async fn upsert_entitlement_inner(
+        &self,
+        context: &AppstoreRequestContext,
+        entitlement: &CommerceEntitlement,
+    ) -> Result<(), AppstoreServiceError> {
+        let sql = self.db.adapt_sql(
+            r#"
+            INSERT INTO appstore_entitlement (
+                id, tenant_id, organization_id, app_id, listing_id,
+                subject_type, subject_id, entitlement_type, source_type,
+                entitlement_status, starts_at, expires_at, grant_snapshot_json,
+                revoked_at, created_at, updated_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ON CONFLICT (tenant_id, app_id, subject_type, subject_id, entitlement_type)
+            DO UPDATE SET
+                organization_id = excluded.organization_id,
+                listing_id = excluded.listing_id,
+                source_type = excluded.source_type,
+                entitlement_status = excluded.entitlement_status,
+                starts_at = excluded.starts_at,
+                expires_at = excluded.expires_at,
+                grant_snapshot_json = excluded.grant_snapshot_json,
+                revoked_at = excluded.revoked_at,
+                updated_at = excluded.updated_at
+            "#,
+        );
+        self.db
+            .query(&sql)
+            .bind(&entitlement.id)
+            .bind(&context.tenant_id)
+            .bind(&entitlement.organization_id)
+            .bind(&entitlement.app_id)
+            .bind(&entitlement.listing_id)
+            .bind(entitlement.subject_type.as_str())
+            .bind(&entitlement.subject_id)
+            .bind(&entitlement.entitlement_type)
+            .bind(&entitlement.source_type)
+            .bind(entitlement.entitlement_status.as_str())
+            .bind(entitlement.starts_at)
+            .bind(entitlement.expires_at)
+            .bind(&entitlement.grant_snapshot_json)
+            .bind(entitlement.revoked_at)
+            .bind(entitlement.created_at)
+            .bind(entitlement.updated_at)
+            .execute_unified(&self.db)
+            .await
+            .map_err(|e| AppstoreServiceError::Internal(format!("Database error: {}", e)))?;
+        Ok(())
     }
 }

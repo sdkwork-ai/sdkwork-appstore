@@ -35,7 +35,7 @@ paths:
         AccessToken: []
       summary: List moderation queue
       parameters:
-      - name: reviewStatus
+      - name: review_status
         in: query
         schema:
           type: string
@@ -120,6 +120,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SdkWorkResourceResponse'
+      x-sdkwork-idempotent: true
   /backend/v3/api/moderation/appeals:
     post:
       tags:
@@ -142,6 +143,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SdkWorkResourceResponse'
+      parameters: []
     get:
       tags:
       - moderation
@@ -228,6 +230,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SdkWorkResourceResponse'
+      parameters: []
   /backend/v3/api/appstore/catalog/collections/{collectionId}:
     patch:
       tags:
@@ -340,6 +343,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SdkWorkResourceResponse'
+      parameters: []
   /backend/v3/api/appstore/catalog/categories/{categoryId}:
     patch:
       tags:
@@ -374,7 +378,11 @@ paths:
         AccessToken: []
       summary: List listings for operators
       parameters:
-      - name: listingStatus
+      - name: status_filter
+        in: query
+        schema:
+          type: string
+      - name: review_status_filter
         in: query
         schema:
           type: string
@@ -479,11 +487,11 @@ paths:
       summary: Retrieve listing metrics
       parameters:
       - $ref: '#/components/parameters/ListingId'
-      - name: fromDate
+      - name: date_from
         in: query
         schema:
           type: string
-      - name: toDate
+      - name: date_to
         in: query
         schema:
           type: string
@@ -637,7 +645,7 @@ paths:
         AccessToken: []
       summary: List external market channels
       parameters:
-      - name: channelStatus
+      - name: channel_status
         in: query
         schema:
           type: string
@@ -671,6 +679,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SdkWorkResourceResponse'
+      parameters: []
   /backend/v3/api/market_channels/{marketChannelId}:
     patch:
       tags:
@@ -705,15 +714,15 @@ paths:
         AccessToken: []
       summary: List external market release projections
       parameters:
-      - name: releaseId
+      - name: release_id
         in: query
         schema:
           type: string
-      - name: channelId
+      - name: channel_id
         in: query
         schema:
           type: string
-      - name: marketStatus
+      - name: market_status
         in: query
         schema:
           type: string
@@ -751,6 +760,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SdkWorkResourceResponse'
+      x-sdkwork-idempotent: true
 components:
   securitySchemes:
     AuthToken:
@@ -781,6 +791,8 @@ components:
       required: true
       schema:
         type: string
+        minLength: 1
+        maxLength: 128
     ReviewId:
       name: reviewId
       in: path
@@ -1055,7 +1067,9 @@ components:
           maximum: 200
         totalItems:
           type: string
+          format: int64
           pattern: ^[0-9]+$
+          x-sdkwork-int64-string: true
         totalPages:
           type: integer
           minimum: 0
@@ -1070,7 +1084,7 @@ components:
       format: int32
       minimum: 40001
       maximum: 79999
-      description: Platform or domain error code per API_SPEC.md 搂15.3.
+      description: Platform or domain error code per API_SPEC.md §15.3.
     ProblemDetail:
       type: object
       additionalProperties: true

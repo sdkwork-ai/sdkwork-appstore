@@ -196,3 +196,71 @@ impl ConsumeDownloadGrantResult {
         }
     }
 }
+
+/// Result of a commerce entitlement sync (idempotent upsert).
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct CommerceEntitlementSyncResult {
+    pub operation_id: &'static str,
+    pub accepted: bool,
+}
+
+impl CommerceEntitlementSyncResult {
+    pub fn accepted(operation_id: &'static str) -> Self {
+        Self {
+            operation_id,
+            accepted: true,
+        }
+    }
+}
+
+/// Result of an entitlement check for one subject/app pair.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct CommerceEntitlementCheckResult {
+    pub operation_id: &'static str,
+    pub has_entitlement: bool,
+    pub entitlement_type: Option<String>,
+    pub expires_at: Option<chrono::DateTime<chrono::Utc>>,
+}
+
+impl CommerceEntitlementCheckResult {
+    pub fn granted(
+        operation_id: &'static str,
+        entitlement_type: Option<String>,
+        expires_at: Option<chrono::DateTime<chrono::Utc>>,
+    ) -> Self {
+        Self {
+            operation_id,
+            has_entitlement: true,
+            entitlement_type,
+            expires_at,
+        }
+    }
+
+    pub fn denied(operation_id: &'static str) -> Self {
+        Self {
+            operation_id,
+            has_entitlement: false,
+            entitlement_type: None,
+            expires_at: None,
+        }
+    }
+}
+
+/// Result of an entitlement revoke.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct CommerceEntitlementRevokeResult {
+    pub operation_id: &'static str,
+    pub revoked: bool,
+}
+
+impl CommerceEntitlementRevokeResult {
+    pub fn revoked(operation_id: &'static str, revoked: bool) -> Self {
+        Self {
+            operation_id,
+            revoked,
+        }
+    }
+}

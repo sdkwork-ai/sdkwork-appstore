@@ -7,5 +7,7 @@ pub mod mapper;
 pub mod pool;
 pub mod repository;
 pub mod test_support;
+pub mod web_stores;
 
 pub use pool::{AppstoreDbPool, AppstoreSqlxDb};
+pub use web_stores::{AppstoreDbIdempotencyStore, AppstoreDbRateLimitStore};

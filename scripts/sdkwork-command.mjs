@@ -60,12 +60,11 @@ function runNode(scriptRelativePath, scriptArgs = []) {
   }
 }
 
-function dbCliArgs(command, database) {
-  const subcommand = command.replace("db:", "");
-  const args = ["--app-root", "."];
-  if (database === "postgres") {
-    args.push("--engine", "postgres");
-  }
+function dbCliArgs(command) {
+  // CLI subcommands use hyphens (`drift-check`); script names use colons
+  // (`db:drift:check`). The engine is resolved from SDKWORK_DATABASE_* env
+  // (topology etc/topology/*.env); the old `--engine` CLI flag was removed.
+  const subcommand = command.replace("db:", "").replaceAll(":", "-");
   return [
     "cargo",
     "run",
@@ -74,7 +73,8 @@ function dbCliArgs(command, database) {
     "-p",
     "sdkwork-database-cli",
     "--",
-    ...args,
+    "--app-root",
+    ".",
     subcommand,
   ].join(" ");
 }
@@ -140,7 +140,11 @@ function dispatch({ command, flags }) {
       run("pnpm run check:pagination");
       run("pnpm run check:tailwind-integration");
       run("pnpm run db:validate");
-      run("cargo fmt --all --check");
+      // AGENTS.md: `cargo fmt --all` is forbidden — path dependencies reach
+      // sibling workspaces (iam/web-framework/utils), whose formatting is
+      // outside this repository's authority. Bare `cargo fmt` scopes to the
+      // workspace members declared in this repository's Cargo.toml.
+      run("cargo fmt -- --check");
       run("cargo check --workspace");
       break;
     }
@@ -186,13 +190,13 @@ function dispatch({ command, flags }) {
       break;
     }
     case "db:postgres:plan":
-      run(dbCliArgs("db:plan", "postgres"));
+      run(dbCliArgs("db:plan"));
       break;
     case "db:postgres:init":
-      run(dbCliArgs("db:init", "postgres"));
+      run(dbCliArgs("db:init"));
       break;
     case "db:postgres:migrate":
-      run(dbCliArgs("db:migrate", "postgres"));
+      run(dbCliArgs("db:migrate"));
       break;
     case "db:validate":
       runNode("../sdkwork-specs/tools/check-database-framework-standard.mjs", ["--root", "."]);

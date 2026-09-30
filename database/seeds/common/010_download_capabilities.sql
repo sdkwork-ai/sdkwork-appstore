@@ -2,7 +2,7 @@
 -- Initialize release artifacts, entitlements, download grants and install events
 -- for end-to-end download capability flows.
 
--- 1) Seed one verified desktop artifact for every published release.
+-- Step 1: Seed one verified desktop artifact for every published release.
 INSERT INTO appstore_release_artifact (
     id,
     tenant_id,
@@ -51,7 +51,7 @@ WHERE r.tenant_id = '100001'
   AND r.release_status = 'published'
 ON CONFLICT (id) DO NOTHING;
 
--- 2) Seed paid entitlements for the demo user so entitlement-gated
+-- Step 2: Seed paid entitlements for the demo user so entitlement-gated
 -- download flow is testable.
 INSERT INTO appstore_entitlement (
     id,
@@ -93,7 +93,7 @@ WHERE l.tenant_id = '100001'
   AND l.pricing_model = 'PAID'
 ON CONFLICT (id) DO NOTHING;
 
--- 3) Seed active grants for published listings so complete download
+-- Step 3: Seed active grants for published listings so complete download
 -- grant flow can be validated across pricing models.
 INSERT INTO appstore_download_grant (
     id,
@@ -145,7 +145,7 @@ WHERE a.tenant_id = '100001'
   AND l.listing_status = 'published'
 ON CONFLICT (id) DO NOTHING;
 
--- 4) Seed completed install events to cover download->install telemetry path.
+-- Step 4: Seed completed install events to cover download->install telemetry path.
 INSERT INTO appstore_install_event (
     id,
     tenant_id,

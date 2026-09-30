@@ -78,8 +78,8 @@ export class CatalogAppstoreCatalogTemplatesApi {
   async list(params?: CatalogAppstoreCatalogTemplatesListParams, requestOptions?: ApiRequestOptions): Promise<{ items: AppTemplate[]; pageInfo: PageInfo; }> {
     const query = buildQueryString([
       { name: 'q', value: params?.q, style: 'form', explode: true, allowReserved: false },
-      { name: 'categoryCode', value: params?.categoryCode, style: 'form', explode: true, allowReserved: false },
-      { name: 'templateType', value: params?.templateType, style: 'form', explode: true, allowReserved: false },
+      { name: 'category_code', value: params?.categoryCode, style: 'form', explode: true, allowReserved: false },
+      { name: 'template_type', value: params?.templateType, style: 'form', explode: true, allowReserved: false },
       { name: 'cursor', value: params?.cursor, style: 'form', explode: true, allowReserved: false },
       { name: 'page_size', value: params?.pageSize, style: 'form', explode: true, allowReserved: false },
     ]);
@@ -297,7 +297,7 @@ export class CatalogAppstoreCatalogListingsApi {
   async list(params?: CatalogAppstoreCatalogListingsListParams, requestOptions?: ApiRequestOptions): Promise<{ items: ListingSummary[]; pageInfo: { mode: 'cursor'; nextCursor?: string | null; hasMore: boolean; }; }> {
     const query = buildQueryString([
       { name: 'q', value: params?.q, style: 'form', explode: true, allowReserved: false },
-      { name: 'categoryId', value: params?.categoryId, style: 'form', explode: true, allowReserved: false },
+      { name: 'category_id', value: params?.categoryId, style: 'form', explode: true, allowReserved: false },
       { name: 'ids', value: params?.ids, style: 'form', explode: true, allowReserved: false },
       { name: 'cursor', value: params?.cursor, style: 'form', explode: true, allowReserved: false },
       { name: 'page_size', value: params?.pageSize, style: 'form', explode: true, allowReserved: false },

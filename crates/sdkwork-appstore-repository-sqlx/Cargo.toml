@@ -17,6 +17,8 @@ serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 sqlx = { version = "0.9", features = ["runtime-tokio", "tls-rustls", "sqlite", "postgres", "chrono"] }
 sdkwork-database-sqlx = { workspace = true }
+sdkwork-web-core.workspace = true
+tracing = "0.1"
 sdkwork-appstore-catalog-service.workspace = true
 sdkwork-appstore-listing-service.workspace = true
 sdkwork-appstore-publisher-service.workspace = true

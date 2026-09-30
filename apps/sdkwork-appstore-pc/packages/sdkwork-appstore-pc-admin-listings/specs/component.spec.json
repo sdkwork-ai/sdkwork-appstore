@@ -48,18 +48,18 @@
     ],
     "providedPorts": [
       {
-        "port": "appstore.pc.admin.listings.module",
-        "description": "Listings capability module: routes, navigation metadata, and locale namespaces."
+        "name": "appstorePcAdminListingsModule",
+        "export": "."
       }
     ],
     "requiredPorts": [
       {
-        "port": "appstore.pc.admin.service-ports",
-        "description": "listings and listing-metrics service ports from @sdkwork/appstore-pc-admin-core."
+        "name": "appstorePcAdminServicePorts",
+        "export": "."
       },
       {
-        "port": "appstore.pc.admin.shell",
-        "description": "Operator UI kit, shell context, and query/command hooks from @sdkwork/appstore-pc-admin-shell."
+        "name": "appstorePcAdminShell",
+        "export": "."
       }
     ],
     "sdkDependencies": [],

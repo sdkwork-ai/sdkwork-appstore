@@ -5,7 +5,9 @@
  * point for the generated backend SDK, the backend-admin permission catalog,
  * access evaluation, route/guard contracts, and one service port per backend
  * domain. Capability packages (`pc-admin-*`) and the shell consume this package
- * through the root export only (`COMPONENT_SPEC.md` `publicExports: ["."]`).
+ * through the root export or the canonical subpath exports
+ * (`./sdk`, `./modules`, `./host`, `./session`, `./composition` — see
+ * `COMPONENT_SPEC.md` `publicExports`).
  *
  * Canonical specs: `APP_PC_ARCHITECTURE_SPEC.md`, `BACKEND_UI_SPEC.md`,
  * `APP_SDK_INTEGRATION_SPEC.md`.

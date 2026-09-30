@@ -65,6 +65,7 @@ const client = new SdkworkAppstoreOpenClient({
 - `client.artifacts` - artifacts API
 - `client.listings` - listings API
 - `client.catalog` - catalog API
+- `client.userStore` - user_store API
 - `client.automation` - automation API
 
 ## Usage Examples
@@ -117,6 +118,14 @@ const params = {
   locale: 'locale',
 };
 const result = await client.catalog.appstore.catalog.public.featured.list(params);
+```
+
+### user_store
+
+```typescript
+// Retrieve a shared personal appstore view
+const shareToken = 'shareToken';
+const result = await client.userStore.appstore.userStores.public.retrieve(shareToken);
 ```
 
 ### automation
@@ -173,7 +182,7 @@ This SDK includes cross-platform publish scripts in `bin/`:
 - `bin/publish.sh`
 - `bin/publish.ps1`
 
-TypeScript check and publish commands use pnpm to materialize workspace dependency versions in a temporary tarball. They reject local-only dependency protocols before npm publication and do not rewrite the source `package.json`.
+TypeScript check and publish commands materialize workspace dependency versions in a temporary tarball with pnpm. They reject local-only dependency protocols before npm publication and do not rewrite the source `package.json`.
 
 ### Check
 

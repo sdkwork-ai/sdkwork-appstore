@@ -855,7 +855,7 @@ impl CatalogRepositoryPort for SqlxCatalogRepository {
 
         if query.is_some() {
             sql.push_str(
-                "  AND (ll.display_name LIKE ? ESCAPE '\' OR ll.subtitle LIKE ? ESCAPE '\')\n",
+                "  AND (ll.display_name LIKE ? ESCAPE '\\' OR ll.subtitle LIKE ? ESCAPE '\\')\n",
             );
         }
         if category_id.is_some() {
@@ -1685,7 +1685,7 @@ impl CatalogRepositoryPort for SqlxCatalogRepository {
         );
 
         if query.is_some() {
-            sql.push_str(" AND query_text LIKE ? ESCAPE '\'\n");
+            sql.push_str(" AND query_text LIKE ? ESCAPE '\\'\n");
         }
         if date_from.is_some() {
             sql.push_str(" AND created_at >= ?\n");
@@ -1701,7 +1701,8 @@ impl CatalogRepositoryPort for SqlxCatalogRepository {
             .bind(&context.tenant_id);
 
         if let Some(qs) = query {
-            q = q.bind(format!("%{qs}%"));
+            let pattern = format!("%{}%", escape_like(qs));
+            q = q.bind(pattern);
         }
         if let Some(from) = date_from {
             q = q.bind(from);
@@ -1790,7 +1791,7 @@ impl CatalogRepositoryPort for SqlxCatalogRepository {
         }
         if query.is_some() {
             sql.push_str(
-                "  AND (t.template_name LIKE ? ESCAPE '\' OR t.description LIKE ? ESCAPE '\')\n",
+                "  AND (t.template_name LIKE ? ESCAPE '\\' OR t.description LIKE ? ESCAPE '\\')\n",
             );
         }
         if cursor.is_some() {

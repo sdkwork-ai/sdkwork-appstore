@@ -104,7 +104,7 @@ export class ModerationAppstoreModerationQueueApi {
 /** List moderation queue */
   async list(params?: ModerationAppstoreModerationQueueListParams, requestOptions?: ApiRequestOptions): Promise<SdkWorkPageData> {
     const query = buildQueryString([
-      { name: 'reviewStatus', value: params?.reviewStatus, style: 'form', explode: true, allowReserved: false },
+      { name: 'review_status', value: params?.reviewStatus, style: 'form', explode: true, allowReserved: false },
       { name: 'cursor', value: params?.cursor, style: 'form', explode: true, allowReserved: false },
       { name: 'page_size', value: params?.pageSize, style: 'form', explode: true, allowReserved: false },
     ]);

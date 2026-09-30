@@ -27,9 +27,9 @@ export class MarketAppstoreMarketReleasesApi {
 /** List external market release projections */
   async list(params?: MarketAppstoreMarketReleasesListParams, requestOptions?: ApiRequestOptions): Promise<SdkWorkPageData> {
     const query = buildQueryString([
-      { name: 'releaseId', value: params?.releaseId, style: 'form', explode: true, allowReserved: false },
-      { name: 'channelId', value: params?.channelId, style: 'form', explode: true, allowReserved: false },
-      { name: 'marketStatus', value: params?.marketStatus, style: 'form', explode: true, allowReserved: false },
+      { name: 'release_id', value: params?.releaseId, style: 'form', explode: true, allowReserved: false },
+      { name: 'channel_id', value: params?.channelId, style: 'form', explode: true, allowReserved: false },
+      { name: 'market_status', value: params?.marketStatus, style: 'form', explode: true, allowReserved: false },
       { name: 'cursor', value: params?.cursor, style: 'form', explode: true, allowReserved: false },
       { name: 'page_size', value: params?.pageSize, style: 'form', explode: true, allowReserved: false },
     ]);
@@ -65,7 +65,7 @@ export class MarketAppstoreMarketChannelsApi {
 /** List external market channels */
   async list(params?: MarketAppstoreMarketChannelsListParams, requestOptions?: ApiRequestOptions): Promise<SdkWorkPageData> {
     const query = buildQueryString([
-      { name: 'channelStatus', value: params?.channelStatus, style: 'form', explode: true, allowReserved: false },
+      { name: 'channel_status', value: params?.channelStatus, style: 'form', explode: true, allowReserved: false },
       { name: 'cursor', value: params?.cursor, style: 'form', explode: true, allowReserved: false },
       { name: 'page_size', value: params?.pageSize, style: 'form', explode: true, allowReserved: false },
     ]);

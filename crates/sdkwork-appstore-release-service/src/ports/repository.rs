@@ -178,6 +178,15 @@ pub trait ReleaseRepositoryPort: Send + Sync {
         listing_id: &str,
     ) -> AppstoreServiceResult<Option<String>>;
 
+    /// Answers whether the subject holds an active commerce entitlement bound
+    /// to the listing (status `active`; expiry is judged by the caller).
+    async fn has_active_entitlement(
+        &self,
+        context: &AppstoreRequestContext,
+        listing_id: &str,
+        subject_id: &str,
+    ) -> AppstoreServiceResult<bool>;
+
     /// Returns the caller's role for a publisher (owner or accepted member)
     /// when the subject has publisher access; `None` otherwise.
     async fn find_publisher_member_role(

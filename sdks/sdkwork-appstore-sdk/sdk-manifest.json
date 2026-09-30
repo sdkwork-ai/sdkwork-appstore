@@ -18,7 +18,7 @@
   "generatedOutput": "sdkwork-appstore-sdk-typescript/generated/server-openapi",
   "standardProfile": "sdkwork-v3",
   "fixedSdkVersion": "0.1.0",
-  "ownerOnlyOperationCount": 6,
+  "ownerOnlyOperationCount": 8,
   "sdkDependencies": [
     "sdkwork-drive-sdk"
   ],

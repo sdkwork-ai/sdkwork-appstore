@@ -19,7 +19,8 @@ export class ListingsAppstoreListingsAdminVisibilityApi {
 }
 
 export interface ListingsAppstoreListingsAdminListParams {
-  listingStatus?: string;
+  statusFilter?: string;
+  reviewStatusFilter?: string;
   cursor?: string;
   pageSize?: number;
 }
@@ -37,7 +38,8 @@ export class ListingsAppstoreListingsAdminApi {
 /** List listings for operators */
   async list(params?: ListingsAppstoreListingsAdminListParams, requestOptions?: ApiRequestOptions): Promise<SdkWorkPageData> {
     const query = buildQueryString([
-      { name: 'listingStatus', value: params?.listingStatus, style: 'form', explode: true, allowReserved: false },
+      { name: 'status_filter', value: params?.statusFilter, style: 'form', explode: true, allowReserved: false },
+      { name: 'review_status_filter', value: params?.reviewStatusFilter, style: 'form', explode: true, allowReserved: false },
       { name: 'cursor', value: params?.cursor, style: 'form', explode: true, allowReserved: false },
       { name: 'page_size', value: params?.pageSize, style: 'form', explode: true, allowReserved: false },
     ]);

@@ -1953,3 +1953,363 @@ CREATE TABLE IF NOT EXISTS appstore_analytics_metric_daily (
   UNIQUE (tenant_id, subject_type, subject_id, metric_code, platform_code, region_code, snapshot_date)
 );;
 ```
+
+## appstore_web_rate_limit_bucket
+
+- profile: control
+- complianceLevel: L2
+
+Distributed fixed-window rate-limit store consumed by the gateway when the
+runtime runs in multi-replica HA mode (`database/migrations/postgres/0005`).
+
+### DDL
+
+```sql
+CREATE TABLE IF NOT EXISTS appstore_web_rate_limit_bucket (
+  bucket_key TEXT PRIMARY KEY,
+  window_start TIMESTAMPTZ NOT NULL,
+  request_count BIGINT NOT NULL DEFAULT 0
+);;
+```
+
+### Indexes
+
+```sql
+CREATE INDEX IF NOT EXISTS idx_appstore_web_rate_limit_bucket_window
+  ON appstore_web_rate_limit_bucket (window_start);
+```
+
+## appstore_web_idempotency_entry
+
+- profile: control
+- complianceLevel: L2
+
+Distributed idempotency store (begin/complete/release lifecycle) consumed by
+the gateway when the runtime runs in multi-replica HA mode
+(`database/migrations/postgres/0005`).
+
+### DDL
+
+```sql
+CREATE TABLE IF NOT EXISTS appstore_web_idempotency_entry (
+  idempotency_key TEXT PRIMARY KEY,
+  fingerprint TEXT NOT NULL,
+  response_status INTEGER,
+  response_content_type TEXT,
+  response_body BYTEA,
+  expires_at TIMESTAMPTZ NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);;
+```
+
+### Indexes
+
+```sql
+CREATE INDEX IF NOT EXISTS idx_appstore_web_idempotency_entry_expires
+  ON appstore_web_idempotency_entry (expires_at);
+```
+
+## appstore_user_category
+
+- profile: master
+- complianceLevel: L2
+
+### DDL
+
+```sql
+CREATE TABLE IF NOT EXISTS appstore_user_category (
+  id TEXT PRIMARY KEY,
+  tenant_id TEXT NOT NULL,
+  organization_id TEXT NOT NULL DEFAULT '0',
+  owner_user_id TEXT NOT NULL,
+  name TEXT NOT NULL,
+  description TEXT,
+  icon_media_resource_id TEXT,
+  sort_order INTEGER NOT NULL DEFAULT 0,
+  category_status TEXT NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL,
+  updated_at TIMESTAMPTZ NOT NULL,
+  UNIQUE (tenant_id, owner_user_id, name)
+);
+```
+
+
+## appstore_user_category_item
+
+- profile: master
+- complianceLevel: L2
+
+### DDL
+
+```sql
+CREATE TABLE IF NOT EXISTS appstore_user_category_item (
+  id TEXT PRIMARY KEY,
+  tenant_id TEXT NOT NULL,
+  organization_id TEXT NOT NULL DEFAULT '0',
+  user_category_id TEXT NOT NULL,
+  listing_id TEXT NOT NULL,
+  note TEXT,
+  sort_order INTEGER NOT NULL DEFAULT 0,
+  created_at TIMESTAMPTZ NOT NULL,
+  updated_at TIMESTAMPTZ NOT NULL,
+  UNIQUE (user_category_id, listing_id)
+);
+```
+
+
+## appstore_user_store_share
+
+- profile: master
+- complianceLevel: L2
+
+### DDL
+
+```sql
+CREATE TABLE IF NOT EXISTS appstore_user_store_share (
+  id TEXT PRIMARY KEY,
+  tenant_id TEXT NOT NULL,
+  organization_id TEXT NOT NULL DEFAULT '0',
+  owner_user_id TEXT NOT NULL,
+  share_token TEXT NOT NULL,
+  title TEXT NOT NULL,
+  description TEXT,
+  share_scope TEXT NOT NULL,
+  selected_category_ids_json TEXT NOT NULL DEFAULT '[]',
+  share_visibility TEXT NOT NULL,
+  share_status TEXT NOT NULL,
+  expires_at TIMESTAMPTZ,
+  view_count BIGINT NOT NULL DEFAULT 0,
+  created_at TIMESTAMPTZ NOT NULL,
+  updated_at TIMESTAMPTZ NOT NULL
+);
+```
+
+
+## appstore_app_sku
+
+- profile: master
+- complianceLevel: L2
+
+### DDL
+
+```sql
+CREATE TABLE IF NOT EXISTS appstore_app_sku (
+  id BIGINT NOT NULL PRIMARY KEY,
+  uuid VARCHAR(64) NOT NULL,
+  tenant_id BIGINT NOT NULL,
+  organization_id BIGINT NOT NULL DEFAULT 0,
+  app_id TEXT NOT NULL,
+  sku_code VARCHAR(64) NOT NULL,
+  sku_kind VARCHAR(32) NOT NULL DEFAULT 'release',
+  sku_status VARCHAR(24) NOT NULL DEFAULT 'draft',
+  is_default BOOLEAN NOT NULL DEFAULT FALSE,
+  display_priority INTEGER NOT NULL DEFAULT 0,
+  version_name VARCHAR(64) NOT NULL,
+  version_code BIGINT NOT NULL,
+  development_tool VARCHAR(64),
+  development_model VARCHAR(128),
+  model_provider VARCHAR(64),
+  primary_owner_user_id BIGINT,
+  git_ref VARCHAR(255),
+  source_template_id BIGINT,
+  source_template_version_id BIGINT,
+  manifest_snapshot_json JSONB NOT NULL DEFAULT '{}'::jsonb,
+  attribute_summary JSONB NOT NULL DEFAULT '{}'::jsonb,
+  metadata JSONB NOT NULL DEFAULT '{}'::jsonb,
+  data_scope INTEGER NOT NULL DEFAULT 0,
+  status INTEGER NOT NULL DEFAULT 1,
+  version BIGINT NOT NULL DEFAULT 0,
+  activated_at TIMESTAMPTZ,
+  defaulted_at TIMESTAMPTZ,
+  deprecated_at TIMESTAMPTZ,
+  retired_at TIMESTAMPTZ,
+  deleted_at TIMESTAMPTZ,
+  created_by BIGINT,
+  updated_by BIGINT,
+  deleted_by BIGINT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  CONSTRAINT uk_appstore_app_sku_uuid UNIQUE (uuid),
+  CONSTRAINT chk_appstore_app_sku_kind
+    CHECK (sku_kind IN ('release', 'beta', 'canary', 'edition', 'custom')),
+  CONSTRAINT chk_appstore_app_sku_status
+    CHECK (
+      sku_status IN (
+        'draft',
+        'pending_review',
+        'approved',
+        'published',
+        'deprecated',
+        'retired'
+      )
+    ),
+  CONSTRAINT chk_appstore_app_sku_version_code CHECK (version_code >= 0),
+  CONSTRAINT chk_appstore_app_sku_display_priority CHECK (display_priority >= 0)
+);
+```
+
+
+## appstore_app_sku_attribute
+
+- profile: master
+- complianceLevel: L2
+
+### DDL
+
+```sql
+CREATE TABLE IF NOT EXISTS appstore_app_sku_attribute (
+  id BIGINT NOT NULL PRIMARY KEY,
+  uuid VARCHAR(64) NOT NULL,
+  tenant_id BIGINT NOT NULL,
+  organization_id BIGINT NOT NULL DEFAULT 0,
+  app_sku_id BIGINT NOT NULL,
+  attribute_group VARCHAR(64) NOT NULL,
+  attribute_key VARCHAR(128) NOT NULL,
+  attribute_value TEXT,
+  value_type VARCHAR(24) NOT NULL DEFAULT 'string',
+  enum_code VARCHAR(128),
+  unit VARCHAR(32),
+  locale VARCHAR(16) NOT NULL DEFAULT '',
+  is_public BOOLEAN NOT NULL DEFAULT TRUE,
+  sort_weight INTEGER NOT NULL DEFAULT 0,
+  metadata JSONB NOT NULL DEFAULT '{}'::jsonb,
+  status INTEGER NOT NULL DEFAULT 1,
+  version BIGINT NOT NULL DEFAULT 0,
+  deleted_at TIMESTAMPTZ,
+  created_by BIGINT,
+  updated_by BIGINT,
+  deleted_by BIGINT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  CONSTRAINT uk_appstore_app_sku_attribute_uuid UNIQUE (uuid),
+  CONSTRAINT chk_appstore_app_sku_attribute_value_type
+    CHECK (value_type IN ('string', 'int', 'decimal', 'bool', 'json', 'enum', 'ref')),
+  CONSTRAINT chk_appstore_app_sku_attribute_sort_weight CHECK (sort_weight >= 0)
+);
+```
+
+
+## appstore_app_sku_model
+
+- profile: master
+- complianceLevel: L2
+
+### DDL
+
+```sql
+CREATE TABLE IF NOT EXISTS appstore_app_sku_model (
+  id BIGINT NOT NULL PRIMARY KEY,
+  uuid VARCHAR(64) NOT NULL,
+  tenant_id BIGINT NOT NULL,
+  organization_id BIGINT NOT NULL DEFAULT 0,
+  app_sku_id BIGINT NOT NULL,
+  model_key VARCHAR(128) NOT NULL,
+  model_provider VARCHAR(64),
+  implementation_role VARCHAR(32) NOT NULL DEFAULT 'primary',
+  implementation_scope VARCHAR(64),
+  weight INTEGER NOT NULL DEFAULT 100,
+  enabled BOOLEAN NOT NULL DEFAULT TRUE,
+  config_snapshot JSONB NOT NULL DEFAULT '{}'::jsonb,
+  metadata JSONB NOT NULL DEFAULT '{}'::jsonb,
+  status INTEGER NOT NULL DEFAULT 1,
+  version BIGINT NOT NULL DEFAULT 0,
+  deleted_at TIMESTAMPTZ,
+  created_by BIGINT,
+  updated_by BIGINT,
+  deleted_by BIGINT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  CONSTRAINT uk_appstore_app_sku_model_uuid UNIQUE (uuid),
+  CONSTRAINT chk_appstore_app_sku_model_role
+    CHECK (implementation_role IN ('primary', 'assistant', 'reviewer', 'fallback')),
+  CONSTRAINT chk_appstore_app_sku_model_weight CHECK (weight >= 0)
+);
+```
+
+
+## appstore_app_sku_contributor
+
+- profile: master
+- complianceLevel: L2
+
+### DDL
+
+```sql
+CREATE TABLE IF NOT EXISTS appstore_app_sku_contributor (
+  id BIGINT NOT NULL PRIMARY KEY,
+  uuid VARCHAR(64) NOT NULL,
+  tenant_id BIGINT NOT NULL,
+  organization_id BIGINT NOT NULL DEFAULT 0,
+  app_sku_id BIGINT NOT NULL,
+  user_id BIGINT NOT NULL,
+  contributor_role VARCHAR(32) NOT NULL DEFAULT 'developer',
+  contribution_share INTEGER,
+  joined_at TIMESTAMPTZ,
+  left_at TIMESTAMPTZ,
+  metadata JSONB NOT NULL DEFAULT '{}'::jsonb,
+  status INTEGER NOT NULL DEFAULT 1,
+  version BIGINT NOT NULL DEFAULT 0,
+  deleted_at TIMESTAMPTZ,
+  created_by BIGINT,
+  updated_by BIGINT,
+  deleted_by BIGINT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  CONSTRAINT uk_appstore_app_sku_contributor_uuid UNIQUE (uuid),
+  CONSTRAINT chk_appstore_app_sku_contributor_role
+    CHECK (contributor_role IN ('owner', 'developer', 'reviewer', 'publisher')),
+  CONSTRAINT chk_appstore_app_sku_contributor_share
+    CHECK (contribution_share IS NULL OR (contribution_share >= 0 AND contribution_share <= 100)),
+  CONSTRAINT chk_appstore_app_sku_contributor_period
+    CHECK (left_at IS NULL OR joined_at IS NULL OR left_at >= joined_at)
+);
+```
+
+
+## appstore_app_deployment_binding
+
+- profile: master
+- complianceLevel: L2
+
+### DDL
+
+```sql
+CREATE TABLE IF NOT EXISTS appstore_app_deployment_binding (
+  id BIGINT NOT NULL PRIMARY KEY,
+  uuid VARCHAR(64) NOT NULL,
+  tenant_id BIGINT NOT NULL,
+  organization_id BIGINT NOT NULL DEFAULT 0,
+  app_id TEXT NOT NULL,
+  app_sku_id BIGINT,
+  deploy_app_id BIGINT NOT NULL,
+  deploy_app_uuid VARCHAR(36),
+  deploy_deployment_id BIGINT,
+  deploy_deployment_uuid VARCHAR(64),
+  environment VARCHAR(16) NOT NULL DEFAULT 'production',
+  platform_code VARCHAR(64) NOT NULL DEFAULT '',
+  binding_role VARCHAR(24) NOT NULL DEFAULT 'primary',
+  binding_status VARCHAR(24) NOT NULL DEFAULT 'pending',
+  is_default BOOLEAN NOT NULL DEFAULT FALSE,
+  config_snapshot JSONB NOT NULL DEFAULT '{}'::jsonb,
+  sync_status VARCHAR(24),
+  last_synced_at TIMESTAMPTZ,
+  metadata JSONB NOT NULL DEFAULT '{}'::jsonb,
+  status INTEGER NOT NULL DEFAULT 1,
+  version BIGINT NOT NULL DEFAULT 0,
+  deleted_at TIMESTAMPTZ,
+  created_by BIGINT,
+  updated_by BIGINT,
+  deleted_by BIGINT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  CONSTRAINT uk_appstore_app_deployment_binding_uuid UNIQUE (uuid),
+  CONSTRAINT chk_appstore_app_deployment_binding_environment
+    CHECK (environment IN ('development', 'test', 'staging', 'demo', 'production')),
+  CONSTRAINT chk_appstore_app_deployment_binding_role
+    CHECK (binding_role IN ('primary', 'canary', 'backup', 'shadow')),
+  CONSTRAINT chk_appstore_app_deployment_binding_status
+    CHECK (binding_status IN ('pending', 'active', 'degraded', 'invalid', 'revoked')),
+  CONSTRAINT chk_appstore_app_deployment_binding_sync_status
+    CHECK (sync_status IS NULL OR sync_status IN ('synced', 'stale', 'unknown', 'error'))
+);
+```

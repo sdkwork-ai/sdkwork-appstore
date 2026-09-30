@@ -5,6 +5,7 @@ import { ReleasesApi, createReleasesApi } from './api/releases';
 import { ArtifactsApi, createArtifactsApi } from './api/artifacts';
 import { ListingsApi, createListingsApi } from './api/listings';
 import { CatalogApi, createCatalogApi } from './api/catalog';
+import { UserStoreApi, createUserStoreApi } from './api/user-store';
 import { AutomationApi, createAutomationApi } from './api/automation';
 
 export class SdkworkAppstoreOpenClient {
@@ -14,6 +15,7 @@ export class SdkworkAppstoreOpenClient {
   public readonly artifacts: ArtifactsApi;
   public readonly listings: ListingsApi;
   public readonly catalog: CatalogApi;
+  public readonly userStore: UserStoreApi;
   public readonly automation: AutomationApi;
 
   constructor(config: SdkworkCustomConfig) {
@@ -25,6 +27,8 @@ export class SdkworkAppstoreOpenClient {
     this.listings = createListingsApi(this.httpClient);
 
     this.catalog = createCatalogApi(this.httpClient);
+
+    this.userStore = createUserStoreApi(this.httpClient);
 
     this.automation = createAutomationApi(this.httpClient);
   }

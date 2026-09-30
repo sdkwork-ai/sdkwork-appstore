@@ -201,3 +201,33 @@ tables:
   - name: appstore_analytics_metric_daily
     lifecycle_status: active
     owner: appstore-platform
+  - name: appstore_user_category
+    lifecycle_status: active
+    owner: appstore-user-store
+  - name: appstore_user_category_item
+    lifecycle_status: active
+    owner: appstore-user-store
+  - name: appstore_user_store_share
+    lifecycle_status: active
+    owner: appstore-user-store
+  - name: appstore_app_sku
+    lifecycle_status: active
+    owner: appstore-platform
+  - name: appstore_app_sku_attribute
+    lifecycle_status: active
+    owner: appstore-platform
+  - name: appstore_app_sku_model
+    lifecycle_status: active
+    owner: appstore-platform
+  - name: appstore_app_sku_contributor
+    lifecycle_status: active
+    owner: appstore-platform
+  - name: appstore_app_deployment_binding
+    lifecycle_status: active
+    owner: appstore-platform
+  - name: appstore_web_rate_limit_bucket
+    lifecycle_status: active
+    owner: appstore-platform
+  - name: appstore_web_idempotency_entry
+    lifecycle_status: active
+    owner: appstore-platform

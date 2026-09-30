@@ -77,7 +77,7 @@ export function ExpertsPage() {
         ))}
       </div>
 
-      <div className="space-y-3 px-4 py-4">
+      <div className="grid grid-cols-1 gap-3 px-4 py-4 sm:grid-cols-2">
         {experts.length === 0 ? (
           <div className="card p-8 text-center">
             <p className="text-sm text-[var(--text-secondary)]">没有匹配的专家，换个关键词试试</p>

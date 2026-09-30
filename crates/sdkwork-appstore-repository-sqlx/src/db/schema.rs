@@ -1,4 +1,9 @@
 //! `appstore_*` table registry for repository implementation.
+//!
+//! Mirrors the full migration chain (folded baseline `0001_appstore_baseline.sql`
+//! including the folded 0002 platform-evolution and 0005 web-store tables, plus
+//! the 0003 user-store and 0004 SKU migrations) so the registry matches the
+//! live schema: 74 tables total.
 
 pub const APPSTORE_TABLES: &[&str] = &[
     "appstore_idempotency_key",
@@ -50,4 +55,34 @@ pub const APPSTORE_TABLES: &[&str] = &[
     "appstore_feedback",
     "appstore_moderation_appeal",
     "appstore_release_beta_invite",
+    // Folded platform evolution — CREATE TABLE statements live in the folded
+    // baseline (0001) and migration 0002 re-asserts them idempotently.
+    "appstore_platform_dictionary",
+    "appstore_app_platform",
+    "appstore_platform_release",
+    "appstore_signing_credential",
+    "appstore_listing_review",
+    "appstore_listing_review_vote",
+    "appstore_listing_review_report",
+    "appstore_rating_distribution_snapshot",
+    "appstore_listing_price",
+    "appstore_promo_code_batch",
+    "appstore_promo_code",
+    "appstore_release_tester_group",
+    "appstore_release_tester_group_member",
+    "appstore_catalog_search_doc",
+    "appstore_analytics_metric_daily",
+    // Web cluster stores (migration 0005).
+    "appstore_web_rate_limit_bucket",
+    "appstore_web_idempotency_entry",
+    // User store domain (migration 0003).
+    "appstore_user_category",
+    "appstore_user_category_item",
+    "appstore_user_store_share",
+    // App SKU and deployment binding (migration 0004).
+    "appstore_app_sku",
+    "appstore_app_sku_attribute",
+    "appstore_app_sku_model",
+    "appstore_app_sku_contributor",
+    "appstore_app_deployment_binding",
 ];

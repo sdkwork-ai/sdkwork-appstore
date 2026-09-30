@@ -2,8 +2,7 @@ use sdkwork_appstore_user_store_service::domain::commands::{
     AddCategoryItemRequest, CreateCategoryRequest, CreateShareRequest, DeleteCategoryRequest,
     ListCategoriesRequest, ListCategoryItemsRequest, PublicCategoryItemsRequest,
     PublicUserStoreViewRequest, RegenerateShareTokenRequest, RemoveCategoryItemRequest,
-    ReorderCategoryItemsRequest, RetrieveCategoryRequest, RevokeShareRequest,
-    UpdateShareRequest,
+    ReorderCategoryItemsRequest, RetrieveCategoryRequest, RevokeShareRequest, UpdateShareRequest,
 };
 use sdkwork_appstore_user_store_service::domain::models::{ShareScope, ShareVisibility};
 

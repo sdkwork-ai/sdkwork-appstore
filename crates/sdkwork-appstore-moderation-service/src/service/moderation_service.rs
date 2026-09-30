@@ -207,13 +207,22 @@ where
             )));
         }
 
+        let expected_updated_at = review.updated_at;
         let now = Utc::now();
         review.assigned_to = Some(request.assigned_to);
         review.review_status = ReviewStatus::InReview;
         review.started_at = Some(review.started_at.unwrap_or(now));
         review.updated_at = now;
 
-        self.repository.update_review(context, &review).await?;
+        let updated = self
+            .repository
+            .update_review(context, &review, expected_updated_at)
+            .await?;
+        if !updated {
+            return Err(AppstoreServiceError::Conflict(
+                "Review was modified by another request".to_string(),
+            ));
+        }
 
         Ok(AssignModerationReviewResult::assigned(
             "appstore.moderation.reviews.assign",
@@ -280,6 +289,18 @@ where
                 .unwrap_or_default()
         );
 
+        let payload_snapshot = serde_json::json!({
+            "review": {
+                "id": review.id.as_str(),
+                "reviewNo": review.review_no,
+                "submissionId": review.submission_id,
+                "queueCode": review.queue_code.as_str(),
+                "assignedTo": review.assigned_to,
+            },
+            "decisionType": decision_type.as_str(),
+            "decidedBy": decided_by,
+        });
+
         let decision = ModerationDecision {
             id: decision_id,
             tenant_id: context.tenant_id.clone(),
@@ -293,13 +314,11 @@ where
             policy_reference: request.policy_reference,
             decided_by,
             decided_at: now,
-            payload_snapshot: serde_json::Value::Object(serde_json::Map::new()),
+            payload_snapshot,
             created_at: now,
         };
 
-        self.repository.insert_decision(context, &decision).await?;
-
-        let decision_type_for_listing = decision_type.clone();
+        let expected_review_updated_at = review.updated_at;
         match decision_type {
             DecisionType::Approve => {
                 review.review_status = ReviewStatus::Approved;
@@ -314,13 +333,23 @@ where
         review.completed_at = Some(now);
         review.updated_at = now;
 
-        self.repository.update_review(context, &review).await?;
+        // Decision insert + review transition commit atomically; a concurrent
+        // moderator rolling the review forward rolls the whole write back.
+        let recorded = self
+            .repository
+            .record_decision_with_review(context, &decision, &review, expected_review_updated_at)
+            .await?;
+        if !recorded {
+            return Err(AppstoreServiceError::Conflict(
+                "Review was modified by another request".to_string(),
+            ));
+        }
 
         if let Some(port) = &self.listing_projection_port {
             port.apply_decision_outcome(
                 context,
                 &review.submission_id,
-                decision_type_for_listing,
+                decision_type.clone(),
                 &review.organization_id,
             )
             .await?;
@@ -377,7 +406,26 @@ where
             updated_at: now,
         };
 
-        self.repository.insert_review(context, &review).await?;
+        if let Err(error) = self.repository.insert_review(context, &review).await {
+            // Two concurrent enqueues can race past the existence check; the
+            // (tenant_id, submission_id) unique constraint keeps only one row.
+            // Re-read the winner and report it as an existing review instead
+            // of surfacing a raw constraint failure.
+            let submission_id = review.submission_id.clone();
+            match self
+                .repository
+                .find_review_by_submission(context, &submission_id)
+                .await
+            {
+                Ok(Some(winner)) => {
+                    return Ok(EnqueueSubmissionReviewResult::existing(
+                        "appstore.moderation.submissions.enqueue",
+                        winner,
+                    ));
+                }
+                _ => return Err(error),
+            }
+        }
 
         Ok(EnqueueSubmissionReviewResult::created(
             "appstore.moderation.submissions.enqueue",
@@ -595,6 +643,7 @@ where
         }
 
         let now = Utc::now();
+        let expected_appeal_updated_at = appeal.updated_at;
         appeal.appeal_status = appeal_status.clone();
         appeal.decided_by = context
             .user_id
@@ -603,6 +652,20 @@ where
         appeal.decision_note = Some(request.note.trim().to_string());
         appeal.decided_at = Some(now);
         appeal.updated_at = now;
+
+        // Persist the verdict first, then project it onto the listing. The
+        // projection is cross-domain and idempotent, so a failure between the
+        // two steps leaves a durable appeal that can be re-projected instead
+        // of an applied listing change with no decision behind it.
+        let updated = self
+            .repository
+            .update_appeal(context, &appeal, expected_appeal_updated_at)
+            .await?;
+        if !updated {
+            return Err(AppstoreServiceError::Conflict(
+                "Appeal was modified by another request".to_string(),
+            ));
+        }
 
         // An approved appeal reverses the rejected decision: re-apply an
         // approve outcome onto the original submission so listing/release
@@ -632,8 +695,6 @@ where
                 }
             }
         }
-
-        self.repository.update_appeal(context, &appeal).await?;
 
         Ok(DecideModerationAppealResult::decided(
             "appstore.moderation.appeals.decide",

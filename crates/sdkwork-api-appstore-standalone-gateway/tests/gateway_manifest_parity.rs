@@ -63,6 +63,24 @@ fn extract_manifest_routes(source: &str) -> BTreeSet<(String, String)> {
     routes
 }
 
+fn registers_method_call(segment: &str, needle: &str) -> bool {
+    // Word-boundary match: `category_delete(` must not count as a `delete(`
+    // route method, so the character before the needle must not be part of an
+    // identifier.
+    let bytes = segment.as_bytes();
+    let mut search = 0;
+    while let Some(pos) = segment[search..].find(needle) {
+        let absolute = search + pos;
+        let boundary_ok = absolute == 0
+            || !bytes[absolute - 1].is_ascii_alphanumeric() && bytes[absolute - 1] != b'_';
+        if boundary_ok {
+            return true;
+        }
+        search = absolute + 1;
+    }
+    false
+}
+
 fn extract_route_crate_routes(source: &str) -> BTreeSet<(String, String)> {
     let mut routes = BTreeSet::new();
 
@@ -82,7 +100,7 @@ fn extract_route_crate_routes(source: &str) -> BTreeSet<(String, String)> {
             ("patch(", "PATCH"),
             ("delete(", "DELETE"),
         ] {
-            if segment.contains(needle) {
+            if registers_method_call(segment, needle) {
                 routes.insert((method.to_string(), path.to_string()));
             }
         }

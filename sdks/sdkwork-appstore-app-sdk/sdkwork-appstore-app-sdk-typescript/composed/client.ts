@@ -11,7 +11,9 @@ import type {
   PublisherCreateRequest, PublisherMemberInviteRequest, PublisherUpdateRequest,
   PublisherVerificationSubmitRequest, ReleaseArtifactAttachRequest, ReleaseCreateRequest,
   ReleaseNotesUpsertRequest, ReleaseRolloutUpdateRequest, ReleaseUpdateRequest,
-  SearchHistoryUpsertRequest,
+  SearchHistoryUpsertRequest, UserCategoryCreateRequest, UserCategoryItemAddRequest,
+  UserCategoryItemsReorderRequest, UserCategoryUpdateRequest, UserStoreShareCreateRequest,
+  UserStoreShareUpdateRequest,
 } from '../generated/server-openapi/src/types/index';
 
 export type TokenManager = AuthTokenManager;
@@ -100,7 +102,7 @@ function createPublishersFacade(client: SdkworkAppstoreAppClient) {
     getMe: () => api.me.retrieve(),
     listMyListings: (p?: { cursor?: string; limit?: number }) => api.me.listings.list(pageParams(p)),
     bootstrapApp: (body: PublisherAppBootstrapRequest) => api.me.apps.create(body, commandOptions()),
-    create: (body: PublisherCreateRequest) => api.create(body),
+    create: (body: PublisherCreateRequest) => api.create(body, commandOptions()),
     update: (id: string, body: PublisherUpdateRequest) => api.update(id, body),
     listMembers: (id: string) => api.members.list(id),
     inviteMember: (id: string, body: PublisherMemberInviteRequest) => api.members.create(id, body),
@@ -137,7 +139,7 @@ function createWishlistFacade(client: SdkworkAppstoreAppClient) {
   return {
     listItems: (p?: { cursor?: string; limit?: number }) =>
       api.list({ cursor: p?.cursor, pageSize: p?.limit }),
-    addItem: (listingId: string) => api.create({ listingId }),
+    addItem: (listingId: string) => api.create({ listingId }, commandOptions()),
     removeItem: (listingId: string) => api.delete(listingId),
   };
 }
@@ -157,6 +159,39 @@ function createComplianceFacade(client: SdkworkAppstoreAppClient) {
   };
 }
 
+function createUserStoreFacade(client: SdkworkAppstoreAppClient) {
+  const api = client.userStore.appstore.userStore;
+  return {
+    // Categories
+    listCategories: (p?: { cursor?: string; limit?: number }) =>
+      api.category.list(pageParams(p)),
+    createCategory: (body: UserCategoryCreateRequest) =>
+      api.category.create(body, commandOptions()),
+    getCategory: (categoryId: string) => api.category.retrieve(categoryId),
+    updateCategory: (categoryId: string, body: UserCategoryUpdateRequest) =>
+      api.category.update(categoryId, body),
+    deleteCategory: (categoryId: string) => api.category.delete(categoryId),
+    // Items within a category
+    listCategoryItems: (categoryId: string, p?: { cursor?: string; limit?: number }) =>
+      api.item.list(categoryId, pageParams(p)),
+    addCategoryItem: (categoryId: string, body: UserCategoryItemAddRequest) =>
+      api.item.create(categoryId, body, commandOptions()),
+    reorderCategoryItems: (categoryId: string, body: UserCategoryItemsReorderRequest) =>
+      api.item.update(categoryId, body),
+    removeCategoryItem: (categoryId: string, itemId: string) =>
+      api.item.delete(categoryId, itemId),
+    // Share links
+    listShares: (p?: { cursor?: string; limit?: number }) =>
+      api.share.list(pageParams(p)),
+    createShare: (body: UserStoreShareCreateRequest) =>
+      api.share.create(body, commandOptions()),
+    updateShare: (shareId: string, body: UserStoreShareUpdateRequest) =>
+      api.share.update(shareId, body),
+    revokeShare: (shareId: string) => api.share.delete(shareId),
+    refreshShare: (shareId: string) => api.share.refresh(shareId, commandOptions()),
+  };
+}
+
 export class AppStoreClient {
   readonly generated: SdkworkAppstoreAppClient;
   readonly catalog: ReturnType<typeof createCatalogFacade>;
@@ -167,6 +202,7 @@ export class AppStoreClient {
   readonly wishlist: ReturnType<typeof createWishlistFacade>;
   readonly downloadGrants: ReturnType<typeof createDownloadGrantFacade>;
   readonly compliance: ReturnType<typeof createComplianceFacade>;
+  readonly userStore: ReturnType<typeof createUserStoreFacade>;
 
   constructor(config: AppStoreClientConfig) {
     this.generated = createGeneratedClient(config);
@@ -178,6 +214,7 @@ export class AppStoreClient {
     this.wishlist = createWishlistFacade(this.generated);
     this.downloadGrants = createDownloadGrantFacade(this.generated);
     this.compliance = createComplianceFacade(this.generated);
+    this.userStore = createUserStoreFacade(this.generated);
   }
 }
 

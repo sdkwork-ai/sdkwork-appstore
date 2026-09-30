@@ -31,6 +31,7 @@ pub enum SqlBind {
     OptI32(Option<i32>),
     DateTime(DateTime<Utc>),
     OptDateTime(Option<DateTime<Utc>>),
+    Bytes(Vec<u8>),
 }
 
 impl SqlBind {
@@ -48,6 +49,7 @@ impl SqlBind {
             SqlBind::OptI32(v) => query.bind(v),
             SqlBind::DateTime(v) => query.bind(v),
             SqlBind::OptDateTime(v) => query.bind(v),
+            SqlBind::Bytes(v) => query.bind(v),
         }
     }
 
@@ -65,6 +67,7 @@ impl SqlBind {
             SqlBind::OptI32(v) => query.bind(v),
             SqlBind::DateTime(v) => query.bind(v),
             SqlBind::OptDateTime(v) => query.bind(v),
+            SqlBind::Bytes(v) => query.bind(v),
         }
     }
 
@@ -82,6 +85,7 @@ impl SqlBind {
             SqlBind::OptI32(v) => query.bind(v),
             SqlBind::DateTime(v) => query.bind(v),
             SqlBind::OptDateTime(v) => query.bind(v),
+            SqlBind::Bytes(v) => query.bind(v),
         }
     }
 
@@ -99,6 +103,7 @@ impl SqlBind {
             SqlBind::OptI32(v) => query.bind(v),
             SqlBind::DateTime(v) => query.bind(v),
             SqlBind::OptDateTime(v) => query.bind(v),
+            SqlBind::Bytes(v) => query.bind(v),
         }
     }
 }
@@ -158,6 +163,13 @@ impl AppstoreTransaction<'_> {
         match self {
             AppstoreTransaction::Sqlite(tx) => tx.commit().await,
             AppstoreTransaction::Postgres(tx) => tx.commit().await,
+        }
+    }
+
+    pub async fn rollback(self) -> sqlx::Result<()> {
+        match self {
+            AppstoreTransaction::Sqlite(tx) => tx.rollback().await,
+            AppstoreTransaction::Postgres(tx) => tx.rollback().await,
         }
     }
 }
@@ -421,6 +433,18 @@ impl BindValue for Option<DateTime<Utc>> {
 impl BindValue for &Option<DateTime<Utc>> {
     fn into_sql_bind(self) -> SqlBind {
         SqlBind::OptDateTime(self.clone())
+    }
+}
+
+impl BindValue for Vec<u8> {
+    fn into_sql_bind(self) -> SqlBind {
+        SqlBind::Bytes(self)
+    }
+}
+
+impl BindValue for &Vec<u8> {
+    fn into_sql_bind(self) -> SqlBind {
+        SqlBind::Bytes(self.clone())
     }
 }
 

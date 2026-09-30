@@ -44,7 +44,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ReleaseCheckUpdateResponse'
-      parameters: []
   /store/v3/api/artifacts/resolve_download:
     post:
       tags:
@@ -66,7 +65,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ArtifactResolveDownloadResponse'
-      parameters: []
   /store/v3/api/listings/{listingSlug}:
     get:
       tags:
@@ -137,7 +135,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PublicFeaturedListResponse'
-  /store/v3/api/user-stores/{shareToken}:
+  /store/v3/api/user_stores/{shareToken}:
     get:
       tags:
       - userStore
@@ -160,7 +158,11 @@ paths:
                 $ref: '#/components/schemas/PublicUserStoreViewResponse'
         '404':
           description: Share not available
-  /store/v3/api/user-stores/{shareToken}/categories/{userCategoryId}/items:
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+  /store/v3/api/user_stores/{shareToken}/categories/{userCategoryId}/items:
     get:
       tags:
       - userStore
@@ -199,6 +201,10 @@ paths:
                 $ref: '#/components/schemas/PublicUserStoreItemsResponse'
         '404':
           description: Share or category not available
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
   /store/v3/api/automation/submissions:
     post:
       tags:
@@ -328,7 +334,6 @@ components:
                   $ref: '#/components/schemas/PublicUserStoreListingCard'
               pageInfo:
                 $ref: '#/components/schemas/PageInfo'
-
     ReleaseCheckUpdateRequest:
       type: object
       required:
@@ -730,7 +735,9 @@ components:
           maximum: 200
         totalItems:
           type: string
+          format: int64
           pattern: ^[0-9]+$
+          x-sdkwork-int64-string: true
         totalPages:
           type: integer
           minimum: 0
@@ -745,7 +752,7 @@ components:
       format: int32
       minimum: 40001
       maximum: 79999
-      description: Platform or domain error code per API_SPEC.md 搂15.3.
+      description: Platform or domain error code per API_SPEC.md §15.3.
     ProblemDetail:
       type: object
       additionalProperties: true

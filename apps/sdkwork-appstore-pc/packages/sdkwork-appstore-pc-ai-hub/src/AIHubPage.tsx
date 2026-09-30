@@ -54,7 +54,20 @@ export default function AIHubPage() {
           setAiApps(categoryApps);
           return;
         }
-        const all = await AppStoreService.getAllApps();
+        const all = await (async () => {
+          // Bounded cursor-following load: at most 4 pages of 50 listings.
+          const collected: Awaited<ReturnType<typeof AppStoreService.listAppsPage>>['items'] = [];
+          let pageCursor: string | undefined;
+          for (let page = 0; page < 4; page += 1) {
+            const result = await AppStoreService.listAppsPage({ cursor: pageCursor, limit: 50 });
+            collected.push(...result.items);
+            if (!result.nextCursor) {
+              break;
+            }
+            pageCursor = result.nextCursor;
+          }
+          return collected;
+        })();
         const filtered = all.filter(a =>
           a.category === 'AI' ||
           a.category === 'AI 智能' ||

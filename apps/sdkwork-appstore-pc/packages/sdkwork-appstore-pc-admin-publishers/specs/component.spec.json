@@ -48,18 +48,18 @@
     ],
     "providedPorts": [
       {
-        "port": "appstore.pc.admin.publishers.module",
-        "description": "Publisher capability module: routes, navigation metadata, and locale namespaces."
+        "name": "appstorePcAdminPublishersModule",
+        "export": "."
       }
     ],
     "requiredPorts": [
       {
-        "port": "appstore.pc.admin.service-ports",
-        "description": "publishers service port from @sdkwork/appstore-pc-admin-core."
+        "name": "appstorePcAdminServicePorts",
+        "export": "."
       },
       {
-        "port": "appstore.pc.admin.shell",
-        "description": "Operator UI kit, shell context, and query/command hooks from @sdkwork/appstore-pc-admin-shell."
+        "name": "appstorePcAdminShell",
+        "export": "."
       }
     ],
     "sdkDependencies": [],

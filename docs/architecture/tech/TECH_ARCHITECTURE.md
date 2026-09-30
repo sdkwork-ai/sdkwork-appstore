@@ -186,7 +186,7 @@ Authority: [PRD.md](../../product/prd/PRD.md)、[appstore-architecture.md](../ap
 
 下文表结构只列业务列，通用列省略。
 
-### 4.3 表清单（47 张）
+### 4.3 表清单（74 张）
 
 | # | 表 | 模块 | 说明 |
 | --- | --- | --- | --- |
@@ -237,6 +237,33 @@ Authority: [PRD.md](../../product/prd/PRD.md)、[appstore-architecture.md](../ap
 | 45 | appstore_market_channel | Market | 市场渠道 |
 | 46 | appstore_market_release | Market | 市场发布 |
 | 47 | appstore_idempotency_key | 通用 | 幂等键 |
+| 48 | appstore_platform_dictionary | Platform | 平台参考字典（mobile/desktop/web 等家族） |
+| 49 | appstore_app_platform | Platform | 应用的平台标识（bundleId/packageName 等） |
+| 50 | appstore_platform_release | Release | 平台发布轨道 |
+| 51 | appstore_signing_credential | Release | 签名凭证（供应链元数据） |
+| 52 | appstore_listing_rating | Listing | 店铺星级评分 |
+| 53 | appstore_feedback | Listing | 用户反馈 |
+| 54 | appstore_listing_review | Listing | 应用评价 |
+| 55 | appstore_listing_review_vote | Listing | 评价投票 |
+| 56 | appstore_listing_review_report | Listing | 评价举报 |
+| 57 | appstore_rating_distribution_snapshot | Analytics | 评分分布快照 |
+| 58 | appstore_listing_price | Listing | 区域定价 |
+| 59 | appstore_promo_code_batch | Market | 促销码批次 |
+| 60 | appstore_promo_code | Market | 促销码 |
+| 61 | appstore_release_tester_group | Release | 内测人员组 |
+| 62 | appstore_release_tester_group_member | Release | 内测人员组成员 |
+| 63 | appstore_catalog_search_doc | Catalog | 搜索读模型文档 |
+| 64 | appstore_analytics_metric_daily | Analytics | 统一分析日指标 |
+| 65 | appstore_web_rate_limit_bucket | 通用 | 集群限流桶（0005） |
+| 66 | appstore_web_idempotency_entry | 通用 | 集群幂等条目（0005） |
+| 67 | appstore_user_category | UserStore | 用户自定义分类（0003） |
+| 68 | appstore_user_category_item | UserStore | 分类-应用绑定（0003） |
+| 69 | appstore_user_store_share | UserStore | 个人 storefront 分享（0003） |
+| 70 | appstore_app_sku | Release | 应用 SKU（0004） |
+| 71 | appstore_app_sku_attribute | Release | SKU 属性（0004） |
+| 72 | appstore_app_sku_model | Release | SKU 适用机型（0004） |
+| 73 | appstore_app_sku_contributor | Release | SKU 贡献者（0004） |
+| 74 | appstore_app_deployment_binding | Release | 部署绑定（0004） |
 
 ### 4.4 表结构详细定义
 
@@ -1623,7 +1650,7 @@ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
 
 | 工作项 | 当前状态 | 下一步 |
 | --- | --- | --- |
-| 数据库 schema | 权威基线 `database/ddl/baseline/postgres/0001_appstore_baseline.sql`（49 表，含索引/唯一约束）；SQLite fixture 对齐 49 表；废弃迁移文件已清理 | 上线后按 `database/migrations/{engine}/` 追加增量迁移 |
+| 数据库 schema | 折叠权威基线 `database/ddl/baseline/postgres/0001_appstore_baseline.sql`（66 表，已折叠 0002/0005）；增量迁移 0003（+3）/0004（+5）；运行时合计 74 表，drift-check 对账通过 | 上线后按 `database/migrations/{engine}/` 追加增量迁移 |
 | 服务鉴权 | listing/release/compliance 写操作 scope + publisher 成员/属主三重校验；admin 端点强制 `appstore.listings.admin`；申诉仅限被审 publisher | 无 |
 | 下载/发布链路 | 制品 Verified 流程 + 发布前置校验 + 付费下载强制 grant + 原子消费（防双花）；check_update 按 semver 排序且灰度真实生效（百分比分桶/region/paused） | 无 |
 | 网关安全 | `SecurityPolicy::production()` + 限流 + 幂等 store + 请求超时 30s + HSTS | 多副本部署时换共享 Redis store |

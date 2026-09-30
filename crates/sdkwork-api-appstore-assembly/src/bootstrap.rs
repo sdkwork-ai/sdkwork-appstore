@@ -33,6 +33,7 @@ use sdkwork_appstore_service_host::integrations::{
 };
 use sdkwork_appstore_user_store_service::service::user_store_service::UserStoreService;
 use sdkwork_database_sqlx::DatabasePool;
+use sdkwork_web_core::stores::{IdempotencyStore, RateLimitStore};
 
 use self::decision_listing_projection::decision_listing_projection_port;
 use self::submission_moderation::submission_moderation_port;
@@ -228,4 +229,22 @@ pub async fn web_module_with_pool(pool: DatabasePool) -> Result<WebModule, Strin
     Ok(WebModule::from_contribution(
         assemble_api_router_with_pool(pool).await?,
     ))
+}
+
+/// Assemble the cluster-safe web chain stores from environment variables.
+///
+/// Fixed-window rate limits and idempotency reservations live in the shared
+/// appstore database so every gateway replica enforces the same budgets and
+/// replays the same responses. Gateways consume these through this assembly
+/// integration point instead of depending on the repository layer directly.
+pub async fn assemble_web_stores_from_env(
+) -> Result<(Arc<dyn RateLimitStore>, Arc<dyn IdempotencyStore>), String> {
+    let database_host = bootstrap_appstore_database_from_env().await?;
+    let db = AppstoreSqlxDb::from_database_pool(database_host.pool())
+        .map_err(|e| format!("Failed to create appstore web store db: {e}"))?;
+    let rate_limit_store: Arc<dyn RateLimitStore> =
+        Arc::new(sdkwork_appstore_repository_sqlx::AppstoreDbRateLimitStore::new(db.clone()));
+    let idempotency_store: Arc<dyn IdempotencyStore> =
+        Arc::new(sdkwork_appstore_repository_sqlx::AppstoreDbIdempotencyStore::new(db));
+    Ok((rate_limit_store, idempotency_store))
 }

@@ -19,8 +19,19 @@ export default function GamesPage() {
   useEffect(() => {
     async function loadGames() {
       try {
-        const apps = await AppStoreService.getAllApps();
-        setAllApps(apps);
+        // Bounded cursor-following load: at most 4 pages of 50 listings per
+        // PAGINATION_SPEC (never an unbounded "fetch all").
+        const collected: AppItem[] = [];
+        let pageCursor: string | undefined;
+        for (let page = 0; page < 4; page += 1) {
+          const result = await AppStoreService.listAppsPage({ cursor: pageCursor, limit: 50 });
+          collected.push(...result.items);
+          if (!result.nextCursor) {
+            break;
+          }
+          pageCursor = result.nextCursor;
+        }
+        setAllApps(collected);
       } catch (err) {
         console.error('Failed to load games page data', err);
       } finally {

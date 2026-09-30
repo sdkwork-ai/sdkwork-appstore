@@ -6,7 +6,7 @@ use sdkwork_web_core::RouteAuth;
 pub const ROUTES: &[RouteDefinition] = &[
     RouteDefinition {
         method: "GET",
-        path: "/app/v3/api/user-store/categories",
+        path: "/app/v3/api/user_store/categories",
         operation_id: "appstore.userStore.category.list",
         auth: RouteAuth::DualToken,
         handler: "user_store_categories_list",
@@ -14,7 +14,7 @@ pub const ROUTES: &[RouteDefinition] = &[
     },
     RouteDefinition {
         method: "POST",
-        path: "/app/v3/api/user-store/categories",
+        path: "/app/v3/api/user_store/categories",
         operation_id: "appstore.userStore.category.create",
         auth: RouteAuth::DualToken,
         handler: "user_store_category_create",
@@ -22,7 +22,7 @@ pub const ROUTES: &[RouteDefinition] = &[
     },
     RouteDefinition {
         method: "GET",
-        path: "/app/v3/api/user-store/categories/{userCategoryId}",
+        path: "/app/v3/api/user_store/categories/{userCategoryId}",
         operation_id: "appstore.userStore.category.retrieve",
         auth: RouteAuth::DualToken,
         handler: "user_store_category_retrieve",
@@ -30,7 +30,7 @@ pub const ROUTES: &[RouteDefinition] = &[
     },
     RouteDefinition {
         method: "PATCH",
-        path: "/app/v3/api/user-store/categories/{userCategoryId}",
+        path: "/app/v3/api/user_store/categories/{userCategoryId}",
         operation_id: "appstore.userStore.category.update",
         auth: RouteAuth::DualToken,
         handler: "user_store_category_update",
@@ -38,7 +38,7 @@ pub const ROUTES: &[RouteDefinition] = &[
     },
     RouteDefinition {
         method: "DELETE",
-        path: "/app/v3/api/user-store/categories/{userCategoryId}",
+        path: "/app/v3/api/user_store/categories/{userCategoryId}",
         operation_id: "appstore.userStore.category.delete",
         auth: RouteAuth::DualToken,
         handler: "user_store_category_delete",
@@ -46,7 +46,7 @@ pub const ROUTES: &[RouteDefinition] = &[
     },
     RouteDefinition {
         method: "GET",
-        path: "/app/v3/api/user-store/categories/{userCategoryId}/items",
+        path: "/app/v3/api/user_store/categories/{userCategoryId}/items",
         operation_id: "appstore.userStore.item.list",
         auth: RouteAuth::DualToken,
         handler: "user_store_items_list",
@@ -54,7 +54,7 @@ pub const ROUTES: &[RouteDefinition] = &[
     },
     RouteDefinition {
         method: "POST",
-        path: "/app/v3/api/user-store/categories/{userCategoryId}/items",
+        path: "/app/v3/api/user_store/categories/{userCategoryId}/items",
         operation_id: "appstore.userStore.item.create",
         auth: RouteAuth::DualToken,
         handler: "user_store_item_create",
@@ -62,7 +62,7 @@ pub const ROUTES: &[RouteDefinition] = &[
     },
     RouteDefinition {
         method: "PATCH",
-        path: "/app/v3/api/user-store/categories/{userCategoryId}/items",
+        path: "/app/v3/api/user_store/categories/{userCategoryId}/items",
         operation_id: "appstore.userStore.item.update",
         auth: RouteAuth::DualToken,
         handler: "user_store_items_update",
@@ -70,7 +70,7 @@ pub const ROUTES: &[RouteDefinition] = &[
     },
     RouteDefinition {
         method: "DELETE",
-        path: "/app/v3/api/user-store/categories/{userCategoryId}/items/{itemId}",
+        path: "/app/v3/api/user_store/categories/{userCategoryId}/items/{itemId}",
         operation_id: "appstore.userStore.item.delete",
         auth: RouteAuth::DualToken,
         handler: "user_store_item_delete",
@@ -78,7 +78,7 @@ pub const ROUTES: &[RouteDefinition] = &[
     },
     RouteDefinition {
         method: "GET",
-        path: "/app/v3/api/user-store/shares",
+        path: "/app/v3/api/user_store/shares",
         operation_id: "appstore.userStore.share.list",
         auth: RouteAuth::DualToken,
         handler: "user_store_shares_list",
@@ -86,7 +86,7 @@ pub const ROUTES: &[RouteDefinition] = &[
     },
     RouteDefinition {
         method: "POST",
-        path: "/app/v3/api/user-store/shares",
+        path: "/app/v3/api/user_store/shares",
         operation_id: "appstore.userStore.share.create",
         auth: RouteAuth::DualToken,
         handler: "user_store_share_create",
@@ -94,7 +94,7 @@ pub const ROUTES: &[RouteDefinition] = &[
     },
     RouteDefinition {
         method: "PATCH",
-        path: "/app/v3/api/user-store/shares/{shareId}",
+        path: "/app/v3/api/user_store/shares/{shareId}",
         operation_id: "appstore.userStore.share.update",
         auth: RouteAuth::DualToken,
         handler: "user_store_share_update",
@@ -102,7 +102,7 @@ pub const ROUTES: &[RouteDefinition] = &[
     },
     RouteDefinition {
         method: "DELETE",
-        path: "/app/v3/api/user-store/shares/{shareId}",
+        path: "/app/v3/api/user_store/shares/{shareId}",
         operation_id: "appstore.userStore.share.delete",
         auth: RouteAuth::DualToken,
         handler: "user_store_share_delete",
@@ -110,7 +110,7 @@ pub const ROUTES: &[RouteDefinition] = &[
     },
     RouteDefinition {
         method: "POST",
-        path: "/app/v3/api/user-store/shares/{shareId}/refresh",
+        path: "/app/v3/api/user_store/shares/{shareId}/refresh",
         operation_id: "appstore.userStore.share.refresh",
         auth: RouteAuth::DualToken,
         handler: "user_store_share_refresh",

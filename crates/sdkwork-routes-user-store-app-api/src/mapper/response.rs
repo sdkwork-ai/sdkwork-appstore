@@ -4,8 +4,8 @@ use sdkwork_appstore_user_store_service::domain::models::{
 };
 use sdkwork_appstore_user_store_service::domain::results::{
     AddCategoryItemResult, CategoriesListResult, CategoryCreateResult, CategoryRetrieveResult,
-    CategoryUpdateResult, PublicUserStoreViewResult, RegenerateShareTokenResult, ShareCreateResult,
-    ShareUpdateResult, SharesListResult,
+    CategoryUpdateResult, RegenerateShareTokenResult, ShareCreateResult, ShareUpdateResult,
+    SharesListResult,
 };
 
 #[derive(Debug, serde::Serialize)]
@@ -112,13 +112,6 @@ pub(crate) struct CategoryItemWithCardResponse {
 
 #[derive(Debug, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
-pub(crate) struct CategoryItemCountResponse {
-    pub(crate) user_category_id: String,
-    pub(crate) count: i64,
-}
-
-#[derive(Debug, serde::Serialize)]
-#[serde(rename_all = "camelCase")]
 pub(crate) struct UserStoreShareResponse {
     pub(crate) id: String,
     pub(crate) share_token: String,
@@ -153,21 +146,6 @@ impl From<&UserStoreShare> for UserStoreShareResponse {
             updated_at: share.updated_at.to_rfc3339(),
         }
     }
-}
-
-#[derive(Debug, serde::Serialize)]
-#[serde(rename_all = "camelCase")]
-pub(crate) struct PublicCategorySummaryResponse {
-    pub(crate) user_category_id: String,
-    pub(crate) name: String,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub(crate) icon_media_resource_id: Option<String>,
-    pub(crate) sort_order: i32,
-    pub(crate) item_count: i64,
-}
-
-pub(crate) fn map_category(category: &UserCategory) -> UserCategoryResponse {
-    UserCategoryResponse::from(category)
 }
 
 pub(crate) fn map_category_created(result: CategoryCreateResult) -> UserCategoryResponse {
@@ -209,10 +187,6 @@ pub(crate) fn map_item_added(result: AddCategoryItemResult) -> CategoryItemWithC
     }
 }
 
-pub(crate) fn map_share(share: &UserStoreShare) -> UserStoreShareResponse {
-    UserStoreShareResponse::from(share)
-}
-
 pub(crate) fn map_share_created(result: ShareCreateResult) -> UserStoreShareResponse {
     UserStoreShareResponse::from(&result.share)
 }
@@ -226,37 +200,6 @@ pub(crate) fn map_shares_page(
         .map(UserStoreShareResponse::from)
         .collect();
     (items, result.next_cursor, result.has_more)
-}
-
-pub(crate) fn map_public_view(result: PublicUserStoreViewResult) -> PublicUserStoreViewResponse {
-    PublicUserStoreViewResponse {
-        share_token: result.share_token,
-        title: result.title,
-        description: result.description,
-        owner_user_id: result.owner_user_id,
-        categories: result
-            .categories
-            .iter()
-            .map(|category| PublicCategorySummaryResponse {
-                user_category_id: category.user_category_id.clone(),
-                name: category.name.clone(),
-                icon_media_resource_id: category.icon_media_resource_id.clone(),
-                sort_order: category.sort_order,
-                item_count: category.item_count,
-            })
-            .collect(),
-    }
-}
-
-#[derive(Debug, serde::Serialize)]
-#[serde(rename_all = "camelCase")]
-pub(crate) struct PublicUserStoreViewResponse {
-    pub(crate) share_token: String,
-    pub(crate) title: String,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub(crate) description: Option<String>,
-    pub(crate) owner_user_id: String,
-    pub(crate) categories: Vec<PublicCategorySummaryResponse>,
 }
 
 pub(crate) fn map_share_updated(result: ShareUpdateResult) -> UserStoreShareResponse {

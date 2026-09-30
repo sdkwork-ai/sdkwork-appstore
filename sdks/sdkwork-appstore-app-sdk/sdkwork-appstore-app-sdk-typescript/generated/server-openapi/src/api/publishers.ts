@@ -102,6 +102,10 @@ export class PublishersAppstorePublishersMeApi {
   }
 }
 
+export interface PublishersAppstorePublishersCreateParams {
+  idempotencyKey: string;
+}
+
 export class PublishersAppstorePublishersApi {
   private client: HttpClient;
   public readonly me: PublishersAppstorePublishersMeApi;
@@ -117,8 +121,14 @@ export class PublishersAppstorePublishersApi {
 
 
 /** Create publisher profile */
-  async create(body: PublisherCreateRequest, requestOptions?: ApiRequestOptions): Promise<Publisher> {
-    return this.client.request<Publisher>(appApiPath(`/publishers`), { ...(requestOptions?.signal !== undefined ? { signal: requestOptions.signal } : {}), ...(requestOptions?.timeout !== undefined ? { timeout: requestOptions.timeout } : {}), method: 'POST' as any, body, contentType: 'application/json', sdkworkUnwrapKind: 'item' });
+  async create(body: PublisherCreateRequest, params: PublishersAppstorePublishersCreateParams, requestOptions?: ApiRequestOptions): Promise<Publisher> {
+    const requestHeaders = buildRequestHeaders(
+      {
+        'Idempotency-Key': { value: params.idempotencyKey, style: 'simple', explode: false },
+      },
+      {}
+    );
+    return this.client.request<Publisher>(appApiPath(`/publishers`), { ...(requestOptions?.signal !== undefined ? { signal: requestOptions.signal } : {}), ...(requestOptions?.timeout !== undefined ? { timeout: requestOptions.timeout } : {}), method: 'POST' as any, body, contentType: 'application/json', ...(requestHeaders !== undefined ? { headers: requestHeaders } : {}), sdkworkUnwrapKind: 'item' });
   }
 
 /** Update publisher profile */

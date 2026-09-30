@@ -264,7 +264,7 @@ export function HomePage() {
         {recItems.length === 0 ? (
           <p className="text-sm text-[var(--text-tertiary)] py-8 text-center">暂无推荐应用</p>
         ) : (
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
             {recItems.slice(0, 8).map((app) => (
               <Link
                 key={app.id}
@@ -327,7 +327,7 @@ export function HomePage() {
             <Clock className="h-4 w-4 text-[var(--accent)]" />
             <h2 className="section-title">最近更新</h2>
           </div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
             {updatedItems.slice(0, 4).map((app) => (
               <Link
                 key={app.id}

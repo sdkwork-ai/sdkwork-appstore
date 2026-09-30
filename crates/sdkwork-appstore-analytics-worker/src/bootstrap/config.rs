@@ -3,7 +3,9 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct WorkerConfig {
-    pub tenant_id: String,
+    /// Optional tenant filter. `None` projects every tenant that has
+    /// analytics source data (multi-tenant operation).
+    pub tenant_id: Option<String>,
     pub metrics_interval_seconds: u64,
     pub chart_interval_seconds: u64,
     pub trending_interval_seconds: u64,
@@ -12,7 +14,9 @@ pub struct WorkerConfig {
 impl WorkerConfig {
     pub fn from_env() -> Self {
         Self {
-            tenant_id: std::env::var("APPSTORE_TENANT_ID").unwrap_or_else(|_| "100001".to_string()),
+            tenant_id: std::env::var("APPSTORE_TENANT_ID")
+                .ok()
+                .filter(|value| !value.trim().is_empty()),
             metrics_interval_seconds: std::env::var("APPSTORE_METRICS_INTERVAL_SECONDS")
                 .ok()
                 .and_then(|v| v.parse().ok())

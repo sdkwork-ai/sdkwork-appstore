@@ -73,35 +73,35 @@ struct ShareUpdateBody {
 pub fn routes() -> Router<AppState> {
     Router::new()
         .route(
-            "/app/v3/api/user-store/categories",
+            "/app/v3/api/user_store/categories",
             get(categories_list_handler).post(category_create_handler),
         )
         .route(
-            "/app/v3/api/user-store/categories/{userCategoryId}",
+            "/app/v3/api/user_store/categories/{userCategoryId}",
             get(category_retrieve_handler)
                 .patch(category_update_handler)
                 .delete(category_delete_handler),
         )
         .route(
-            "/app/v3/api/user-store/categories/{userCategoryId}/items",
+            "/app/v3/api/user_store/categories/{userCategoryId}/items",
             get(items_list_handler)
                 .post(item_add_handler)
                 .patch(items_reorder_handler),
         )
         .route(
-            "/app/v3/api/user-store/categories/{userCategoryId}/items/{itemId}",
+            "/app/v3/api/user_store/categories/{userCategoryId}/items/{itemId}",
             delete(item_remove_handler),
         )
         .route(
-            "/app/v3/api/user-store/shares",
+            "/app/v3/api/user_store/shares",
             get(shares_list_handler).post(share_create_handler),
         )
         .route(
-            "/app/v3/api/user-store/shares/{shareId}",
+            "/app/v3/api/user_store/shares/{shareId}",
             patch(share_update_handler).delete(share_revoke_handler),
         )
         .route(
-            "/app/v3/api/user-store/shares/{shareId}/refresh",
+            "/app/v3/api/user_store/shares/{shareId}/refresh",
             post(share_regenerate_token_handler),
         )
 }

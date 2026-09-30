@@ -44,15 +44,24 @@ export default function AppDetail() {
         const appData = await AppStoreService.getAppById(id);
         if (appData) {
           setApp(appData);
-          const [appReviews, moreApps, appsList, similar] = await Promise.all([
+          const [appReviews, moreApps, similar] = await Promise.all([
             AppStoreService.getReviewsByAppId(id),
             AppStoreService.getMoreByDeveloper(appData.developer, id),
-            AppStoreService.getAllApps(),
             AppStoreService.getSimilarApps(id).catch(() => []),
           ]);
           setReviews(appReviews);
           setOtherApps(moreApps);
-          setAllApps(appsList);
+          // Recommendations run over the bounded related-app set (similar +
+          // same-developer), not a wide catalog sweep.
+          const recommendationPool: AppItem[] = [];
+          const seenIds = new Set([id]);
+          for (const candidate of [...similar, ...moreApps]) {
+            if (!seenIds.has(candidate.id)) {
+              seenIds.add(candidate.id);
+              recommendationPool.push(candidate);
+            }
+          }
+          setAllApps(recommendationPool);
           setSimilarApps(similar);
         } else {
           setApp(null);

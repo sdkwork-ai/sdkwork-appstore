@@ -1,6 +1,22 @@
 import type { AppItem, Review, EditorialCollection, CategoryDetail, EventItem } from '../types';
 
 /**
+ * Cursor-paged catalog window (PAGINATION_SPEC §4: keyset cursor, bounded
+ * page). `nextCursor` is `null` when the server has no further rows.
+ */
+export interface AppItemPage {
+  items: AppItem[];
+  nextCursor: string | null;
+}
+
+export interface AppItemPageParams {
+  /** Opaque keyset cursor from a previous {@link AppItemPage}. */
+  cursor?: string;
+  /** Page size; clamped server-side to the canonical maximum. */
+  limit?: number;
+}
+
+/**
  * AppStore SDK Contract Interface
  * Implemented by the bootstrap-configured service port backed by the
  * `@sdkwork/appstore-app-sdk` and `@sdkwork/comments-app-sdk` clients.
@@ -14,7 +30,10 @@ export interface IAppStoreSDK {
   getEventDetail(id: string): Promise<EventItem | undefined>;
   getDiscoverApps(): Promise<{ editorial: AppItem[]; newAndNoteworthy: AppItem[]; secondaryEditorial: AppItem[] }>;
   listRecentlyUpdated(): Promise<AppItem[]>;
-  getAllApps(): Promise<AppItem[]>;
+  /** One bounded, cursor-paged catalog window. Never fabricates completeness. */
+  listAppsPage(params?: AppItemPageParams): Promise<AppItemPage>;
+  /** Exact, bounded resolution of known listing ids (editorial content). */
+  getAppsByIds(ids: string[]): Promise<AppItem[]>;
   getTopCharts(type: 'free' | 'paid' | 'all'): Promise<AppItem[]>;
   searchApps(query: string, filter?: string): Promise<AppItem[]>;
   getTrendingSearches(): Promise<string[]>;
@@ -57,7 +76,8 @@ export const AppStoreService: IAppStoreSDK = {
   getEventDetail: (id) => appStorePort.getEventDetail(id),
   getDiscoverApps: () => appStorePort.getDiscoverApps(),
   listRecentlyUpdated: () => appStorePort.listRecentlyUpdated(),
-  getAllApps: () => appStorePort.getAllApps(),
+  listAppsPage: (params) => appStorePort.listAppsPage(params),
+  getAppsByIds: (ids) => appStorePort.getAppsByIds(ids),
   getTopCharts: (type = 'all') => appStorePort.getTopCharts(type),
   searchApps: (query, filter = 'All') => appStorePort.searchApps(query, filter),
   getTrendingSearches: () => appStorePort.getTrendingSearches(),
@@ -96,7 +116,8 @@ function createUnconfiguredAppStorePort(): AppStoreServicePort {
     getEventDetail: async () => unavailable(),
     getDiscoverApps: async () => unavailable(),
     listRecentlyUpdated: async () => unavailable(),
-    getAllApps: async () => unavailable(),
+    listAppsPage: async () => unavailable(),
+    getAppsByIds: async () => unavailable(),
     getTopCharts: async () => unavailable(),
     searchApps: async () => unavailable(),
     getTrendingSearches: async () => unavailable(),

@@ -9,6 +9,7 @@ import { PublishersApi, createPublishersApi } from './api/publishers';
 import { ComplianceApi, createComplianceApi } from './api/compliance';
 import { LibraryApi, createLibraryApi } from './api/library';
 import { WishlistApi, createWishlistApi } from './api/wishlist';
+import { UserStoreApi, createUserStoreApi } from './api/user-store';
 import { DownloadGrantsApi, createDownloadGrantsApi } from './api/download-grants';
 
 export class SdkworkAppstoreAppClient {
@@ -21,6 +22,7 @@ export class SdkworkAppstoreAppClient {
   public readonly compliance: ComplianceApi;
   public readonly library: LibraryApi;
   public readonly wishlist: WishlistApi;
+  public readonly userStore: UserStoreApi;
   public readonly downloadGrants: DownloadGrantsApi;
 
   constructor(config: SdkworkAppConfig) {
@@ -38,6 +40,8 @@ export class SdkworkAppstoreAppClient {
     this.library = createLibraryApi(this.httpClient);
 
     this.wishlist = createWishlistApi(this.httpClient);
+
+    this.userStore = createUserStoreApi(this.httpClient);
 
     this.downloadGrants = createDownloadGrantsApi(this.httpClient);
   }

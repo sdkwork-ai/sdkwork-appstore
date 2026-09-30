@@ -109,7 +109,7 @@ export function createAppstoreAdminListingsPort(
     async listListings(query) {
       const payload = await executeAdminOperation(operations.listListings, () =>
         client.listings.appstore.listings.admin.list({
-          ...(query?.listingStatus ? { listingStatus: query.listingStatus } : {}),
+          ...(query?.listingStatus ? { statusFilter: query.listingStatus } : {}),
           ...(query?.cursor ? { cursor: query.cursor } : {}),
           ...(query?.pageSize === undefined ? {} : { pageSize: query.pageSize }),
         }),
@@ -147,8 +147,8 @@ export function createAppstoreAdminListingsPort(
       const id = requireAdminIdentifier(listingId, 'listingId');
       const payload = await executeAdminOperation(operations.retrieveMetrics, () =>
         client.metrics.appstore.metrics.listings.retrieve(id, {
-          ...(range?.from ? { fromDate: range.from } : {}),
-          ...(range?.to ? { toDate: range.to } : {}),
+          ...(range?.from ? { dateFrom: range.from } : {}),
+          ...(range?.to ? { dateTo: range.to } : {}),
         }),
       );
       if (!payload) {

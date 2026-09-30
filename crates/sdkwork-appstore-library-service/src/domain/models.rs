@@ -307,3 +307,86 @@ pub struct UpdateAvailable {
     pub release_notes: Option<String>,
     pub released_at: Option<chrono::DateTime<chrono::Utc>>,
 }
+
+/// Lifecycle of a commerce-synced entitlement snapshot.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+pub enum EntitlementStatus {
+    Active,
+    Expired,
+    Revoked,
+}
+
+impl EntitlementStatus {
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            EntitlementStatus::Active => "active",
+            EntitlementStatus::Expired => "expired",
+            EntitlementStatus::Revoked => "revoked",
+        }
+    }
+
+    pub fn from_str(value: &str) -> Option<Self> {
+        match value {
+            "active" => Some(EntitlementStatus::Active),
+            "expired" => Some(EntitlementStatus::Expired),
+            "revoked" => Some(EntitlementStatus::Revoked),
+            _ => None,
+        }
+    }
+}
+
+/// Subject kind an entitlement is bound to (currently user-only; the column
+/// is kept for future group/organization grants).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+pub enum EntitlementSubjectType {
+    User,
+}
+
+impl EntitlementSubjectType {
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            EntitlementSubjectType::User => "user",
+        }
+    }
+
+    pub fn from_str(value: &str) -> Option<Self> {
+        match value {
+            "user" => Some(EntitlementSubjectType::User),
+            _ => None,
+        }
+    }
+}
+
+/// Appstore-side projection of an Order/Payment entitlement. The store never
+/// settles payment; commerce pushes snapshots through the sync endpoint and
+/// this store only answers "is this subject allowed to use app X".
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct CommerceEntitlement {
+    pub id: String,
+    pub tenant_id: String,
+    pub organization_id: String,
+    pub app_id: String,
+    pub listing_id: Option<String>,
+    pub subject_type: EntitlementSubjectType,
+    pub subject_id: String,
+    pub entitlement_type: String,
+    pub source_type: String,
+    pub entitlement_status: EntitlementStatus,
+    pub starts_at: DateTime<Utc>,
+    pub expires_at: Option<DateTime<Utc>>,
+    pub grant_snapshot_json: String,
+    pub revoked_at: Option<DateTime<Utc>>,
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
+}
+
+impl CommerceEntitlement {
+    /// True when the entitlement currently grants access (active, started,
+    /// and not expired).
+    pub fn is_active(&self, now: DateTime<Utc>) -> bool {
+        self.entitlement_status == EntitlementStatus::Active
+            && self.starts_at <= now
+            && self.expires_at.map(|expires| expires > now).unwrap_or(true)
+    }
+}

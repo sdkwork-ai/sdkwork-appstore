@@ -23,13 +23,11 @@ impl AppstoreGatewayConfig {
     }
 
     pub fn addr(&self) -> std::net::SocketAddr {
-        self.bind_address
-            .parse()
-            .unwrap_or_else(|error| {
-                panic!(
-                    "invalid SDKWORK_APPSTORE_APPLICATION_PUBLIC_INGRESS_BIND `{}`: {error}",
-                    self.bind_address
-                )
-            })
+        self.bind_address.parse().unwrap_or_else(|error| {
+            panic!(
+                "invalid SDKWORK_APPSTORE_APPLICATION_PUBLIC_INGRESS_BIND `{}`: {error}",
+                self.bind_address
+            )
+        })
     }
 }

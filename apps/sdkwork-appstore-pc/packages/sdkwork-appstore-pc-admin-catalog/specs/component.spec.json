@@ -43,18 +43,18 @@
     ],
     "providedPorts": [
       {
-        "port": "appstore.pc.admin.catalog.module",
-        "description": "Catalog capability module: authoring routes, navigation metadata, and locale namespaces."
+        "name": "appstorePcAdminCatalogModule",
+        "export": "."
       }
     ],
     "requiredPorts": [
       {
-        "port": "appstore.pc.admin.service-ports",
-        "description": "catalog service port (category, collection, collection-item, and featured-slot writes) from @sdkwork/appstore-pc-admin-core."
+        "name": "appstorePcAdminServicePorts",
+        "export": "."
       },
       {
-        "port": "appstore.pc.admin.shell",
-        "description": "Operator UI kit, shell context, and command hook from @sdkwork/appstore-pc-admin-shell."
+        "name": "appstorePcAdminShell",
+        "export": "."
       }
     ],
     "sdkDependencies": [],

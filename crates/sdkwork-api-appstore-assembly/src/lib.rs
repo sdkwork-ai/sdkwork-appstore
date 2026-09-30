@@ -9,7 +9,8 @@ pub mod web_bootstrap;
 
 pub use bootstrap::{
     assemble_api_router, assemble_api_router_with_pool, assemble_contribution_with_pool,
-    web_module, web_module_with_pool, ApiAssembly, ApiAssemblyContribution,
+    assemble_web_stores_from_env, web_module, web_module_with_pool, ApiAssembly,
+    ApiAssemblyContribution,
 };
 
 pub fn assembly_route_count() -> usize {

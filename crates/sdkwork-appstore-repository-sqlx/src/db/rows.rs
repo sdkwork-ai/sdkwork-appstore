@@ -769,3 +769,23 @@ pub struct UserStoreShareRow {
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
 }
+
+#[derive(Debug, Clone, FromRow)]
+pub struct EntitlementRow {
+    pub id: String,
+    pub tenant_id: String,
+    pub organization_id: String,
+    pub app_id: String,
+    pub listing_id: Option<String>,
+    pub subject_type: String,
+    pub subject_id: String,
+    pub entitlement_type: String,
+    pub source_type: String,
+    pub entitlement_status: String,
+    pub starts_at: DateTime<Utc>,
+    pub expires_at: Option<DateTime<Utc>>,
+    pub grant_snapshot_json: String,
+    pub revoked_at: Option<DateTime<Utc>>,
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
+}

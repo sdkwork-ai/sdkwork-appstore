@@ -54,7 +54,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HomeFeedResponse'
-      parameters: []
   /app/v3/api/appstore/catalog/categories:
     get:
       tags:
@@ -173,7 +172,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/FeaturedListResponse'
-      parameters: []
   /app/v3/api/appstore/catalog/charts/{chartCode}:
     get:
       tags:
@@ -222,7 +220,7 @@ paths:
         in: query
         schema:
           type: string
-      - name: categoryId
+      - name: category_id
         in: query
         schema:
           type: string
@@ -424,7 +422,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SdkWorkApiResponse'
-      parameters: []
     delete:
       tags:
       - catalog
@@ -436,7 +433,6 @@ paths:
       responses:
         '204':
           description: Removed
-      parameters: []
   /app/v3/api/appstore/catalog/templates:
     get:
       tags:
@@ -451,11 +447,11 @@ paths:
         in: query
         schema:
           type: string
-      - name: categoryCode
+      - name: category_code
         in: query
         schema:
           type: string
-      - name: templateType
+      - name: template_type
         in: query
         schema:
           type: string
@@ -981,7 +977,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PublisherResponse'
-      parameters: []
   /app/v3/api/publishers/me/listings:
     get:
       tags:
@@ -1047,6 +1042,8 @@ paths:
       security:
       - AuthToken: []
         AccessToken: []
+      parameters:
+      - $ref: '#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
         content:
@@ -1060,7 +1057,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PublisherResponse'
-      parameters: []
+      x-sdkwork-idempotent: true
   /app/v3/api/publishers/{publisherId}:
     patch:
       tags:
@@ -1455,7 +1452,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SdkWorkResourceResponse'
-      parameters: []
   /app/v3/api/library/updates/check:
     post:
       tags:
@@ -1478,7 +1474,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/LibraryUpdatesCheckResponse'
-      parameters: []
   /app/v3/api/wishlist/items:
     get:
       tags:
@@ -1506,6 +1501,8 @@ paths:
       security:
       - AuthToken: []
         AccessToken: []
+      parameters:
+      - $ref: '#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
         content:
@@ -1519,7 +1516,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/WishlistItemResponse'
-      parameters: []
+      x-sdkwork-idempotent: true
   /app/v3/api/wishlist/items/{listingId}:
     delete:
       tags:
@@ -1534,7 +1531,7 @@ paths:
       responses:
         '204':
           description: Removed
-  /app/v3/api/user-store/categories:
+  /app/v3/api/user_store/categories:
     get:
       tags:
       - userStore
@@ -1553,7 +1550,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserCategoryPageResponse'
-      parameters: []
     post:
       tags:
       - userStore
@@ -1562,6 +1558,8 @@ paths:
       security:
       - AuthToken: []
         AccessToken: []
+      parameters:
+      - $ref: '#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
         content:
@@ -1575,8 +1573,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserCategoryResponse'
-      parameters: []
-  /app/v3/api/user-store/categories/{userCategoryId}:
+      x-sdkwork-idempotent: true
+  /app/v3/api/user_store/categories/{userCategoryId}:
     get:
       tags:
       - userStore
@@ -1594,7 +1592,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserCategoryResponse'
-      parameters: []
     patch:
       tags:
       - userStore
@@ -1618,7 +1615,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserCategoryResponse'
-      parameters: []
     delete:
       tags:
       - userStore
@@ -1632,7 +1628,7 @@ paths:
       responses:
         '204':
           description: Deleted
-  /app/v3/api/user-store/categories/{userCategoryId}/items:
+  /app/v3/api/user_store/categories/{userCategoryId}/items:
     get:
       tags:
       - userStore
@@ -1652,7 +1648,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserCategoryItemPageResponse'
-      parameters: []
     post:
       tags:
       - userStore
@@ -1663,6 +1658,7 @@ paths:
         AccessToken: []
       parameters:
       - $ref: '#/components/parameters/UserCategoryId'
+      - $ref: '#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
         content:
@@ -1676,7 +1672,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserCategoryItemResponse'
-      parameters: []
+      x-sdkwork-idempotent: true
     patch:
       tags:
       - userStore
@@ -1700,8 +1696,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserStoreCommandResponse'
-      parameters: []
-  /app/v3/api/user-store/categories/{userCategoryId}/items/{itemId}:
+  /app/v3/api/user_store/categories/{userCategoryId}/items/{itemId}:
     delete:
       tags:
       - userStore
@@ -1716,7 +1711,7 @@ paths:
       responses:
         '204':
           description: Removed
-  /app/v3/api/user-store/shares:
+  /app/v3/api/user_store/shares:
     get:
       tags:
       - userStore
@@ -1735,7 +1730,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserStoreSharePageResponse'
-      parameters: []
     post:
       tags:
       - userStore
@@ -1744,6 +1738,8 @@ paths:
       security:
       - AuthToken: []
         AccessToken: []
+      parameters:
+      - $ref: '#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
         content:
@@ -1757,8 +1753,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserStoreShareResponse'
-      parameters: []
-  /app/v3/api/user-store/shares/{shareId}:
+      x-sdkwork-idempotent: true
+  /app/v3/api/user_store/shares/{shareId}:
     patch:
       tags:
       - userStore
@@ -1782,7 +1778,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserStoreShareResponse'
-      parameters: []
     delete:
       tags:
       - userStore
@@ -1796,7 +1791,7 @@ paths:
       responses:
         '204':
           description: Revoked
-  /app/v3/api/user-store/shares/{shareId}/refresh:
+  /app/v3/api/user_store/shares/{shareId}/refresh:
     post:
       tags:
       - userStore
@@ -1807,6 +1802,7 @@ paths:
         AccessToken: []
       parameters:
       - $ref: '#/components/parameters/ShareId'
+      - $ref: '#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Success
@@ -1814,7 +1810,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserStoreShareResponse'
-      parameters: []
+      x-sdkwork-idempotent: true
   /app/v3/api/download_grants:
     post:
       tags:
@@ -4370,7 +4366,9 @@ components:
           maximum: 200
         totalItems:
           type: string
+          format: int64
           pattern: ^[0-9]+$
+          x-sdkwork-int64-string: true
         totalPages:
           type: integer
           minimum: 0
@@ -4385,7 +4383,7 @@ components:
       format: int32
       minimum: 40001
       maximum: 79999
-      description: Platform or domain error code per API_SPEC.md 搂15.3.
+      description: Platform or domain error code per API_SPEC.md §15.3.
     FieldError:
       type: object
       additionalProperties: false

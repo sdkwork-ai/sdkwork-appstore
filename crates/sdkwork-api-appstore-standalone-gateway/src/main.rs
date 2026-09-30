@@ -7,8 +7,7 @@ use sdkwork_database_sqlx::enable_process_shared_database_pool;
 use sdkwork_iam_web_adapter::{
     build_web_framework_builder_with_open_api_prefixes, iam_web_request_context_resolver_from_env,
 };
-use sdkwork_web_bootstrap::{ApiModuleRegistry, ComposedApiAssembly, infra_public_path_prefixes};
-use sdkwork_web_core::{memory_idempotency_store, memory_rate_limit_store};
+use sdkwork_web_bootstrap::{infra_public_path_prefixes, ApiModuleRegistry};
 use tracing_subscriber::EnvFilter;
 
 mod bootstrap;
@@ -57,14 +56,24 @@ async fn main() {
         .expect("appstore gateway composition failed");
     let mut public_path_prefixes = infra_public_path_prefixes();
     public_path_prefixes.extend(appstore_public_path_prefixes());
+    // Cluster-safe web chain stores come from the owner API assembly
+    // integration point: fixed-window rate limits and idempotency reservations
+    // live in the shared appstore database, so every replica enforces the same
+    // budgets and replays the same responses. The previous per-process memory
+    // stores multiplied rate limits by replica count and silently dropped
+    // idempotency across replicas.
+    let (rate_limit_store, idempotency_store) =
+        sdkwork_api_appstore_assembly::assemble_web_stores_from_env()
+            .await
+            .expect("appstore web store assembly failed");
     let framework = build_web_framework_builder_with_open_api_prefixes(
         iam_web_request_context_resolver_from_env().await,
         composed.route_manifest.clone(),
         public_path_prefixes,
         appstore_open_api_prefixes(),
     )
-    .rate_limit_store(memory_rate_limit_store())
-    .idempotency_store(memory_idempotency_store());
+    .rate_limit_store(rate_limit_store)
+    .idempotency_store(idempotency_store);
     let hosted = composed.into_hosted(framework);
     let app = sdkwork_web_axum::with_request_timeout(hosted.router, Duration::from_secs(30))
         .layer(cors_layer_from_env());

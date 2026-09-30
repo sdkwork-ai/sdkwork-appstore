@@ -199,3 +199,82 @@ impl ConsumeDownloadGrantRequest {
         }
     }
 }
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct CommerceEntitlementSyncRequest {
+    pub app_id: String,
+    pub listing_id: Option<String>,
+    pub subject_id: String,
+    pub entitlement_type: String,
+    pub source_type: String,
+    pub entitlement_status: String,
+    pub starts_at: chrono::DateTime<chrono::Utc>,
+    pub expires_at: Option<chrono::DateTime<chrono::Utc>>,
+    pub grant_snapshot_json: String,
+}
+
+impl CommerceEntitlementSyncRequest {
+    #[allow(clippy::too_many_arguments)]
+    pub fn new(
+        app_id: impl Into<String>,
+        listing_id: Option<String>,
+        subject_id: impl Into<String>,
+        entitlement_type: impl Into<String>,
+        source_type: impl Into<String>,
+        entitlement_status: impl Into<String>,
+        starts_at: chrono::DateTime<chrono::Utc>,
+        expires_at: Option<chrono::DateTime<chrono::Utc>>,
+        grant_snapshot_json: impl Into<String>,
+    ) -> Self {
+        Self {
+            app_id: app_id.into(),
+            listing_id,
+            subject_id: subject_id.into(),
+            entitlement_type: entitlement_type.into(),
+            source_type: source_type.into(),
+            entitlement_status: entitlement_status.into(),
+            starts_at,
+            expires_at,
+            grant_snapshot_json: grant_snapshot_json.into(),
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct CommerceEntitlementCheckRequest {
+    pub app_id: String,
+    pub subject_id: String,
+}
+
+impl CommerceEntitlementCheckRequest {
+    pub fn new(app_id: impl Into<String>, subject_id: impl Into<String>) -> Self {
+        Self {
+            app_id: app_id.into(),
+            subject_id: subject_id.into(),
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct CommerceEntitlementRevokeRequest {
+    pub app_id: String,
+    pub subject_id: String,
+    pub entitlement_type: String,
+}
+
+impl CommerceEntitlementRevokeRequest {
+    pub fn new(
+        app_id: impl Into<String>,
+        subject_id: impl Into<String>,
+        entitlement_type: impl Into<String>,
+    ) -> Self {
+        Self {
+            app_id: app_id.into(),
+            subject_id: subject_id.into(),
+            entitlement_type: entitlement_type.into(),
+        }
+    }
+}

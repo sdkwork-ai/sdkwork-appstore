@@ -7,4 +7,5 @@ export { PublishersApi, createPublishersApi } from './publishers';
 export { ComplianceApi, createComplianceApi } from './compliance';
 export { LibraryApi, createLibraryApi } from './library';
 export { WishlistApi, createWishlistApi } from './wishlist';
+export { UserStoreApi, createUserStoreApi } from './user-store';
 export { DownloadGrantsApi, createDownloadGrantsApi } from './download-grants';

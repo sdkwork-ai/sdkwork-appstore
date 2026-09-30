@@ -73,7 +73,7 @@ const client = new SdkworkAppstoreBackendClient({
 ```typescript
 // List moderation queue
 const params = {
-  reviewStatus: 'reviewStatus',
+  review_status: 'review_status',
   cursor: 'cursor',
   page_size: 3,
 };
@@ -97,9 +97,10 @@ const result = await client.catalog.appstore.catalog.collections.create(body);
 ```typescript
 // List listings for operators
 const params = {
-  listingStatus: 'listingStatus',
+  status_filter: 'status_filter',
+  review_status_filter: 'review_status_filter',
   cursor: 'cursor',
-  page_size: 3,
+  page_size: 4,
 };
 const result = await client.listings.appstore.listings.admin.list(params);
 ```
@@ -122,8 +123,8 @@ const result = await client.publishers.appstore.publishers.admin.verify(publishe
 // Retrieve listing metrics
 const listingId = '1';
 const params = {
-  fromDate: 'fromDate',
-  toDate: 'toDate',
+  date_from: 'date_from',
+  date_to: 'date_to',
 };
 const result = await client.metrics.appstore.metrics.listings.retrieve(listingId, params);
 ```
@@ -144,7 +145,7 @@ const result = await client.analytics.appstore.analytics.publisher.overview.retr
 ```typescript
 // List external market channels
 const params = {
-  channelStatus: 'channelStatus',
+  channel_status: 'channel_status',
   cursor: 'cursor',
   page_size: 3,
 };
@@ -182,7 +183,7 @@ This SDK includes cross-platform publish scripts in `bin/`:
 - `bin/publish.sh`
 - `bin/publish.ps1`
 
-TypeScript check and publish commands use pnpm to materialize workspace dependency versions in a temporary tarball. They reject local-only dependency protocols before npm publication and do not rewrite the source `package.json`.
+TypeScript check and publish commands materialize workspace dependency versions in a temporary tarball with pnpm. They reject local-only dependency protocols before npm publication and do not rewrite the source `package.json`.
 
 ### Check
 

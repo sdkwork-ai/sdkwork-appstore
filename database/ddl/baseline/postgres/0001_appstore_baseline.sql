@@ -131,7 +131,7 @@ CREATE TABLE IF NOT EXISTS appstore_app (
   bundle_id TEXT,
   store_url TEXT,
   artifact_resource_snapshot TEXT NOT NULL DEFAULT '',
-  download_count INTEGER NOT NULL DEFAULT 0,
+  download_count BIGINT NOT NULL DEFAULT 0,
   rating_avg TEXT NOT NULL DEFAULT '0',
   rating_count INTEGER NOT NULL DEFAULT 0,
   legacy_uuid TEXT,
@@ -245,7 +245,7 @@ CREATE TABLE IF NOT EXISTS appstore_listing (
   commerce_product_id TEXT,
   current_release_id TEXT,
   featured_score INTEGER NOT NULL DEFAULT 0,
-  download_count INTEGER NOT NULL DEFAULT 0,
+  download_count BIGINT NOT NULL DEFAULT 0,
   average_rating TEXT,
   rating_count INTEGER NOT NULL DEFAULT 0,
   version INTEGER NOT NULL DEFAULT 0,
@@ -639,7 +639,7 @@ CREATE TABLE IF NOT EXISTS appstore_user_library_item (
   updated_at TIMESTAMPTZ NOT NULL,
   removed_at TIMESTAMPTZ,
   created_at TIMESTAMPTZ NOT NULL,
-  UNIQUE (tenant_id, user_id, app_key, platform)
+  UNIQUE (tenant_id, user_id, listing_id, platform)
 );
 
 CREATE TABLE IF NOT EXISTS appstore_user_wishlist_item (
@@ -721,11 +721,11 @@ CREATE TABLE IF NOT EXISTS appstore_listing_metric_snapshot (
   tenant_id TEXT NOT NULL,
   listing_id TEXT NOT NULL,
   snapshot_date TEXT NOT NULL,
-  impression_count INTEGER NOT NULL DEFAULT 0,
-  detail_view_count INTEGER NOT NULL DEFAULT 0,
-  install_count INTEGER NOT NULL DEFAULT 0,
-  uninstall_count INTEGER NOT NULL DEFAULT 0,
-  update_count INTEGER NOT NULL DEFAULT 0,
+  impression_count BIGINT NOT NULL DEFAULT 0,
+  detail_view_count BIGINT NOT NULL DEFAULT 0,
+  install_count BIGINT NOT NULL DEFAULT 0,
+  uninstall_count BIGINT NOT NULL DEFAULT 0,
+  update_count BIGINT NOT NULL DEFAULT 0,
   conversion_rate TEXT,
   created_at TIMESTAMPTZ NOT NULL,
   UNIQUE (tenant_id, listing_id, snapshot_date)
@@ -1152,7 +1152,6 @@ ALTER TABLE appstore_release ALTER COLUMN retired_at TYPE TIMESTAMPTZ USING reti
 ALTER TABLE appstore_release ALTER COLUMN submitted_at TYPE TIMESTAMPTZ USING submitted_at::timestamptz;
 ALTER TABLE appstore_release ALTER COLUMN updated_at TYPE TIMESTAMPTZ USING updated_at::timestamptz;
 ALTER TABLE appstore_release_artifact ALTER COLUMN created_at TYPE TIMESTAMPTZ USING created_at::timestamptz;
-ALTER TABLE appstore_release_artifact ALTER COLUMN package_format TYPE TIMESTAMPTZ USING package_format::timestamptz;
 ALTER TABLE appstore_release_artifact ALTER COLUMN updated_at TYPE TIMESTAMPTZ USING updated_at::timestamptz;
 ALTER TABLE appstore_release_beta_invite ALTER COLUMN accepted_at TYPE TIMESTAMPTZ USING accepted_at::timestamptz;
 ALTER TABLE appstore_release_beta_invite ALTER COLUMN created_at TYPE TIMESTAMPTZ USING created_at::timestamptz;
@@ -1181,47 +1180,25 @@ ALTER TABLE appstore_user_wishlist_item ALTER COLUMN created_at TYPE TIMESTAMPTZ
 ALTER TABLE appstore_user_wishlist_item ALTER COLUMN updated_at TYPE TIMESTAMPTZ USING updated_at::timestamptz;
 
 -- folded migration: migrations/postgres/0002_appstore_platform_evolution.up.sql
--- Platform-alignment evolution: defect fixes (package_format type, version
--- ordering, rating numerics, counter widths, library uniqueness) plus
--- platform-as-first-class-entity tables (dictionary, app_platform,
--- platform_release), signing credentials, review lifecycle, regional pricing,
--- promo codes, tester groups, search read model, and unified analytics.
+-- Platform-alignment evolution: platform-as-first-class-entity tables
+-- (dictionary, app_platform, platform_release), signing credentials, review
+-- lifecycle, regional pricing, promo codes, tester groups, search read model,
+-- and unified analytics.
+--
+-- Structural-defect fixes from 0002 (package_format type, counter widths,
+-- library uniqueness scope, rating numerics, version_code_numeric) are folded
+-- directly into the CREATE TABLE definitions below so this baseline is final
+-- and replayable on a fresh database:
+--   * package_format stays TEXT (format token, never a timestamp).
+--   * Hot-row counters (download_count, metric counters) are BIGINT.
+--   * appstore_user_library_item uniqueness is scoped to listing identity.
+--   * Rating averages (rating_avg / average_rating) stay TEXT: the wire
+--     contract and repository rows treat them as decimal strings, and all
+--     numeric aggregation happens on the INTEGER rating columns.
+--   * version_code_numeric was dropped: no repository reads or writes it;
+--     update checks order by published_at via idx_appstore_release_update_check.
 -- Source of truth for rationale: docs/database/APPSTORE_DATABASE_DESIGN_REVIEW.md
-
--- FIX-1: package_format is a package format token (ipa/apk/hap/msix/dmg/crx/xpi/zip),
--- not a timestamp. Restore TEXT type after the 0004 TIMESTAMPTZ conversion bug.
-ALTER TABLE appstore_release_artifact
-  ALTER COLUMN package_format TYPE TEXT
-  USING NULLIF(COALESCE(package_format::text, ''), '')::text;
-
--- FIX-2: numeric mirror of version_code for monotonic update checks.
-ALTER TABLE appstore_release ADD COLUMN IF NOT EXISTS version_code_numeric BIGINT;
-UPDATE appstore_release
-   SET version_code_numeric = NULLIF(regexp_replace(version_code, '[^0-9]', '', 'g'), '')::bigint
- WHERE version_code_numeric IS NULL;
-
--- FIX-3: rating averages as NUMERIC.
-ALTER TABLE appstore_app
-  ALTER COLUMN rating_avg TYPE NUMERIC(4,2) USING NULLIF(rating_avg, '')::numeric;
-ALTER TABLE appstore_listing
-  ALTER COLUMN average_rating TYPE NUMERIC(4,2) USING NULLIF(average_rating, '')::numeric;
-
--- FIX-4: widen hot-row counters to BIGINT.
-ALTER TABLE appstore_app ALTER COLUMN download_count TYPE BIGINT;
-ALTER TABLE appstore_listing ALTER COLUMN download_count TYPE BIGINT;
-ALTER TABLE appstore_listing_metric_snapshot
-  ALTER COLUMN impression_count TYPE BIGINT,
-  ALTER COLUMN detail_view_count TYPE BIGINT,
-  ALTER COLUMN install_count TYPE BIGINT,
-  ALTER COLUMN uninstall_count TYPE BIGINT,
-  ALTER COLUMN update_count TYPE BIGINT;
-
--- FIX-5: scope user library uniqueness to listing identity.
-ALTER TABLE appstore_user_library_item
-  DROP CONSTRAINT IF EXISTS appstore_user_library_item_tenant_id_user_id_app_key_platform_key;
-ALTER TABLE appstore_user_library_item
-  ADD CONSTRAINT appstore_user_library_item_uk
-  UNIQUE (tenant_id, user_id, listing_id, platform);
+-- Pre-cleanup environments reconcile through migrations/postgres/0002.
 
 CREATE TABLE IF NOT EXISTS appstore_platform_dictionary (
   id TEXT PRIMARY KEY,
@@ -1394,7 +1371,7 @@ CREATE TABLE IF NOT EXISTS appstore_rating_distribution_snapshot (
   star_3_count INTEGER NOT NULL DEFAULT 0,
   star_4_count INTEGER NOT NULL DEFAULT 0,
   star_5_count INTEGER NOT NULL DEFAULT 0,
-  rating_avg NUMERIC(4,2),
+  rating_avg TEXT,
   rating_count INTEGER NOT NULL DEFAULT 0,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   UNIQUE (tenant_id, listing_id, snapshot_date)
@@ -1528,5 +1505,27 @@ CREATE TABLE IF NOT EXISTS appstore_analytics_metric_daily (
 CREATE INDEX IF NOT EXISTS idx_appstore_analytics_metric_daily_subject
   ON appstore_analytics_metric_daily (tenant_id, subject_type, subject_id, snapshot_date DESC);
 
-CREATE INDEX IF NOT EXISTS idx_appstore_release_update_check_numeric
-  ON appstore_release (tenant_id, listing_id, release_status, version_code_numeric DESC);
+-- ---------------------------------------------------------------------------
+-- Web chain backing stores (cluster-safe rate limit + idempotency).
+-- Shared by all gateway replicas; replaces the per-process memory stores.
+-- ---------------------------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS appstore_web_rate_limit_bucket (
+  bucket_key TEXT PRIMARY KEY,
+  window_start TIMESTAMPTZ NOT NULL,
+  request_count BIGINT NOT NULL DEFAULT 0
+);
+CREATE INDEX IF NOT EXISTS idx_appstore_web_rate_limit_bucket_window
+  ON appstore_web_rate_limit_bucket (window_start);
+
+CREATE TABLE IF NOT EXISTS appstore_web_idempotency_entry (
+  idempotency_key TEXT PRIMARY KEY,
+  fingerprint TEXT NOT NULL,
+  response_status INTEGER,
+  response_content_type TEXT,
+  response_body BYTEA,
+  expires_at TIMESTAMPTZ NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS idx_appstore_web_idempotency_entry_expires
+  ON appstore_web_idempotency_entry (expires_at);

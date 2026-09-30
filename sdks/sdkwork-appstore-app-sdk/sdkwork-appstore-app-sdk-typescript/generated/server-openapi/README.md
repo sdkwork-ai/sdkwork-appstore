@@ -61,6 +61,7 @@ const client = new SdkworkAppstoreAppClient({
 - `client.compliance` - compliance API
 - `client.library` - library API
 - `client.wishlist` - wishlist API
+- `client.userStore` - user_store API
 - `client.downloadGrants` - download_grants API
 
 ## Usage Examples
@@ -125,6 +126,17 @@ const params = {
 const result = await client.wishlist.appstore.wishlist.items.list(params);
 ```
 
+### user_store
+
+```typescript
+// List my custom categories
+const params = {
+  cursor: 'cursor',
+  page_size: 2,
+};
+const result = await client.userStore.appstore.userStore.category.list(params);
+```
+
 ### download_grants
 
 ```typescript
@@ -160,7 +172,7 @@ This SDK includes cross-platform publish scripts in `bin/`:
 - `bin/publish.sh`
 - `bin/publish.ps1`
 
-TypeScript check and publish commands use pnpm to materialize workspace dependency versions in a temporary tarball. They reject local-only dependency protocols before npm publication and do not rewrite the source `package.json`.
+TypeScript check and publish commands materialize workspace dependency versions in a temporary tarball with pnpm. They reject local-only dependency protocols before npm publication and do not rewrite the source `package.json`.
 
 ### Check
 

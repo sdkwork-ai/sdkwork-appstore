@@ -1,7 +1,7 @@
 # APPSTORE 数据库设计评审：对齐行业最专业的应用市场能力
 
 - 版本：1.0（2026-09-06）
-- 范围：`database/` 全部 49 张基线表 + 演化设计（migration 0002，新增 15 张表）
+- 范围：`database/` 全部表——评审时点 49 张基线；现已折叠为 66 张权威基线（0001 含 0002/0005 演化），加 0003 user-store（+3）与 0004 SKU（+5），运行时合计 74 张
 - 基线：`database/ddl/baseline/postgres/0001_appstore_baseline.sql`
 - 演化：`database/migrations/postgres/0002_appstore_platform_evolution.up.sql`
 - 对标体系：Apple App Store Connect、Google Play Console、Microsoft Store、华为 AppGallery（鸿蒙）、Chrome Web Store / Edge Add-ons / Firefox Add-ons、微信/支付宝/抖音/百度/淘宝小程序平台、Steam（PC 桌面分发）
