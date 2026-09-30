@@ -141,7 +141,15 @@ export default defineConfig(({ command, mode }) => {
       ],
     },
     optimizeDeps: {
-      include: ['@sdkwork/sdk-common', '@sdkwork/utils'],
+      // The shared IAM H5 auth components pull in the i18n stack through
+      // workspace sources; pre-bundle it against the SAME react instance as
+      // the app, or the provider crashes on a second React copy.
+      include: [
+        '@sdkwork/sdk-common',
+        '@sdkwork/utils',
+        'react-i18next',
+        'i18next',
+      ],
       exclude: ['@sdkwork/iam-credential-entry'],
     },
     server: {

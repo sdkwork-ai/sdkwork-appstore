@@ -2,6 +2,11 @@ import {
   createSdkworkAppbasePcAuthRuntime,
   type SdkworkAppbasePcAuthRuntimeComposition,
 } from '@sdkwork/auth-runtime-pc-react';
+import {
+  createSdkworkIamH5AuthController,
+  type SdkworkIamH5AuthController,
+  type SdkworkIamH5AuthSession,
+} from '@sdkwork/iam-h5-auth';
 import { createTokenManager, type AuthTokenManager } from '@sdkwork/sdk-common';
 import { getEnvironment } from './environment';
 import { resetStoreClient } from '@/services/storeClient';
@@ -183,6 +188,30 @@ export function applyDevTokens(authToken: string, accessToken?: string): void {
   commitStoredSession({
     authToken: authToken.trim(),
     accessToken: (accessToken?.trim() || authToken).trim(),
+  });
+}
+
+/**
+ * Builds the shared IAM H5 auth controller bound to this root's one IAM
+ * service instance (`specs/AGENTS_DEPENDENCY_BOUNDARY_SPEC.md`-style
+ * composition: the bootstrap is the only place that assembles IAM pieces).
+ * The login screen consumes the controller and never touches the runtime.
+ */
+export function createAppstoreAuthController(): SdkworkIamH5AuthController {
+  const runtime = getAppstoreAuthRuntime().getRuntime();
+  return createSdkworkIamH5AuthController(runtime.service);
+}
+
+/**
+ * Persists a session produced by the shared IAM login screen: tokens land in
+ * the token manager + local storage through the same path as the session
+ * bridge, and every authenticated SDK client is reset.
+ */
+export function commitIamAuthSession(session: SdkworkIamH5AuthSession): void {
+  commitStoredSession({
+    authToken: session.authToken,
+    accessToken: session.accessToken,
+    refreshToken: (session as { refreshToken?: string }).refreshToken,
   });
 }
 

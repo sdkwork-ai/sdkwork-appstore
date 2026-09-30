@@ -36,6 +36,8 @@ packages:
   - "../sdkwork-app-topology"
   - "../sdkwork-drive/sdks/sdkwork-drive-app-sdk/sdkwork-drive-app-sdk-typescript"
   - "../sdkwork-cloudrouter/sdks/cloudrouter-app-sdk/cloudrouter-app-sdk-typescript"
+  - "../sdkwork-iam/apps/sdkwork-iam-h5/packages/sdkwork-iam-h5-auth"
+  - "../sdkwork-iam/apps/sdkwork-iam-h5/packages/sdkwork-iam-h5-core"
   - "../sdkwork-comments/sdks/sdkwork-comments-app-sdk/sdkwork-comments-app-sdk-typescript"
   - "../sdkwork-agents/sdks/sdkwork-agents-app-sdk/sdkwork-agents-app-sdk-typescript"
   - "../sdkwork-skills/sdks/sdkwork-skills-app-sdk/sdkwork-skills-app-sdk-typescript"

@@ -103,7 +103,9 @@
   },
   "pnpm": {
     "overrides": {
-      "@sdkwork/sdk-common": "workspace:*"
+      "@sdkwork/sdk-common": "workspace:*",
+      "react": "19.3.0",
+      "react-dom": "19.3.0"
     }
   }
 }
