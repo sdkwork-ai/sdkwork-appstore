@@ -3,19 +3,25 @@ import { Link, useNavigate } from 'react-router-dom';
 import {
   User,
   Bell,
-  Shield,
+  Package,
   Palette,
-  Globe,
-  Download,
-  HardDrive,
   ChevronRight,
   ArrowLeft,
   Moon,
   Sun,
   Check,
-  Package,
+  Library,
+  RefreshCw,
+  Heart,
+  LogOut,
 } from 'lucide-react';
-import { fetchCurrentIamUser, getCurrentUser, isAuthenticated, type IamUser } from '@/bootstrap/iamRuntime';
+import {
+  fetchCurrentIamUser,
+  getCurrentUser,
+  isAuthenticated,
+  signOut,
+  type IamUser,
+} from '@/bootstrap/iamRuntime';
 import { LoadingSpinner } from '@sdkwork/appstore-h5-commons';
 import { useTheme, type Theme } from '@/hooks/useTheme';
 
@@ -56,10 +62,9 @@ export function SettingsPage() {
   const sections = [
     { label: '开发者中心', icon: Package, path: '/publisher' },
     { label: '通知', icon: Bell, path: '/notifications' },
-    { label: '隐私与安全', icon: Shield, path: '/settings' },
-    { label: '语言与地区', icon: Globe, path: '/settings' },
-    { label: '下载', icon: Download, path: '/settings' },
-    { label: '存储', icon: HardDrive, path: '/settings' },
+    { label: '我的库', icon: Library, path: '/library' },
+    { label: '更新', icon: RefreshCw, path: '/updates' },
+    { label: '心愿单', icon: Heart, path: '/wishlist' },
   ];
 
   const themeOptions: { id: Theme; label: string; icon: typeof Sun }[] = [
@@ -179,8 +184,25 @@ export function SettingsPage() {
       <div className="px-4 py-4 pb-8">
         <div className="card p-4 text-center">
           <p className="text-sm text-[var(--text-secondary)]">SDKWork App Store</p>
-          <p className="mt-1 text-xs text-[var(--text-tertiary)]">版本 1.0.0</p>
+          <p className="mt-1 text-xs text-[var(--text-tertiary)]">
+            版本 1.0.0 · 应用 ID sdkwork-appstore-h5
+          </p>
         </div>
+
+        {isAuthenticated() ? (
+          <button
+            type="button"
+            onClick={() => {
+              signOut();
+              setIamUser(null);
+            }}
+            className="card card-press mt-3 flex w-full items-center justify-center gap-2 p-4"
+            style={{ color: 'var(--danger)' }}
+          >
+            <LogOut className="h-5 w-5" />
+            <span className="text-sm font-medium">退出登录</span>
+          </button>
+        ) : null}
       </div>
     </div>
   );
