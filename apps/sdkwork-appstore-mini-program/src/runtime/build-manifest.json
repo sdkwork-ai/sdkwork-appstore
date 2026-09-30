@@ -1,0 +1,6 @@
+{
+  "profileId": "standalone.development",
+  "deploymentProfile": "standalone",
+  "environment": "development",
+  "runtimeTarget": "mini-program-weixin"
+}

@@ -1,4 +1,4 @@
 /** zh-CN copy fragment for the apps capability. */
-export const appsMessages = undefined as const;
+export const appsMessages = {} as const;
 
 export type AppsMessages = typeof appsMessages;
