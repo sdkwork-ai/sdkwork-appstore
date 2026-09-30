@@ -330,3 +330,40 @@ export function purchaseListingViaCommerce(
 }
 
 export type { AppStoreApiError };
+
+
+/** Trending search terms (catalog search domain). */
+export function useTrendingSearches(enabled: boolean) {
+  return useApi(
+    async () => {
+      if (!enabled) return { items: [] };
+      const page = await getStoreClient().catalog.listTrendingSearchTerms({ locale: 'zh-CN', limit: 10 });
+      return { items: (page?.items ?? []).map((r: any) => r.term ?? r.keyword ?? '') .filter(Boolean) };
+    },
+    { immediate: enabled },
+  );
+}
+
+/** Search suggestions for a query prefix. */
+export function useSearchSuggestions(query: string) {
+  return useApi(
+    async () => {
+      if (!query.trim()) return { items: [] };
+      const page = await getStoreClient().catalog.listSearchSuggestions({ q: query.trim() });
+      return { items: (page?.items ?? []).map((r: any) => r.term ?? r.keyword ?? r.suggestion ?? '').filter(Boolean) };
+    },
+    { refreshKey: query },
+  );
+}
+
+/** User's search history (catalog search domain). */
+export function useSearchHistory(enabled: boolean) {
+  return useApi(
+    async () => {
+      if (!enabled) return { items: [] };
+      const page = await getStoreClient().catalog.listSearchHistory({ limit: 10 });
+      return { items: (page?.items ?? []).map((r: any) => r.term ?? r.query ?? '').filter(Boolean) };
+    },
+    { refreshKey: String(enabled) },
+  );
+}

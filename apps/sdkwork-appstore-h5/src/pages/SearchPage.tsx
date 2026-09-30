@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { Search, X } from 'lucide-react';
-import { useSearch, formatApiError } from '@/hooks/useApi';
+import { Search, X, TrendingUp, Clock, ChevronRight } from 'lucide-react';
+import { useSearch, useTrendingSearches, useSearchSuggestions, useSearchHistory, formatApiError } from '@/hooks/useApi';
+import { getStoreClient } from '@/services/storeClient';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import {
   PlatformBadges,
@@ -39,6 +40,11 @@ export function SearchPage() {
   const [query, setQuery] = useState(initialQuery);
   const [submittedQuery, setSubmittedQuery] = useState(initialQuery);
   const [platformFilter, setPlatformFilter] = useState<PlatformFilterValue>('all');
+  const [suggestionsOpen, setSuggestionsOpen] = useState(false);
+  const authed = Boolean(getStoreClient);
+  const trending = useTrendingSearches(!submittedQuery);
+  const suggestions = useSearchSuggestions(query.trim().length >= 2 ? query.trim() : '');
+  const history = useSearchHistory(true);
   const { data, loading, error } = useSearch(submittedQuery);
 
   useEffect(() => {
@@ -48,10 +54,28 @@ export function SearchPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams]);
 
-  function submitSearch() {
-    const trimmed = query.trim();
+  function submitSearch(term?: string) {
+    const trimmed = (term ?? query).trim();
+    if (!trimmed) return;
+    setQuery(trimmed);
     setSubmittedQuery(trimmed);
+    setSuggestionsOpen(false);
     setSearchParams(trimmed ? { q: trimmed } : {}, { replace: true });
+    try {
+      getStoreClient().catalog.upsertSearchHistory({ queryText: trimmed });
+      history.execute();
+    } catch {
+      // history save is best-effort
+    }
+  }
+
+  async function clearHistory() {
+    try {
+      await getStoreClient().catalog.clearSearchHistory();
+      history.execute();
+    } catch {
+      // best-effort
+    }
   }
 
   const items = useMemo(() => {
@@ -59,9 +83,12 @@ export function SearchPage() {
     if (platformFilter === 'all') {
       return mapped;
     }
-    // 平台过滤在当前页结果上生效，待目录 API 支持服务端平台筛选后切换。
     return mapped.filter((app) => appSupportsPlatformGroup(app.platforms, platformFilter));
   }, [data, platformFilter]);
+
+  const suggestionItems = (suggestions.data?.items ?? []).filter(
+    (s) => s !== query.trim(),
+  );
 
   return (
     <div className="animate-fade-in">
@@ -81,7 +108,12 @@ export function SearchPage() {
           <Search className="h-4 w-4 text-[var(--text-tertiary)]" />
           <input
             value={query}
-            onChange={(event) => setQuery(event.target.value)}
+            onChange={(event) => {
+              setQuery(event.target.value);
+              setSuggestionsOpen(true);
+            }}
+            onFocus={() => setSuggestionsOpen(true)}
+            onBlur={() => setTimeout(() => setSuggestionsOpen(false), 150)}
             placeholder="搜索应用名称或关键词"
             className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-[var(--text-tertiary)]"
           />
@@ -92,6 +124,7 @@ export function SearchPage() {
               onClick={() => {
                 setQuery('');
                 setSubmittedQuery('');
+                setSuggestionsOpen(false);
                 setSearchParams({}, { replace: true });
               }}
               className="text-[var(--text-tertiary)]"
@@ -103,6 +136,22 @@ export function SearchPage() {
             搜索
           </button>
         </form>
+
+        {suggestionsOpen && suggestionItems.length > 0 ? (
+          <div className="card mt-1 overflow-hidden">
+            {suggestionItems.map((s) => (
+              <button
+                key={s}
+                type="button"
+                className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm hover:bg-[var(--bg-subtle)]"
+                onClick={() => submitSearch(s)}
+              >
+                <Search className="h-3 w-3 flex-shrink-0 text-[var(--text-tertiary)]" />
+                <span className="truncate">{s}</span>
+              </button>
+            ))}
+          </div>
+        ) : null}
       </div>
 
       <div className="px-4">
@@ -110,51 +159,99 @@ export function SearchPage() {
       </div>
 
       <div className="px-4 py-4">
-        {error ? (
-          <p className="text-sm text-[var(--danger)]">{formatApiError(error)}</p>
-        ) : loading ? (
-          <div className="flex justify-center py-16">
-            <LoadingSpinner />
-          </div>
-        ) : items.length === 0 ? (
-          <div className="card p-8 text-center">
-            <p className="text-sm text-[var(--text-secondary)]">
-              {submittedQuery
-                ? `没有找到与「${submittedQuery}」相关的内容`
-                : platformFilter === 'all'
-                  ? '输入关键词开始搜索'
-                  : '该平台下暂无匹配内容'}
-            </p>
-          </div>
-        ) : (
-          <div className="space-y-2">
-            {items.map((app, index) => (
-              <Link
-                key={app.id}
-                to={`/app/${app.id}`}
-                className="card card-press flex items-center gap-3 p-3"
-              >
-                <span className="w-6 text-center text-sm font-bold text-[var(--text-tertiary)]">
-                  {index + 1}
-                </span>
-                <div
-                  className="app-icon flex h-12 w-12 items-center justify-center text-sm font-bold text-white"
-                  style={{ background: 'linear-gradient(135deg, var(--accent), #5856d6)' }}
+        {!submittedQuery && trending.data && trending.data.items.length > 0 ? (
+          <section className="mb-4">
+            <h3 className="mb-2 flex items-center gap-1 text-xs font-semibold text-[var(--text-secondary)]">
+              <TrendingUp className="h-3 w-3 text-[var(--accent)]" />
+              热门搜索
+            </h3>
+            <div className="flex flex-wrap gap-2">
+              {trending.data.items.map((term) => (
+                <button
+                  key={term}
+                  type="button"
+                  onClick={() => submitSearch(term)}
+                  className="rounded-full border px-3 py-1.5 text-xs"
+                  style={{ borderColor: 'var(--border-subtle)', color: 'var(--text-secondary)' }}
                 >
-                  {app.name[0]?.toUpperCase() ?? 'A'}
-                </div>
-                <div className="min-w-0 flex-1">
-                  <h3 className="truncate text-sm font-semibold">{app.name}</h3>
-                  <p className="truncate text-xs text-[var(--text-tertiary)]">{app.developer}</p>
-                  <PlatformBadges platforms={app.platforms} max={2} className="mt-0.5" />
-                </div>
-                {app.rating > 0 ? (
-                  <span className="text-xs text-[var(--text-secondary)]">{app.rating.toFixed(1)}★</span>
-                ) : null}
-              </Link>
-            ))}
-          </div>
-        )}
+                  {term}
+                </button>
+              ))}
+            </div>
+          </section>
+        ) : null}
+
+        {!submittedQuery && history.data && history.data.items.length > 0 ? (
+          <section className="mb-4">
+            <div className="mb-2 flex items-center justify-between">
+              <h3 className="flex items-center gap-1 text-xs font-semibold text-[var(--text-secondary)]">
+                <Clock className="h-3 w-3 text-[var(--accent)]" />
+                搜索历史
+              </h3>
+              <button type="button" onClick={() => void clearHistory()} className="text-xs text-[var(--text-tertiary)]">
+                清空
+              </button>
+            </div>
+            <div className="space-y-1">
+              {history.data.items.map((term) => (
+                <button
+                  key={term}
+                  type="button"
+                  className="flex w-full items-center gap-2 px-2 py-1.5 text-left text-sm"
+                  onClick={() => submitSearch(term)}
+                >
+                  <Clock className="h-3 w-3 flex-shrink-0 text-[var(--text-tertiary)]" />
+                  <span className="flex-1 truncate">{term}</span>
+                  <ChevronRight className="h-3 w-3 text-[var(--text-tertiary)]" />
+                </button>
+              ))}
+            </div>
+          </section>
+        ) : null}
+
+        {submittedQuery ? (
+          error ? (
+            <p className="text-sm text-[var(--danger)]">{formatApiError(error)}</p>
+          ) : loading ? (
+            <div className="flex justify-center py-16">
+              <LoadingSpinner />
+            </div>
+          ) : items.length === 0 ? (
+            <div className="card p-8 text-center">
+              <p className="text-sm text-[var(--text-secondary)]">
+                {`没有找到与「${submittedQuery}」相关的内容`}
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {items.map((app, index) => (
+                <Link
+                  key={app.id}
+                  to={`/app/${app.id}`}
+                  className="card card-press flex items-center gap-3 p-3"
+                >
+                  <span className="w-6 text-center text-sm font-bold text-[var(--text-tertiary)]">
+                    {index + 1}
+                  </span>
+                  <div
+                    className="app-icon flex h-12 w-12 items-center justify-center text-sm font-bold text-white"
+                    style={{ background: 'linear-gradient(135deg, var(--accent), #5856d6)' }}
+                  >
+                    {app.name[0]?.toUpperCase() ?? 'A'}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <h3 className="truncate text-sm font-semibold">{app.name}</h3>
+                    <p className="truncate text-xs text-[var(--text-tertiary)]">{app.developer}</p>
+                    <PlatformBadges platforms={app.platforms} max={2} className="mt-0.5" />
+                  </div>
+                  {app.rating > 0 ? (
+                    <span className="text-xs text-[var(--text-secondary)]">{app.rating.toFixed(1)}★</span>
+                  ) : null}
+                </Link>
+              ))}
+            </div>
+          )
+        ) : null}
       </div>
     </div>
   );
