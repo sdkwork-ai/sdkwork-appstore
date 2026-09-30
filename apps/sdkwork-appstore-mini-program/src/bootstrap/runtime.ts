@@ -1,3 +1,9 @@
+import { createClient as createIamClient, type SdkworkAppClient as IamAppClient } from "@sdkwork/iam-app-sdk";
+import {
+  getAppstoreAppSdkClient,
+  setAppSdkSession,
+  clearAppSdkSession,
+} from "@sdkwork/appstore-mp-core";
 import { seedRuntimeEnvFromBundle } from "./runtimeBundle";
 import { installWxFetch } from "./wxRequestPolyfill";
 import { createSdkClients } from "./sdkClients";
@@ -18,13 +24,23 @@ import type { AppstoreAppClient } from "@sdkwork/appstore-mp-core";
 export function bootstrapAppstoreMiniProgram(options: {
   appApiBaseUrl?: string;
   accessToken?: string;
+  iamBaseUrl?: string;
 } = {}) {
   installWxFetch();
   seedRuntimeEnvFromBundle({ appApiBaseUrl: options.appApiBaseUrl });
   registerHostAdapters();
   const sdkClients = createSdkClients(options.accessToken);
   const routes = createRoutes();
-  return { sdkClients, routes, pageLoaders: createPageLoaders(sdkClients) };
+  const iamClient = createIamClient({
+    baseUrl: options.iamBaseUrl ?? options.appApiBaseUrl ?? '',
+    platform: "mini-program",
+  });
+  return {
+    sdkClients,
+    routes,
+    pageLoaders: createPageLoaders(() => getAppstoreAppSdkClient()),
+    auth: createAuthLoaders(iamClient),
+  };
 }
 
 type ListingRow = {
@@ -41,7 +57,7 @@ type ListingRow = {
  * pages; mapping follows the PC/H5 root data flows (ranking id resolution,
  * id-set queries, order-preserving listings, localized catalog headers).
  */
-function createPageLoaders(client: AppstoreAppClient) {
+function createPageLoaders(getClient: () => AppstoreAppClient) {
   function listingRows(items: unknown): ListingRow[] {
     if (!Array.isArray(items)) {
       return [];
@@ -104,7 +120,7 @@ function createPageLoaders(client: AppstoreAppClient) {
     cursor?: string;
     limit?: number;
   }): Promise<{ rows: ListingRow[]; nextCursor?: string }> {
-    const page = await client.catalog.searchListings(params);
+    const page = await getClient().catalog.searchListings(params);
     const pageInfo = (page ?? {}) as {
       pageInfo?: { nextCursor?: string | null };
     };
@@ -126,7 +142,7 @@ function createPageLoaders(client: AppstoreAppClient) {
     async charts(
       kind: string,
     ): Promise<Array<ListingRow & { rank: number }>> {
-      const chart = (await client.catalog.getChart(
+      const chart = (await getClient().catalog.getChart(
         kind === 'paid' ? 'paid' : 'free',
       )) as unknown as Record<string, unknown>;
       const rankingRaw = chart.rankingJson ?? chart.ranking;
@@ -179,14 +195,14 @@ function createPageLoaders(client: AppstoreAppClient) {
     }> {
       const [home, categoriesPage, eventsPage, recommendationsPage] =
         await Promise.all([
-          client.catalog.getHome().catch(() => undefined),
-          client.catalog
+          getClient().catalog.getHome().catch(() => undefined),
+          getClient().catalog
             .listCategories({ limit: 10, locale: 'zh-CN' })
             .catch(() => undefined),
-          client.catalog
+          getClient().catalog
             .listEvents({ status: 'active', limit: 6 })
             .catch(() => undefined),
-          client.catalog
+          getClient().catalog
             .listRecommendations({ limit: 8 })
             .catch(() => undefined),
         ]);
@@ -249,7 +265,7 @@ function createPageLoaders(client: AppstoreAppClient) {
       name: string;
       apps: ListingRow[];
     }> {
-      const category = (await client.catalog.getCategory(categoryId)) as unknown as Record<
+      const category = (await getClient().catalog.getCategory(categoryId)) as unknown as Record<
         string,
         unknown
       >;
@@ -265,7 +281,7 @@ function createPageLoaders(client: AppstoreAppClient) {
       name: string;
       apps: ListingRow[];
     }> {
-      const collection = (await client.catalog.getCollection(collectionId)) as unknown as Record<
+      const collection = (await getClient().catalog.getCollection(collectionId)) as unknown as Record<
         string,
         unknown
       >;
@@ -283,7 +299,7 @@ function createPageLoaders(client: AppstoreAppClient) {
       name: string;
       apps: ListingRow[];
     }> {
-      const event = (await client.catalog.getEvent(eventId)) as unknown as Record<
+      const event = (await getClient().catalog.getEvent(eventId)) as unknown as Record<
         string,
         unknown
       >;
@@ -306,11 +322,11 @@ function createPageLoaders(client: AppstoreAppClient) {
       whatsNew: string;
       similar: ListingRow[];
     }> {
-      const listing = (await client.listings.get(listingId)) as unknown as Record<
+      const listing = (await getClient().listings.get(listingId)) as unknown as Record<
         string,
         unknown
       >;
-      const similarResponse = await client.listings
+      const similarResponse = await getClient().listings
         .listSimilar(listingId, { limit: 6 })
         .catch(() => undefined);
       return {
@@ -340,7 +356,7 @@ function createPageLoaders(client: AppstoreAppClient) {
     ): Promise<
       Array<{ id: string; name: string; author: string; description: string; stars: number }>
     > {
-      const page = await client.catalog.listTemplates({ templateType, limit: 50 });
+      const page = await getClient().catalog.listTemplates({ templateType, limit: 50 });
       if (!Array.isArray(page?.items)) {
         return [];
       }
@@ -359,5 +375,158 @@ function createPageLoaders(client: AppstoreAppClient) {
         };
       });
     },
+    /** Library: installed listings (library domain, auth required). */
+    async library(): Promise<ListingRow[]> {
+      const page = await getClient().library.listItems({ limit: 200 });
+      return (page?.items ?? []).map((row) => ({
+        id: row.listingId,
+        name: row.listingId,
+        developer: '',
+        rating: 0,
+      }));
+    },
+
+    /** Wishlist: saved listings (wishlist domain, auth required). */
+    async wishlist(): Promise<ListingRow[]> {
+      const page = await getClient().wishlist.listItems({ limit: 200 });
+      return (page?.items ?? []).map((row) => ({
+        id: row.listingId,
+        name: row.listingId,
+        developer: '',
+        rating: 0,
+      }));
+    },
+
+    /** Updates: pending updates for installed library (library domain). */
+    async updates(): Promise<ListingRow[]> {
+      const installed = await getClient().library
+        .listItems({ limit: 200 })
+        .catch(() => undefined);
+      const installRows = installed?.items ?? [];
+      if (installRows.length === 0) {
+        return [];
+      }
+      const items = installRows.map((row) => ({
+        appKey: row.appKey ?? '',
+        platform: 'mini-program',
+        installedVersionCode: row.installedVersionCode ?? '0',
+      }));
+      const check = await getClient().library
+        .checkUpdates({ items })
+        .catch(() => undefined);
+      const checkItems = check?.items ?? [];
+      const byAppKey = new Map(checkItems.map((row) => [row.appKey ?? '', row]));
+      const result: ListingRow[] = [];
+      for (const item of installRows) {
+        const update = byAppKey.get(item.appKey ?? '');
+        if (update) {
+          result.push({
+            id: item.listingId ?? '',
+            name: item.listingId ?? '应用',
+            developer: '',
+            rating: 0,
+          });
+        }
+      }
+      return result;
+    },
+
+    /** User store: custom categories + active shares (user_store domain, auth). */
+    async userStore(): Promise<{
+      categories: Array<{ id: string; name: string; itemCount: number }>;
+      shares: Array<{ id: string; title: string; shareToken: string }>;
+    }> {
+      const [categories, shares] = await Promise.all([
+        getClient().userStore.listCategories().catch(() => undefined),
+        getClient().userStore.listShares().catch(() => undefined),
+      ]);
+      return {
+        categories: (categories?.items ?? []).map((row) => ({
+          id: row.id,
+          name: row.name ?? '分类',
+          itemCount: row.itemCount ?? 0,
+        })),
+        shares: (shares?.items ?? [])
+          .filter((row) => (row.status ?? 'active') === 'active')
+          .map((row) => ({
+            id: row.id,
+            title: row.title ?? '我的 Appstore',
+            shareToken: row.shareToken ?? '',
+          })),
+      };
+    },
+
+    /** Publisher: my listings (publishers domain, auth required). */
+    async publisher(): Promise<ListingRow[]> {
+      const page = await getClient().publishers.listMyListings({ limit: 50 });
+      const items = ((page?.items ?? []) as unknown) as Array<Record<string, unknown>>;
+      return items.map((row) => ({
+        id: String(row.listingSlug ?? row.id ?? ''),
+        name: String(row.displayName ?? '应用'),
+        developer: String(row.status ?? ''),
+        rating: 0,
+      }));
+    },
   };
+}
+
+/**
+ * Auth loaders over the generated iam-app-sdk client. Tokens from the session
+ * create response persist through the page-layer session module (wx storage)
+ * and re-seed the appstore client via `setAppSdkSession`.
+ */
+function createAuthLoaders(iamClient: IamAppClient) {
+  return {
+    async loginWithPassword(account: string, password: string): Promise<void> {
+      const trimmed = account.trim();
+      const command: Record<string, unknown> = { password };
+      if (trimmed.includes('@')) {
+        command.email = trimmed;
+      } else if (/^1\d{10}$/.test(trimmed)) {
+        command.phone = trimmed;
+      } else {
+        command.username = trimmed;
+      }
+      const response = (await iamClient.auth.sessions.create(command as never)) as unknown as Record<string, unknown>;
+      applySessionTokens(response);
+    },
+
+    async loginWithExternalToken(externalToken: string, providerKey: string): Promise<void> {
+      const response = (await iamClient.auth.sessions.create({
+        externalToken,
+        providerKey,
+      } as never)) as unknown as Record<string, unknown>;
+      applySessionTokens(response);
+    },
+
+    async currentUser(): Promise<{ userId: string; displayName: string }> {
+      const profile = (await iamClient.iam.users.current.retrieve()) as unknown as Record<string, unknown>;
+      return {
+        userId: String(profile.id ?? ''),
+        displayName: [profile.displayName, profile.nickname, profile.name]
+          .find((value) => typeof value === 'string' && value.trim() !== '')
+          ?.toString() ?? 'SDKWork 用户',
+      };
+    },
+
+    async logout(): Promise<void> {
+      await iamClient.auth.sessions.current.delete().catch(() => undefined);
+      clearAppSdkSession();
+    },
+  };
+}
+
+function applySessionTokens(response: Record<string, unknown>): void {
+  const tokens: Record<string, string> = {};
+  for (const [key, value] of Object.entries(response)) {
+    const normalized = key.replace(/_([a-z])/g, (_m: string, c: string) => c.toUpperCase());
+    if (
+      (normalized === 'authToken' || normalized === 'accessToken' || normalized === 'refreshToken') &&
+      typeof value === 'string' &&
+      value.trim() !== ''
+    ) {
+      tokens[normalized] = value.trim();
+    }
+  }
+  setAppSdkSession(tokens);
 }

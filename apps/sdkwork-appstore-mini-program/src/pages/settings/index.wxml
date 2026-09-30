@@ -1,0 +1,17 @@
+<view wx:if="{{!authed}}" class="auth-gate">
+  <view class="auth-gate__title">登录后可管理账户与偏好</view>
+  <button class="auth-gate__button" bindtap="onLoginTap">去登录</button>
+</view>
+<block wx:else>
+  <view class="settings-card">
+    <view class="settings-card__avatar">{{displayName[0]}}</view>
+    <view class="settings-card__info">
+      <view class="settings-card__name">{{displayName}}</view>
+      <view class="settings-card__hint">已登录</view>
+    </view>
+    <button class="settings-card__logout" size="mini" bindtap="onLogout">退出</button>
+  </view>
+</block>
+<view class="settings-about">
+  <text>SDKWork App Store · 小程序端</text>
+</view>

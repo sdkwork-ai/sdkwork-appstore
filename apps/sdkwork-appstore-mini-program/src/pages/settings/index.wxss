@@ -1,0 +1,43 @@
+
+.auth-gate {
+  padding: 96rpx 32rpx;
+  text-align: center;
+}
+.auth-gate__title {
+  font-size: 28rpx;
+  color: #6e6e73;
+  margin-bottom: 24rpx;
+}
+.auth-gate__button {
+  background-color: #4f46e5;
+  color: #ffffff;
+  font-size: 28rpx;
+  border-radius: 40rpx;
+}
+
+.settings-card {
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+  margin: 24rpx 32rpx;
+  padding: 32rpx;
+  border-radius: 28rpx;
+  background-color: #ffffff;
+}
+.settings-card__avatar {
+  width: 100rpx;
+  height: 100rpx;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  color: #ffffff;
+  font-size: 40rpx;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.settings-card__info { flex: 1; }
+.settings-card__name { font-size: 30rpx; font-weight: 600; color: #1d1d1f; }
+.settings-card__hint { margin-top: 6rpx; font-size: 22rpx; color: #6e6e73; }
+.settings-card__logout { background-color: #fef2f2; color: #ef4444; font-size: 22rpx; }
+.settings-about { margin-top: 48rpx; text-align: center; font-size: 22rpx; color: #9ca3af; }

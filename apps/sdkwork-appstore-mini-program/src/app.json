@@ -10,7 +10,14 @@
     "pages/collection/index",
     "pages/events/index",
     "pages/app-detail/index",
-    "pages/templates/index"
+    "pages/templates/index",
+    "pages/login/index",
+    "pages/library/index",
+    "pages/wishlist/index",
+    "pages/updates/index",
+    "pages/user-store/index",
+    "pages/publisher/index",
+    "pages/settings/index"
   ],
   "window": {
     "navigationBarTitleText": "SDKWork App Store Mini Program",

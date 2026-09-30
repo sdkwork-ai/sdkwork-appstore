@@ -1,0 +1,8 @@
+<view wx:if="{{!authed}}" class="auth-gate">
+  <view class="auth-gate__title">登录后可查看</view>
+  <button class="auth-gate__button" bindtap="onLoginTap">去登录</button>
+</view>
+<block wx:else>
+<import src="../../templates/list.tpl.wxml"/>
+<template is="listPage" data="{{ loading, error, items, emptyText: '所有应用都是最新版本' }}"/>
+</block>

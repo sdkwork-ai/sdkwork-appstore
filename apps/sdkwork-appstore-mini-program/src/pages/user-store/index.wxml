@@ -1,0 +1,21 @@
+<view wx:if="{{!authed}}" class="auth-gate">
+  <view class="auth-gate__title">登录后可查看</view>
+  <button class="auth-gate__button" bindtap="onLoginTap">去登录</button>
+</view>
+<block wx:else>
+<view class="section__title" style="margin: 32rpx 32rpx 16rpx;">我的分类</view>
+<view class="wp-list-item" wx:for="{{categories}}" wx:key="id">
+  <view class="wp-item-icon">{{item.name[0]}}</view>
+  <view class="wp-item-main">
+    <view class="wp-item-name">{{item.name}}</view>
+    <view class="wp-item-developer">{{item.itemCount}} 个应用</view>
+  </view>
+</view>
+<view class="section__title" style="margin: 32rpx 32rpx 16rpx;">分享链接</view>
+<view class="wp-list-item" wx:for="{{shares}}" wx:key="id">
+  <view class="wp-item-main">
+    <view class="wp-item-name">{{item.title}}</view>
+    <view class="wp-item-developer">/store/{{item.shareToken}}</view>
+  </view>
+</view>
+</block>

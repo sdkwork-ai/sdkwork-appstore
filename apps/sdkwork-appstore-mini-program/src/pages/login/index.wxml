@@ -1,0 +1,12 @@
+<view class="page">
+  <view class="card">
+    <view class="card__title">登录</view>
+    <view class="card__subtitle">使用 SDKWork 账户登录，同步库、收藏与应用更新。</view>
+    <view wx:if="{{error}}" class="error">{{error}}</view>
+    <input class="field" placeholder="账号 / 邮箱 / 手机号" value="{{account}}" bindinput="onAccountInput" />
+    <input class="field" placeholder="密码" password value="{{password}}" bindinput="onPasswordInput" bindconfirm="onSubmit" />
+    <button class="submit" loading="{{submitting}}" disabled="{{submitting}}" bindtap="onSubmit">
+      {{submitting ? '登录中…' : '登录'}}
+    </button>
+  </view>
+</view>
