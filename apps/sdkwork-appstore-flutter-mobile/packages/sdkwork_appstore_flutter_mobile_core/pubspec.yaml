@@ -9,6 +9,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  http: ^1.2.0
   sdkwork_appstore_app_sdk:
     path: ../../../../sdks/sdkwork-appstore-app-sdk/sdkwork-appstore-app-sdk-dart
 

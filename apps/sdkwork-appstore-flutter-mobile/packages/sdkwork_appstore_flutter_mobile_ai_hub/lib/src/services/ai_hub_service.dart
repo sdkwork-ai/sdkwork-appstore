@@ -8,14 +8,26 @@ import '../models/ai_hub_models.dart';
 /// Injected clients only; data flows through the generated Dart target of
 /// `sdkwork-appstore-app-sdk`: catalog AI-category filter for AI apps,
 /// catalog template domain for plugins (templateType PLUGIN) and app
-/// templates (templateType APP). Skills / MCP registries ride the skills and
-/// mcp SDK families whose Dart targets are not generated yet — those calls
-/// keep the explicit-unconfigured error path. The curated expert catalog is
-/// local presentation content and needs no transport.
+/// templates (templateType APP). Skills / MCP registries ride the generated
+/// Dart targets of the skills and mcp SDK families, injected alongside. The
+/// curated expert catalog is local presentation content and needs no
+/// transport.
 class AiHubService {
-  const AiHubService({required this.clients});
+  const AiHubService({
+    required this.clients,
+    this.skillsClient,
+    this.mcpClient,
+  });
 
   final AppstoreAppSdkClients clients;
+
+  /// Generated skills-domain client (null keeps the skill surfaces on the
+  /// explicit-unconfigured error path).
+  final SdkworkAppClient? skillsClient;
+
+  /// Generated mcp-domain client (null keeps the MCP surface on the
+  /// explicit-unconfigured error path).
+  final SdkworkMcpAppClient? mcpClient;
 
   String get capability => 'ai-hub';
 
@@ -78,16 +90,62 @@ class AiHubService {
     ];
   }
 
-  /// Skill marketplace (skills domain; Dart target not generated yet).
+  /// Skill marketplace (generated skills-domain Dart client).
   Future<List<AiSkillEntry>> loadSkills({String query = ''}) async {
-    clients.ensureTransportBound(capability);
-    throw AppstoreServiceUnconfiguredException('skills');
+    final client = skillsClient;
+    if (client == null) {
+      throw const AppstoreServiceUnconfiguredException('skills');
+    }
+    final trimmed = query.trim().isEmpty ? null : query.trim();
+    final marketplace =
+        await client.skill.marketplaceList(1, 48, null, trimmed);
+    final installations = await client.skillInstallation
+        .skillInstallationsList(1, 200)
+        .catchError((Object error) => null);
+    final installedSkillIds = <String>{};
+    final installedPackageIds = <String>{};
+    for (final row in AppstoreAppSdkClients.itemsOf(installations?.data)) {
+      final enabled = row['enabled'] == true;
+      final status = row['installStatus']?.toString() ?? row['install_status']?.toString() ?? '';
+      if (enabled && status != 'deleted') {
+        installedSkillIds.add(_text(row['skillId']));
+        installedPackageIds.add(_text(row['packageId']));
+      }
+    }
+    return <AiSkillEntry>[
+      for (final row in AppstoreAppSdkClients.itemsOf(marketplace?.data))
+        AiSkillEntry(
+          id: _text(row['id']),
+          name: _text(row['name'], '技能'),
+          version: _text(row['version'], '1.0.0'),
+          category: _categoriesOf(row),
+          description:
+              _text(row['summary'], _text(row['description'])),
+          installs: int.tryParse(_text(row['installCount'], '0')) ?? 0,
+        ),
+    ];
   }
 
-  /// MCP registry servers (mcp domain; Dart target not generated yet).
+  /// MCP registry servers (generated mcp-domain Dart client).
   Future<List<AiMcpServerEntry>> loadMcpServers({String query = ''}) async {
-    clients.ensureTransportBound(capability);
-    throw AppstoreServiceUnconfiguredException('mcp');
+    final client = mcpClient;
+    if (client == null) {
+      throw const AppstoreServiceUnconfiguredException('mcp');
+    }
+    final trimmed = query.trim().isEmpty ? null : query.trim();
+    final response = await client.mcp.getListServers(1, 48, trimmed);
+    return <AiMcpServerEntry>[
+      for (final row in AppstoreAppSdkClients.itemsOf(response?.data))
+        AiMcpServerEntry(
+          id: _text(row['id']),
+          name: _text(row['name']),
+          publisher: _text(row['categoryCode'] ?? row['category_code'], 'SDKWork MCP'),
+          description: _text(row['description']),
+          transportType: _transportLabel(
+            _text(row['transport'], _text(row['transport_type'])),
+          ),
+        ),
+    ];
   }
 
   /// App templates (catalog template domain, templateType APP).
@@ -133,6 +191,28 @@ class AiHubService {
       forks: int.tryParse(_text(row['forkCount'], '0')) ?? 0,
     );
   }
+}
+
+String _categoriesOf(Map<String, dynamic> row) {
+  final categories = row['categories'];
+  if (categories is List && categories.isNotEmpty) {
+    return categories.first.toString();
+  }
+  return 'General';
+}
+
+String _transportLabel(String raw) {
+  final transport = raw.toLowerCase();
+  if (transport == 'sse') {
+    return 'SSE';
+  }
+  if (transport == 'http' || transport == 'streamable-http') {
+    return 'HTTP';
+  }
+  if (transport == 'websocket' || transport == 'ws') {
+    return 'WebSocket';
+  }
+  return 'stdio';
 }
 
 Map<String, dynamic> _metadata(Map<String, dynamic> row) {
