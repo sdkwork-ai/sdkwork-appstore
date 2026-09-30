@@ -6,6 +6,9 @@
 @source "../packages/sdkwork-appstore-h5-listing/src";
 @source "../packages/sdkwork-appstore-h5-library/src";
 @source "../packages/sdkwork-appstore-h5-search/src";
+/* Shared cross-repo component packages render Tailwind utilities of their
+   own; the host scanner must cover them or their layouts collapse. */
+@source "../../../sdkwork-iam/apps/sdkwork-iam-h5/packages/sdkwork-iam-h5-auth/src";
 
 /* SDKWork App Store H5 — aligned with UI_DESIGN_SPEC tokens */
 
