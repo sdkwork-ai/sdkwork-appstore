@@ -64,6 +64,10 @@ export function NotificationsPage() {
           <LoadingSpinner size="lg" />
         </div>
       ) : error ? (
+        <div className="card p-4 text-center">
+          <p className="text-sm text-[var(--danger)]">{formatApiError(error)}</p>
+          <button type="button" onClick={() => execute()} className="btn-primary mt-2 text-sm">重试</button>
+        </div>
         <div className="px-4 py-8 text-center text-sm text-[var(--accent)]">
           {formatApiError(error)}
         </div>

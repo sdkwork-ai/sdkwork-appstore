@@ -10,6 +10,7 @@ import {
   formatApiError,
 } from '@/hooks/useApi';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
+import { ErrorRetry } from '@/components/common/ErrorRetry';
 import { PlatformBadges } from '@/components/common/PlatformBadges';
 import { readListingPlatformCodes } from '@/platforms';
 
@@ -48,9 +49,9 @@ function HeroBanner({ title, subtitle }: { title: string; subtitle: string }) {
 }
 
 export function HomePage() {
-  const { data: homeFeed, loading: feedLoading, error: feedError } = useHomeFeed();
-  const { data: categories, loading: categoriesLoading, error: categoriesError } = useCategories(10);
-  const { data: recommendations, loading: recLoading, error: recError } = useRecommendations(12);
+  const { data: homeFeed, loading: feedLoading, error: feedError, execute: feedExecute } = useHomeFeed();
+  const { data: categories, loading: categoriesLoading, error: categoriesError, execute: categoriesExecute } = useCategories(10);
+  const { data: recommendations, loading: recLoading, error: recError, execute: recExecute } = useRecommendations(12);
   const { data: collections, loading: collectionsLoading } = useCollections(8);
   const { data: events, loading: eventsLoading } = useActiveEvents(6);
   const { data: recentlyUpdated, loading: updatedLoading } = useRecentlyUpdated(6);
