@@ -14,3 +14,30 @@
   font-size: 28rpx;
   border-radius: 40rpx;
 }
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 32rpx 32rpx 16rpx;
+}
+.section-header__text {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #1d1d1f;
+}
+.section-header__action {
+  font-size: 22rpx;
+  color: #4f46e5;
+  background-color: transparent;
+  border: none;
+  padding: 0;
+}
+.wp-item-action {
+  font-size: 22rpx;
+  color: #4f46e5;
+  padding: 8rpx 16rpx;
+}
+.wp-item-action--danger {
+  color: #ef4444;
+}

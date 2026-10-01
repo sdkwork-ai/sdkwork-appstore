@@ -456,6 +456,25 @@ function createPageLoaders(getClient: () => AppstoreAppClient) {
       };
     },
 
+    /** Create a custom category (user_store domain, auth required). */
+    async createCategory(name: string): Promise<void> {
+      await getClient().userStore.createCategory({ name });
+    },
+
+    /** Delete a custom category (user_store domain, auth required). */
+    async deleteCategory(categoryId: string): Promise<void> {
+      await getClient().userStore.deleteCategory(categoryId);
+    },
+
+    /** Create an unlisted share link (user_store domain, auth required). */
+    async createShare(title: string): Promise<void> {
+      await getClient().userStore.createShare({ title });
+    },
+
+    /** Revoke a share link (user_store domain, auth required). */
+    async revokeShare(shareId: string): Promise<void> {
+      await getClient().userStore.revokeShare(shareId);
+    },
     /** Publisher: my listings (publishers domain, auth required). */
     async publisher(): Promise<ListingRow[]> {
       const page = await getClient().publishers.listMyListings({ limit: 50 });
