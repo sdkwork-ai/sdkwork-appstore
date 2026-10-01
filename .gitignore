@@ -132,3 +132,6 @@ __pycache__/
 
 # Local one-off truth-table scratch dump (never committed)
 /tmp_truth_tables.json
+
+# Local one-off Flutter pub probe scratch (never committed)
+/tmp-pub-probe/
