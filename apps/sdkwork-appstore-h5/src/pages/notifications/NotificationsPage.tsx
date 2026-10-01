@@ -68,9 +68,6 @@ export function NotificationsPage() {
           <p className="text-sm text-[var(--danger)]">{formatApiError(error)}</p>
           <button type="button" onClick={() => execute()} className="btn-primary mt-2 text-sm">重试</button>
         </div>
-        <div className="px-4 py-8 text-center text-sm text-[var(--accent)]">
-          {formatApiError(error)}
-        </div>
       ) : notifications.length === 0 ? (
         <div className="text-center py-20 px-4">
           <Bell className="w-16 h-16 text-[var(--border-strong)] mx-auto mb-4" />
