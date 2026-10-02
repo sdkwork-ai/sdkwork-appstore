@@ -1,9 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AppstoreInstallContext, useInstall } from '@sdkwork/appstore-pc-commons';
+import {
+  desktopInstallCodes,
+  detectDesktopOs,
+  openDistributionUrl,
+  primaryDistributionAction,
+} from '@sdkwork/appstore-pc-core';
 import { AppItem } from '../types';
 import { AnimatePresence } from 'motion/react';
 import { InstallModal } from '../components/install/InstallModal';
+import { QrCodeModal } from '../components/install/QrCodeModal';
 import { InstallService } from '../services/api';
 
 export { useInstall };
@@ -17,6 +24,15 @@ function readLocalInstalledApps(): Set<string> {
   }
 }
 
+/**
+ * The desktop platform code an install records: the detected OS when the
+ * listing ships it, else its first shipped desktop code (the runtime port
+ * defaults to the PC storefront context when none applies).
+ */
+function resolveInstallPlatform(app: AppItem): string | undefined {
+  return desktopInstallCodes(app.platforms, detectDesktopOs())[0];
+}
+
 export function InstallProvider({ children }: { children: React.ReactNode }) {
   const { t } = useTranslation();
   const [appToInstall, setAppToInstall] = useState<AppItem | null>(null);
@@ -24,6 +40,8 @@ export function InstallProvider({ children }: { children: React.ReactNode }) {
   const [progress, setProgress] = useState(0);
   const [installError, setInstallError] = useState<string | null>(null);
   const [installedAppIds, setInstalledAppIds] = useState<Set<string>>(readLocalInstalledApps);
+  const [qrApp, setQrApp] = useState<AppItem | null>(null);
+  const [forcedPlatform, setForcedPlatform] = useState<string | undefined>(undefined);
 
   // Hydrate the installed set from the server-backed library. The server
   // response is authoritative — an empty library renders an empty state, no
@@ -52,7 +70,19 @@ export function InstallProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const installApp = (app: AppItem) => {
+  const installApp = (app: AppItem, platform?: string) => {
+    // Web surfaces open directly in a new independent window; mobile and
+    // mini-program distributions continue through the scan dialog.
+    const primary = primaryDistributionAction(app);
+    if (primary?.kind === 'open') {
+      openDistributionUrl(primary.url);
+      return;
+    }
+    if (primary?.kind === 'qr') {
+      setQrApp(app);
+      return;
+    }
+    setForcedPlatform(platform);
     setAppToInstall(app);
     setInstallState('confirm');
     setProgress(0);
@@ -93,8 +123,9 @@ export function InstallProvider({ children }: { children: React.ReactNode }) {
       return;
     }
     // Drive the flow from the server-backed library record; the progress ring
-    // reflects the real request instead of a simulated download.
-    InstallService.installApp(target.id)
+    // reflects the real request instead of a simulated download. The library
+    // row records the requested desktop platform instead of a fixed `pc`.
+    InstallService.installApp(target.id, forcedPlatform ?? resolveInstallPlatform(target))
       .then(() => {
         setProgress(100);
         setInstallState('success');
@@ -133,9 +164,11 @@ export function InstallProvider({ children }: { children: React.ReactNode }) {
         installedAppIds,
         activeDownloadApp: appToInstall,
         downloadState: appToInstall ? installState : null,
+        requestQr: setQrApp,
       }}
     >
       {children}
+      <QrCodeModal app={qrApp} onClose={() => setQrApp(null)} />
       {runningAppNotice && (
         <div className="fixed bottom-6 right-6 z-50 px-4 py-3 bg-gray-900/90 text-white dark:bg-store-subtle/90 dark:text-store-ink rounded-store-card shadow-xl border border-store-line/50 backdrop-blur-md text-xs font-semibold flex items-center gap-2 animate-bounce ">
           <span className="w-2 h-2 rounded-full bg-store-success animate-ping" />
@@ -149,6 +182,7 @@ export function InstallProvider({ children }: { children: React.ReactNode }) {
             installState={installState}
             progress={progress}
             error={installError}
+            installPlatform={forcedPlatform ?? resolveInstallPlatform(appToInstall)}
             onConfirm={confirmInstall}
             onCancel={cancelInstall}
           />

@@ -2048,6 +2048,17 @@ components:
           type: string
         ratingCount:
           type: integer
+        platforms:
+          type: array
+          description: Raw platform codes the app ships for (appstore_platform_dictionary).
+          items:
+            type: string
+        appType:
+          type: string
+          description: Store application type of the owning appstore_app row.
+        accessUrl:
+          type: string
+          description: Direct-open URL for web/H5 distributions; QR scan target.
     ListingResponse:
       allOf:
       - $ref: '#/components/schemas/SdkWorkApiResponse'

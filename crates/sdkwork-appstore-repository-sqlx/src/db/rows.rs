@@ -422,6 +422,12 @@ pub struct ListingSearchRow {
     pub released_at: Option<DateTime<Utc>>,
     pub average_rating: Option<String>,
     pub rating_count: i32,
+    /// `appstore_app.platforms` JSON array text (`["windows","web",...]`).
+    pub app_platforms: Option<String>,
+    /// `appstore_app.app_type` (for example `app`, `game`, `plugin`).
+    pub app_type: Option<String>,
+    /// `appstore_app.access_url`: direct-open URL for web distributions.
+    pub access_url: Option<String>,
 }
 
 #[derive(Debug, Clone, FromRow)]

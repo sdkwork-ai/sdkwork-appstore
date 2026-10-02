@@ -18,8 +18,8 @@ export function createInstallServicePort(client: AppStoreClient): InstallService
         .filter(Boolean);
     },
 
-    async installApp(appId: string): Promise<boolean> {
-      await client.library.install({ listingId: appId, platform: 'pc' });
+    async installApp(appId: string, platform?: string): Promise<boolean> {
+      await client.library.install({ listingId: appId, platform: platform?.trim() || 'pc' });
       return true;
     },
 

@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { Star } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import type { AppItem } from '@sdkwork/appstore-pc-core'
+import { primaryDistributionAction } from '@sdkwork/appstore-pc-core'
 import { DynamicIcon } from './DynamicIcon'
 import { useInstall } from '../install'
 
@@ -9,12 +10,13 @@ interface HandheldGameCardProps {
   game: AppItem
 }
 
-/** Handheld-game catalog card with install/open action. */
+/** Handheld-game catalog card whose action follows the game's distribution. */
 export function HandheldGameCard({ game }: HandheldGameCardProps) {
   const { t } = useTranslation()
   const { installApp, openApp, isInstalled, isDownloading } = useInstall()
   const installed = isInstalled(game.id)
   const downloading = isDownloading(game.id)
+  const primary = primaryDistributionAction(game)
 
   return (
     <Link
@@ -57,7 +59,13 @@ export function HandheldGameCard({ game }: HandheldGameCardProps) {
                 : 'bg-store-brand text-white hover:bg-store-brand shadow-sm'
           }`}
         >
-          {downloading ? t('common.actions.downloading') : installed ? t('common.actions.open') : t('common.actions.downloadFree')}
+          {downloading
+            ? t('common.actions.downloading')
+            : primary?.kind === 'open'
+              ? t('common.distribution.openShort')
+              : installed
+                ? t('common.actions.open')
+                : t('common.actions.downloadFree')}
         </button>
       </div>
     </Link>

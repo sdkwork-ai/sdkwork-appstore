@@ -12,6 +12,10 @@ export const install = {
     completed: '应用安装成功！',
     launchNow: '立即运行应用',
     runningNotice: '应用【{{name}}】正在本地桌面沙盒环境运行中...',
-    installFailed: '安装失败，请稍后重试'
+    installFailed: '安装失败，请稍后重试',
+    platformNote: '已识别当前系统，将安装 {{platform}} 版本',
+    platformNoteGeneric: '将安装 {{platform}} 版本',
+    qrTitle: '扫码获取',
+    qrScanHint: '使用手机或对应客户端扫描二维码继续'
   }
 };

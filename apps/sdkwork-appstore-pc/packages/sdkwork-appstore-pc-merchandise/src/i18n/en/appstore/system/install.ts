@@ -12,6 +12,10 @@ export const install = {
     completed: 'Application Installed Successfully!',
     launchNow: 'Launch App Now',
     runningNotice: 'App "{{name}}" is running in the local desktop sandbox...',
-    installFailed: 'Installation failed, please try again later'
+    installFailed: 'Installation failed, please try again later',
+    platformNote: 'Detected on this system; installing the {{platform}} version',
+    platformNoteGeneric: 'Installing the {{platform}} version',
+    qrTitle: 'Scan to Get',
+    qrScanHint: 'Scan the QR code with your phone or the matching client to continue'
   }
 };

@@ -88,6 +88,30 @@ export const common = {
     miniprogram: 'Mini Program',
     browserExtension: 'Browser Extension'
   },
+  distribution: {
+    openShort: 'Open',
+    openPcWeb: 'Open Web App',
+    openH5Web: 'Open H5 App',
+    missingUrl: 'No access link available yet',
+    download: {
+      windows: 'Download for Windows',
+      macos: 'Download for macOS',
+      linux: 'Download for Linux'
+    },
+    os: {
+      windows: 'Windows',
+      macos: 'macOS',
+      linux: 'Linux'
+    },
+    qrAndroid: 'Scan with Android',
+    qrIos: 'Scan with iOS',
+    qrHarmonyos: 'Scan with HarmonyOS',
+    qrMiniprogram: 'Open Mini Program',
+    qrBrowserExtension: 'Browser Extension',
+    qrGeneric: 'Scan to Continue',
+    scanHint: 'Scan the QR code with your phone or the matching client to continue',
+    detectedTag: 'This system'
+  },
   time: {
     recently: 'Recently'
   },

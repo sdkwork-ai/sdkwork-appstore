@@ -121,6 +121,7 @@ export function createAppStoreServicePort(
       description: readString(item, 'description') || '',
       screenshots: readStringArray(item, 'screenshots', 'mediaScreenshots'),
       platforms: readPlatformCodes(item),
+      accessUrl: readString(item, 'accessUrl', 'access_url') || undefined,
       icon: visual.icon,
       iconColor: visual.color,
       version: readString(item, 'currentVersion', 'current_version') || '1.0.0',
@@ -380,8 +381,15 @@ export function createAppStoreServicePort(
     },
 
     async getAppById(id: string): Promise<AppItem | undefined> {
-      const listing = await client.listings.get(id);
-      const row = listing as unknown as Record<string, unknown>;
+      // The catalog projection carries the distribution fields (platforms,
+      // accessUrl); the single-listing aggregate does not expose them yet.
+      const response = await client.catalog
+        .searchListings({ ids: [id], limit: 1 })
+        .catch(() => undefined);
+      const row = readPageItems<Record<string, unknown>>(response)[0];
+      if (!row) {
+        return undefined;
+      }
       const app = mapListingSummary(row);
       app.description = readString(row, 'description') || app.description;
       const [releases] = await Promise.all([

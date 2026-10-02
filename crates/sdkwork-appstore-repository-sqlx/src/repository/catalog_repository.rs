@@ -833,10 +833,15 @@ impl CatalogRepositoryPort for SqlxCatalogRepository {
                    p.display_name AS developer_name,
                    COALESCE(ll.full_description, ll.short_description) AS description,
                    r.version_name AS current_version,
-                   art.file_size_bytes AS file_size_bytes,
+                   (SELECT art.file_size_bytes FROM appstore_release_artifact art
+                    WHERE art.release_id = r.id AND art.artifact_status = 'verified'
+                    ORDER BY art.id ASC LIMIT 1) AS file_size_bytes,
                    ll.whats_new_summary AS whats_new_summary,
                    r.published_at AS released_at,
-                   l.average_rating, l.rating_count
+                   l.average_rating, l.rating_count,
+                   a.platforms::text AS app_platforms,
+                   a.app_type AS app_type,
+                   a.access_url AS access_url
             FROM appstore_listing l
             LEFT JOIN appstore_listing_localization ll
                 ON ll.listing_id = l.id AND ll.locale = l.default_locale AND ll.tenant_id = l.tenant_id
@@ -844,8 +849,8 @@ impl CatalogRepositoryPort for SqlxCatalogRepository {
                 ON p.id = l.publisher_id AND p.tenant_id = l.tenant_id
             LEFT JOIN appstore_release r
                 ON r.id = l.current_release_id
-            LEFT JOIN appstore_release_artifact art
-                ON art.release_id = r.id AND art.artifact_status = 'verified'
+            LEFT JOIN appstore_app a
+                ON a.id = l.app_id AND a.tenant_id = l.tenant_id
             WHERE l.tenant_id = ?
               AND l.listing_status = 'active'
               AND l.storefront_visibility = 'visible'
@@ -985,10 +990,15 @@ impl CatalogRepositoryPort for SqlxCatalogRepository {
                    p.display_name AS developer_name,
                    COALESCE(ll.full_description, ll.short_description) AS description,
                    r.version_name AS current_version,
-                   art.file_size_bytes AS file_size_bytes,
+                   (SELECT art.file_size_bytes FROM appstore_release_artifact art
+                    WHERE art.release_id = r.id AND art.artifact_status = 'verified'
+                    ORDER BY art.id ASC LIMIT 1) AS file_size_bytes,
                    ll.whats_new_summary AS whats_new_summary,
                    r.published_at AS released_at,
-                   l.average_rating, l.rating_count
+                   l.average_rating, l.rating_count,
+                   a.platforms::text AS app_platforms,
+                   a.app_type AS app_type,
+                   a.access_url AS access_url
             FROM appstore_listing l
             LEFT JOIN appstore_listing_localization ll
                 ON ll.listing_id = l.id
@@ -998,8 +1008,8 @@ impl CatalogRepositoryPort for SqlxCatalogRepository {
                 ON p.id = l.publisher_id AND p.tenant_id = l.tenant_id
             LEFT JOIN appstore_release r
                 ON r.id = l.current_release_id
-            LEFT JOIN appstore_release_artifact art
-                ON art.release_id = r.id AND art.artifact_status = 'verified'
+            LEFT JOIN appstore_app a
+                ON a.id = l.app_id AND a.tenant_id = l.tenant_id
             WHERE l.tenant_id = ?
               AND l.id IN ({placeholders})
               AND l.listing_status = 'active'
@@ -1043,12 +1053,29 @@ impl CatalogRepositoryPort for SqlxCatalogRepository {
                    (SELECT m.media_resource_id FROM appstore_listing_media m
                     WHERE m.listing_id = l.id AND m.media_role = 'ICON' AND m.tenant_id = l.tenant_id
                     ORDER BY m.sort_order ASC, m.id ASC LIMIT 1) AS icon_media_resource_id,
-                   l.average_rating, l.rating_count
+                   p.display_name AS developer_name,
+                   COALESCE(ll.full_description, ll.short_description) AS description,
+                   r.version_name AS current_version,
+                   (SELECT art.file_size_bytes FROM appstore_release_artifact art
+                    WHERE art.release_id = r.id AND art.artifact_status = 'verified'
+                    ORDER BY art.id ASC LIMIT 1) AS file_size_bytes,
+                   ll.whats_new_summary AS whats_new_summary,
+                   r.published_at AS released_at,
+                   l.average_rating, l.rating_count,
+                   a.platforms::text AS app_platforms,
+                   a.app_type AS app_type,
+                   a.access_url AS access_url
             FROM appstore_listing l
             LEFT JOIN appstore_listing_localization ll
                 ON ll.listing_id = l.id
                AND ll.locale = ?
                AND ll.tenant_id = l.tenant_id
+            LEFT JOIN appstore_publisher p
+                ON p.id = l.publisher_id AND p.tenant_id = l.tenant_id
+            LEFT JOIN appstore_release r
+                ON r.id = l.current_release_id
+            LEFT JOIN appstore_app a
+                ON a.id = l.app_id AND a.tenant_id = l.tenant_id
             WHERE l.tenant_id = ?
               AND l.listing_status = 'active'
               AND l.storefront_visibility = 'visible'

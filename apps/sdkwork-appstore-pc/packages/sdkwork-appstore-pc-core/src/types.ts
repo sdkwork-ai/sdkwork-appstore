@@ -16,6 +16,8 @@ export interface AppItem {
   description: string;
   /** Raw platform codes this listing ships for (see platforms.ts display groups). */
   platforms?: string[];
+  /** Direct-open URL for web/H5 distributions; the QR scan target otherwise. */
+  accessUrl?: string;
   whatsNew?: { version: string; date: string; notes: string };
   screenshots: string[];
   icon: string; // Lucide icon name or emoji

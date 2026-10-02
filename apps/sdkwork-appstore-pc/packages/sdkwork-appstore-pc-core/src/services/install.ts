@@ -7,7 +7,13 @@ export interface StorageStats {
 
 export interface IInstallSDK {
   getInstalledAppIds(): Promise<string[]>;
-  installApp(appId: string): Promise<boolean>;
+  /**
+   * Record an install of a listing on the given platform.
+   * @param appId - the listing id.
+   * @param platform - raw platform code (windows/macos/linux/android/...);
+   *   defaults to the PC storefront context when omitted.
+   */
+  installApp(appId: string, platform?: string): Promise<boolean>;
   uninstallApp(appId: string): Promise<boolean>;
   getStorageStats(): Promise<StorageStats>;
 }
@@ -23,7 +29,7 @@ export function configureInstallServicePort(port: InstallServicePort): void {
 
 export const InstallService: IInstallSDK = {
   getInstalledAppIds: () => installPort.getInstalledAppIds(),
-  installApp: (appId) => installPort.installApp(appId),
+  installApp: (appId, platform) => installPort.installApp(appId, platform),
   uninstallApp: (appId) => installPort.uninstallApp(appId),
   getStorageStats: () => installPort.getStorageStats(),
 };

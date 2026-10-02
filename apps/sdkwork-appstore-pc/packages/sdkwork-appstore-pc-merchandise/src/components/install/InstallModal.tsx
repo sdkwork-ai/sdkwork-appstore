@@ -1,4 +1,5 @@
 import { motion } from 'motion/react';
+import { useTranslation } from 'react-i18next';
 import { DynamicIcon } from '../DynamicIcon';
 import { AppItem } from '../../types';
 import { InstallModalConfirmActions } from './InstallModalConfirmActions';
@@ -10,6 +11,8 @@ interface InstallModalProps {
   installState: 'confirm' | 'downloading' | 'success';
   progress: number;
   error?: string | null;
+  /** Desktop platform code the install records (windows/macos/linux); shown on confirm. */
+  installPlatform?: string;
   onConfirm: () => void;
   onCancel: () => void;
 }
@@ -19,9 +22,11 @@ export function InstallModal({
   installState,
   progress,
   error,
+  installPlatform,
   onConfirm,
   onCancel,
 }: InstallModalProps) {
+  const { t } = useTranslation();
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center px-4">
       <motion.div
@@ -53,7 +58,16 @@ export function InstallModal({
           )}
 
           {installState === 'confirm' && (
-            <InstallModalConfirmActions onConfirm={onConfirm} onCancel={onCancel} />
+            <>
+              {installPlatform && (
+                <p className="text-xs font-medium text-store-ink-soft bg-store-subtle border border-store-line-soft rounded-full px-3 py-1 mb-4">
+                  {t('install.modal.platformNote', {
+                    platform: t(`common.distribution.os.${installPlatform}`),
+                  })}
+                </p>
+              )}
+              <InstallModalConfirmActions onConfirm={onConfirm} onCancel={onCancel} />
+            </>
           )}
 
           {installState === 'downloading' && (

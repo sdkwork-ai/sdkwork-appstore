@@ -19,4 +19,10 @@ export interface ListingSummary {
   releasedAt?: string;
   averageRating?: string;
   ratingCount?: number;
+  /** Raw platform codes the app ships for (appstore_platform_dictionary). */
+  platforms?: string[];
+  /** Store application type of the owning appstore_app row. */
+  appType?: string;
+  /** Direct-open URL for web/H5 distributions; QR scan target. */
+  accessUrl?: string;
 }

@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { Flame } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import type { AppItem } from '@sdkwork/appstore-pc-core'
+import { primaryDistributionAction } from '@sdkwork/appstore-pc-core'
 import { DynamicIcon } from './DynamicIcon'
 import { useInstall } from '../install'
 
@@ -9,12 +10,13 @@ interface MiniGameCardProps {
   game: AppItem
 }
 
-/** Compact mini-game card with install/open action. */
+/** Compact mini-game card whose action follows the game's distribution. */
 export function MiniGameCard({ game }: MiniGameCardProps) {
   const { t } = useTranslation()
   const { installApp, openApp, isInstalled, isDownloading } = useInstall()
   const installed = isInstalled(game.id)
   const downloading = isDownloading(game.id)
+  const primary = primaryDistributionAction(game)
 
   return (
     <Link
@@ -52,7 +54,13 @@ export function MiniGameCard({ game }: MiniGameCardProps) {
               : 'bg-store-raised text-store-ink-soft hover:bg-gray-300 dark:hover:bg-store-raised '
         }`}
       >
-        {downloading ? t('common.actions.downloading') : installed ? t('common.actions.open') : t('common.actions.downloadFree')}
+        {downloading
+          ? t('common.actions.downloading')
+          : primary?.kind === 'open'
+            ? t('common.distribution.openShort')
+            : installed
+              ? t('common.actions.open')
+              : t('common.actions.downloadFree')}
       </button>
     </Link>
   )

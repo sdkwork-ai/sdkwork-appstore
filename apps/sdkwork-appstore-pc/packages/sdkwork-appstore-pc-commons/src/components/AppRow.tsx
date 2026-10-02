@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { motion } from 'motion/react'
 import type { AppItem } from '@sdkwork/appstore-pc-core'
+import { openDistributionUrl, primaryDistributionAction } from '@sdkwork/appstore-pc-core'
 import { DynamicIcon } from './DynamicIcon'
 import { PlatformBadges } from './PlatformBadges'
 import { formatPrice } from '../formatPrice'
@@ -14,18 +15,30 @@ interface AppRowProps {
   hideButton?: boolean
 }
 
-/** Compact catalog row with install/open action. */
+/** Compact catalog row whose primary action follows the app's distribution. */
 export function AppRow({ app, showRank, hideButton }: AppRowProps) {
   const { t, i18n } = useTranslation()
-  const { installApp, openApp, isInstalled, isDownloading, downloadProgress } = useInstall()
+  const { installApp, openApp, requestQr, isInstalled, isDownloading, downloadProgress } = useInstall()
 
   const installed = isInstalled(app.id)
   const downloading = isDownloading(app.id)
   const progress = downloadProgress(app.id)
+  const primary = primaryDistributionAction(app)
 
   const handleAction = (event: MouseEvent) => {
     event.preventDefault()
     event.stopPropagation()
+    // Web surfaces open directly in a new independent window; mobile and
+    // mini-program distributions continue through the scan dialog. Desktop
+    // (and platform-less) listings keep the install flow.
+    if (primary?.kind === 'open') {
+      openDistributionUrl(primary.url)
+      return
+    }
+    if (primary?.kind === 'qr') {
+      requestQr(app)
+      return
+    }
     if (installed) {
       openApp(app)
     } else {
@@ -75,11 +88,13 @@ export function AppRow({ app, showRank, hideButton }: AppRowProps) {
           >
             {downloading
               ? `${Math.round(progress)}%`
-              : installed
-                ? t('common.actions.open')
-                : app.price === 0
-                  ? t('common.labels.free')
-                  : formatPrice(app.price, i18n.language)}
+              : primary?.kind === 'open'
+                ? t('common.distribution.openShort')
+                : installed
+                  ? t('common.actions.open')
+                  : app.price === 0
+                    ? t('common.labels.free')
+                    : formatPrice(app.price, i18n.language)}
           </button>
         )}
       </motion.div>

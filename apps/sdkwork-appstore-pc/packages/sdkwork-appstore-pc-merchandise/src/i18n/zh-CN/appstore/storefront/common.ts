@@ -88,6 +88,30 @@ export const common = {
     miniprogram: '小程序',
     browserExtension: '浏览器扩展'
   },
+  distribution: {
+    openShort: '打开',
+    openPcWeb: '打开网页版',
+    openH5Web: '打开 H5 版',
+    missingUrl: '暂未提供访问链接',
+    download: {
+      windows: '下载 Windows 版',
+      macos: '下载 macOS 版',
+      linux: '下载 Linux 版'
+    },
+    os: {
+      windows: 'Windows',
+      macos: 'macOS',
+      linux: 'Linux'
+    },
+    qrAndroid: '安卓扫码安装',
+    qrIos: 'iOS 扫码安装',
+    qrHarmonyos: '鸿蒙扫码安装',
+    qrMiniprogram: '扫码打开小程序',
+    qrBrowserExtension: '浏览器扩展',
+    qrGeneric: '扫码访问',
+    scanHint: '使用手机或对应客户端扫描二维码继续',
+    detectedTag: '当前系统'
+  },
   time: {
     recently: '最近'
   },

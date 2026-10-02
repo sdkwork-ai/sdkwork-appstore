@@ -781,6 +781,13 @@ pub fn map_listing_search_row_to_domain(row: ListingSearchRow) -> ListingSummary
         released_at: row.released_at.map(|timestamp| timestamp.to_rfc3339()),
         average_rating: row.average_rating,
         rating_count: row.rating_count,
+        platforms: row
+            .app_platforms
+            .as_deref()
+            .and_then(|json| serde_json::from_str::<Vec<String>>(json).ok())
+            .unwrap_or_default(),
+        app_type: row.app_type,
+        access_url: row.access_url,
     }
 }
 

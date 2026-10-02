@@ -364,6 +364,18 @@ pub struct ListingSummary {
     pub released_at: Option<String>,
     pub average_rating: Option<String>,
     pub rating_count: i32,
+    /// Raw platform codes from `appstore_app.platforms` (see
+    /// `appstore_platform_dictionary`): android, ios, harmonyos, windows,
+    /// macos, linux, web, h5, miniprogram-*, browser-extension-*.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub platforms: Vec<String>,
+    /// `appstore_app.app_type` (for example `app`, `game`, `plugin`).
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub app_type: Option<String>,
+    /// `appstore_app.access_url`: the direct-open URL for web/H5
+    /// distributions; the scan target encoded into distribution QR codes.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub access_url: Option<String>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]

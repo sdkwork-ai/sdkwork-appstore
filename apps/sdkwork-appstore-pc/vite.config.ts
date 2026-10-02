@@ -115,6 +115,10 @@ export default defineConfig(({ mode }) => {
         ...createSharedWorkspaceAliases(),
       ],
       dedupe: ['react', 'react-dom'],
+      // Workspace packages are consumed as TypeScript sources; try `.ts` before
+      // `.js` so a machine-local tsc residue (`src/*.js` next to `src/*.ts`,
+      // gitignored) can never shadow the source plane in builds and tests.
+      extensions: ['.mts', '.ts', '.tsx', '.mjs', '.js', '.jsx', '.json'],
     },
     optimizeDeps: {
       include: ['@sdkwork/sdk-common', '@sdkwork/utils'],
