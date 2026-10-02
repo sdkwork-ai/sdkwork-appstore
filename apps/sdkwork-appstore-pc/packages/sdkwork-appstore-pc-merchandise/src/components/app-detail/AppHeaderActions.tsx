@@ -96,7 +96,7 @@ export const AppHeaderActions: React.FC<AppHeaderActionsProps> = ({ app }) => {
         app={app}
         onOpen={handleOpen}
         onInstall={(target, platform) => installApp(target, platform)}
-        onQr={(target) => requestQr(target)}
+        onQr={(target, action) => requestQr(target, action.group)}
       />
     </div>
   );

@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { platformGroupsForCodes } from '@sdkwork/appstore-pc-core';
 import { AppItem } from '../../types';
 import { AppInfoRow } from './AppInfoRow';
 
@@ -14,6 +15,14 @@ export function AppInfo({ app }: AppInfoProps) {
       <h3 className="text-2xl font-bold mb-6 text-store-ink ">{t('appDetail.info.title')}</h3>
       <div className="flex flex-col">
         <AppInfoRow label={t('appDetail.info.provider')} value={app.seller || app.developer} />
+        {platformGroupsForCodes(app.platforms).length > 0 && (
+          <AppInfoRow
+            label={t('common.platformGroups.title')}
+            value={platformGroupsForCodes(app.platforms)
+              .map((group) => t(`common.platformGroups.${group}`))
+              .join(' / ')}
+          />
+        )}
         <AppInfoRow label={t('appDetail.info.size')} value={app.size} />
         <AppInfoRow label={t('appDetail.info.category')} value={app.category} isLink />
         <AppInfoRow label={t('appDetail.info.language')} value={app.language || 'English'} />

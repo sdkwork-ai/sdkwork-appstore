@@ -53,7 +53,12 @@ export interface IAppStoreSDK {
   removeFromWishlist(listingId: string): Promise<void>;
   getInstalledApps(): Promise<AppItem[]>;
   getPendingUpdates(): Promise<AppItem[]>;
-  updateApp(id: string): Promise<boolean>;
+  /**
+   * Record an app update on the given platform.
+   * @param platform - raw platform code; defaults to the PC storefront
+   *   context when omitted.
+   */
+  updateApp(id: string, platform?: string): Promise<boolean>;
   updateAllApps(ids: string[]): Promise<boolean>;
   submitFeedback(feedbackData: { appId?: string; type: string; content: string; contact?: string }): Promise<boolean>;
 }
@@ -98,7 +103,7 @@ export const AppStoreService: IAppStoreSDK = {
   removeFromWishlist: (listingId) => appStorePort.removeFromWishlist(listingId),
   getInstalledApps: () => appStorePort.getInstalledApps(),
   getPendingUpdates: () => appStorePort.getPendingUpdates(),
-  updateApp: (id) => appStorePort.updateApp(id),
+  updateApp: (id, platform) => appStorePort.updateApp(id, platform),
   updateAllApps: (ids) => appStorePort.updateAllApps(ids),
   submitFeedback: (feedbackData) => appStorePort.submitFeedback(feedbackData),
 };

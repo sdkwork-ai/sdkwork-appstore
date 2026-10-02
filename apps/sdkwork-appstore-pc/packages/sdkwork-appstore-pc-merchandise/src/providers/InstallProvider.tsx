@@ -6,6 +6,7 @@ import {
   detectDesktopOs,
   openDistributionUrl,
   primaryDistributionAction,
+  type AppPlatformGroupKey,
   type ListingArtifact,
 } from '@sdkwork/appstore-pc-core';
 import { AppItem } from '../types';
@@ -58,7 +59,9 @@ export function InstallProvider({ children }: { children: React.ReactNode }) {
   const [progress, setProgress] = useState(0);
   const [installError, setInstallError] = useState<string | null>(null);
   const [installedAppIds, setInstalledAppIds] = useState<Set<string>>(readLocalInstalledApps);
-  const [qrApp, setQrApp] = useState<AppItem | null>(null);
+  const [qrTarget, setQrTarget] = useState<{ app: AppItem; group?: AppPlatformGroupKey } | null>(
+    null,
+  );
   const [forcedPlatform, setForcedPlatform] = useState<string | undefined>(undefined);
 
   // Hydrate the installed set from the server-backed library. The server
@@ -97,7 +100,7 @@ export function InstallProvider({ children }: { children: React.ReactNode }) {
       return;
     }
     if (primary?.kind === 'qr') {
-      setQrApp(app);
+      setQrTarget({ app, group: primary.group });
       return;
     }
     setForcedPlatform(platform);
@@ -198,11 +201,11 @@ export function InstallProvider({ children }: { children: React.ReactNode }) {
         installedAppIds,
         activeDownloadApp: appToInstall,
         downloadState: appToInstall ? installState : null,
-        requestQr: setQrApp,
+        requestQr: (app, group) => setQrTarget({ app, group }),
       }}
     >
       {children}
-      <QrCodeModal app={qrApp} onClose={() => setQrApp(null)} />
+      <QrCodeModal qr={qrTarget} onClose={() => setQrTarget(null)} />
       {runningAppNotice && (
         <div className="fixed bottom-6 right-6 z-50 px-4 py-3 bg-gray-900/90 text-white dark:bg-store-subtle/90 dark:text-store-ink rounded-store-card shadow-xl border border-store-line/50 backdrop-blur-md text-xs font-semibold flex items-center gap-2 animate-bounce ">
           <span className="w-2 h-2 rounded-full bg-store-success animate-ping" />

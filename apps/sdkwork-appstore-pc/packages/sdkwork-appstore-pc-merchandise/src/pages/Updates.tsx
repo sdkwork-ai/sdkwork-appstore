@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { desktopInstallCodes, detectDesktopOs } from '@sdkwork/appstore-pc-core';
 import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { AppStoreService } from '../services/api';
@@ -55,7 +56,11 @@ export default function Updates() {
   const handleUpdate = async (id: string) => {
     setUpdating(prev => [...prev, id]);
     try {
-      await AppStoreService.updateApp(id);
+      const app = appsWithUpdates.find(item => item.id === id);
+      await AppStoreService.updateApp(
+        id,
+        desktopInstallCodes(app?.platforms, detectDesktopOs())[0],
+      );
       setAppsWithUpdates(prev => prev.filter(app => app.id !== id));
     } catch (error) {
       console.error("Update failed", error);

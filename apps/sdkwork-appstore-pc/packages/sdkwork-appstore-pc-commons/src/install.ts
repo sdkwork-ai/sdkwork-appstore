@@ -1,5 +1,5 @@
 import { createContext, useContext } from 'react'
-import type { AppItem } from '@sdkwork/appstore-pc-core'
+import type { AppItem, AppPlatformGroupKey } from '@sdkwork/appstore-pc-core'
 
 /** Install actions and library state consumed by storefront cards. */
 export interface AppstoreInstallApi {
@@ -18,8 +18,12 @@ export interface AppstoreInstallApi {
   installedAppIds: Set<string>
   activeDownloadApp: AppItem | null
   downloadState: 'confirm' | 'downloading' | 'success' | null
-  /** Open the scan-to-continue dialog for a mobile/mini-program distribution. */
-  requestQr: (app: AppItem) => void
+  /**
+   * Open the scan-to-continue dialog for a mobile/mini-program distribution.
+   * `group` labels the dialog with the scanned platform when triggered from a
+   * per-platform scan button.
+   */
+  requestQr: (app: AppItem, group?: AppPlatformGroupKey) => void
 }
 
 /** React context filled by the product `InstallProvider`. */

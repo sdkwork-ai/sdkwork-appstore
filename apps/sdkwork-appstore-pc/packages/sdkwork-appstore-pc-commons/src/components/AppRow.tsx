@@ -36,7 +36,7 @@ export function AppRow({ app, showRank, hideButton }: AppRowProps) {
       return
     }
     if (primary?.kind === 'qr') {
-      requestQr(app)
+      requestQr(app, primary.group)
       return
     }
     if (installed) {

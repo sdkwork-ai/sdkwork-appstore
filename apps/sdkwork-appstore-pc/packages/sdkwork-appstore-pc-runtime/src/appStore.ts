@@ -614,8 +614,8 @@ export function createAppStoreServicePort(
       return results.filter((app): app is AppItem => Boolean(app));
     },
 
-    async updateApp(id: string): Promise<boolean> {
-      await client.library.install({ listingId: id, platform: 'pc' });
+    async updateApp(id: string, platform?: string): Promise<boolean> {
+      await client.library.install({ listingId: id, platform: platform?.trim() || 'pc' });
       return true;
     },
 
