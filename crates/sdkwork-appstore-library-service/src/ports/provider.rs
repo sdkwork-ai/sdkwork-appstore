@@ -14,7 +14,6 @@ pub struct EntitlementGrant {
 pub struct DownloadUrlResult {
     pub url: String,
     pub expires_at: chrono::DateTime<chrono::Utc>,
-    pub artifact_id: String,
 }
 
 #[async_trait]
@@ -26,11 +25,14 @@ pub trait LibraryProviderPort: Send + Sync {
         user_id: &str,
     ) -> Result<Option<EntitlementGrant>, String>;
 
+    /// Resolves a short-lived download URL for the drive node backing a
+    /// verified artifact (the presigned link the storefront hands to the
+    /// browser download).
     async fn generate_download_url(
         &self,
         tenant_id: &str,
-        artifact_id: &str,
-        user_id: &str,
+        drive_node_id: &str,
+        expires_in_seconds: i64,
     ) -> Result<DownloadUrlResult, String>;
 
     async fn resolve_latest_release(

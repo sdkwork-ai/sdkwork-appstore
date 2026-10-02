@@ -404,6 +404,27 @@ pub struct ListingMetricSnapshotRow {
     pub created_at: DateTime<Utc>,
 }
 
+/// Delivery projection of a verified artifact (drive-backed installer).
+#[derive(Debug, Clone, FromRow)]
+pub struct ArtifactDeliveryRow {
+    pub drive_node_id: String,
+    pub platform: String,
+    pub architecture: String,
+    pub package_format: String,
+    pub file_size_bytes: Option<String>,
+}
+
+/// Verified-artifact installer projection for storefront release histories.
+#[derive(Debug, Clone, FromRow)]
+pub struct ArtifactSummaryRow {
+    pub release_id: String,
+    pub id: String,
+    pub platform: String,
+    pub architecture: String,
+    pub package_format: String,
+    pub file_size_bytes: Option<String>,
+}
+
 #[derive(Debug, Clone, FromRow)]
 pub struct ListingSearchRow {
     pub id: String,

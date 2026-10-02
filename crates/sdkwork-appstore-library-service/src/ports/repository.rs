@@ -5,6 +5,17 @@ use crate::domain::models::{
 };
 use crate::error::AppstoreServiceResult;
 
+/// Delivery projection of a verified artifact: the drive node backing the
+/// installer plus the platform metadata rendered with the download.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ArtifactDelivery {
+    pub drive_node_id: String,
+    pub platform: String,
+    pub architecture: String,
+    pub package_format: String,
+    pub file_size_bytes: Option<String>,
+}
+
 #[async_trait::async_trait]
 pub trait LibraryRepositoryPort: Send + Sync {
     async fn find_library_items_by_user(
@@ -103,6 +114,15 @@ pub trait LibraryRepositoryPort: Send + Sync {
         context: &AppstoreRequestContext,
         artifact_id: &str,
     ) -> AppstoreServiceResult<Option<(String, String, String)>>;
+
+    /// Resolves the delivery projection of a verified artifact: the drive
+    /// node backing the installer plus the platform metadata the storefront
+    /// renders with the download.
+    async fn find_artifact_delivery(
+        &self,
+        context: &AppstoreRequestContext,
+        artifact_id: &str,
+    ) -> AppstoreServiceResult<Option<ArtifactDelivery>>;
 
     async fn insert_download_grant(
         &self,

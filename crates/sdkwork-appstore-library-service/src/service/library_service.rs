@@ -23,7 +23,8 @@ use crate::domain::results::{
     RetrieveLibraryItemResult,
 };
 use crate::error::{AppstoreServiceError, AppstoreServiceResult};
-use crate::ports::repository::LibraryRepositoryPort;
+use crate::ports::provider::LibraryProviderPort;
+use crate::ports::repository::{ArtifactDelivery, LibraryRepositoryPort};
 
 #[async_trait::async_trait]
 pub trait LibraryOperations {
@@ -111,14 +112,75 @@ pub trait LibraryOperations {
     ) -> AppstoreServiceResult<CommerceEntitlementRevokeResult>;
 }
 
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub struct LibraryService<R> {
     repository: R,
+    provider: Option<std::sync::Arc<dyn LibraryProviderPort>>,
+}
+
+impl<R: std::fmt::Debug> std::fmt::Debug for LibraryService<R> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("LibraryService")
+            .field("repository", &self.repository)
+            .field("provider", &self.provider.is_some())
+            .finish()
+    }
 }
 
 impl<R> LibraryService<R> {
     pub fn new(repository: R) -> Self {
-        Self { repository }
+        Self {
+            repository,
+            provider: None,
+        }
+    }
+
+    /// Attaches the integration provider that resolves presigned download
+    /// URLs for consumed artifacts (drive integration; optional).
+    pub fn with_provider(mut self, provider: std::sync::Arc<dyn LibraryProviderPort>) -> Self {
+        self.provider = Some(provider);
+        self
+    }
+
+    /// Best-effort delivery projection for a consumed grant: artifact platform
+    /// metadata always, presigned download URL when the drive integration is
+    /// wired. A missing artifact row or a disabled integration leaves the
+    /// result without a delivery so the storefront falls back to install-only.
+    async fn resolve_grant_delivery(
+        &self,
+        context: &AppstoreRequestContext,
+        grant: &DownloadGrant,
+    ) -> Option<crate::domain::results::DownloadDelivery>
+    where
+        R: LibraryRepositoryPort,
+    {
+        let delivery = self
+            .repository
+            .find_artifact_delivery(context, &grant.artifact_id)
+            .await
+            .ok()
+            .flatten()?;
+
+        let mut download = crate::domain::results::DownloadDelivery {
+            download_url: None,
+            download_url_expires_at: None,
+            platform: delivery.platform,
+            architecture: delivery.architecture,
+            package_format: delivery.package_format,
+            file_size_bytes: delivery.file_size_bytes,
+        };
+        if !delivery.drive_node_id.is_empty() {
+            if let Some(provider) = &self.provider {
+                if let Ok(url) = provider
+                    .generate_download_url(&context.tenant_id, &delivery.drive_node_id, 300)
+                    .await
+                {
+                    download.download_url = Some(url.url);
+                    download.download_url_expires_at = Some(url.expires_at.to_rfc3339());
+                }
+            }
+        }
+        Some(download)
     }
 }
 
@@ -666,10 +728,14 @@ where
             .consume_download_grant_atomically(context, grant_id, user_id)
             .await?
         {
-            return Ok(ConsumeDownloadGrantResult::consumed(
+            let mut result = ConsumeDownloadGrantResult::consumed(
                 "appstore.downloadGrants.consume",
                 grant,
-            ));
+            );
+            if let Some(delivery) = self.resolve_grant_delivery(context, &result.grant).await {
+                result = result.with_delivery(delivery);
+            }
+            return Ok(result);
         }
 
         // The atomic guard rejected the consumption; classify the reason for

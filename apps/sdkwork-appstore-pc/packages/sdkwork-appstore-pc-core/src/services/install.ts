@@ -5,6 +5,16 @@ export interface StorageStats {
   cacheMb: number;
 }
 
+/** Delivery projection returned when a consumed grant resolves an installer. */
+export interface InstallerDownload {
+  downloadUrl?: string;
+  downloadUrlExpiresAt?: string;
+  platform: string;
+  architecture: string;
+  packageFormat: string;
+  fileSizeBytes?: string;
+}
+
 export interface IInstallSDK {
   getInstalledAppIds(): Promise<string[]>;
   /**
@@ -14,6 +24,11 @@ export interface IInstallSDK {
    *   defaults to the PC storefront context when omitted.
    */
   installApp(appId: string, platform?: string): Promise<boolean>;
+  /**
+   * Issue and consume a download grant for one artifact, returning the
+   * delivery projection (presigned URL when drive integration is enabled).
+   */
+  resolveInstallerDownload(artifactId: string): Promise<InstallerDownload | undefined>;
   uninstallApp(appId: string): Promise<boolean>;
   getStorageStats(): Promise<StorageStats>;
 }
@@ -30,6 +45,7 @@ export function configureInstallServicePort(port: InstallServicePort): void {
 export const InstallService: IInstallSDK = {
   getInstalledAppIds: () => installPort.getInstalledAppIds(),
   installApp: (appId, platform) => installPort.installApp(appId, platform),
+  resolveInstallerDownload: (artifactId) => installPort.resolveInstallerDownload(artifactId),
   uninstallApp: (appId) => installPort.uninstallApp(appId),
   getStorageStats: () => installPort.getStorageStats(),
 };
@@ -41,6 +57,7 @@ function createUnconfiguredInstallPort(): InstallServicePort {
   return {
     getInstalledAppIds: async () => unavailable(),
     installApp: async () => unavailable(),
+    resolveInstallerDownload: async () => unavailable(),
     uninstallApp: async () => unavailable(),
     getStorageStats: async () => unavailable(),
   };

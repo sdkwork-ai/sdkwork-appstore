@@ -31,6 +31,52 @@ impl SqlxListingRepository {
     pub fn new(db: AppstoreSqlxDb) -> Self {
         Self { db }
     }
+
+    /// Verified-artifact installer projections for the given releases, keyed
+    /// by release id: id, platform, architecture, package format, size.
+    async fn find_verified_artifacts_by_releases(
+        &self,
+        context: &AppstoreRequestContext,
+        release_ids: &[&str],
+    ) -> Result<std::collections::HashMap<String, Vec<serde_json::Value>>, AppstoreServiceError>
+    {
+        if release_ids.is_empty() {
+            return Ok(std::collections::HashMap::new());
+        }
+        let placeholders = release_ids.iter().map(|_| "?").collect::<Vec<_>>().join(", ");
+        let sql = format!(
+            r#"SELECT release_id, id, platform, architecture, package_format, file_size_bytes
+            FROM appstore_release_artifact
+            WHERE tenant_id = ? AND release_id IN ({placeholders}) AND artifact_status = 'verified'
+            ORDER BY id ASC"#
+        );
+        let mut query = self
+            .db
+            .query_as::<crate::db::rows::ArtifactSummaryRow>(self.db.adapt_sql(&sql).as_str())
+            .bind(&context.tenant_id);
+        for release_id in release_ids.iter().copied() {
+            query = query.bind(release_id);
+        }
+        let rows = query
+            .fetch_all(&self.db)
+            .await
+            .map_err(|e| AppstoreServiceError::Internal(format!("Database error: {e}")))?;
+
+        let mut grouped: std::collections::HashMap<String, Vec<serde_json::Value>> =
+            std::collections::HashMap::new();
+        for row in rows {
+            grouped.entry(row.release_id.clone()).or_default().push(
+                serde_json::json!({
+                    "id": row.id,
+                    "platform": row.platform,
+                    "architecture": row.architecture,
+                    "packageFormat": row.package_format,
+                    "fileSizeBytes": row.file_size_bytes,
+                }),
+            );
+        }
+        Ok(grouped)
+    }
 }
 
 #[async_trait::async_trait]
@@ -1100,10 +1146,19 @@ impl ListingRepositoryPort for SqlxListingRepository {
                 .map_err(|e| AppstoreServiceError::Internal(format!("Database error: {e}")))?
         };
 
+        // Storefront install flows resolve the platform installer from this
+        // projection: verified artifacts only, grouped per release, in
+        // deterministic id order.
+        let release_ids: Vec<String> = rows.iter().map(|r| r.id.clone()).collect();
+        let id_refs: Vec<&str> = release_ids.iter().map(|id| id.as_str()).collect();
+        let artifacts_by_release = self
+            .find_verified_artifacts_by_releases(context, &id_refs)
+            .await?;
+
         Ok(rows
             .into_iter()
             .map(|r| {
-                serde_json::json!({
+                let mut release = serde_json::json!({
                     "id": r.id,
                     "tenant_id": r.tenant_id,
                     "organization_id": r.organization_id,
@@ -1124,7 +1179,11 @@ impl ListingRepositoryPort for SqlxListingRepository {
                     "version": r.version,
                     "created_at": r.created_at,
                     "updated_at": r.updated_at,
-                })
+                });
+                if let Some(artifacts) = artifacts_by_release.get(&r.id) {
+                    release["artifacts"] = serde_json::json!(artifacts);
+                }
+                release
             })
             .collect())
     }

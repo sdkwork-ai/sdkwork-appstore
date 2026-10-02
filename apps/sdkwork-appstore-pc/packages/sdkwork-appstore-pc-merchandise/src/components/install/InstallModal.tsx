@@ -1,7 +1,7 @@
 import { motion } from 'motion/react';
 import { useTranslation } from 'react-i18next';
 import { DynamicIcon } from '../DynamicIcon';
-import { AppItem } from '../../types';
+import type { AppItem, ListingArtifact } from '../../types';
 import { InstallModalConfirmActions } from './InstallModalConfirmActions';
 import { InstallModalProgress } from './InstallModalProgress';
 import { InstallModalSuccessState } from './InstallModalSuccessState';
@@ -13,8 +13,23 @@ interface InstallModalProps {
   error?: string | null;
   /** Desktop platform code the install records (windows/macos/linux); shown on confirm. */
   installPlatform?: string;
+  /** Verified installer artifact matched for the requested platform. */
+  installArtifact?: ListingArtifact;
   onConfirm: () => void;
   onCancel: () => void;
+}
+
+/** Human-readable artifact size from a byte-count string. */
+function formatArtifactSize(fileSizeBytes: string | undefined): string {
+  const bytes = Number.parseInt(fileSizeBytes ?? '', 10);
+  if (!Number.isFinite(bytes) || bytes <= 0) {
+    return '—';
+  }
+  const mb = bytes / (1024 * 1024);
+  if (mb >= 1024) {
+    return `${(mb / 1024).toFixed(1)} GB`;
+  }
+  return `${mb.toFixed(1)} MB`;
 }
 
 export function InstallModal({
@@ -23,6 +38,7 @@ export function InstallModal({
   progress,
   error,
   installPlatform,
+  installArtifact,
   onConfirm,
   onCancel,
 }: InstallModalProps) {
@@ -63,6 +79,14 @@ export function InstallModal({
                 <p className="text-xs font-medium text-store-ink-soft bg-store-subtle border border-store-line-soft rounded-full px-3 py-1 mb-4">
                   {t('install.modal.platformNote', {
                     platform: t(`common.distribution.os.${installPlatform}`),
+                  })}
+                </p>
+              )}
+              {installArtifact && (
+                <p className="text-xs text-store-ink-faint mb-4">
+                  {t('install.modal.artifactNote', {
+                    format: installArtifact.packageFormat.toUpperCase(),
+                    size: formatArtifactSize(installArtifact.fileSizeBytes),
                   })}
                 </p>
               )}

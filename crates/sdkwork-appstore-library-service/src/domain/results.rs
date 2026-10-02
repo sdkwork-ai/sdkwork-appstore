@@ -186,6 +186,11 @@ impl CreateDownloadGrantResult {
 pub struct ConsumeDownloadGrantResult {
     pub operation_id: &'static str,
     pub grant: DownloadGrant,
+    /// Delivery projection of the consumed artifact, present when the artifact
+    /// row was resolved; `download_url` additionally requires the drive
+    /// integration so the storefront can hand a presigned link to the browser.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub delivery: Option<DownloadDelivery>,
 }
 
 impl ConsumeDownloadGrantResult {
@@ -193,8 +198,30 @@ impl ConsumeDownloadGrantResult {
         Self {
             operation_id,
             grant,
+            delivery: None,
         }
     }
+
+    pub fn with_delivery(mut self, delivery: DownloadDelivery) -> Self {
+        self.delivery = Some(delivery);
+        self
+    }
+}
+
+/// Platform metadata (and, when drive integration is enabled, the presigned
+/// download URL) of the artifact behind a consumed download grant.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct DownloadDelivery {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub download_url: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub download_url_expires_at: Option<String>,
+    pub platform: String,
+    pub architecture: String,
+    pub package_format: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub file_size_bytes: Option<String>,
 }
 
 /// Result of a commerce entitlement sync (idempotent upsert).

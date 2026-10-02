@@ -4,6 +4,15 @@ export interface InAppPurchase {
   price: number;
 }
 
+/** Verified installer artifact of a release (storefront-facing projection). */
+export interface ListingArtifact {
+  id: string;
+  platform: string;
+  architecture: string;
+  packageFormat: string;
+  fileSizeBytes?: string;
+}
+
 export interface AppItem {
   id: string;
   name: string;
@@ -18,6 +27,8 @@ export interface AppItem {
   platforms?: string[];
   /** Direct-open URL for web/H5 distributions; the QR scan target otherwise. */
   accessUrl?: string;
+  /** Verified installer artifacts of the current release (desktop download flow). */
+  artifacts?: ListingArtifact[];
   whatsNew?: { version: string; date: string; notes: string };
   screenshots: string[];
   icon: string; // Lucide icon name or emoji

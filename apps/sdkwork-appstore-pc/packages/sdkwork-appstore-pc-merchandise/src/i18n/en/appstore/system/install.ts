@@ -16,6 +16,8 @@ export const install = {
     platformNote: 'Detected on this system; installing the {{platform}} version',
     platformNoteGeneric: 'Installing the {{platform}} version',
     qrTitle: 'Scan to Get',
-    qrScanHint: 'Scan the QR code with your phone or the matching client to continue'
+    qrScanHint: 'Scan the QR code with your phone or the matching client to continue',
+    artifactNote: 'Installer {{format}} · {{size}}',
+    downloadStarted: 'Installer download started; follow the installer to finish setup'
   }
 };

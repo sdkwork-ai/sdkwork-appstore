@@ -97,6 +97,14 @@ pub async fn assemble_api_router_with_pool(pool: DatabasePool) -> Result<ApiAsse
         }
     };
 
+    let library_service = {
+        let service = LibraryService::new(library_repo);
+        match DriveIntegrationAdapter::from_env() {
+            Ok(adapter) => service.with_provider(Arc::new(adapter)),
+            Err(_) => service,
+        }
+    };
+
     let catalog_service = {
         let mut service = CatalogService::new(catalog_repo);
         if let Ok(adapter) = SearchFederationAdapter::from_env() {
@@ -123,7 +131,7 @@ pub async fn assemble_api_router_with_pool(pool: DatabasePool) -> Result<ApiAsse
         listing_service,
         release_service,
         catalog_service,
-        library_service: LibraryService::new(library_repo),
+        library_service,
         moderation_service,
         compliance_service: ComplianceService::new(compliance_repo),
         market_service,

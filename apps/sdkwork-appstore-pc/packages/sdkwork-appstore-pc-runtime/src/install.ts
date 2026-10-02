@@ -1,9 +1,11 @@
 import type { AppStoreClient } from '@sdkwork/appstore-pc-core';
 import {
   configureInstallServicePort,
+  type InstallerDownload,
   type InstallServicePort,
   type StorageStats,
 } from '@sdkwork/appstore-pc-core';
+import type { DownloadGrant } from '@sdkwork/appstore-app-sdk';
 
 export function configureAppstorePcInstall(client: AppStoreClient): void {
   configureInstallServicePort(createInstallServicePort(client));
@@ -21,6 +23,14 @@ export function createInstallServicePort(client: AppStoreClient): InstallService
     async installApp(appId: string, platform?: string): Promise<boolean> {
       await client.library.install({ listingId: appId, platform: platform?.trim() || 'pc' });
       return true;
+    },
+
+    async resolveInstallerDownload(artifactId: string): Promise<InstallerDownload | undefined> {
+      const grant = await client.downloadGrants.create({ artifactId });
+      const consumed = (await client.downloadGrants.consume(grant.id)) as DownloadGrant & {
+        delivery?: InstallerDownload;
+      };
+      return consumed.delivery;
     },
 
     async uninstallApp(appId: string): Promise<boolean> {

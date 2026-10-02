@@ -1,7 +1,9 @@
 use sdkwork_appstore_library_service::domain::models::{
     DownloadGrant, InstallEvent, UpdateAvailable, UserLibraryItem, UserWishlistItem,
 };
-use sdkwork_appstore_library_service::domain::results::LibraryInstallResult;
+use sdkwork_appstore_library_service::domain::results::{
+    ConsumeDownloadGrantResult, LibraryInstallResult,
+};
 
 #[derive(Debug, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -142,6 +144,45 @@ pub(crate) fn map_wishlist_item(item: UserWishlistItem) -> WishlistItemResponse 
         listing_id: item.listing_id,
         wishlist_status: item.wishlist_status.as_str().to_string(),
         created_at: item.created_at.to_rfc3339(),
+    }
+}
+
+#[derive(Debug, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct DownloadDeliveryResponse {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    download_url: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    download_url_expires_at: Option<String>,
+    platform: String,
+    architecture: String,
+    package_format: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    file_size_bytes: Option<String>,
+}
+
+#[derive(Debug, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct ConsumedDownloadGrantResponse {
+    #[serde(flatten)]
+    grant: DownloadGrantResponse,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    delivery: Option<DownloadDeliveryResponse>,
+}
+
+pub(crate) fn map_consumed_download_grant(
+    result: ConsumeDownloadGrantResult,
+) -> ConsumedDownloadGrantResponse {
+    ConsumedDownloadGrantResponse {
+        grant: map_download_grant(result.grant),
+        delivery: result.delivery.map(|delivery| DownloadDeliveryResponse {
+            download_url: delivery.download_url,
+            download_url_expires_at: delivery.download_url_expires_at,
+            platform: delivery.platform,
+            architecture: delivery.architecture,
+            package_format: delivery.package_format,
+            file_size_bytes: delivery.file_size_bytes,
+        }),
     }
 }
 

@@ -1,3 +1,5 @@
+import type { ReleaseArtifactSummary } from './release-artifact-summary';
+
 export interface Release {
   id: string;
   releaseNo: string;
@@ -12,4 +14,6 @@ export interface Release {
   approvedAt?: string;
   publishedAt?: string;
   retiredAt?: string;
+  /** Verified installer artifacts of this release. */
+  artifacts?: ReleaseArtifactSummary[];
 }

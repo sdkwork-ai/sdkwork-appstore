@@ -51,6 +51,84 @@ WHERE r.tenant_id = '100001'
   AND r.release_status = 'published'
 ON CONFLICT (id) DO NOTHING;
 
+-- Step 1b: macOS DMG variant for releases whose listing ships macos.
+INSERT INTO appstore_release_artifact (
+    id, tenant_id, organization_id, release_id, artifact_no,
+    platform, architecture, package_format, artifact_status, drive_node_id,
+    media_resource_id, file_size_bytes, content_type, checksum_sha256,
+    signature_snapshot_json, sbom_ref, provenance_ref, min_os_version,
+    created_at, updated_at
+)
+SELECT
+    'artifact-' || r.id || '-macos',
+    r.tenant_id,
+    r.organization_id,
+    r.id,
+    'ART-MACOS-' || UPPER(REPLACE(r.id, '-', '')),
+    'macos',
+    'aarch64',
+    'dmg',
+    'verified',
+    'drive://appstore/' || r.listing_id || '/releases/' || r.version_code || '/macos-aarch64.dmg',
+    'mr-artifact-' || r.id || '-macos',
+    CAST(58720256 + (ABS(HASHTEXT(r.id)) % 524288001) AS TEXT),
+    'application/x-apple-diskimage',
+    md5(r.id || ':macos:' || r.version_code),
+    '{"signer":"sdkwork-appstore-release-service","algorithm":"sha256","keyId":"seed-ed25519-2026","signedAt":"2026-08-03T00:00:00Z"}',
+    NULL,
+    NULL,
+    COALESCE(r.minimum_os_version, '12.0'),
+    CURRENT_TIMESTAMP,
+    CURRENT_TIMESTAMP
+FROM appstore_release r
+JOIN appstore_listing l
+    ON l.id = r.listing_id AND l.tenant_id = r.tenant_id
+JOIN appstore_app a
+    ON a.id = l.app_id AND a.tenant_id = l.tenant_id
+WHERE r.tenant_id = '100001'
+  AND r.release_status = 'published'
+  AND a.platforms::text LIKE '%macos%'
+ON CONFLICT (id) DO NOTHING;
+
+-- Step 1c: Linux AppImage variant for releases whose listing ships linux.
+INSERT INTO appstore_release_artifact (
+    id, tenant_id, organization_id, release_id, artifact_no,
+    platform, architecture, package_format, artifact_status, drive_node_id,
+    media_resource_id, file_size_bytes, content_type, checksum_sha256,
+    signature_snapshot_json, sbom_ref, provenance_ref, min_os_version,
+    created_at, updated_at
+)
+SELECT
+    'artifact-' || r.id || '-linux',
+    r.tenant_id,
+    r.organization_id,
+    r.id,
+    'ART-LINUX-' || UPPER(REPLACE(r.id, '-', '')),
+    'linux',
+    'x86_64',
+    'appimage',
+    'verified',
+    'drive://appstore/' || r.listing_id || '/releases/' || r.version_code || '/linux-x86_64.AppImage',
+    'mr-artifact-' || r.id || '-linux',
+    CAST(46137344 + (ABS(HASHTEXT(r.id)) % 524288001) AS TEXT),
+    'application/vnd.appimage',
+    md5(r.id || ':linux:' || r.version_code),
+    '{"signer":"sdkwork-appstore-release-service","algorithm":"sha256","keyId":"seed-ed25519-2026","signedAt":"2026-08-03T00:00:00Z"}',
+    NULL,
+    NULL,
+    COALESCE(r.minimum_os_version, '10.0'),
+    CURRENT_TIMESTAMP,
+    CURRENT_TIMESTAMP
+FROM appstore_release r
+JOIN appstore_listing l
+    ON l.id = r.listing_id AND l.tenant_id = r.tenant_id
+JOIN appstore_app a
+    ON a.id = l.app_id AND a.tenant_id = l.tenant_id
+WHERE r.tenant_id = '100001'
+  AND r.release_status = 'published'
+  AND a.platforms::text LIKE '%linux%'
+ON CONFLICT (id) DO NOTHING;
+
 -- Step 2: Seed paid entitlements for the demo user so entitlement-gated
 -- download flow is testable.
 INSERT INTO appstore_entitlement (
@@ -143,7 +221,9 @@ JOIN appstore_listing l
 WHERE a.tenant_id = '100001'
   AND a.artifact_status = 'verified'
   AND l.listing_status = 'published'
-ON CONFLICT (id) DO NOTHING;
+-- Untargeted conflict guard: seeded grant_no values are deterministic, so a
+-- re-apply collides on (tenant_id, grant_no) before the id conflict triggers.
+ON CONFLICT DO NOTHING;
 
 -- Step 4: Seed completed install events to cover download->install telemetry path.
 INSERT INTO appstore_install_event (

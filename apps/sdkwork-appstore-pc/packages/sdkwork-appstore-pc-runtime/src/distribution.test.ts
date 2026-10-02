@@ -14,13 +14,13 @@ function catalogPage(items: unknown[]): { items: unknown[] } {
   return { items };
 }
 
-function stubClient(searchItems: unknown[]): AppStoreClient {
+function stubClient(searchItems: unknown[], releases: unknown[] = []): AppStoreClient {
   return {
     catalog: {
       searchListings: vi.fn(async () => catalogPage(searchItems)),
     },
     listings: {
-      listReleases: vi.fn(async () => catalogPage([])),
+      listReleases: vi.fn(async () => catalogPage(releases)),
     },
   } as unknown as AppStoreClient;
 }
@@ -55,6 +55,65 @@ describe('appStore service distribution mapping', () => {
 
     expect(app?.platforms).toEqual(['windows']);
     expect(app?.accessUrl).toBeUndefined();
+  });
+});
+
+describe('appStore service artifact mapping', () => {
+  it('maps verified release artifacts onto the app', async () => {
+    const client = stubClient(
+      [{ id: 'app-cursor', displayName: 'Cursor AI', pricingModel: 'FREEMIUM' }],
+      [
+        {
+          id: 'rel-app-cursor-0420',
+          versionName: '0.42.0',
+          artifacts: [
+            {
+              id: 'artifact-rel-app-cursor-0420',
+              platform: 'windows',
+              architecture: 'x86_64',
+              packageFormat: 'msi',
+              fileSizeBytes: '52428800',
+            },
+          ],
+        },
+      ],
+    );
+
+    const service = createAppStoreServicePort(client, stubComments());
+    const app = await service.getAppById('app-cursor');
+
+    expect(app?.artifacts).toEqual([
+      {
+        id: 'artifact-rel-app-cursor-0420',
+        platform: 'windows',
+        architecture: 'x86_64',
+        packageFormat: 'msi',
+        fileSizeBytes: '52428800',
+      },
+    ]);
+  });
+});
+
+describe('install service download resolution', () => {
+  it('issues and consumes a grant, returning the delivery projection', async () => {
+    const grant = { id: 'grant-1', artifactId: 'artifact-1' };
+    const delivery = { platform: 'windows', architecture: 'x86_64', packageFormat: 'msi' };
+    const create = vi.fn(async () => grant);
+    const consume = vi.fn(async () => ({
+      ...grant,
+      delivery: { ...delivery, downloadUrl: 'https://dl.example/x.msi' },
+    }));
+    const client = {
+      downloadGrants: { create, consume },
+    } as unknown as AppStoreClient;
+
+    const port = createInstallServicePort(client);
+    const download = await port.resolveInstallerDownload('artifact-1');
+
+    expect(create).toHaveBeenCalledWith({ artifactId: 'artifact-1' });
+    expect(consume).toHaveBeenCalledWith('grant-1');
+    expect(download?.downloadUrl).toBe('https://dl.example/x.msi');
+    expect(download?.packageFormat).toBe('msi');
   });
 });
 

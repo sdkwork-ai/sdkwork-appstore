@@ -50,6 +50,7 @@ export type { PublisherVerificationResponse } from './publisher-verification-res
 export type { ReleaseCreateRequest } from './release-create-request';
 export type { ReleaseUpdateRequest } from './release-update-request';
 export type { Release } from './release';
+export type { ReleaseArtifactSummary } from './release-artifact-summary';
 export type { ReleaseResponse } from './release-response';
 export type { ReleaseNotesUpsertRequest } from './release-notes-upsert-request';
 export type { ReleaseNoteLocalization } from './release-note-localization';
@@ -84,6 +85,8 @@ export type { WishlistItemResponse } from './wishlist-item-response';
 export type { DownloadGrantCreateRequest } from './download-grant-create-request';
 export type { DownloadGrant } from './download-grant';
 export type { DownloadGrantResponse } from './download-grant-response';
+export type { DownloadGrantConsumeResponse } from './download-grant-consume-response';
+export type { DownloadGrantDelivery } from './download-grant-delivery';
 export type { SearchHistoryUpsertRequest } from './search-history-upsert-request';
 export type { AppTemplate } from './app-template';
 export type { AppTemplateCreateRequest } from './app-template-create-request';

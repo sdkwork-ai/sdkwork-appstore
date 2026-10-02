@@ -409,6 +409,16 @@ export function createAppStoreServicePort(
               notes: app.whatsNew?.notes ?? '',
             };
           }
+          const artifacts = readArray(latest, 'artifacts');
+          if (artifacts.length > 0) {
+            app.artifacts = artifacts.map((artifact) => ({
+              id: readString(artifact, 'id'),
+              platform: readString(artifact, 'platform'),
+              architecture: readString(artifact, 'architecture'),
+              packageFormat: readString(artifact, 'packageFormat', 'package_format'),
+              fileSizeBytes: readString(artifact, 'fileSizeBytes', 'file_size_bytes') || undefined,
+            }));
+          }
         }
       }
       return app;

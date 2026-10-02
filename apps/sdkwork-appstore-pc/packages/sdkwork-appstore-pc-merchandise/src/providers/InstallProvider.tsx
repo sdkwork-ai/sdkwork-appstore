@@ -6,6 +6,7 @@ import {
   detectDesktopOs,
   openDistributionUrl,
   primaryDistributionAction,
+  type ListingArtifact,
 } from '@sdkwork/appstore-pc-core';
 import { AppItem } from '../types';
 import { AnimatePresence } from 'motion/react';
@@ -31,6 +32,23 @@ function readLocalInstalledApps(): Set<string> {
  */
 function resolveInstallPlatform(app: AppItem): string | undefined {
   return desktopInstallCodes(app.platforms, detectDesktopOs())[0];
+}
+
+/**
+ * The verified installer artifact matching the requested desktop platform,
+ * preferring the detected OS so the download matches this machine.
+ */
+function resolveInstallArtifact(
+  app: AppItem,
+  platform: string | undefined,
+): ListingArtifact | undefined {
+  if (!app.artifacts?.length || !platform) {
+    return undefined;
+  }
+  return (
+    app.artifacts.find((artifact) => artifact.platform === platform) ??
+    app.artifacts.find((artifact) => artifact.platform === detectDesktopOs())
+  );
 }
 
 export function InstallProvider({ children }: { children: React.ReactNode }) {
@@ -125,8 +143,24 @@ export function InstallProvider({ children }: { children: React.ReactNode }) {
     // Drive the flow from the server-backed library record; the progress ring
     // reflects the real request instead of a simulated download. The library
     // row records the requested desktop platform instead of a fixed `pc`.
-    InstallService.installApp(target.id, forcedPlatform ?? resolveInstallPlatform(target))
-      .then(() => {
+    const platform = forcedPlatform ?? resolveInstallPlatform(target);
+    const artifact = resolveInstallArtifact(target, platform);
+    InstallService.installApp(target.id, platform)
+      .then(async () => {
+        // Trigger the installer download for the matched artifact (best
+        // effort): the grant resolves a presigned URL when the drive
+        // integration is enabled; otherwise the install record stands alone.
+        if (artifact) {
+          try {
+            const delivery = await InstallService.resolveInstallerDownload(artifact.id);
+            const url = delivery?.downloadUrl;
+            if (url && /^https?:/i.test(url)) {
+              window.open(url, '_blank', 'noopener,noreferrer');
+            }
+          } catch {
+            // download resolution is additive; keep the install success
+          }
+        }
         setProgress(100);
         setInstallState('success');
         setInstalledAppIds((prev) => {
@@ -183,6 +217,9 @@ export function InstallProvider({ children }: { children: React.ReactNode }) {
             progress={progress}
             error={installError}
             installPlatform={forcedPlatform ?? resolveInstallPlatform(appToInstall)}
+            installArtifact={
+              resolveInstallArtifact(appToInstall, forcedPlatform ?? resolveInstallPlatform(appToInstall))
+            }
             onConfirm={confirmInstall}
             onCancel={cancelInstall}
           />

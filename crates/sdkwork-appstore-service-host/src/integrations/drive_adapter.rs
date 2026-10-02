@@ -3,6 +3,7 @@
 use async_trait::async_trait;
 use serde::Deserialize;
 
+use sdkwork_appstore_library_service::ports::provider::LibraryProviderPort;
 use sdkwork_appstore_listing_service::ports::provider::{
     AppReference, ListingProviderPort, MediaUploadResult,
 };
@@ -247,5 +248,45 @@ impl Default for MediaResourceWire {
             mime_type: None,
             size_bytes: None,
         }
+    }
+}
+
+#[async_trait]
+impl LibraryProviderPort for DriveIntegrationAdapter {
+    async fn check_entitlement(
+        &self,
+        _tenant_id: &str,
+        _app_id: &str,
+        _user_id: &str,
+    ) -> Result<Option<sdkwork_appstore_library_service::ports::provider::EntitlementGrant>, String>
+    {
+        // Commerce entitlement reads are owned by the compliance adapter.
+        Err("commerce entitlement checks are not part of the drive integration".to_string())
+    }
+
+    async fn generate_download_url(
+        &self,
+        tenant_id: &str,
+        drive_node_id: &str,
+        expires_in_seconds: i64,
+    ) -> Result<sdkwork_appstore_library_service::ports::provider::DownloadUrlResult, String> {
+        let url = ReleaseProviderPort::generate_download_url(self, tenant_id, drive_node_id, expires_in_seconds).await?;
+        // The presigned URL TTL is clamped server-side (30..300s); report the
+        // same clamp so consumers do not treat the link as longer-lived.
+        let ttl = expires_in_seconds.clamp(30, 300);
+        Ok(sdkwork_appstore_library_service::ports::provider::DownloadUrlResult {
+            url,
+            expires_at: chrono::Utc::now() + chrono::Duration::seconds(ttl),
+        })
+    }
+
+    async fn resolve_latest_release(
+        &self,
+        _tenant_id: &str,
+        _listing_id: &str,
+        _platform: &str,
+    ) -> Result<Option<sdkwork_appstore_library_service::ports::provider::ReleaseInfo>, String> {
+        // Release resolution is owned by the release service adapter.
+        Err("latest-release resolution is not part of the drive integration".to_string())
     }
 }

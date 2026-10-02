@@ -16,6 +16,8 @@ export const install = {
     platformNote: '已识别当前系统，将安装 {{platform}} 版本',
     platformNoteGeneric: '将安装 {{platform}} 版本',
     qrTitle: '扫码获取',
-    qrScanHint: '使用手机或对应客户端扫描二维码继续'
+    qrScanHint: '使用手机或对应客户端扫描二维码继续',
+    artifactNote: '安装包 {{format}} · {{size}}',
+    downloadStarted: '安装包下载已开始，请按安装程序引导完成安装'
   }
 };

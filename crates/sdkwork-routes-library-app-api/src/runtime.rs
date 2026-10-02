@@ -4,7 +4,11 @@ use crate::handlers::{
     wishlist_items_list, wishlist_items_remove,
 };
 use crate::mapper::response::{
-    map_download_grant, map_library_install, map_library_item, map_update_available,
+    map_consumed_download_grant,
+    map_download_grant,
+    map_library_install,
+    map_library_item,
+    map_update_available,
     map_wishlist_item,
 };
 use axum::extract::{Extension, Json, Path, Query, State};
@@ -264,7 +268,7 @@ async fn download_grant_consume_handler(
         Err(resp) => return resp,
     };
     match download_grants_consume(&state.library_service, &ctx, grant_id).await {
-        Ok(result) => ok_item(context.as_ref(), map_download_grant(result.grant)),
+        Ok(result) => ok_item(context.as_ref(), map_consumed_download_grant(result)),
         Err(error) => map_library_error(context.as_ref(), error),
     }
 }

@@ -1,7 +1,7 @@
 import { appApiPath } from './paths';
 import type { ApiRequestOptions, HttpClient } from '../http/client';
 
-import type { DownloadGrant, DownloadGrantCreateRequest } from '../types';
+import type { DownloadGrant, DownloadGrantCreateRequest, DownloadGrantDelivery } from '../types';
 
 
 export interface DownloadGrantsAppstoreDownloadGrantsCreateParams {
@@ -28,8 +28,8 @@ export class DownloadGrantsAppstoreDownloadGrantsApi {
   }
 
 /** Consume download grant */
-  async consume(grantId: string, requestOptions?: ApiRequestOptions): Promise<DownloadGrant> {
-    return this.client.request<DownloadGrant>(appApiPath(`/download_grants/${serializePathParameter(grantId, { name: 'grantId', style: 'simple', explode: false })}/consume`), { ...(requestOptions?.signal !== undefined ? { signal: requestOptions.signal } : {}), ...(requestOptions?.timeout !== undefined ? { timeout: requestOptions.timeout } : {}), method: 'POST' as any, sdkworkUnwrapKind: 'item' });
+  async consume(grantId: string, requestOptions?: ApiRequestOptions): Promise<DownloadGrant & { delivery?: DownloadGrantDelivery; }> {
+    return this.client.request<DownloadGrant & { delivery?: DownloadGrantDelivery; }>(appApiPath(`/download_grants/${serializePathParameter(grantId, { name: 'grantId', style: 'simple', explode: false })}/consume`), { ...(requestOptions?.signal !== undefined ? { signal: requestOptions.signal } : {}), ...(requestOptions?.timeout !== undefined ? { timeout: requestOptions.timeout } : {}), method: 'POST' as any, sdkworkUnwrapKind: 'item' });
   }
 }
 

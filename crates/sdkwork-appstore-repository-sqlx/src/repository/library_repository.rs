@@ -5,8 +5,8 @@ use crate::db::columns::{
     APPSTORE_USER_LIBRARY_ITEM_COLUMNS, APPSTORE_USER_WISHLIST_ITEM_COLUMNS,
 };
 use crate::db::rows::{
-    DownloadGrantRow, EntitlementRow, ReleaseArtifactRow, ReleaseRow, UserLibraryItemRow,
-    UserWishlistItemRow,
+    ArtifactDeliveryRow, DownloadGrantRow, EntitlementRow, ReleaseArtifactRow, ReleaseRow,
+    UserLibraryItemRow, UserWishlistItemRow,
 };
 use crate::mapper::row_mapper::{
     map_entitlement_row_to_domain, map_install_event_domain_to_row,
@@ -21,7 +21,7 @@ use sdkwork_appstore_library_service::domain::models::{
     UserLibraryItem, UserWishlistItem,
 };
 use sdkwork_appstore_library_service::error::AppstoreServiceError;
-use sdkwork_appstore_library_service::ports::repository::LibraryRepositoryPort;
+use sdkwork_appstore_library_service::ports::repository::{ArtifactDelivery, LibraryRepositoryPort};
 
 #[derive(Debug, Clone)]
 pub struct SqlxLibraryRepository {
@@ -477,6 +477,34 @@ impl LibraryRepositoryPort for SqlxLibraryRepository {
             .map_err(|e| AppstoreServiceError::Internal(format!("Database error: {}", e)))?;
 
         Ok(row)
+    }
+
+    async fn find_artifact_delivery(
+        &self,
+        context: &AppstoreRequestContext,
+        artifact_id: &str,
+    ) -> Result<Option<ArtifactDelivery>, AppstoreServiceError> {
+        let row: Option<ArtifactDeliveryRow> = self
+            .db
+            .query_as::<ArtifactDeliveryRow>(
+                r#"SELECT a.drive_node_id, a.platform, a.architecture, a.package_format, a.file_size_bytes
+                FROM appstore_release_artifact a
+                WHERE a.id = ? AND a.tenant_id = ?
+                LIMIT 1"#,
+            )
+            .bind(artifact_id)
+            .bind(&context.tenant_id)
+            .fetch_optional(&self.db)
+            .await
+            .map_err(|e| AppstoreServiceError::Internal(format!("Database error: {}", e)))?;
+
+        Ok(row.map(|row| ArtifactDelivery {
+            drive_node_id: row.drive_node_id,
+            platform: row.platform,
+            architecture: row.architecture,
+            package_format: row.package_format,
+            file_size_bytes: row.file_size_bytes,
+        }))
     }
 
     async fn insert_download_grant(
