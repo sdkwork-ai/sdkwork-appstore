@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { ExternalLink, RefreshCw, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { PlatformBadges } from '@sdkwork/appstore-pc-commons';
 import { AppItem } from '../../types';
 import { DynamicIcon } from '../DynamicIcon';
 
@@ -40,9 +41,12 @@ export function LibraryAppCard({
               {app.name}
             </h4>
           </Link>
-          <p className="text-[11px] text-store-ink-faint truncate ">
-            {app.developer} · v{app.whatsNew?.version || '1.0.0'}
-          </p>
+          <div className="flex items-center gap-1.5">
+            <p className="text-[11px] text-store-ink-faint truncate ">
+              {app.developer} · v{app.whatsNew?.version || '1.0.0'}
+            </p>
+            <PlatformBadges platforms={app.platforms} max={2} />
+          </div>
           {hasUpdate && (
             <span className="inline-flex items-center gap-1 mt-1 px-2.5 py-0.5 rounded-full bg-store-warning/10 text-store-warning text-xs font-medium ">
               <RefreshCw className="w-2.5 h-2.5" />

@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import type { AppItem } from '@sdkwork/appstore-pc-core'
 import { primaryDistributionAction } from '@sdkwork/appstore-pc-core'
 import { DynamicIcon } from './DynamicIcon'
+import { PlatformBadges } from './PlatformBadges'
 import { useInstall } from '../install'
 
 interface MiniGameCardProps {
@@ -35,9 +36,10 @@ export function MiniGameCard({ game }: MiniGameCardProps) {
       <h4 className="font-bold text-xs text-store-ink truncate w-full group-hover:text-store-brand transition-colors ">
         {game.name}
       </h4>
-      <span className="text-[10px] text-store-ink-faint mt-0.5 mb-2 truncate w-full">
+      <span className="text-[10px] text-store-ink-faint mt-0.5 truncate w-full">
         {game.category}
       </span>
+      <PlatformBadges platforms={game.platforms} max={2} className="mb-2" />
 
       <button
         onClick={(event) => {

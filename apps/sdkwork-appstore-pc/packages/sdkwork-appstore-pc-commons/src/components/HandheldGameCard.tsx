@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import type { AppItem } from '@sdkwork/appstore-pc-core'
 import { primaryDistributionAction } from '@sdkwork/appstore-pc-core'
 import { DynamicIcon } from './DynamicIcon'
+import { PlatformBadges } from './PlatformBadges'
 import { useInstall } from '../install'
 
 interface HandheldGameCardProps {
@@ -38,6 +39,7 @@ export function HandheldGameCard({ game }: HandheldGameCardProps) {
             </span>
             <span>•</span>
             <span className="truncate">{game.developer}</span>
+            <PlatformBadges platforms={game.platforms} max={2} className="ml-auto" />
           </div>
         </div>
       </div>
