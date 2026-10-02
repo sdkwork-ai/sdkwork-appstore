@@ -25,6 +25,8 @@ export interface ListingDetail {
   appType?: string;
   /** Direct-open URL for web/H5 distributions; QR scan target. */
   accessUrl?: string;
+  /** Per-platform scan/delivery links (appstore_app_platform qrUrl). */
+  platformLinks?: Record<string, string>;
   listingStatus?: string;
   reviewStatus?: string;
   commentsThreadId?: string;

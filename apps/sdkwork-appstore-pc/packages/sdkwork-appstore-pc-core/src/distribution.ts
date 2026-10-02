@@ -11,7 +11,11 @@
  */
 
 import type { AppItem } from './types';
-import { platformGroupsForCodes, type AppPlatformGroupKey } from './platforms';
+import {
+  platformGroupsForCodes,
+  resolveAppPlatformGroup,
+  type AppPlatformGroupKey,
+} from './platforms';
 
 /** Host desktop operating system detected from the user agent. */
 export type DesktopOs = 'windows' | 'macos' | 'linux';
@@ -70,6 +74,22 @@ export function desktopInstallCodes(
   return [detectedOs, ...shipped.filter((code) => code !== detectedOs)];
 }
 
+/**
+ * The first raw platform code the listing ships within one display group —
+ * the key the per-platform link map (appstore_app_platform) is keyed by.
+ */
+function firstCodeForGroup(
+  platforms: readonly string[],
+  group: AppPlatformGroupKey,
+): string | undefined {
+  for (const raw of platforms) {
+    if (resolveAppPlatformGroup(raw) === group) {
+      return raw.trim().toLowerCase();
+    }
+  }
+  return undefined;
+}
+
 /** QR fallback target: this storefront's own listing anchor on the current origin. */
 function listingFallbackUrl(appId: string): string {
   if (typeof window === 'undefined' || !window.location) {
@@ -91,7 +111,7 @@ function listingFallbackUrl(appId: string): string {
  * @returns one action per supported distribution group.
  */
 export function resolveDistributionActions(
-  app: Pick<AppItem, 'platforms' | 'accessUrl' | 'id'>,
+  app: Pick<AppItem, 'platforms' | 'accessUrl' | 'platformLinks' | 'id'>,
   detectedOs?: DesktopOs | null,
 ): DistributionAction[] {
   const groups = platformGroupsForCodes(app.platforms);
@@ -107,7 +127,9 @@ export function resolveDistributionActions(
     if (group === 'pcDesktop') {
       return { group, kind: 'install', platformCodes: desktopCodes };
     }
-    return { group, kind: 'qr', platformCodes: [], url: app.accessUrl ?? listingFallbackUrl(app.id) };
+    const code = firstCodeForGroup(app.platforms ?? [], group);
+    const qrUrl = (code && app.platformLinks?.[code]) || app.accessUrl;
+    return { group, kind: 'qr', platformCodes: [], url: qrUrl ?? listingFallbackUrl(app.id) };
   });
 }
 
@@ -120,7 +142,7 @@ const PRIMARY_PRIORITY: readonly DistributionActionKind[] = ['open', 'install', 
  * @returns the highest-priority action, or undefined for platform-less listings.
  */
 export function primaryDistributionAction(
-  app: Pick<AppItem, 'platforms' | 'accessUrl' | 'id'>,
+  app: Pick<AppItem, 'platforms' | 'accessUrl' | 'platformLinks' | 'id'>,
 ): DistributionAction | undefined {
   const actions = resolveDistributionActions(app);
   if (actions.length === 0) {

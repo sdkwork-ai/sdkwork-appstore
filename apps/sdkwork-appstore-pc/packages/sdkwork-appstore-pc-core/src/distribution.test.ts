@@ -86,6 +86,36 @@ describe('resolveDistributionActions', () => {
     expect(actions[0]).toMatchObject({ group: 'miniprogram', kind: 'qr', url: 'https://mp.example' });
   });
 
+  it('prefers the per-platform scan link over the access URL', () => {
+    const actions = resolveDistributionActions(
+      {
+        id: 'a',
+        platforms: ['android', 'ios'],
+        accessUrl: 'https://a.example/web',
+        platformLinks: { android: 'https://a.example/m/android', ios: 'https://a.example/m/ios' },
+      },
+      null,
+    );
+    const byGroup = new Map(actions.map((action) => [action.group, action]));
+    expect(byGroup.get('android')?.url).toBe('https://a.example/m/android');
+    expect(byGroup.get('ios')?.url).toBe('https://a.example/m/ios');
+  });
+
+  it('keeps the access URL for groups without a platform link', () => {
+    const actions = resolveDistributionActions(
+      {
+        id: 'a',
+        platforms: ['android', 'harmonyos'],
+        accessUrl: 'https://a.example/web',
+        platformLinks: { android: 'https://a.example/m/android' },
+      },
+      null,
+    );
+    const byGroup = new Map(actions.map((action) => [action.group, action]));
+    expect(byGroup.get('android')?.url).toBe('https://a.example/m/android');
+    expect(byGroup.get('harmonyos')?.url).toBe('https://a.example/web');
+  });
+
   it('returns no actions for platform-less listings', () => {
     expect(resolveDistributionActions({ id: 'a', platforms: [] }, 'windows')).toEqual([]);
   });

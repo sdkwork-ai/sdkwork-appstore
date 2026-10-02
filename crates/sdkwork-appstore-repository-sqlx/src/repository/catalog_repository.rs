@@ -53,6 +53,74 @@ impl SqlxCatalogRepository {
     pub fn new(db: AppstoreSqlxDb) -> Self {
         Self { db }
     }
+
+    /// Per-platform scan/delivery links for the given listing apps, keyed by
+    /// app id and platform code (appstore_app_platform rows carrying a
+    /// `qrUrl` in their config). QR distributions prefer these over the
+    /// listing's generic access URL.
+    async fn find_platform_links(
+        &self,
+        context: &AppstoreRequestContext,
+        app_ids: &[&str],
+    ) -> Result<
+        std::collections::HashMap<String, std::collections::BTreeMap<String, String>>,
+        AppstoreServiceError,
+    > {
+        if app_ids.is_empty() {
+            return Ok(std::collections::HashMap::new());
+        }
+        let placeholders = app_ids.iter().map(|_| "?").collect::<Vec<_>>().join(", ");
+        let sql = format!(
+            r#"SELECT app_id, platform_code, config_json->>'qrUrl' AS qr_url
+            FROM appstore_app_platform
+            WHERE tenant_id = ? AND app_id IN ({placeholders})
+              AND platform_status = 'active'
+              AND config_json->>'qrUrl' IS NOT NULL
+            ORDER BY app_id ASC, platform_code ASC"#
+        );
+        let mut query = self
+            .db
+            .query_as::<(String, String, String)>(self.db.adapt_sql(&sql).as_str())
+            .bind(&context.tenant_id);
+        for app_id in app_ids.iter().copied() {
+            query = query.bind(app_id);
+        }
+        let rows = query
+            .fetch_all(&self.db)
+            .await
+            .map_err(|e| AppstoreServiceError::Internal(format!("Database error: {e}")))?;
+
+        let mut grouped: std::collections::HashMap<
+            String,
+            std::collections::BTreeMap<String, String>,
+        > = std::collections::HashMap::new();
+        for (app_id, platform_code, qr_url) in rows {
+            grouped
+                .entry(app_id)
+                .or_default()
+                .insert(platform_code, qr_url);
+        }
+        Ok(grouped)
+    }
+
+    /// Attaches platform links to listing summaries produced from search rows.
+    async fn attach_platform_links(
+        &self,
+        context: &AppstoreRequestContext,
+        mut summaries: Vec<ListingSummary>,
+    ) -> Result<Vec<ListingSummary>, AppstoreServiceError> {
+        let app_refs: Vec<&str> = summaries.iter().map(|s| s.app_id.as_str()).collect();
+        let links = self.find_platform_links(context, &app_refs).await?;
+        if links.is_empty() {
+            return Ok(summaries);
+        }
+        for summary in &mut summaries {
+            if let Some(app_links) = links.get(&summary.app_id) {
+                summary.platform_links = Some(app_links.clone());
+            }
+        }
+        Ok(summaries)
+    }
 }
 
 #[async_trait::async_trait]
@@ -910,10 +978,11 @@ impl CatalogRepositoryPort for SqlxCatalogRepository {
             .await
             .map_err(|e| AppstoreServiceError::Internal(format!("Database error: {}", e)))?;
 
-        Ok(rows
+        let summaries = rows
             .into_iter()
             .map(map_listing_search_row_to_domain)
-            .collect())
+            .collect();
+        self.attach_platform_links(context, summaries).await
     }
 
     async fn find_metric_snapshots(
@@ -1032,10 +1101,11 @@ impl CatalogRepositoryPort for SqlxCatalogRepository {
             .await
             .map_err(|e| AppstoreServiceError::Internal(format!("Database error: {}", e)))?;
 
-        Ok(rows
+        let summaries = rows
             .into_iter()
             .map(map_listing_search_row_to_domain)
-            .collect())
+            .collect();
+        self.attach_platform_links(context, summaries).await
     }
 
     async fn find_recently_updated_listings(
@@ -1118,10 +1188,11 @@ impl CatalogRepositoryPort for SqlxCatalogRepository {
             .await
             .map_err(|e| AppstoreServiceError::Internal(format!("Database error: {}", e)))?;
 
-        Ok(rows
+        let summaries = rows
             .into_iter()
             .map(map_listing_search_row_to_domain)
-            .collect())
+            .collect();
+        self.attach_platform_links(context, summaries).await
     }
 
     async fn find_event_collections(

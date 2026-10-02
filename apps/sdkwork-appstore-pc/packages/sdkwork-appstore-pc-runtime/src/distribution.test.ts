@@ -45,6 +45,29 @@ describe('appStore service distribution mapping', () => {
     expect(app?.accessUrl).toBe('https://tongyi.aliyun.com/qianwen');
   });
 
+  it('maps the per-platform scan links onto AppItem', async () => {
+    const client = stubClient([
+      {
+        id: 'app-feishu',
+        displayName: '飞书',
+        pricingModel: 'FREE',
+        platforms: ['android', 'ios'],
+        platformLinks: {
+          android: 'https://apps.sdkwork.com/m/app-feishu',
+          ios: 'https://apps.sdkwork.com/m/app-feishu',
+        },
+      },
+    ]);
+
+    const service = createAppStoreServicePort(client, stubComments());
+    const app = await service.getAppById('app-feishu');
+
+    expect(app?.platformLinks).toEqual({
+      android: 'https://apps.sdkwork.com/m/app-feishu',
+      ios: 'https://apps.sdkwork.com/m/app-feishu',
+    });
+  });
+
   it('keeps the PC-desktop fallback for rows without a platform projection', async () => {
     const client = stubClient([
       { id: 'app-cursor', displayName: 'Cursor AI', pricingModel: 'FREEMIUM' },

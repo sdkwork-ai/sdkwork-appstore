@@ -62,6 +62,7 @@
         "common/009_user_demo_data.sql",
         "common/010_download_capabilities.sql",
         "common/012_storefront_distribution.sql",
+        "common/013_app_platform_delivery.sql",
         "001_bootstrap.sql"
       ],
       "locales": {

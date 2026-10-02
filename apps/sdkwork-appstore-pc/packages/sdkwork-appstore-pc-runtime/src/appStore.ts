@@ -123,6 +123,7 @@ export function createAppStoreServicePort(
       screenshots: readStringArray(item, 'screenshots', 'mediaScreenshots'),
       platforms: readPlatformCodes(item),
       accessUrl: readString(item, 'accessUrl', 'access_url') || undefined,
+      platformLinks: readPlatformLinks(item),
       icon: visual.icon,
       iconColor: visual.color,
       version: readString(item, 'currentVersion', 'current_version') || '1.0.0',
@@ -693,6 +694,21 @@ function readPlatformCodes(item: Record<string, unknown>): string[] {
     .map((code) => code.trim())
     .filter(Boolean);
   return codes.length > 0 ? Array.from(new Set(codes)) : ['windows'];
+}
+
+/** Per-platform scan links from the catalog projection (platform code -> URL). */
+function readPlatformLinks(item: Record<string, unknown>): Record<string, string> | undefined {
+  const raw = item['platformLinks'] ?? item['platform_links'];
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) {
+    return undefined;
+  }
+  const links: Record<string, string> = {};
+  for (const [code, url] of Object.entries(raw as Record<string, unknown>)) {
+    if (typeof url === 'string' && url.trim()) {
+      links[code] = url.trim();
+    }
+  }
+  return Object.keys(links).length > 0 ? links : undefined;
 }
 
 function formatSize(fileSizeBytes: string | undefined): string {

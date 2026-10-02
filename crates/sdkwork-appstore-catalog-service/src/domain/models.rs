@@ -376,6 +376,10 @@ pub struct ListingSummary {
     /// distributions; the scan target encoded into distribution QR codes.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub access_url: Option<String>,
+    /// Per-platform scan/delivery links from `appstore_app_platform`
+    /// (`platform code -> qrUrl`), preferred by QR distributions.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub platform_links: Option<std::collections::BTreeMap<String, String>>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]

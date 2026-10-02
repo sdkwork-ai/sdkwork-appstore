@@ -29,6 +29,8 @@ export interface AppItem {
   accessUrl?: string;
   /** Verified installer artifacts of the current release (desktop download flow). */
   artifacts?: ListingArtifact[];
+  /** Per-platform scan/delivery links (platform code -> URL), preferred by QR actions. */
+  platformLinks?: Record<string, string>;
   whatsNew?: { version: string; date: string; notes: string };
   screenshots: string[];
   icon: string; // Lucide icon name or emoji

@@ -788,6 +788,9 @@ pub fn map_listing_search_row_to_domain(row: ListingSearchRow) -> ListingSummary
             .unwrap_or_default(),
         app_type: row.app_type,
         access_url: row.access_url,
+        // Attached post-mapping by the catalog repository from
+        // appstore_app_platform rows; the search row itself carries none.
+        platform_links: None,
     }
 }
 
