@@ -50,3 +50,41 @@ UPDATE appstore_app SET platforms = '["h5","miniprogram-wechat"]'::jsonb, access
 
 UPDATE appstore_app SET platforms = '["android","ios","harmonyos"]'::jsonb WHERE id IN ('game-mobile-mc','game-mobile-ys','game-mobile-honor');
 UPDATE appstore_app SET platforms = '["android","ios"]'::jsonb WHERE id = 'game-mobile-cf';
+
+-- Office & collaboration expansion (013 storefront catalog): desktop
+-- installers, direct-open web surfaces, and scan-to-continue mobile clients.
+UPDATE appstore_app SET platforms = '["windows","macos","linux","android","ios","harmonyos","web"]'::jsonb, access_url = 'https://www.feishu.cn' WHERE id = 'app-feishu';
+UPDATE appstore_app SET platforms = '["windows","macos","linux","android","ios","harmonyos","web"]'::jsonb, access_url = 'https://www.dingtalk.com' WHERE id = 'app-dingtalk';
+UPDATE appstore_app SET platforms = '["windows","macos","android","ios","harmonyos"]'::jsonb, access_url = 'https://work.weixin.qq.com' WHERE id = 'app-wecom';
+UPDATE appstore_app SET platforms = '["windows","macos","android","ios","harmonyos","miniprogram-wechat"]'::jsonb, access_url = 'https://meeting.tencent.com' WHERE id = 'app-tencent-meeting';
+UPDATE appstore_app SET platforms = '["web","windows","android","ios","miniprogram-wechat"]'::jsonb, access_url = 'https://docs.qq.com' WHERE id = 'app-tencent-docs';
+UPDATE appstore_app SET platforms = '["web","android","ios","miniprogram-wechat"]'::jsonb, access_url = 'https://shimo.im' WHERE id = 'app-shimo';
+UPDATE appstore_app SET platforms = '["web","windows","macos","android","ios"]'::jsonb, access_url = 'https://www.yuque.com' WHERE id = 'app-yuque';
+UPDATE appstore_app SET platforms = '["windows","macos","linux","android","ios"]'::jsonb, access_url = 'https://xmind.cn' WHERE id = 'app-xmind';
+UPDATE appstore_app SET platforms = '["windows","macos","linux","android","ios"]'::jsonb, access_url = 'https://obsidian.md' WHERE id = 'app-obsidian';
+UPDATE appstore_app SET platforms = '["windows","macos","android","ios"]'::jsonb, access_url = 'https://mail.163.com/dashi' WHERE id = 'app-mailmaster';
+UPDATE appstore_app SET platforms = '["windows","macos","linux","android","ios","web"]'::jsonb, access_url = 'https://www.jianguoyun.com' WHERE id = 'app-nutstore';
+UPDATE appstore_app SET platforms = '["windows","macos","android","ios","harmonyos","miniprogram-alipay"]'::jsonb, access_url = 'https://www.alipan.com' WHERE id = 'app-aliyundrive';
+UPDATE appstore_app SET platforms = '["windows","macos","linux","android","ios","web"]'::jsonb, access_url = 'https://zoom.us' WHERE id = 'app-zoom';
+UPDATE appstore_app SET platforms = '["windows","macos","android","ios","web"]'::jsonb, access_url = 'https://www.adobe.com/acrobat.html' WHERE id = 'app-acrobat';
+
+-- AI expansion.
+UPDATE appstore_app SET platforms = '["web","android","ios","macos","windows"]'::jsonb, access_url = 'https://chatgpt.com' WHERE id = 'app-chatgpt';
+UPDATE appstore_app SET platforms = '["web","android","ios"]'::jsonb, access_url = 'https://gemini.google.com' WHERE id = 'app-gemini';
+UPDATE appstore_app SET platforms = '["web","android","ios","miniprogram-wechat"]'::jsonb, access_url = 'https://chatglm.cn' WHERE id = 'app-chatglm';
+UPDATE appstore_app SET platforms = '["web","android","ios","harmonyos"]'::jsonb, access_url = 'https://xinghuo.xfyun.cn' WHERE id = 'app-spark';
+UPDATE appstore_app SET platforms = '["web","android","ios","miniprogram-wechat"]'::jsonb, access_url = 'https://yuanbao.tencent.com' WHERE id = 'app-yuanbao';
+UPDATE appstore_app SET platforms = '["windows","macos","linux","web"]'::jsonb, access_url = 'https://github.com/features/copilot' WHERE id = 'app-copilot';
+UPDATE appstore_app SET platforms = '["windows","macos","linux"]'::jsonb WHERE id = 'app-windsurf';
+UPDATE appstore_app SET platforms = '["web","android","ios"]'::jsonb, access_url = 'https://app.klingai.com' WHERE id = 'app-kling';
+UPDATE appstore_app SET platforms = '["web","android","ios"]'::jsonb, access_url = 'https://jimeng.jianying.com' WHERE id = 'app-jimeng';
+UPDATE appstore_app SET platforms = '["web","android","ios"]'::jsonb, access_url = 'https://hailuoai.com' WHERE id = 'app-hailuo';
+UPDATE appstore_app SET platforms = '["web"]'::jsonb, access_url = 'https://notebooklm.google.com' WHERE id = 'app-notebooklm';
+UPDATE appstore_app SET platforms = '["web","android","ios","miniprogram-wechat"]'::jsonb, access_url = 'https://metaso.cn' WHERE id = 'app-metaso';
+
+-- Utilities expansion.
+UPDATE appstore_app SET platforms = '["windows","macos","linux"]'::jsonb, access_url = 'https://zh.snipaste.com' WHERE id = 'app-snipaste';
+UPDATE appstore_app SET platforms = '["windows","linux","macos"]'::jsonb, access_url = 'https://www.7-zip.org' WHERE id = 'app-7zip';
+UPDATE appstore_app SET platforms = '["windows","macos","linux"]'::jsonb, access_url = 'https://obsproject.com' WHERE id = 'app-obs-studio';
+UPDATE appstore_app SET platforms = '["windows","macos","linux","android","ios"]'::jsonb, access_url = 'https://www.videolan.org' WHERE id = 'app-vlc';
+UPDATE appstore_app SET platforms = '["windows","macos","linux","android","ios","harmonyos","web"]'::jsonb, access_url = 'https://music.163.com' WHERE id = 'app-netease-music';

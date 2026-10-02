@@ -6,7 +6,8 @@ VALUES
     ('loc-col-1-en', '100001', 'col-1', 'en-US', 'Weekly Picks: AI Productivity Revolution', 'Editor picks for AI productivity apps', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
     ('loc-col-2-en', '100001', 'col-2', 'en-US', 'AI Coding & Agent Essentials', 'Tools that boost engineering efficiency from editors to agents', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
     ('loc-col-3-en', '100001', 'col-3', 'en-US', 'AI Creative & Multimedia Reimagined', 'AI image, music, and video creation', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-    ('loc-col-4-en', '100001', 'col-4', 'en-US', 'Board & Card Game Hall', 'Landlord, mahjong, xiangqi, and other classics', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+    ('loc-col-4-en', '100001', 'col-4', 'en-US', 'Board & Card Game Hall', 'Landlord, mahjong, xiangqi, and other classics', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('loc-col-5-en', '100001', 'col-5', 'en-US', 'Office Essentials for Efficient Teams', 'Feishu, DingTalk, Tencent Meeting, and collaboration suites', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
 ON CONFLICT (id) DO UPDATE SET
     display_name = EXCLUDED.display_name,
     description = EXCLUDED.description,
@@ -24,7 +25,10 @@ VALUES
     ('trend-7-en', '100001', 'Manus Agent', 'en-US', 7, 67.0, '2026-08-03', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
     ('trend-8-en', '100001', 'Tencent ima', 'en-US', 8, 61.5, '2026-08-03', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
     ('trend-9-en', '100001', 'Notion AI', 'en-US', 9, 56.0, '2026-08-03', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-    ('trend-10-en', '100001', 'ComfyUI', 'en-US', 10, 50.5, '2026-08-03', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+    ('trend-10-en', '100001', 'ComfyUI', 'en-US', 10, 50.5, '2026-08-03', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('trend-11-en', '100001', 'Feishu (Lark)', 'en-US', 11, 47.0, '2026-10-03', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('trend-12-en', '100001', 'Tencent Meeting', 'en-US', 12, 43.5, '2026-10-03', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('trend-13-en', '100001', 'ChatGPT', 'en-US', 13, 40.0, '2026-10-03', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
 ON CONFLICT (id) DO UPDATE SET
     term = EXCLUDED.term,
     rank = EXCLUDED.rank,

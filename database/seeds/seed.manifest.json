@@ -19,9 +19,9 @@
   ],
   "localeSets": {
     "zh-CN": {
-      "version": "1.0.0",
+      "version": "1.1.0",
       "required": true,
-      "checksum": "sha256:280697bc3f6d0789954fbbe208c80a5c180d3addc45b44640c1464658a569e10",
+      "checksum": "sha256:e37663f666867671777f86e408b5796da3ac22116e057d92e310c03f371786e4",
       "files": [
         "locales/zh-CN/001_storefront_listings_zh.sql",
         "locales/zh-CN/002_storefront_releases_zh.sql",
@@ -29,9 +29,9 @@
       ]
     },
     "en-US": {
-      "version": "1.0.0",
+      "version": "1.1.0",
       "required": false,
-      "checksum": "sha256:e9bf4ed7c865e39e234b800cb3ffacbdf78329fd7c4d7d438e67b328294414c6",
+      "checksum": "sha256:6e94cfe769d57dd57f31ec343956c8c0714af6921715684e4232033d09fa92bd",
       "files": [
         "locales/en-US/001_storefront_listings_en.sql",
         "locales/en-US/002_storefront_releases_en.sql",

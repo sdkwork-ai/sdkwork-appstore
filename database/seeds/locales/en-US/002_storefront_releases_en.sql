@@ -87,7 +87,73 @@ VALUES
 • Improved PDF editing', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
     ('note-app-baidunetdisk-1120-en', '100001', '0', 'rel-app-baidunetdisk-1120', 'en-US', '• AI photo organization', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
     ('note-app-wechat-8030-en', '100001', '0', 'rel-app-wechat-8030', 'en-US', '• Channels live streaming features', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-    ('note-app-douyin-2760-en', '100001', '0', 'rel-app-douyin-2760', 'en-US', '• AI video editing tools', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+    ('note-app-douyin-2760-en', '100001', '0', 'rel-app-douyin-2760', 'en-US', '• AI video editing tools', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('note-app-feishu-765-en', '100001', '0', 'rel-app-feishu-765', 'en-US', '• AI companion generates meeting minutes
+• Base adds automation flows
+• Improved meeting caption accuracy', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('note-app-dingtalk-760-en', '100001', '0', 'rel-app-dingtalk-760', 'en-US', '• AI assistant with meeting minutes
+• Approval flows support conditional branches
+• Performance and stability fixes', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('note-app-wecom-412-en', '100001', '0', 'rel-app-wecom-412', 'en-US', '• Smart sheets support multiple views
+• Employee services and approval improvements', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('note-app-tencent-meeting-3281-en', '100001', '0', 'rel-app-tencent-meeting-3281', 'en-US', '• AI assistant answers in-meeting questions
+• Smart minutes extract action items
+• Better audio quality on weak networks', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('note-app-tencent-docs-290-en', '100001', '0', 'rel-app-tencent-docs-290', 'en-US', '• Smart sheets add automation and plugins
+• Collaboration performance improvements', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('note-app-shimo-540-en', '100001', '0', 'rel-app-shimo-540', 'en-US', '• AI polish and full-text summary
+• New office template collections', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('note-app-yuque-421-en', '100001', '0', 'rel-app-yuque-421', 'en-US', '• AI writing assistant
+• Extended knowledge-base export formats', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('note-app-xmind-2501-en', '100001', '0', 'rel-app-xmind-2501', 'en-US', '• AI mind-map generation
+• One-tap outline presenting', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('note-app-obsidian-189-en', '100001', '0', 'rel-app-obsidian-189', 'en-US', '• Canvas and properties panel enhancements
+• Sync performance and stability improvements', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('note-app-mailmaster-635-en', '100001', '0', 'rel-app-mailmaster-635', 'en-US', '• AI mail summary and smart replies
+• Faster attachment search', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('note-app-nutstore-714-en', '100001', '0', 'rel-app-nutstore-714', 'en-US', '• Smart sync conflict handling
+• Finer team space permissions', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('note-app-aliyundrive-620-en', '100001', '0', 'rel-app-aliyundrive-620', 'en-US', '• Resource library and cast playback
+• Upgraded smart album organization', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('note-app-zoom-631-en', '100001', '0', 'rel-app-zoom-631', 'en-US', '• AI Companion generates action items
+• Enhanced webinar interactions', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('note-app-acrobat-251-en', '100001', '0', 'rel-app-acrobat-251', 'en-US', '• AI assistant document Q&A and summaries
+• Improved annotation experience', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('note-app-chatgpt-202630-en', '100001', '0', 'rel-app-chatgpt-202630', 'en-US', '• More natural advanced voice mode
+• Real-time vision understanding
+• Chart export for data analysis', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('note-app-gemini-20262-en', '100001', '0', 'rel-app-gemini-20262', 'en-US', '• Deep Research produces full reports
+• Deeper Gmail and Docs integration', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('note-app-chatglm-460-en', '100001', '0', 'rel-app-chatglm-460', 'en-US', '• GLM-4 vision understanding
+• Expanded agent template marketplace', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('note-app-spark-420-en', '100001', '0', 'rel-app-spark-420', 'en-US', '• Spark speech model upgrade
+• Batch document quick-reading', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('note-app-yuanbao-280-en', '100001', '0', 'rel-app-yuanbao-280', 'en-US', '• DeepSeek-R1 thinking mode
+• Broader WeChat article source retrieval', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('note-app-copilot-21800-en', '100001', '0', 'rel-app-copilot-21800', 'en-US', '• Agent mode multi-file edits
+• Model choice and custom instructions', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('note-app-windsurf-1124-en', '100001', '0', 'rel-app-windsurf-1124', 'en-US', '• Cascade multi-step task execution
+• Automatic terminal command review', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('note-app-kling-160-en', '100001', '0', 'rel-app-kling-160', 'en-US', '• 1.6 model quality and motion upgrade
+• Tail-frame continuation support', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('note-app-jimeng-310-en', '100001', '0', 'rel-app-jimeng-310', 'en-US', '• Image 3.0 model
+• Smart canvas batch generation', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('note-app-hailuo-192-en', '100001', '0', 'rel-app-hailuo-192', 'en-US', '• Image-to-video generation
+• More natural voice cloning', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('note-app-notebooklm-140-en', '100001', '0', 'rel-app-notebooklm-140', 'en-US', '• Multilingual audio overviews
+• Improved citation traceability', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('note-app-metaso-270-en', '100001', '0', 'rel-app-metaso-270', 'en-US', '• Trending topic tracking
+• Wider academic search coverage', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('note-app-snipaste-206-en', '100001', '0', 'rel-app-snipaste-206', 'en-US', '• High-DPI screen adaptation
+• Pin opacity adjustment', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('note-app-7zip-249-en', '100001', '0', 'rel-app-7zip-249', 'en-US', '• Updated RAR and NSIS decoding
+• Improved compression performance', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('note-app-obs-studio-31002-en', '100001', '0', 'rel-app-obs-studio-31002', 'en-US', '• Panoramic and mixed output support
+• Encoder stability fixes', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('note-app-vlc-3021-en', '100001', '0', 'rel-app-vlc-3021', 'en-US', '• Updated decoders and HDR support
+• Improved subtitle sync precision', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('note-app-netease-music-315-en', '100001', '0', 'rel-app-netease-music-315', 'en-US', '• Upgraded AI recommendations
+• Expanded VIP perks', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
 ON CONFLICT (id) DO UPDATE SET
     release_notes = EXCLUDED.release_notes,
     updated_at = EXCLUDED.updated_at;

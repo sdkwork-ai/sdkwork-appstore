@@ -30,6 +30,7 @@ VALUES
     ('catloc-board-games-en', '100001', 'cat-board-games', 'en-US', 'Board & Card Games', 'Classic board and card games', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
     ('catloc-mini-games-en', '100001', 'cat-mini-games', 'en-US', 'Mini Games', 'Lightweight mini-game collection', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
     ('catloc-mobile-games-en', '100001', 'cat-mobile-games', 'en-US', 'Mobile Games', 'Premium mobile games', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('catloc-office-en', '100001', 'cat-office', 'en-US', 'Office & Collaboration', 'Documents, meetings, mail, cloud drives, and daily productivity', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
     ('catloc-utilities-en', '100001', 'cat-utilities', 'en-US', 'Utilities', 'Essential desktop utilities', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
 ON CONFLICT (id) DO UPDATE SET
     display_name = EXCLUDED.display_name,

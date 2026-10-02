@@ -6,7 +6,8 @@ VALUES
     ('loc-col-1', '100001', 'col-1', 'zh-CN', '本期精选 - AI 生产力革命', '编辑部精选的 AI 生产力应用', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
     ('loc-col-2', '100001', 'col-2', 'zh-CN', 'AI 编程与 Agent 神器 - 从编辑器到智能体', '全面提升研发效率的 AI 工具', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
     ('loc-col-3', '100001', 'col-3', 'zh-CN', 'AI 创意与多媒体重构 - 灵感无限', 'AI 图像、音乐与视频创作', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-    ('loc-col-4', '100001', 'col-4', 'zh-CN', '棋牌游戏大厅 - 经典棋牌一网打尽', '斗地主、麻将、象棋等经典棋牌', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+    ('loc-col-4', '100001', 'col-4', 'zh-CN', '棋牌游戏大厅 - 经典棋牌一网打尽', '斗地主、麻将、象棋等经典棋牌', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('loc-col-5', '100001', 'col-5', 'zh-CN', '办公精选 - 高效团队都在用', '飞书、钉钉、腾讯会议等办公协同套件', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
 ON CONFLICT (id) DO UPDATE SET
     display_name = EXCLUDED.display_name,
     description = EXCLUDED.description,
@@ -24,7 +25,10 @@ VALUES
     ('trend-7', '100001', 'Manus Agent', 'zh-CN', 7, 67.0, '2026-08-03', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
     ('trend-8', '100001', '腾讯 ima', 'zh-CN', 8, 61.5, '2026-08-03', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
     ('trend-9', '100001', 'Notion AI', 'zh-CN', 9, 56.0, '2026-08-03', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-    ('trend-10', '100001', 'ComfyUI', 'zh-CN', 10, 50.5, '2026-08-03', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+    ('trend-10', '100001', 'ComfyUI', 'zh-CN', 10, 50.5, '2026-08-03', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('trend-11', '100001', '飞书', 'zh-CN', 11, 47.0, '2026-10-03', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('trend-12', '100001', '腾讯会议', 'zh-CN', 12, 43.5, '2026-10-03', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('trend-13', '100001', 'ChatGPT', 'zh-CN', 13, 40.0, '2026-10-03', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
 ON CONFLICT (id) DO UPDATE SET
     term = EXCLUDED.term,
     rank = EXCLUDED.rank,

@@ -28,6 +28,7 @@ const categoryVisuals: Record<string, { icon: string; color: string }> = {
   'board-games': { icon: 'Dices', color: 'bg-store-warning' },
   'mini-games': { icon: 'Smartphone', color: 'bg-store-info' },
   'mobile-games': { icon: 'Gamepad', color: 'bg-store-brand' },
+  office: { icon: 'Briefcase', color: 'bg-sky-700' },
   utilities: { icon: 'Wrench', color: 'bg-store-brand' },
   apps: { icon: 'AppWindow', color: 'bg-gray-800' },
   games: { icon: 'Gamepad2', color: 'bg-store-success' },

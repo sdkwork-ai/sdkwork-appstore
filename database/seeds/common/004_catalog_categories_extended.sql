@@ -12,6 +12,7 @@ VALUES
     ('cat-board-games', '100001', 'board-games', NULL, 1, 'active', 150, 'mr-cat-board-games-icon', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
     ('cat-mini-games', '100001', 'mini-games', NULL, 1, 'active', 160, 'mr-cat-mini-games-icon', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
     ('cat-mobile-games', '100001', 'mobile-games', NULL, 1, 'active', 170, 'mr-cat-mobile-games-icon', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('cat-office', '100001', 'office', NULL, 1, 'active', 175, 'mr-cat-office-icon', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
     ('cat-utilities', '100001', 'utilities', NULL, 1, 'active', 180, 'mr-cat-utilities-icon', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
 ON CONFLICT (id) DO UPDATE SET
     category_status = EXCLUDED.category_status,
@@ -29,6 +30,7 @@ VALUES
     ('catloc-board-games', '100001', 'cat-board-games', 'zh-CN', '棋牌游戏', '棋牌与休闲对弈游戏', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
     ('catloc-mini-games', '100001', 'cat-mini-games', 'zh-CN', '微信小游戏', '微信小游戏合集', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
     ('catloc-mobile-games', '100001', 'cat-mobile-games', 'zh-CN', '精品手游', '精品移动端游戏', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('catloc-office', '100001', 'cat-office', 'zh-CN', '办公软件', '文档协作、音视频会议、邮箱网盘与效率办公', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
     ('catloc-utilities', '100001', 'cat-utilities', 'zh-CN', '实用程序与工具', '效率工具与实用程序', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
 ON CONFLICT (id) DO UPDATE SET
     display_name = EXCLUDED.display_name,
