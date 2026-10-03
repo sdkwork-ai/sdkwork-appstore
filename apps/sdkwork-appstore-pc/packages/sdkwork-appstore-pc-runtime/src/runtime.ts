@@ -24,6 +24,7 @@ import { configureAppstorePcMcp } from './mcp';
 import { configureAppstorePcPlugins } from './plugins';
 import { configureAppstorePcSkills } from './skills';
 import { configureAppstorePcTemplates } from './templates';
+import { configureAppstorePcUserStore } from './userStore';
 
 export interface AppstorePcRuntime {
   config: AppstorePcRuntimeConfig;
@@ -80,6 +81,7 @@ export function createAppstorePcRuntime(
   configureAppstorePcPlugins(sdkClients.app);
   configureAppstorePcConsole(sdkClients.app);
   configureAppstorePcInstall(sdkClients.app);
+  configureAppstorePcUserStore(sdkClients);
   configureAppstorePcAdminRuntime(config, tokenManager);
 
   return { config, iamRuntime, sdkClients, session };

@@ -3,6 +3,10 @@ import {
   type AppStoreClient,
 } from '@sdkwork/appstore-app-sdk';
 import {
+  createAppStoreOpenClient,
+  type AppStoreOpenClient,
+} from '@sdkwork/appstore-sdk';
+import {
   createClient as createCommentsAppClient,
   type SdkworkAppClient as CommentsAppClient,
 } from '@sdkwork/comments-app-sdk';
@@ -30,6 +34,7 @@ export type {
   AgentRuntimeExecutionRecord,
   AgentsAppClient,
   AppStoreClient,
+  AppStoreOpenClient,
   CommentsAppClient,
   McpAppClient,
   McpServerRecord,
@@ -45,6 +50,8 @@ export interface AppstorePcSdkClientInventory {
   app: AppStoreClient;
   comments: CommentsAppClient;
   mcp: McpAppClient;
+  /** Anonymous open-api client (`/store/v3/api`); public share views. */
+  open: AppStoreOpenClient;
   sdkFamilies: {
     app: readonly string[];
   };
@@ -95,15 +102,22 @@ export function createAppstorePcSdkClients(
     platform: 'pc',
     tokenManager,
   });
+  // The open-api surface rides the same gateway origin as the app-api; the
+  // generated client re-adds the `/store/v3/api` prefix per operation.
+  const open = createAppStoreOpenClient({
+    baseUrl: normalizeGeneratedSdkBaseUrl(config.appApiBaseUrl, '/app/v3/api'),
+  });
 
   return {
     agents,
     app,
     comments,
     mcp,
+    open,
     sdkFamilies: {
       app: [
         'sdkwork-appstore-app-sdk',
+        'sdkwork-appstore-sdk',
         'sdkwork-iam-app-sdk',
         'sdkwork-agents-app-sdk',
         'sdkwork-skills-app-sdk',

@@ -89,7 +89,12 @@ describe('createAppstorePcRuntime session-auth boundary', () => {
 
   function stubTokenManagerWithAccessToken(): AuthTokenManager {
     const manager = stubTokenManager() as unknown as Record<string, unknown>;
-    manager.getAccessToken = () => 'bootstrap-access-token';
+    // The iam runtime validates the bootstrap access token as a JWT compact
+    // serialization with a non-negative integer `token_version` claim
+    // (sdkwork-appbase jwtTransport), so the stub carries both even though the
+    // signature is never verified here.
+    manager.getAccessToken = () =>
+      'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwidG9rZW5fdmVyc2lvbiI6MX0.c3R1Yg';
     return manager as unknown as AuthTokenManager;
   }
 

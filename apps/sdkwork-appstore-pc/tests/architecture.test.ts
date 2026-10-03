@@ -8,8 +8,8 @@ function readSource(relativePath: string): string {
 
 describe('PC architecture contracts', () => {
   it('uses the shared IAM runtime and generated SDK clients', () => {
-    const iamRuntime = readSource('src/bootstrap/iamRuntime.ts');
-    const sdkClients = readSource('src/bootstrap/sdkClients.ts');
+    const iamRuntime = readSource('packages/sdkwork-appstore-pc-runtime/src/iamRuntime.ts');
+    const sdkClients = readSource('packages/sdkwork-appstore-pc-core/src/sdk/clients.ts');
 
     expect(iamRuntime).toContain('createSdkworkAppbasePcAuthRuntime');
     expect(iamRuntime).toContain('credentialEntry');
@@ -28,22 +28,22 @@ describe('PC architecture contracts', () => {
     const mcpService = readSource(
       'packages/sdkwork-appstore-pc-core/src/services/mcp.ts',
     );
-    const skillsBootstrap = readSource('src/bootstrap/skills.ts');
-    const mcpBootstrap = readSource('src/bootstrap/mcp.ts');
+    const skillsBootstrap = readSource('packages/sdkwork-appstore-pc-runtime/src/skills.ts');
+    const mcpBootstrap = readSource('packages/sdkwork-appstore-pc-runtime/src/mcp.ts');
 
     expect(skillsService).not.toContain('localStorage');
     expect(skillsService).not.toContain('mockSkills');
     expect(mcpService).not.toContain('localStorage');
     expect(mcpService).not.toContain('mockMcpServers');
     expect(skillsBootstrap).toContain('client.skills.marketplace.list');
-    expect(mcpBootstrap).toContain('client.mcp.listServers');
+    expect(mcpBootstrap).toContain('client.mcp.servers.list');
   });
 
   it('keeps AI execution behind the Agents SDK boundary', () => {
     const aiHubService = readSource(
       'packages/sdkwork-appstore-pc-core/src/services/aihub.ts',
     );
-    const aiHubBootstrap = readSource('src/bootstrap/aiHub.ts');
+    const aiHubBootstrap = readSource('packages/sdkwork-appstore-pc-runtime/src/aiHub.ts');
 
     expect(aiHubService).not.toMatch(/\bfetch\s*\(/u);
     expect(aiHubBootstrap).toContain('previewResponses.create');

@@ -141,6 +141,11 @@ export function AppstorePcRoutes({
             <Route path="publisher/apps/new" element={<PublisherCreateAppPage />} />
             <Route path="publisher/apps/:id" element={<PublisherAppManagePage />} />
           </Route>
+          {/* Operator console: the admin shell owns its own chrome and internal
+            routing under the `/admin` prefix, so it mounts outside the
+            storefront Layout. AuthGate still protects the prefix
+            (authGateLogic protected paths). */}
+          <Route path="/admin/*" element={<AppstoreAdminSurface runtime={runtime} />} />
         </Routes>
       </AuthGate>
     </SdkworkSessionAuthBrowserRoot>

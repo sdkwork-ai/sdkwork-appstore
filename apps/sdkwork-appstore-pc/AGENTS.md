@@ -16,7 +16,8 @@ Read `sdkwork.app.config.json` for application identity, release, media, and pac
 
 - `specs/`: application-level component and composition contracts.
 - `packages/*/specs/`: independently authored PC module contracts.
-- `src/bootstrap/`: runtime configuration, IAM, global TokenManager, and SDK client composition.
+- `packages/sdkwork-appstore-pc-runtime/`: runtime configuration, IAM, global TokenManager, and SDK client composition.
+- `packages/sdkwork-appstore-pc-merchandise/src/bootstrap/`: standalone entry bootstrap wiring (auth, session store).
 - `packages/`: app, console, backend-admin, shell, feature, and host modules.
 - `etc/`: source-controlled runtime and deployment configuration.
 - `tests/`: application architecture and contract tests.
