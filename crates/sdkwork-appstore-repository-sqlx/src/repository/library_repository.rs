@@ -21,7 +21,9 @@ use sdkwork_appstore_library_service::domain::models::{
     UserLibraryItem, UserWishlistItem,
 };
 use sdkwork_appstore_library_service::error::AppstoreServiceError;
-use sdkwork_appstore_library_service::ports::repository::{ArtifactDelivery, LibraryRepositoryPort};
+use sdkwork_appstore_library_service::ports::repository::{
+    ArtifactDelivery, LibraryRepositoryPort,
+};
 
 #[derive(Debug, Clone)]
 pub struct SqlxLibraryRepository {

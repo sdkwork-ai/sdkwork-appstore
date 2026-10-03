@@ -1,11 +1,10 @@
-import type { AppStoreClient } from '@sdkwork/appstore-pc-core';
+import type { AppStoreClient, DownloadGrant } from '@sdkwork/appstore-pc-core';
 import {
   configureInstallServicePort,
   type InstallerDownload,
   type InstallServicePort,
   type StorageStats,
 } from '@sdkwork/appstore-pc-core';
-import type { DownloadGrant } from '@sdkwork/appstore-app-sdk';
 
 export function configureAppstorePcInstall(client: AppStoreClient): void {
   configureInstallServicePort(createInstallServicePort(client));

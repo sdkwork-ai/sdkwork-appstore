@@ -43,7 +43,11 @@ impl SqlxListingRepository {
         if release_ids.is_empty() {
             return Ok(std::collections::HashMap::new());
         }
-        let placeholders = release_ids.iter().map(|_| "?").collect::<Vec<_>>().join(", ");
+        let placeholders = release_ids
+            .iter()
+            .map(|_| "?")
+            .collect::<Vec<_>>()
+            .join(", ");
         let sql = format!(
             r#"SELECT release_id, id, platform, architecture, package_format, file_size_bytes
             FROM appstore_release_artifact
@@ -65,15 +69,16 @@ impl SqlxListingRepository {
         let mut grouped: std::collections::HashMap<String, Vec<serde_json::Value>> =
             std::collections::HashMap::new();
         for row in rows {
-            grouped.entry(row.release_id.clone()).or_default().push(
-                serde_json::json!({
+            grouped
+                .entry(row.release_id.clone())
+                .or_default()
+                .push(serde_json::json!({
                     "id": row.id,
                     "platform": row.platform,
                     "architecture": row.architecture,
                     "packageFormat": row.package_format,
                     "fileSizeBytes": row.file_size_bytes,
-                }),
-            );
+                }));
         }
         Ok(grouped)
     }

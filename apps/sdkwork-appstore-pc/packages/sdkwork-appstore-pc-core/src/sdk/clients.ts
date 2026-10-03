@@ -1,6 +1,7 @@
 import {
   createAppStoreClient,
   type AppStoreClient,
+  type DownloadGrant,
 } from '@sdkwork/appstore-app-sdk';
 import {
   createAppStoreOpenClient,
@@ -36,6 +37,7 @@ export type {
   AppStoreClient,
   AppStoreOpenClient,
   CommentsAppClient,
+  DownloadGrant,
   McpAppClient,
   McpServerRecord,
   SkillArtifactRecord,

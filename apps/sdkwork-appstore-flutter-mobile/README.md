@@ -73,13 +73,15 @@ implementations.
 
 | Surface | Workspace | Package | Status |
 | --- | --- | --- | --- |
-| app-api | `sdkwork-appstore-app-sdk` | `sdkwork_appstore_app_sdk` | transport pending Dart target generation |
+| app-api | `sdkwork-appstore-app-sdk` | `sdkwork_appstore_app_sdk` | bound (generated Dart target, path dependency from `sdks/`) |
 
-The SDK generation chain currently emits the TypeScript target of
-`sdkwork-appstore-app-sdk` only. `core` therefore declares the SDK port
-contract, base-URL normalization, and credential resolution boundary instead of
-vendoring a transport copy or importing a package that does not exist. Feature
-packages must never fill this gap with raw request APIs or manual auth headers.
+The generated Dart target of `sdkwork-appstore-app-sdk` is bound by the root
+bootstrap as a path dependency; `core` owns the SDK port contract, base-URL
+normalization, and the single token-owner session bridge. The skills and MCP
+Dart targets are vendored import-rewritten copies under
+`packages/sdkwork_appstore_flutter_mobile_core/lib/src/vendor/`
+(regenerate-then-re-vendor is the upgrade path). Feature packages never fill a
+transport gap with raw request APIs or manual auth headers.
 
 ## Configuration
 

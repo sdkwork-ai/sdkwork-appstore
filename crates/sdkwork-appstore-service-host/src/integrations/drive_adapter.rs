@@ -270,14 +270,22 @@ impl LibraryProviderPort for DriveIntegrationAdapter {
         drive_node_id: &str,
         expires_in_seconds: i64,
     ) -> Result<sdkwork_appstore_library_service::ports::provider::DownloadUrlResult, String> {
-        let url = ReleaseProviderPort::generate_download_url(self, tenant_id, drive_node_id, expires_in_seconds).await?;
+        let url = ReleaseProviderPort::generate_download_url(
+            self,
+            tenant_id,
+            drive_node_id,
+            expires_in_seconds,
+        )
+        .await?;
         // The presigned URL TTL is clamped server-side (30..300s); report the
         // same clamp so consumers do not treat the link as longer-lived.
         let ttl = expires_in_seconds.clamp(30, 300);
-        Ok(sdkwork_appstore_library_service::ports::provider::DownloadUrlResult {
-            url,
-            expires_at: chrono::Utc::now() + chrono::Duration::seconds(ttl),
-        })
+        Ok(
+            sdkwork_appstore_library_service::ports::provider::DownloadUrlResult {
+                url,
+                expires_at: chrono::Utc::now() + chrono::Duration::seconds(ttl),
+            },
+        )
     }
 
     async fn resolve_latest_release(
@@ -285,7 +293,8 @@ impl LibraryProviderPort for DriveIntegrationAdapter {
         _tenant_id: &str,
         _listing_id: &str,
         _platform: &str,
-    ) -> Result<Option<sdkwork_appstore_library_service::ports::provider::ReleaseInfo>, String> {
+    ) -> Result<Option<sdkwork_appstore_library_service::ports::provider::ReleaseInfo>, String>
+    {
         // Release resolution is owned by the release service adapter.
         Err("latest-release resolution is not part of the drive integration".to_string())
     }

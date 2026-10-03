@@ -728,10 +728,8 @@ where
             .consume_download_grant_atomically(context, grant_id, user_id)
             .await?
         {
-            let mut result = ConsumeDownloadGrantResult::consumed(
-                "appstore.downloadGrants.consume",
-                grant,
-            );
+            let mut result =
+                ConsumeDownloadGrantResult::consumed("appstore.downloadGrants.consume", grant);
             if let Some(delivery) = self.resolve_grant_delivery(context, &result.grant).await {
                 result = result.with_delivery(delivery);
             }

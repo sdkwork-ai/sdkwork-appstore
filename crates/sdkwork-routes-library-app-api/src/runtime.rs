@@ -4,12 +4,8 @@ use crate::handlers::{
     wishlist_items_list, wishlist_items_remove,
 };
 use crate::mapper::response::{
-    map_consumed_download_grant,
-    map_download_grant,
-    map_library_install,
-    map_library_item,
-    map_update_available,
-    map_wishlist_item,
+    map_consumed_download_grant, map_download_grant, map_library_install, map_library_item,
+    map_update_available, map_wishlist_item,
 };
 use axum::extract::{Extension, Json, Path, Query, State};
 use axum::response::Response;
