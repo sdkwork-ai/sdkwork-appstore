@@ -37,6 +37,7 @@
     "@sdkwork/cloudrouter-app-sdk": "workspace:*",
     "@sdkwork/comments-app-sdk": "workspace:*",
     "@sdkwork/drive-app-sdk": "workspace:*",
+    "@sdkwork/drive-upload-image-core": "workspace:*",
     "@sdkwork/iam-credential-entry": "workspace:*",
     "@sdkwork/iam-h5-auth": "workspace:*",
     "@sdkwork/sdk-common": "workspace:*",

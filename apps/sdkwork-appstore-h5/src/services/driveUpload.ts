@@ -1,5 +1,10 @@
 import { hexEncode } from '@sdkwork/utils';
 import type { DriveUploaderProgress } from '@sdkwork/drive-app-sdk';
+import {
+  createDriveNodesImagePreviewReader,
+  createDriveUploadImageService,
+  type DriveUploadImageService,
+} from '@sdkwork/drive-upload-image-core';
 import type { ListingMediaAttachRequest } from '@sdkwork/appstore-app-sdk';
 import {
   APPSTORE_H5_LISTING_MEDIA_UPLOAD,
@@ -16,6 +21,14 @@ export interface UploadListingMediaParams {
   platformScope?: string;
   locale?: string;
   onProgress?: (progress: DriveUploaderProgress) => void;
+}
+
+export interface AttachListingMediaParams {
+  listingId: string;
+  mediaRole: ListingMediaAttachRequest['mediaRole'];
+  mediaResourceId: string;
+  platformScope?: string;
+  locale?: string;
 }
 
 export interface UploadReleaseArtifactParams {
@@ -58,12 +71,38 @@ export async function uploadListingMedia(params: UploadListingMediaParams) {
   });
 
   const assetId = uploadResult.uploadItem.nodeId;
+  return attachListingMedia({
+    listingId: params.listingId,
+    mediaRole: params.mediaRole,
+    mediaResourceId: assetId,
+    platformScope: params.platformScope,
+    locale: params.locale,
+  });
+}
+
+/** Attach an already-uploaded Drive node to a listing as listing media. */
+export async function attachListingMedia(params: AttachListingMediaParams) {
   const store = getStoreClient();
   return store.listings.attachMedia(params.listingId, {
     mediaRole: params.mediaRole,
-    mediaResourceId: assetId,
+    mediaResourceId: params.mediaResourceId,
     platformScope: params.platformScope ?? 'ALL',
     locale: params.locale,
+  });
+}
+
+/**
+ * Build the shared Drive image-upload service for listing-media images, bound
+ * to the declared `APPSTORE_H5_LISTING_MEDIA_UPLOAD` intent
+ * (`DRIVE_SPEC.md` §18: the service layer, not the UI, supplies the declared
+ * values). Components receive only this service.
+ */
+export function createAppstoreListingImageService(): DriveUploadImageService {
+  const drive = getDriveClient();
+  return createDriveUploadImageService({
+    uploader: drive.uploader,
+    declaration: APPSTORE_H5_LISTING_MEDIA_UPLOAD,
+    previewReader: createDriveNodesImagePreviewReader(drive.drive.nodes),
   });
 }
 

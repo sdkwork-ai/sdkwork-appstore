@@ -9,6 +9,7 @@ export {
 export {
   configurePublisherUploads,
   getPublisherUploads,
+  type AttachListingMediaParams,
   type PublisherUploadHandlers,
   type UploadListingMediaParams,
   type UploadReleaseArtifactParams,

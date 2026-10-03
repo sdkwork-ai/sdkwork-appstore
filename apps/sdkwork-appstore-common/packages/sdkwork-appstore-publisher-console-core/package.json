@@ -7,6 +7,7 @@
   "dependencies": {
     "@sdkwork/appstore-app-sdk": "workspace:*",
     "@sdkwork/drive-app-sdk": "workspace:*",
+    "@sdkwork/drive-upload-image-core": "workspace:*",
     "@sdkwork/utils": "workspace:*",
     "react": "catalog:"
   },

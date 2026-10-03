@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import {
@@ -11,6 +11,11 @@ import {
   useListingReleases,
   usePublisher,
 } from '@sdkwork/appstore-publisher-console-core';
+import { DriveUploadImage, DriveUploadImageList } from '@sdkwork/drive-mobile-react-upload-image';
+import type {
+  DriveUploadImageCopy,
+  DriveUploadImageValue,
+} from '@sdkwork/drive-upload-image-core';
 import { LoadingSpinner, readString } from '@sdkwork/appstore-h5-commons';
 
 const MEDIA_ROLES = [
@@ -18,6 +23,25 @@ const MEDIA_ROLES = [
   { value: 'SCREENSHOT', label: '截图' },
   { value: 'FEATURE_GRAPHIC', label: '特色图' },
 ] as const;
+
+/** Chinese copy for the shared upload-image shells, matching this page's language. */
+const UPLOAD_IMAGE_COPY: Partial<DriveUploadImageCopy> = {
+  pickImage: '上传图片',
+  replaceImage: '更换图片',
+  removeImage: '移除图片',
+  retryUpload: '重试上传',
+  uploading: '上传中…',
+  uploadFailed: '上传失败',
+  invalidFileType: '仅支持图片文件。',
+  fileTooLarge: '图片过大。',
+  emptyFile: '文件为空。',
+  tooManyFiles: '选择的图片过多。',
+  fileTooLargeDetail: '图片必须小于 {max}。',
+  previewUnavailable: '预览不可用',
+  chooseFromAlbum: '从相册选择',
+  takePhoto: '拍照',
+  cancel: '取消',
+};
 
 export function PublisherListingManagePage() {
   const { listingId = '' } = useParams();
@@ -57,8 +81,9 @@ export function PublisherListingManagePage() {
   const [localizationMessage, setLocalizationMessage] = useState<string | null>(null);
 
   const [mediaRole, setMediaRole] = useState<(typeof MEDIA_ROLES)[number]['value']>('ICON');
-  const [mediaUploading, setMediaUploading] = useState(false);
   const [mediaMessage, setMediaMessage] = useState<string | null>(null);
+  const listingImageService = useMemo(() => getPublisherUploads().createListingImageService(), []);
+  const attachedMediaNodeIds = useRef<Set<string>>(new Set());
 
   const [channelCode, setChannelCode] = useState('stable');
   const [versionName, setVersionName] = useState('1.0.0');
@@ -79,6 +104,7 @@ export function PublisherListingManagePage() {
   const releaseItems = releasesData?.items ?? [];
   const loading = listingLoading || mediaLoading || releasesLoading;
   const error = listingError ?? mediaError ?? releasesError;
+  const mediaRoleLabel = MEDIA_ROLES.find((role) => role.value === mediaRole)?.label ?? mediaRole;
 
   useEffect(() => {
     if (!listing || localizationSeeded) {
@@ -118,21 +144,31 @@ export function PublisherListingManagePage() {
     }
   }
 
-  async function handleMediaUpload(file: File) {
-    if (!organizationId) {
-      setMediaMessage('Drive 上传需要组织上下文，请登录 IAM 或创建发布者资料。');
+  /** Attach one uploaded Drive image to the listing as listing media, then refresh the media list. */
+  async function attachUploadedImage(value: DriveUploadImageValue) {
+    const nodeId = value.metadata?.drive?.nodeId;
+    if (nodeId === undefined || nodeId === '' || attachedMediaNodeIds.current.has(nodeId)) {
       return;
     }
-    setMediaUploading(true);
-    setMediaMessage(null);
     try {
-      await getPublisherUploads().uploadListingMedia({ file, organizationId, listingId, mediaRole });
+      await getPublisherUploads().attachListingMedia({
+        listingId,
+        mediaRole,
+        mediaResourceId: nodeId,
+        platformScope: 'ALL',
+      });
+      attachedMediaNodeIds.current.add(nodeId);
       setMediaMessage('媒体已上传并关联。');
       await refreshMedia();
     } catch (err) {
       setMediaMessage(formatApiError(err as Error));
-    } finally {
-      setMediaUploading(false);
+    }
+  }
+
+  /** Attach every newly uploaded image exactly once (list onChange carries the full value list). */
+  async function handleUploadedValues(values: readonly DriveUploadImageValue[]) {
+    for (const value of values) {
+      await attachUploadedImage(value);
     }
   }
 
@@ -280,22 +316,38 @@ export function PublisherListingManagePage() {
               </option>
             ))}
           </select>
-          <label className="block w-full py-2.5 text-center bg-[var(--accent)] text-white rounded-xl text-sm font-medium">
-            {mediaUploading ? '上传中…' : '上传媒体'}
-            <input
-              type="file"
-              className="hidden"
-              accept="image/*,video/*"
-              disabled={mediaUploading}
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file) {
-                  void handleMediaUpload(file);
-                }
-                e.target.value = '';
+          {mediaRole === 'SCREENSHOT' ? (
+            <DriveUploadImageList
+              key={mediaRole}
+              service={listingImageService}
+              appResourceId={listingId}
+              sources={['album', 'camera']}
+              maxFiles={8}
+              label={mediaRoleLabel}
+              copy={UPLOAD_IMAGE_COPY}
+              onUploadError={() => setMediaMessage('上传失败，请重试。')}
+              onChange={(values) => {
+                void handleUploadedValues(values);
               }}
             />
-          </label>
+          ) : (
+            <DriveUploadImage
+              key={mediaRole}
+              service={listingImageService}
+              appResourceId={listingId}
+              sources={['album', 'camera']}
+              shape="rounded"
+              sizePx={80}
+              label={mediaRoleLabel}
+              copy={UPLOAD_IMAGE_COPY}
+              onUploadError={() => setMediaMessage('上传失败，请重试。')}
+              onChange={(value) => {
+                if (value !== null) {
+                  void attachUploadedImage(value);
+                }
+              }}
+            />
+          )}
           {mediaMessage && <p className="text-xs text-[var(--text-tertiary)]">{mediaMessage}</p>}
           <p className="text-xs text-[var(--text-tertiary)]">已关联 {mediaItems.length} 项媒体</p>
         </section>

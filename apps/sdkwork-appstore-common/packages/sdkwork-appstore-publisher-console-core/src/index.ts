@@ -15,6 +15,7 @@ export {
   configurePublisherUploads,
   getPublisherUploads,
   resolveOrganizationId,
+  type AttachListingMediaParams,
   type PublisherUploadHandlers,
   type UploadListingMediaParams,
   type UploadReleaseArtifactParams,
