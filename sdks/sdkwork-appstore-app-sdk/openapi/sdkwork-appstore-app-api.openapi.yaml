@@ -1857,7 +1857,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DownloadGrantResponse'
+                $ref: '#/components/schemas/DownloadGrantConsumeResponse'
 components:
   securitySchemes:
     AuthToken:
@@ -2048,6 +2048,22 @@ components:
           type: string
         ratingCount:
           type: integer
+        platforms:
+          type: array
+          description: Raw platform codes the app ships for (appstore_platform_dictionary).
+          items:
+            type: string
+        appType:
+          type: string
+          description: Store application type of the owning appstore_app row.
+        accessUrl:
+          type: string
+          description: Direct-open URL for web/H5 distributions; QR scan target.
+        platformLinks:
+          type: object
+          description: Per-platform scan/delivery links (appstore_app_platform qrUrl).
+          additionalProperties:
+            type: string
     ListingResponse:
       allOf:
       - $ref: '#/components/schemas/SdkWorkApiResponse'
@@ -2975,6 +2991,29 @@ components:
         retiredAt:
           type: string
           format: date-time
+        artifacts:
+          type: array
+          description: Verified installer artifacts of this release.
+          items:
+            $ref: '#/components/schemas/ReleaseArtifactSummary'
+    ReleaseArtifactSummary:
+      type: object
+      required:
+      - id
+      - platform
+      - architecture
+      - packageFormat
+      properties:
+        id:
+          type: string
+        platform:
+          type: string
+        architecture:
+          type: string
+        packageFormat:
+          type: string
+        fileSizeBytes:
+          type: string
     ReleaseResponse:
       allOf:
       - $ref: '#/components/schemas/SdkWorkApiResponse'
@@ -3620,6 +3659,47 @@ components:
             properties:
               item:
                 $ref: '#/components/schemas/DownloadGrant'
+    DownloadGrantConsumeResponse:
+      allOf:
+      - $ref: '#/components/schemas/SdkWorkApiResponse'
+      - type: object
+        required:
+        - data
+        properties:
+          data:
+            type: object
+            required:
+            - item
+            properties:
+              item:
+                allOf:
+                - $ref: '#/components/schemas/DownloadGrant'
+                - type: object
+                  properties:
+                    delivery:
+                      $ref: '#/components/schemas/DownloadGrantDelivery'
+    DownloadGrantDelivery:
+      type: object
+      required:
+      - platform
+      - architecture
+      - packageFormat
+      properties:
+        downloadUrl:
+          type: string
+          description: Presigned installer URL (present when drive integration is
+            enabled).
+        downloadUrlExpiresAt:
+          type: string
+          format: date-time
+        platform:
+          type: string
+        architecture:
+          type: string
+        packageFormat:
+          type: string
+        fileSizeBytes:
+          type: string
     SearchHistoryUpsertRequest:
       type: object
       required:

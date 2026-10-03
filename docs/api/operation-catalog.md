@@ -106,6 +106,25 @@ Prefix lock:
 | `appstore.downloadGrants.create` | POST | `/app/v3/api/download_grants` | `appstore.downloads.request` |
 | `appstore.downloadGrants.consume` | POST | `/app/v3/api/download_grants/{grantId}/consume` | `appstore.downloads.consume` |
 
+## App API — User Store
+
+| operationId | Method | Path | Permission |
+| --- | --- | --- | --- |
+| `appstore.userStore.category.list` | GET | `/app/v3/api/user_store/categories` | — (tier 2 ownership) |
+| `appstore.userStore.category.create` | POST | `/app/v3/api/user_store/categories` | — (tier 2 ownership) |
+| `appstore.userStore.category.retrieve` | GET | `/app/v3/api/user_store/categories/{userCategoryId}` | — (tier 2 ownership) |
+| `appstore.userStore.category.update` | PATCH | `/app/v3/api/user_store/categories/{userCategoryId}` | — (tier 2 ownership) |
+| `appstore.userStore.category.delete` | DELETE | `/app/v3/api/user_store/categories/{userCategoryId}` | — (tier 2 ownership) |
+| `appstore.userStore.item.list` | GET | `/app/v3/api/user_store/categories/{userCategoryId}/items` | — (tier 2 ownership) |
+| `appstore.userStore.item.create` | POST | `/app/v3/api/user_store/categories/{userCategoryId}/items` | — (tier 2 ownership) |
+| `appstore.userStore.item.update` | PATCH | `/app/v3/api/user_store/categories/{userCategoryId}/items` | — (tier 2 ownership) |
+| `appstore.userStore.item.delete` | DELETE | `/app/v3/api/user_store/categories/{userCategoryId}/items/{itemId}` | — (tier 2 ownership) |
+| `appstore.userStore.share.list` | GET | `/app/v3/api/user_store/shares` | — (tier 2 ownership) |
+| `appstore.userStore.share.create` | POST | `/app/v3/api/user_store/shares` | — (tier 2 ownership) |
+| `appstore.userStore.share.update` | PATCH | `/app/v3/api/user_store/shares/{shareId}` | — (tier 2 ownership) |
+| `appstore.userStore.share.delete` | DELETE | `/app/v3/api/user_store/shares/{shareId}` | — (tier 2 ownership) |
+| `appstore.userStore.share.refresh` | POST | `/app/v3/api/user_store/shares/{shareId}/refresh` | — (tier 2 ownership) |
+
 ## Backend API �?Moderation
 
 | operationId | Method | Path | Permission |
@@ -165,6 +184,8 @@ Prefix lock:
 | `appstore.listings.public.retrieve` | GET | `/store/v3/api/listings/{listingSlug}` | API key optional |
 | `appstore.releases.public.retrieve` | GET | `/store/v3/api/releases/{releaseId}` | API key optional |
 | `appstore.catalog.public.featured.list` | GET | `/store/v3/api/catalog/featured` | none |
+| `appstore.userStores.public.retrieve` | GET | `/store/v3/api/user_stores/{shareToken}` | none |
+| `appstore.userStores.public.items.list` | GET | `/store/v3/api/user_stores/{shareToken}/categories/{userCategoryId}/items` | none |
 | `appstore.publish.automation.submissions.create` | POST | `/store/v3/api/automation/submissions` | API key |
 
 ## Comments integration (not owned �?client calls comments SDK)

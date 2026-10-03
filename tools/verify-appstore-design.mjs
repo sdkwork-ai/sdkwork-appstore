@@ -40,7 +40,11 @@ function extractRegistryTables(registry) {
 }
 
 function extractMigrationFiles(registry) {
-  return [...registry.matchAll(/^\s+file:\s+(migrations\/[A-Za-z0-9_]+\.sql)\s*$/gm)].map(
+  // Registry entries point at the consolidated initialization baseline and the
+  // ordered post-GA migrations under database/migrations/postgres/ (both
+  // relative to specs/database/); see DATABASE_FRAMEWORK_SPEC.md section 7.5
+  // and tools/appstore-database-assets.mjs, the canonical inventory reader.
+  return [...registry.matchAll(/^\s+file:\s+(\S+\.sql)\s*$/gm)].map(
     (match) => match[1],
   );
 }
@@ -189,6 +193,7 @@ const routeCrates = [
   ["library", "app-api"],
   ["publisher", "app-api"],
   ["compliance", "app-api"],
+  ["user-store", "app-api"],
   ["moderation", "backend-api"],
   ["appstore-catalog", "backend-api"],
   ["listing", "backend-api"],
@@ -199,6 +204,7 @@ const routeCrates = [
   ["appstore-catalog", "open-api"],
   ["listing", "open-api"],
   ["automation", "open-api"],
+  ["user-store", "open-api"],
 ].map(([capability, surface]) => ({
   capability,
   surface,
@@ -239,13 +245,18 @@ assertContains(registry, "domain: appstore", "Schema registry must declare domai
 assertContains(registry, "databasePrefix: appstore_", "Schema registry must use appstore_ prefix");
 assertContains(
   registry,
-  "file: migrations/0001_appstore_foundation.sql",
-  "Schema registry migration path must be migrations/0001_appstore_foundation.sql",
+  "file: ../../database/ddl/baseline/postgres/0001_appstore_baseline.sql",
+  "Schema registry migration path must be the consolidated initialization baseline",
 );
 assertNotContains(
   registry,
   "0001_appstore_store_foundation.sql",
   "Schema registry must not reference deprecated appstore_store migration name",
+);
+assertNotContains(
+  registry,
+  "file: migrations/0001_appstore_foundation.sql",
+  "Schema registry must not reference the deleted pre-consolidation foundation migration",
 );
 
 const registryTables = extractRegistryTables(registry);

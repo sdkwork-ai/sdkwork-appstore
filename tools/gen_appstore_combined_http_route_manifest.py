@@ -15,6 +15,7 @@ APP_CRATES = [
     "sdkwork-routes-publisher-app-api",
     "sdkwork-routes-release-app-api",
     "sdkwork-routes-listing-app-api",
+    "sdkwork-routes-user-store-app-api",
 ]
 
 BACKEND_CRATES = [
@@ -31,6 +32,7 @@ OPEN_CRATES = [
     "sdkwork-routes-listing-open-api",
     "sdkwork-routes-release-open-api",
     "sdkwork-routes-automation-open-api",
+    "sdkwork-routes-user-store-open-api",
 ]
 
 ROUTE_ENTRY = re.compile(
@@ -39,7 +41,9 @@ ROUTE_ENTRY = re.compile(
     r'"([^"]+)",\s*'
     r'"([^"]+)",\s*'
     r'"([^"]+)",\s*'
-    r"\),",
+    # The final route of a per-crate manifest closes with `)]` (no trailing
+    # comma); tolerate both `),` and `)` so no entry is silently dropped.
+    r"\)\s*,?",
     re.MULTILINE,
 )
 

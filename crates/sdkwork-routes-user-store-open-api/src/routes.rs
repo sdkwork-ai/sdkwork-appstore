@@ -6,7 +6,7 @@ use sdkwork_web_core::RouteAuth;
 pub const ROUTES: &[RouteDefinition] = &[
     RouteDefinition {
         method: "GET",
-        path: "/store/v3/api/user-stores/{shareToken}",
+        path: "/store/v3/api/user_stores/{shareToken}",
         operation_id: "appstore.userStores.public.retrieve",
         auth: RouteAuth::Public,
         handler: "user_stores_public_retrieve",
@@ -14,7 +14,7 @@ pub const ROUTES: &[RouteDefinition] = &[
     },
     RouteDefinition {
         method: "GET",
-        path: "/store/v3/api/user-stores/{shareToken}/categories/{userCategoryId}/items",
+        path: "/store/v3/api/user_stores/{shareToken}/categories/{userCategoryId}/items",
         operation_id: "appstore.userStores.public.items.list",
         auth: RouteAuth::Public,
         handler: "user_stores_public_items_list",

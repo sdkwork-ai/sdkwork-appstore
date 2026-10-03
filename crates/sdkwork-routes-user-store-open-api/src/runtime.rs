@@ -13,11 +13,11 @@ use sdkwork_web_core::WebRequestContext;
 pub fn routes() -> Router<AppState> {
     Router::new()
         .route(
-            "/store/v3/api/user-stores/{shareToken}",
+            "/store/v3/api/user_stores/{shareToken}",
             get(public_user_store_retrieve),
         )
         .route(
-            "/store/v3/api/user-stores/{shareToken}/categories/{userCategoryId}/items",
+            "/store/v3/api/user_stores/{shareToken}/categories/{userCategoryId}/items",
             get(public_user_store_items),
         )
 }

@@ -66,6 +66,27 @@ This document maps each route operation to its generated handler and service met
 | `appstore.downloadGrants.create` | `sdkwork-routes-library-app-api` | `download_grants_create` | `sdkwork-appstore-library-service` | `download_grants_create` | Implemented |
 | `appstore.downloadGrants.consume` | `sdkwork-routes-library-app-api` | `download_grants_consume` | `sdkwork-appstore-library-service` | `download_grants_consume` | Implemented |
 
+## sdkwork-appstore-user-store-service
+
+| operationId | routeCrate | handler | serviceCrate | serviceMethod | Status |
+| --- | --- | --- | --- | --- | --- |
+| `appstore.userStore.category.list` | `sdkwork-routes-user-store-app-api` | `user_store_categories_list` | `sdkwork-appstore-user-store-service` | `categories_list` | Implemented |
+| `appstore.userStore.category.create` | `sdkwork-routes-user-store-app-api` | `user_store_category_create` | `sdkwork-appstore-user-store-service` | `category_create` | Implemented |
+| `appstore.userStore.category.retrieve` | `sdkwork-routes-user-store-app-api` | `user_store_category_retrieve` | `sdkwork-appstore-user-store-service` | `category_retrieve` | Implemented |
+| `appstore.userStore.category.update` | `sdkwork-routes-user-store-app-api` | `user_store_category_update` | `sdkwork-appstore-user-store-service` | `category_update` | Implemented |
+| `appstore.userStore.category.delete` | `sdkwork-routes-user-store-app-api` | `user_store_category_delete` | `sdkwork-appstore-user-store-service` | `category_delete` | Implemented |
+| `appstore.userStore.item.list` | `sdkwork-routes-user-store-app-api` | `user_store_items_list` | `sdkwork-appstore-user-store-service` | `items_list` | Implemented |
+| `appstore.userStore.item.create` | `sdkwork-routes-user-store-app-api` | `user_store_item_create` | `sdkwork-appstore-user-store-service` | `item_create` | Implemented |
+| `appstore.userStore.item.update` | `sdkwork-routes-user-store-app-api` | `user_store_items_update` | `sdkwork-appstore-user-store-service` | `items_update` | Implemented |
+| `appstore.userStore.item.delete` | `sdkwork-routes-user-store-app-api` | `user_store_item_delete` | `sdkwork-appstore-user-store-service` | `item_delete` | Implemented |
+| `appstore.userStore.share.list` | `sdkwork-routes-user-store-app-api` | `user_store_shares_list` | `sdkwork-appstore-user-store-service` | `shares_list` | Implemented |
+| `appstore.userStore.share.create` | `sdkwork-routes-user-store-app-api` | `user_store_share_create` | `sdkwork-appstore-user-store-service` | `share_create` | Implemented |
+| `appstore.userStore.share.update` | `sdkwork-routes-user-store-app-api` | `user_store_share_update` | `sdkwork-appstore-user-store-service` | `share_update` | Implemented |
+| `appstore.userStore.share.delete` | `sdkwork-routes-user-store-app-api` | `user_store_share_delete` | `sdkwork-appstore-user-store-service` | `share_delete` | Implemented |
+| `appstore.userStore.share.refresh` | `sdkwork-routes-user-store-app-api` | `user_store_share_refresh` | `sdkwork-appstore-user-store-service` | `share_refresh` | Implemented |
+| `appstore.userStores.public.retrieve` | `sdkwork-routes-user-store-open-api` | `user_stores_public_retrieve` | `sdkwork-appstore-user-store-service` | `public_user_store_view` | Implemented |
+| `appstore.userStores.public.items.list` | `sdkwork-routes-user-store-open-api` | `user_stores_public_items_list` | `sdkwork-appstore-user-store-service` | `public_category_items` | Implemented |
+
 ## sdkwork-appstore-listing-service
 
 | operationId | routeCrate | handler | serviceCrate | serviceMethod | Status |

@@ -11,7 +11,7 @@
   "language": "typescript",
   "apiPrefix": "/store/v3/api",
   "authoritySpec": "openapi/sdkwork-appstore-open-api.openapi.yaml",
-  "generationInputSpec": "openapi/sdkwork-appstore-open-api.sdkgen.yaml",
+  "generationInputSpec": "../../apis/open-api/store/openapi.yaml",
   "derivedSpecs": {
     "default": "openapi/sdkwork-appstore-open-api.sdkgen.yaml"
   },

@@ -3687,7 +3687,8 @@ components:
       properties:
         downloadUrl:
           type: string
-          description: Presigned installer URL (present when drive integration is enabled).
+          description: Presigned installer URL (present when drive integration is
+            enabled).
         downloadUrlExpiresAt:
           type: string
           format: date-time

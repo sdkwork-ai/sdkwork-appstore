@@ -201,13 +201,20 @@ tables:
     profile: read_model
     complianceLevel: L2
 migrations:
+  # Immutable primary baseline (DATABASE_FRAMEWORK_SPEC.md section 7.5): the
+  # consolidated initialization DDL; migrations/ is reserved for post-GA
+  # changes. Ordered post-baseline migrations follow, matching
+  # `database/migrations/postgres/` (tools/appstore-database-assets.mjs is the
+  # canonical inventory reader).
   - id: "0001"
-    file: migrations/0001_appstore_foundation.sql
+    file: ../../database/ddl/baseline/postgres/0001_appstore_baseline.sql
   - id: "0002"
-    file: migrations/0002_appstore_extensions.sql
+    file: ../../database/migrations/postgres/0001_organization_id_not_null.up.sql
   - id: "0003"
-    file: migrations/0003_appstore_rating_feedback.sql
-  - id: "0004"
-    file: migrations/0004_appstore_timestamps_timestamptz.sql
-  - id: "0005"
     file: ../../database/migrations/postgres/0002_appstore_platform_evolution.up.sql
+  - id: "0004"
+    file: ../../database/migrations/postgres/0003_user_store.up.sql
+  - id: "0005"
+    file: ../../database/migrations/postgres/0004_appstore_app_sku_and_deployment_binding.up.sql
+  - id: "0006"
+    file: ../../database/migrations/postgres/0005_appstore_web_stores.up.sql

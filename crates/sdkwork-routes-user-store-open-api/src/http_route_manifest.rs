@@ -5,13 +5,13 @@ use sdkwork_web_core::{HttpMethod, HttpRoute, HttpRouteManifest};
 const HTTP_ROUTES: &[HttpRoute] = &[
     HttpRoute::public(
         HttpMethod::Get,
-        "/store/v3/api/user-stores/{shareToken}",
+        "/store/v3/api/user_stores/{shareToken}",
         "appstore",
         "appstore.userStores.public.retrieve",
     ),
     HttpRoute::public(
         HttpMethod::Get,
-        "/store/v3/api/user-stores/{shareToken}/categories/{userCategoryId}/items",
+        "/store/v3/api/user_stores/{shareToken}/categories/{userCategoryId}/items",
         "appstore",
         "appstore.userStores.public.items.list",
     ),
