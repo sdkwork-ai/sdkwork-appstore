@@ -25,6 +25,7 @@ class AppstoreApp extends StatelessWidget {
       screenBuilders: runtime.createScreenBuilders(),
       tabs: runtime.createTabs(),
       authGuard: runtime.isRouteAuthorized,
+      loginHandler: runtime.loginWithPassword,
     );
     return AppstoreRuntimeScope(
       runtime: runtime,

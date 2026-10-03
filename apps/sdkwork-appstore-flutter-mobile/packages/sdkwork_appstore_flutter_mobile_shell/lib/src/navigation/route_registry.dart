@@ -79,7 +79,10 @@ class AppstoreRouteStack {
     if (match.route.auth == 'required' && guard != null && !guard(match.route)) {
       return MaterialPageRoute<void>(
         settings: settings,
-        builder: (BuildContext context) => _AppstoreAuthRequiredScreen(loginHandler: loginHandler),
+        builder: (BuildContext context) => _AppstoreAuthRequiredScreen(
+          loginHandler: loginHandler,
+          authenticatedRouteName: name,
+        ),
       );
     }
     final builder = screenBuilders[match.route.id];
@@ -117,7 +120,7 @@ class AppstoreRouteStack {
       (route) => route.id == spec.routeId,
     );
     if (route.auth == 'required' && guard != null && !guard(route)) {
-      return const _AppstoreAuthRequiredScreen();
+      return _AppstoreAuthRequiredScreen(loginHandler: loginHandler);
     }
     if (builder == null) {
       return _AppstoreMissingScreen(routeId: spec.routeId);
@@ -187,9 +190,18 @@ class _AppstoreNotFoundScreen extends StatelessWidget {
 }
 
 class _AppstoreAuthRequiredScreen extends StatefulWidget {
-  const _AppstoreAuthRequiredScreen({this.loginHandler});
+  const _AppstoreAuthRequiredScreen({
+    this.loginHandler,
+    this.authenticatedRouteName,
+  });
 
   final AppstoreRouteLoginHandler? loginHandler;
+
+  /// Canonical path this panel replaced. Set when the panel is pushed as the
+  /// guarded route itself; after a successful login the panel re-resolves that
+  /// route (the guard now passes) instead of leaving the login form on stack.
+  /// Tab-inline panels leave this null and rely on the root AuthGate rebuild.
+  final String? authenticatedRouteName;
 
   @override
   State<_AppstoreAuthRequiredScreen> createState() =>
@@ -217,6 +229,10 @@ class _AppstoreAuthRequiredScreenState
     setState(() => _submitting = true);
     try {
       await widget.loginHandler?.call(account, password);
+      final routeName = widget.authenticatedRouteName;
+      if (mounted && routeName != null && routeName.isNotEmpty) {
+        Navigator.of(context).pushReplacementNamed(routeName);
+      }
     } catch (error) {
       if (mounted) {
         setState(() =>

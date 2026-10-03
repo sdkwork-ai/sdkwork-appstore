@@ -51,7 +51,7 @@ class UpdatesService {
   Future<String?> update(String listingId) async {
     clients.ensureTransportBound(capability);
     await clients.requireAppClient.library_.appstoreLibraryInstall(
-      LibraryInstallRequest(listingId: listingId, platform: 'windows'),
+      LibraryInstallRequest(listingId: listingId, platform: appstorePlatformCode),
       DateTime.now().microsecondsSinceEpoch.toString(),
     );
     return null;

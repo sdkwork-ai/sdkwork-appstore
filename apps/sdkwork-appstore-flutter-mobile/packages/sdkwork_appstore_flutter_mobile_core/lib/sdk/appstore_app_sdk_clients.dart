@@ -17,6 +17,14 @@ import 'package:sdkwork_appstore_app_sdk/sdkwork_appstore_app_sdk.dart';
 /// App-api path prefix owned by the appstore app-api surface.
 const String appstoreAppApiPrefix = '/app/v3/api';
 
+/// Storefront platform code this client reports for install/update calls
+/// (`appstore_app_platform.code`; override via the SDKWORK_PLATFORM_CODE
+/// dart-define when building for iOS).
+const String appstorePlatformCode = String.fromEnvironment(
+  'SDKWORK_PLATFORM_CODE',
+  defaultValue: 'android',
+);
+
 String? _configuredBaseUrl;
 
 /// Normalize and pin the App Store app-api base URL.

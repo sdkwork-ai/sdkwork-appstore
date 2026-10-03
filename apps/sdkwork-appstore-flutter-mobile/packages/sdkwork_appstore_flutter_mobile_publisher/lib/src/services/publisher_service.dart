@@ -30,17 +30,20 @@ class PublisherService {
   }
 
   /// Bootstraps a new publisher app draft.
+  ///
+  /// [appType] follows the storefront app-type dictionary (`APP`/`PLUGIN`),
+  /// not a platform code.
   Future<PublisherListingRow> createApp({
     required String displayName,
     required String appKey,
-    String platform = 'windows',
+    String appType = 'APP',
   }) async {
     clients.ensureTransportBound(capability);
     final response = await clients.requireAppClient.publishers.appstorePublishersMeAppsCreate(
       PublisherAppBootstrapRequest(
         displayName: displayName,
         appKey: appKey,
-        appType: platform,
+        appType: appType,
       ),
       DateTime.now().microsecondsSinceEpoch.toString(),
     );

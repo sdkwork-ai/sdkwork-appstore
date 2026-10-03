@@ -81,7 +81,7 @@ class AppDetailService {
     clients.ensureTransportBound(capability);
     final client = clients.requireAppClient;
     await client.library_.appstoreLibraryInstall(
-      LibraryInstallRequest(listingId: listingId, platform: 'windows'),
+      LibraryInstallRequest(listingId: listingId, platform: appstorePlatformCode),
       DateTime.now().microsecondsSinceEpoch.toString(),
     );
   }

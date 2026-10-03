@@ -37,6 +37,8 @@ class AppstoreMobileRuntime {
     required this.sdkClients,
     required this.openClient,
     required this.iamClient,
+    required this.skillsClient,
+    required this.mcpClient,
     required this.routes,
   })  : discoverService = DiscoverService(clients: sdkClients),
         appsService = AppsService(clients: sdkClients),
@@ -46,7 +48,11 @@ class AppstoreMobileRuntime {
         categoryService = CategoryService(clients: sdkClients),
         collectionService = CollectionService(clients: sdkClients),
         eventsService = EventsService(clients: sdkClients),
-        aiHubService = AiHubService(clients: sdkClients),
+        aiHubService = AiHubService(
+          clients: sdkClients,
+          skillsClient: skillsClient,
+          mcpClient: mcpClient,
+        ),
         appDetailService = AppDetailService(clients: sdkClients),
         libraryService = LibraryService(clients: sdkClients),
         updatesService = UpdatesService(clients: sdkClients),
@@ -64,12 +70,26 @@ class AppstoreMobileRuntime {
       authToken: getIamRuntime().session.authToken,
       accessToken: getIamRuntime().session.accessToken,
     );
+    propagateDependencyTokens(getIamRuntime().session);
+    getIamRuntime().addSessionListener((AppstoreSession session) {
+      propagateDependencyTokens(session);
+    });
   }
 
   final AppstoreAppSdkClients sdkClients;
   final SdkworkAppstoreOpenClient openClient;
   final SdkworkIamAppClient iamClient;
+  final SdkworkAppClient skillsClient;
+  final SdkworkMcpAppClient mcpClient;
   final List<SdkworkUiRouteContribution> routes;
+
+  /// Pushes the single-owner session tokens into the dependency SDK clients.
+  void propagateDependencyTokens(AppstoreSession session) {
+    skillsClient.setAuthToken(session.authToken ?? '');
+    skillsClient.setAccessToken(session.accessToken ?? '');
+    mcpClient.setAuthToken(session.authToken ?? '');
+    mcpClient.setAccessToken(session.accessToken ?? '');
+  }
 
   final DiscoverService discoverService;
   final AppsService appsService;
@@ -271,11 +291,24 @@ Future<AppstoreMobileRuntime> bootstrap() async {
   final iamClient = createAppstoreFlutterIamClient(
     baseUrl: sdkClients.transportBaseUrl,
   );
+  final session = getIamRuntime().session;
+  final skillsClient = createAppstoreFlutterSkillsClient(
+    baseUrl: sdkClients.transportBaseUrl,
+    authToken: session.authToken,
+    accessToken: session.accessToken,
+  );
+  final mcpClient = createAppstoreFlutterMcpClient(
+    baseUrl: sdkClients.transportBaseUrl,
+    authToken: session.authToken,
+    accessToken: session.accessToken,
+  );
   final routes = createRoutes();
   return AppstoreMobileRuntime(
     sdkClients: sdkClients,
     openClient: openClient,
     iamClient: iamClient,
+    skillsClient: skillsClient,
+    mcpClient: mcpClient,
     routes: routes,
   );
 }

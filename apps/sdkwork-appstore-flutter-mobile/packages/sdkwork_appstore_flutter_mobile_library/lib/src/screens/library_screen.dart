@@ -86,14 +86,15 @@ class _LibraryScreenState extends State<LibraryScreen> {
             );
           }
           final entries = snapshot.data ?? const <LibraryEntry>[];
-          if (entries.isEmpty) {
-            return const AppstoreScreenState(
-              kind: AppstoreScreenStateKind.empty,
-              message: '还没有已获取的应用',
-            );
-          }
           return ListView(
             children: <Widget>[
+              _QuickLinksSection(onNavigate: _openQuickLink),
+              const SizedBox(height: 8),
+              if (entries.isEmpty)
+                const AppstoreScreenState(
+                  kind: AppstoreScreenStateKind.empty,
+                  message: '还没有已获取的应用',
+                ),
               for (final entry in entries)
                 AppstoreListTileCard(
                   title: entry.title,
@@ -112,6 +113,50 @@ class _LibraryScreenState extends State<LibraryScreen> {
         },
       ),
     ),
+    );
+  }
+
+  void _openQuickLink(String path) {
+    Navigator.pushNamed(context, path);
+  }
+}
+
+/// Quick-access entry points for the account-scoped screens that have no
+/// bottom tab (canonical routes; `APP_CLIENT_ARCHITECTURE_ALIGNMENT_SPEC.md`
+/// section 7).
+class _QuickLinksSection extends StatelessWidget {
+  const _QuickLinksSection({required this.onNavigate});
+
+  final void Function(String path) onNavigate;
+
+  static const List<(String, String, IconData)> _links = <(String, String, IconData)>[
+    ('/updates', '更新中心', Icons.system_update_outlined),
+    ('/wishlist', '收藏夹', Icons.favorite_outline),
+    ('/charts', '排行榜', Icons.leaderboard_outlined),
+    ('/user-store', '我的店铺', Icons.storefront_outlined),
+    ('/publisher', '开发者中心', Icons.rocket_launch_outlined),
+    ('/console/settings', '设置', Icons.settings_outlined),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+        child: Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: <Widget>[
+            for (final (path, label, icon) in _links)
+              ActionChip(
+                avatar: Icon(icon, size: 18),
+                label: Text(label),
+                onPressed: () => onNavigate(path),
+              ),
+          ],
+        ),
+      ),
     );
   }
 }
