@@ -6,6 +6,7 @@ import {
   McpPage,
   PluginsPage,
   SkillsPage,
+  TemplatesPage,
   initializeAppstorePcI18n,
   i18n,
   ThemeProvider,
@@ -26,19 +27,20 @@ import {
 } from '@sdkwork/appstore-pc-runtime';
 
 /**
- * One market page of the App Store storefront, embeddable without the full
+ * One catalog page of the App Store storefront, embeddable without the full
  * product shell. Hosts that already own navigation chrome (headers, tabs,
  * window controls) render one of these per tab instead of mounting the whole
  * `AppstorePcHost` router, so the storefront's catalog pages stay reusable
  * across embedding applications.
  */
-export type AppstoreMarketsPage = 'plugins' | 'experts' | 'skills' | 'mcp';
+export type AppstoreMarketsPage = 'plugins' | 'experts' | 'skills' | 'mcp' | 'templates';
 
 const MARKET_PAGE_COMPONENTS = {
   plugins: PluginsPage,
   experts: ExpertsPage,
   skills: SkillsPage,
   mcp: McpPage,
+  templates: TemplatesPage,
 } as const satisfies Record<AppstoreMarketsPage, unknown>;
 
 /** Session data accepted from the embedding application. */
