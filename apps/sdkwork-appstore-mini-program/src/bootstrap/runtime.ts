@@ -1,10 +1,12 @@
 import { createClient as createIamClient, type SdkworkAppClient as IamAppClient } from "@sdkwork/iam-app-sdk";
+import { createTokenManager, type AuthTokenManager } from "@sdkwork/sdk-common";
 import {
   getAppstoreAppSdkClient,
-  setAppSdkSession,
+  syncAppSdkSessionTokens,
   clearAppSdkSession,
 } from "@sdkwork/appstore-mp-core";
 import { seedRuntimeEnvFromBundle } from "./runtimeBundle";
+import { readRuntimeEnv } from "./environment";
 import { installWxFetch } from "./wxRequestPolyfill";
 import { createSdkClients } from "./sdkClients";
 import { registerHostAdapters } from "./hostAdapters";
@@ -17,30 +19,187 @@ import type { AppstoreAppClient } from "@sdkwork/appstore-mp-core";
  * capability page loaders consumed by the thin native pages. Mirrors the
  * Flutter and Harmony roots.
  *
+ * The thin pages destructure `pageLoaders` / `auth` / `loadCurrentUser` from
+ * this module at require time, so the singletons below are created at module
+ * scope and each entrypoint lazily calls `ensureBootstrapped` — the first
+ * loader invocation (or an explicit `bootstrapAppstoreMiniProgram` call)
+ * installs the transport, seeds the runtime environment, restores the
+ * persisted session, and constructs the SDK clients exactly once.
+ *
  * `appApiBaseUrl` is forwarded into the runtime-env resolution, so a host that
  * already resolved a gateway origin can override the bundled profile value
  * without bypassing `resolveBaseUrl` (`ENVIRONMENT_SPEC.md` §6.3).
  */
-export function bootstrapAppstoreMiniProgram(options: {
+
+/** Persisted IAM session projection shared by the pages and this bundle. */
+export interface AppstoreMiniProgramIamSession {
+  accessToken?: string;
+  authToken?: string;
+  refreshToken?: string;
+  displayName?: string;
+  userId?: string;
+}
+
+const SESSION_STORAGE_KEY = "sdkwork-appstore-mp-session";
+
+let iamSession: AppstoreMiniProgramIamSession = {};
+const iamSessionListeners: Array<(session: AppstoreMiniProgramIamSession) => void> = [];
+const iamTokenManager: AuthTokenManager = createTokenManager();
+
+function readSessionStorage(): AppstoreMiniProgramIamSession | null {
+  try {
+    const raw = wx.getStorageSync(SESSION_STORAGE_KEY) as unknown;
+    if (raw && typeof raw === "object") {
+      return raw as AppstoreMiniProgramIamSession;
+    }
+  } catch {
+    // storage unavailable (pre-launch window); fall back to memory only
+  }
+  return null;
+}
+
+function writeSessionStorage(session: AppstoreMiniProgramIamSession): void {
+  try {
+    wx.setStorageSync(SESSION_STORAGE_KEY, session);
+  } catch {
+    // storage full/unavailable; the memory copy still holds the session
+  }
+}
+
+/** Mirror a session change into the appstore SDK client and the IAM client. */
+function projectSessionTokens(session: AppstoreMiniProgramIamSession): void {
+  syncAppSdkSessionTokens(session);
+  const authToken =
+    typeof session.authToken === "string" && session.authToken.trim() !== ""
+      ? session.authToken
+      : undefined;
+  const accessToken =
+    typeof session.accessToken === "string" && session.accessToken.trim() !== ""
+      ? session.accessToken
+      : undefined;
+  if (authToken) {
+    iamTokenManager.setAuthToken(authToken);
+  } else {
+    iamTokenManager.clearAuthToken();
+  }
+  if (accessToken) {
+    iamTokenManager.setAccessToken(accessToken);
+  } else {
+    iamTokenManager.clearAccessToken();
+  }
+}
+
+/** Re-seed the session from wx storage; call once during bootstrap. */
+export function loadPersistedIamSession(): AppstoreMiniProgramIamSession {
+  const persisted = readSessionStorage();
+  if (persisted) {
+    iamSession = persisted;
+    projectSessionTokens(persisted);
+  }
+  return { ...iamSession };
+}
+
+export function getIamSession(): AppstoreMiniProgramIamSession {
+  return { ...iamSession };
+}
+
+export function setIamSession(next: AppstoreMiniProgramIamSession): void {
+  iamSession = next;
+  writeSessionStorage(next);
+  projectSessionTokens(next);
+  for (const listener of iamSessionListeners) {
+    listener({ ...next });
+  }
+}
+
+export function clearIamSession(): void {
+  iamSession = {};
+  try {
+    wx.removeStorageSync(SESSION_STORAGE_KEY);
+  } catch {
+    // ignore; nothing persisted
+  }
+  iamTokenManager.clearTokens();
+  clearAppSdkSession();
+  for (const listener of iamSessionListeners) {
+    listener({});
+  }
+}
+
+export function onIamSessionChange(
+  listener: (session: AppstoreMiniProgramIamSession) => void,
+): void {
+  iamSessionListeners.push(listener);
+}
+
+export function isIamAuthenticated(): boolean {
+  const current = getIamSession();
+  return Boolean(
+    (current.authToken && current.authToken.length > 0) ||
+      (current.accessToken && current.accessToken.length > 0),
+  );
+}
+
+interface BootstrapOptions {
   appApiBaseUrl?: string;
   accessToken?: string;
   iamBaseUrl?: string;
-} = {}) {
+}
+
+interface AppstoreMiniProgramRuntime {
+  readonly sdkClients: ReturnType<typeof createSdkClients>;
+  readonly routes: ReturnType<typeof createRoutes>;
+  readonly iamClient: IamAppClient;
+}
+
+let bootstrapOptions: BootstrapOptions = {};
+let runtime: AppstoreMiniProgramRuntime | null = null;
+
+/**
+ * Idempotent bootstrap. Every lazy entrypoint (page loaders, auth loaders)
+ * calls this, so page-layer module loading order can never race the
+ * transport, environment, session restore, or SDK client construction.
+ */
+function ensureBootstrapped(options: BootstrapOptions = bootstrapOptions): AppstoreMiniProgramRuntime {
+  if (runtime) {
+    return runtime;
+  }
   installWxFetch();
   seedRuntimeEnvFromBundle({ appApiBaseUrl: options.appApiBaseUrl });
   registerHostAdapters();
+  loadPersistedIamSession();
   const sdkClients = createSdkClients(options.accessToken);
   const routes = createRoutes();
+  const iamBaseUrl =
+    options.iamBaseUrl ?? options.appApiBaseUrl ?? readRuntimeEnv().appstoreAppApiBaseUrl;
   const iamClient = createIamClient({
-    baseUrl: options.iamBaseUrl ?? options.appApiBaseUrl ?? '',
+    baseUrl: iamBaseUrl,
     platform: "mini-program",
+    tokenManager: iamTokenManager,
   });
+  runtime = { sdkClients, routes, iamClient };
+  return runtime;
+}
+
+export function bootstrapAppstoreMiniProgram(options: BootstrapOptions = {}) {
+  bootstrapOptions = { ...options };
+  const state = ensureBootstrapped(options);
   return {
-    sdkClients,
-    routes,
-    pageLoaders: createPageLoaders(() => getAppstoreAppSdkClient()),
-    auth: createAuthLoaders(iamClient),
+    sdkClients: state.sdkClients,
+    routes: state.routes,
+    pageLoaders,
+    auth,
   };
+}
+
+function requireAppClient(): AppstoreAppClient {
+  ensureBootstrapped();
+  return getAppstoreAppSdkClient();
+}
+
+function requireIamClient(): IamAppClient {
+  const state = ensureBootstrapped();
+  return state.iamClient;
 }
 
 type ListingRow = {
@@ -49,6 +208,37 @@ type ListingRow = {
   developer: string;
   rating: number;
 };
+
+/** Describe a pending update for the shared list template's subtitle slot. */
+function describeUpdate(update: { latestVersionName?: string; fileSizeBytes?: string }): string {
+  const parts: string[] = [];
+  const version =
+    typeof update.latestVersionName === "string" ? update.latestVersionName.trim() : "";
+  if (version !== "") {
+    parts.push(`v${version.replace(/^v/i, "")}`);
+  }
+  const sizeBytes = Number(update.fileSizeBytes ?? 0);
+  if (Number.isFinite(sizeBytes) && sizeBytes > 0) {
+    parts.push(`${(sizeBytes / (1024 * 1024)).toFixed(1)} MB`);
+  }
+  return parts.join(" · ");
+}
+
+const PUBLISHER_STATUS_LABELS: Record<string, string> = {
+  draft: "草稿",
+  submitted: "待审核",
+  in_review: "审核中",
+  pending_review: "待审核",
+  approved: "审核通过",
+  published: "已发布",
+  rejected: "已拒绝",
+  archived: "已下架",
+  retired: "已退役",
+};
+
+function publisherStatusLabel(status: string): string {
+  return PUBLISHER_STATUS_LABELS[status] ?? status;
+}
 
 /**
  * Capability page loaders over the composed app SDK client.
@@ -78,6 +268,49 @@ function createPageLoaders(getClient: () => AppstoreAppClient) {
         rating: Number(row.averageRating ?? row.rating ?? 0) || 0,
       };
     });
+  }
+
+  /**
+   * Resolve raw listing references into display rows, keyed by both the
+   * listing slug and the listing id, so domain rows carrying either shape
+   * (library `listingId`, ranking snapshot ids) find their display card.
+   */
+  async function resolveRowsByListingIds(
+    listingIds: string[],
+  ): Promise<Map<string, ListingRow>> {
+    const map = new Map<string, ListingRow>();
+    const uniqueIds = Array.from(
+      new Set(
+        listingIds.filter(
+          (id) => typeof id === "string" && id.trim() !== "",
+        ),
+      ),
+    );
+    const chunkSize = 50;
+    for (let index = 0; index < uniqueIds.length; index += chunkSize) {
+      const chunk = uniqueIds.slice(index, index + chunkSize);
+      try {
+        const page = await getClient().catalog.searchListings({
+          ids: chunk,
+          limit: chunk.length,
+        });
+        for (const item of page?.items ?? []) {
+          const record = (item ?? {}) as unknown as Record<string, unknown>;
+          const mapped = listingRows([record])[0];
+          if (!mapped) {
+            continue;
+          }
+          for (const key of [record.listingSlug, record.id]) {
+            if (typeof key === "string" && key.trim() !== "" && !map.has(key)) {
+              map.set(key, mapped);
+            }
+          }
+        }
+      } catch {
+        // name resolution is best-effort; unresolved rows keep their raw ids
+      }
+    }
+    return map;
   }
 
   function localizedField(
@@ -153,13 +386,14 @@ function createPageLoaders(getClient: () => AppstoreAppClient) {
             : '',
         )
         .filter((id) => id !== '');
-      const page = await searchListings({ ids: rankedIds, limit: rankedIds.length });
-      const bySlug = new Map(page.rows.map((row) => [row.id, row]));
+      const resolved = await resolveRowsByListingIds(rankedIds);
       const entries: Array<ListingRow & { rank: number }> = [];
-      for (let index = 0; index < rankedIds.length; index++) {
-        const row = bySlug.get(rankedIds[index]);
+      let rank = 0;
+      for (const rankedId of rankedIds) {
+        const row = resolved.get(rankedId);
         if (row) {
-          entries.push({ ...row, rank: index + 1 });
+          rank += 1;
+          entries.push({ ...row, rank });
         }
       }
       return entries;
@@ -295,7 +529,7 @@ function createPageLoaders(getClient: () => AppstoreAppClient) {
     },
 
     /** Event detail: localized header plus id-ordered participating listings. */
-    async event(eventId: string): Promise<{
+    async events(eventId: string): Promise<{
       name: string;
       apps: ListingRow[];
     }> {
@@ -375,26 +609,40 @@ function createPageLoaders(getClient: () => AppstoreAppClient) {
         };
       });
     },
-    /** Library: installed listings (library domain, auth required). */
+    /** Library: installed listings with resolved display names (auth required). */
     async library(): Promise<ListingRow[]> {
       const page = await getClient().library.listItems({ limit: 200 });
-      return (page?.items ?? []).map((row) => ({
-        id: row.listingId,
-        name: row.listingId,
-        developer: '',
-        rating: 0,
-      }));
+      const items = page?.items ?? [];
+      const resolved = await resolveRowsByListingIds(
+        items.map((row) => row.listingId),
+      );
+      return items.map((row) => {
+        const card = resolved.get(row.listingId);
+        return {
+          id: row.listingId,
+          name: card?.name ?? row.listingId,
+          developer: card?.developer ?? '',
+          rating: card?.rating ?? 0,
+        };
+      });
     },
 
-    /** Wishlist: saved listings (wishlist domain, auth required). */
+    /** Wishlist: saved listings with resolved display names (auth required). */
     async wishlist(): Promise<ListingRow[]> {
       const page = await getClient().wishlist.listItems({ limit: 200 });
-      return (page?.items ?? []).map((row) => ({
-        id: row.listingId,
-        name: row.listingId,
-        developer: '',
-        rating: 0,
-      }));
+      const items = page?.items ?? [];
+      const resolved = await resolveRowsByListingIds(
+        items.map((row) => row.listingId),
+      );
+      return items.map((row) => {
+        const card = resolved.get(row.listingId);
+        return {
+          id: row.listingId,
+          name: card?.name ?? row.listingId,
+          developer: card?.developer ?? '',
+          rating: card?.rating ?? 0,
+        };
+      });
     },
 
     /** Updates: pending updates for installed library (library domain). */
@@ -415,20 +663,26 @@ function createPageLoaders(getClient: () => AppstoreAppClient) {
         .checkUpdates({ items })
         .catch(() => undefined);
       const checkItems = check?.items ?? [];
-      const byAppKey = new Map(checkItems.map((row) => [row.appKey ?? '', row]));
-      const result: ListingRow[] = [];
-      for (const item of installRows) {
-        const update = byAppKey.get(item.appKey ?? '');
-        if (update) {
-          result.push({
-            id: item.listingId ?? '',
-            name: item.listingId ?? '应用',
-            developer: '',
-            rating: 0,
-          });
-        }
+      if (checkItems.length === 0) {
+        return [];
       }
-      return result;
+      const byAppKey = new Map(checkItems.map((row) => [row.appKey ?? '', row]));
+      const pending = installRows.filter((item) =>
+        byAppKey.has(item.appKey ?? ''),
+      );
+      const resolved = await resolveRowsByListingIds(
+        pending.map((item) => item.listingId),
+      );
+      return pending.map((item) => {
+        const update = byAppKey.get(item.appKey ?? '');
+        const card = resolved.get(item.listingId);
+        return {
+          id: item.listingId,
+          name: card?.name ?? item.listingId,
+          developer: update ? describeUpdate(update) : '',
+          rating: card?.rating ?? 0,
+        };
+      });
     },
 
     /** User store: custom categories + active shares (user_store domain, auth). */
@@ -475,26 +729,34 @@ function createPageLoaders(getClient: () => AppstoreAppClient) {
     async revokeShare(shareId: string): Promise<void> {
       await getClient().userStore.revokeShare(shareId);
     },
-    /** Publisher: my listings (publishers domain, auth required). */
+    /** Publisher: my listings with readable statuses (publishers domain, auth). */
     async publisher(): Promise<ListingRow[]> {
       const page = await getClient().publishers.listMyListings({ limit: 50 });
       const items = ((page?.items ?? []) as unknown) as Array<Record<string, unknown>>;
-      return items.map((row) => ({
-        id: String(row.listingSlug ?? row.id ?? ''),
-        name: String(row.displayName ?? '应用'),
-        developer: String(row.status ?? ''),
-        rating: 0,
-      }));
+      const resolved = await resolveRowsByListingIds(
+        items.map((row) => String(row.id ?? '')),
+      );
+      return items.map((row) => {
+        const listingId = String(row.id ?? '');
+        const card = resolved.get(listingId);
+        const name = String(row.displayName ?? '') || card?.name || listingId || '应用';
+        return {
+          id: String(row.listingSlug ?? listingId),
+          name,
+          developer: publisherStatusLabel(String(row.status ?? '')),
+          rating: 0,
+        };
+      });
     },
   };
 }
 
 /**
  * Auth loaders over the generated iam-app-sdk client. Tokens from the session
- * create response persist through the page-layer session module (wx storage)
- * and re-seed the appstore client via `setAppSdkSession`.
+ * create response persist through the bundle session module (wx storage) and
+ * re-seed both the appstore client and the IAM client via the token managers.
  */
-function createAuthLoaders(iamClient: IamAppClient) {
+function createAuthLoaders(getIamClient: () => IamAppClient) {
   return {
     async loginWithPassword(account: string, password: string): Promise<void> {
       const trimmed = account.trim();
@@ -506,12 +768,12 @@ function createAuthLoaders(iamClient: IamAppClient) {
       } else {
         command.username = trimmed;
       }
-      const response = (await iamClient.auth.sessions.create(command as never)) as unknown as Record<string, unknown>;
+      const response = (await getIamClient().auth.sessions.create(command as never)) as unknown as Record<string, unknown>;
       applySessionTokens(response);
     },
 
     async loginWithExternalToken(externalToken: string, providerKey: string): Promise<void> {
-      const response = (await iamClient.auth.sessions.create({
+      const response = (await getIamClient().auth.sessions.create({
         externalToken,
         providerKey,
       } as never)) as unknown as Record<string, unknown>;
@@ -519,24 +781,26 @@ function createAuthLoaders(iamClient: IamAppClient) {
     },
 
     async currentUser(): Promise<{ userId: string; displayName: string }> {
-      const profile = (await iamClient.iam.users.current.retrieve()) as unknown as Record<string, unknown>;
-      return {
+      const profile = (await getIamClient().iam.users.current.retrieve()) as unknown as Record<string, unknown>;
+      const result = {
         userId: String(profile.id ?? ''),
         displayName: [profile.displayName, profile.nickname, profile.name]
           .find((value) => typeof value === 'string' && value.trim() !== '')
           ?.toString() ?? 'SDKWork 用户',
       };
+      setIamSession({ ...getIamSession(), displayName: result.displayName, userId: result.userId });
+      return result;
     },
 
     async logout(): Promise<void> {
-      await iamClient.auth.sessions.current.delete().catch(() => undefined);
-      clearAppSdkSession();
+      await getIamClient().auth.sessions.current.delete().catch(() => undefined);
+      clearIamSession();
     },
   };
 }
 
 function applySessionTokens(response: Record<string, unknown>): void {
-  const tokens: Record<string, string> = {};
+  const tokens: Partial<AppstoreMiniProgramIamSession> = {};
   for (const [key, value] of Object.entries(response)) {
     const normalized = key.replace(/_([a-z])/g, (_m: string, c: string) => c.toUpperCase());
     if (
@@ -547,5 +811,14 @@ function applySessionTokens(response: Record<string, unknown>): void {
       tokens[normalized] = value.trim();
     }
   }
-  setAppSdkSession(tokens);
+  setIamSession({ ...getIamSession(), ...tokens });
+}
+
+/** Module-scope singletons the thin pages destructure at require time. */
+export const pageLoaders = createPageLoaders(requireAppClient);
+export const auth = createAuthLoaders(requireIamClient);
+
+/** Top-level current-user fetch (login/settings pages import it directly). */
+export async function loadCurrentUser(): Promise<{ userId: string; displayName: string }> {
+  return auth.currentUser();
 }

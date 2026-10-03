@@ -9,6 +9,7 @@ import {
   readAppSdkSessionTokens,
   resolveAppSdkAccessToken,
   resolveAppSdkAuthToken,
+  setAppSdkSession,
   type AppstoreMpSession,
 } from "../session/session.js";
 
@@ -96,6 +97,33 @@ export function getAppstoreAppSdkClient(): AppstoreAppClient {
   return client ?? (() => {
     throw new Error("App Store app SDK client is not initialized");
   })();
+}
+
+/**
+ * Project a session change into the live SDK client.
+ *
+ * `setAppSdkSession` only updates the in-memory session, which the client
+ * reads at construction time. Session changes that arrive after construction
+ * (login, logout, relaunch re-seed) must also reach the client's token
+ * manager, or every subsequent request keeps the stale token state.
+ */
+export function syncAppSdkSessionTokens(next: AppstoreMpSession): void {
+  setAppSdkSession(next);
+  if (!tokenManager) {
+    return;
+  }
+  const authToken = resolveAppSdkAuthToken(next);
+  const accessToken = resolveAppSdkAccessToken(next);
+  if (authToken) {
+    tokenManager.setAuthToken(authToken);
+  } else {
+    tokenManager.clearAuthToken();
+  }
+  if (accessToken) {
+    tokenManager.setAccessToken(accessToken);
+  } else {
+    tokenManager.clearAccessToken();
+  }
 }
 
 export function resetAppstoreAppSdkClient(): void {

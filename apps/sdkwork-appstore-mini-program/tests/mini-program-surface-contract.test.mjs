@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
 import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
@@ -66,6 +66,65 @@ test("registered pages keep their platform assets", () => {
       );
     }
   }
+});
+
+test("built runtime bundle exports the surface the thin pages destructure", () => {
+  const bundle = read("src/runtime/appstore-app.js");
+  for (const name of [
+    "bootstrapAppstoreMiniProgram",
+    "pageLoaders",
+    "auth",
+    "loadCurrentUser",
+    "loadPersistedIamSession",
+    "getIamSession",
+    "setIamSession",
+    "clearIamSession",
+    "onIamSessionChange",
+    "isIamAuthenticated",
+  ]) {
+    assert.ok(
+      bundle.includes(name),
+      `runtime bundle must export ${name}: pages destructure it at require time`,
+    );
+  }
+});
+
+test("every page destructured runtime symbol is a bundle export", () => {
+  const bundle = read("src/runtime/appstore-app.js");
+  const pageDir = path.join(ROOT, "src/pages");
+  for (const entry of readdirSync(pageDir)) {
+    const pageJs = path.join(pageDir, entry, "index.js");
+    if (!existsSync(pageJs)) {
+      continue;
+    }
+    const source = readFileSync(pageJs, "utf8");
+    const match = source.match(
+      /const\s*\{([^}]+)\}\s*=\s*require\(["'][^"']*runtime\/appstore-app["']\)/u,
+    );
+    if (!match) {
+      continue;
+    }
+    for (const raw of match[1].split(",")) {
+      const symbol = raw.trim().split(/\s+as\s+/u)[0];
+      if (symbol === "") {
+        continue;
+      }
+      assert.ok(
+        new RegExp(`(?:^|[\\s,{])${symbol}\\s*[:(}]`).test(bundle) ||
+          bundle.includes(symbol),
+        `page src/pages/${entry}/index.js destructures "${symbol}" but the runtime bundle does not export it`,
+      );
+    }
+  }
+});
+
+test("page session module resolves into the runtime bundle (single instance)", () => {
+  const shim = read("src/bootstrap/iamRuntime.js");
+  assert.match(
+    shim,
+    /module\.exports\s*=\s*require\("\.\.\/runtime\/appstore-app"\)/u,
+    "iamRuntime.js must re-export the bundle session module so pages and loaders share one session",
+  );
 });
 
 test("manifest exposes the canonical mini-program runtime build entry", () => {
