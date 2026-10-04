@@ -14,7 +14,7 @@ export {
   AppMoreByDeveloper,
   AppRecommendations,
   AppRecommendationCard,
-} from '@sdkwork/appstore-pc-merchandise';
+} from '@sdkwork/appstore-pc-storefront';
 
 export const appDetailRoute = {
   path: '/app/:id',

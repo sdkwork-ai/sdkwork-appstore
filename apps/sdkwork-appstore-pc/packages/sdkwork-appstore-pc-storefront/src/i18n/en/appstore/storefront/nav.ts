@@ -11,6 +11,7 @@ export const nav = {
     skills: 'Skills',
     mcp: 'MCP Servers',
     templates: 'Templates',
+    demands: 'Demand Hall',
     updates: 'Updates & Library',
     charts: 'Top Charts',
     search: 'Search',

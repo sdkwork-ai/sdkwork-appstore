@@ -8,6 +8,7 @@ export type AppstorePcRuntimeTarget = 'browser' | 'desktop';
 export interface AppstorePcRuntimeConfig {
   agentsAppApiBaseUrl: string;
   commentsAppApiBaseUrl: string;
+  companyAppApiBaseUrl: string;
   aiPreviewAgentId?: string;
   appApiBaseUrl: string;
   appDisplayName: string;
@@ -49,6 +50,7 @@ function resolveEnvironment(mode: string): AppstorePcEnvironment {
 export interface AppstorePcRuntimeConfigOverrides {
   agentsAppApiBaseUrl?: string
   commentsAppApiBaseUrl?: string
+  companyAppApiBaseUrl?: string
   appApiBaseUrl?: string
   backendApiBaseUrl?: string
   iamAppApiBaseUrl?: string
@@ -95,6 +97,8 @@ export function resolveAppstorePcRuntimeConfig(
     aiPreviewAgentId: overrides.aiPreviewAgentId ?? readEnv('VITE_SDKWORK_APPSTORE_AI_PREVIEW_AGENT_ID'),
     commentsAppApiBaseUrl:
       overrides.commentsAppApiBaseUrl ?? readEnv('VITE_SDKWORK_COMMENTS_APP_API_BASE_URL') ?? platformApiGatewayUrl,
+    companyAppApiBaseUrl:
+      overrides.companyAppApiBaseUrl ?? readEnv('VITE_SDKWORK_COMPANY_APP_API_BASE_URL') ?? platformApiGatewayUrl,
     appApiBaseUrl: overrides.appApiBaseUrl ?? applicationPublicUrl,
     appDisplayName: overrides.appDisplayName ?? manifest.app.displayName,
     appKey: overrides.appKey ?? manifest.app.key,

@@ -27,7 +27,7 @@
     "@sdkwork/appstore-pc-admin-moderation": "workspace:*",
     "@sdkwork/appstore-pc-admin-publishers": "workspace:*",
     "@sdkwork/appstore-pc-admin-shell": "workspace:*",
-    "@sdkwork/appstore-pc-merchandise": "workspace:*",
+    "@sdkwork/appstore-pc-storefront": "workspace:*",
     "@sdkwork/appstore-pc-runtime": "workspace:*",
     "i18next": "^26.3.6",
     "react-i18next": "^17.0.11"

@@ -2,11 +2,11 @@
   "schemaVersion": 1,
   "kind": "sdkwork.component.spec",
   "component": {
-    "name": "@sdkwork/appstore-pc-merchandise",
+    "name": "@sdkwork/appstore-pc-storefront",
     "displayName": "SDKWork App Store PC Merchandise",
     "version": "1.0.0",
     "type": "react-package",
-    "root": "apps/sdkwork-appstore-pc/packages/sdkwork-appstore-pc-merchandise",
+    "root": "apps/sdkwork-appstore-pc/packages/sdkwork-appstore-pc-storefront",
     "domain": "appstore",
     "capability": "merchandise",
     "surface": "app",
@@ -29,6 +29,6 @@
     "dependencyApiSurfaces": []
   },
   "verification": {
-    "commands": ["pnpm --filter @sdkwork/appstore-pc-merchandise typecheck"]
+    "commands": ["pnpm --filter @sdkwork/appstore-pc-storefront typecheck"]
   }
 }

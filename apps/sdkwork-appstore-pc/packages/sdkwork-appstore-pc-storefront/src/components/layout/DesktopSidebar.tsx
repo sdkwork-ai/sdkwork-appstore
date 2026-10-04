@@ -1,6 +1,7 @@
 import { useLocation, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
+  Megaphone,
   Home,
   Grid,
   Gamepad2,
@@ -46,6 +47,7 @@ export function DesktopSidebar() {
     { name: t('nav.menu.skills'), path: '/skills', icon: Zap },
     { name: t('nav.menu.mcp'), path: '/mcp', icon: Network },
     { name: t('nav.menu.templates'), path: '/templates', icon: Boxes },
+    { name: t('nav.menu.demands'), path: '/demands', icon: Megaphone },
   ];
 
   const adminTabs: SidebarNavItem[] = [

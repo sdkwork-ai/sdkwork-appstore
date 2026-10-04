@@ -11,6 +11,7 @@ export const nav = {
     skills: '技能中心',
     mcp: 'MCP 服务',
     templates: '应用模板',
+    demands: '需求大厅',
     updates: '更新与已安装',
     charts: '排行榜',
     search: '全局搜索',

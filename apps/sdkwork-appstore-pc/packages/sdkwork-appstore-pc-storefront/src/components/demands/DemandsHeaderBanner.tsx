@@ -1,0 +1,28 @@
+import React from 'react';
+import { Megaphone, Sparkles } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+
+export const DemandsHeaderBanner: React.FC = () => {
+  const { t } = useTranslation();
+
+  return (
+    <div className="relative overflow-hidden rounded-store-card bg-gradient-to-br from-store-subtle to-store-subtle border border-store-line p-6 md:p-8 text-store-ink shadow-lg">
+      <div className="relative z-10 max-w-2xl">
+        <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-store-brand/10 border border-store-brand/20 text-store-brand text-xs font-medium mb-3">
+          <Sparkles className="w-3.5 h-3.5" />
+          {t('demands.header.badge')}
+        </div>
+        <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight">
+          {t('demands.header.title')}
+        </h1>
+        <p className="mt-2 text-xs md:text-sm text-store-ink-soft leading-relaxed">
+          {t('demands.header.subtitle')}
+        </p>
+      </div>
+
+      <div className="absolute -right-8 -bottom-10 opacity-10 pointer-events-none">
+        <Megaphone className="w-64 h-64 text-white" />
+      </div>
+    </div>
+  );
+};

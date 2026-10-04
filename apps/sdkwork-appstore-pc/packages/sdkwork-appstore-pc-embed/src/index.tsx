@@ -28,6 +28,7 @@ import {
   SkillsPage,
   TemplateDetailPage,
   TemplatesPage,
+  DemandsPage,
   ThemeProvider,
   UpdatesPage,
   WishlistPage,
@@ -35,7 +36,7 @@ import {
   PublicUserStorePage,
   initializeAppstorePcI18n,
   i18n,
-} from '@sdkwork/appstore-pc-merchandise'
+} from '@sdkwork/appstore-pc-storefront'
 import {
   buildAppstorePcHostSessionCandidate,
   createAppstorePcHostSessionSyncState,
@@ -119,6 +120,7 @@ export function AppstorePcRoutes({
             <Route path="skills" element={<SkillsPage />} />
             <Route path="mcp" element={<McpPage />} />
             <Route path="templates" element={<TemplatesPage />} />
+            <Route path="demands" element={<DemandsPage />} />
             <Route path="template/:id" element={<TemplateDetailPage />} />
             <Route path="templates/:id" element={<TemplateDetailPage />} />
             <Route path="charts" element={<ChartsPage />} />

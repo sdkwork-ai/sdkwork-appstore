@@ -1,6 +1,6 @@
 import {StrictMode} from 'react';
 import {createRoot} from 'react-dom/client';
-import { initializeAppstorePcI18n } from '@sdkwork/appstore-pc-merchandise';
+import { initializeAppstorePcI18n } from '@sdkwork/appstore-pc-storefront';
 import App from './App.tsx';
 import './index.css';
 

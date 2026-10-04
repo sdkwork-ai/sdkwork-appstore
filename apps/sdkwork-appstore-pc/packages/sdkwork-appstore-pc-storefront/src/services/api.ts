@@ -5,6 +5,7 @@ export {
   SkillsService,
   McpService,
   TemplatesService,
+  CompanyDemandsService,
   ConsoleService,
   InstallService,
   UserStoreService,

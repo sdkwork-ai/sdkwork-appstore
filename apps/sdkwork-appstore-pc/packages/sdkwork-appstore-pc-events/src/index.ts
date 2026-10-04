@@ -1,4 +1,4 @@
-export { EventPage } from '@sdkwork/appstore-pc-merchandise';
+export { EventPage } from '@sdkwork/appstore-pc-storefront';
 
 export const eventRoute = {
   path: '/events/:id',

@@ -18,6 +18,7 @@ export {
   McpPage,
 } from '@sdkwork/appstore-pc-markets'
 export { default as TemplatesPage } from './pages/Templates'
+export { default as DemandsPage } from './pages/Demands'
 export { default as TemplateDetailPage } from './pages/TemplateDetail'
 export { default as ChartsPage } from './pages/Charts'
 export { default as SearchPage } from './pages/Search'

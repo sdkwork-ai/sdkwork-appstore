@@ -16,7 +16,7 @@ under `packages/`, the API gateway composition lives in
 - `packages/sdkwork-appstore-pc-commons` — shared storefront UI (app rows,
   platform badges, QR code image, distribution action buttons, install
   context).
-- `packages/sdkwork-appstore-pc-merchandise` — storefront pages (discover,
+- `packages/sdkwork-appstore-pc-storefront` — storefront pages (discover,
   apps, games, search, charts, listing detail, library, updates) and the
   install/QR flows.
 - `packages/sdkwork-appstore-pc-embed` — the host-embeddable root that wraps

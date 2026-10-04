@@ -24,6 +24,7 @@ import { configureAppstorePcMcp } from './mcp';
 import { configureAppstorePcPlugins } from './plugins';
 import { configureAppstorePcSkills } from './skills';
 import { configureAppstorePcTemplates } from './templates';
+import { configureAppstorePcCompany } from './company';
 import { configureAppstorePcUserStore } from './userStore';
 
 export interface AppstorePcRuntime {
@@ -78,6 +79,7 @@ export function createAppstorePcRuntime(
   configureAppstorePcMcp(sdkClients.mcp);
   configureAppstorePcAppStore(sdkClients.app, sdkClients.comments);
   configureAppstorePcTemplates(sdkClients.app);
+  configureAppstorePcCompany(sdkClients.company);
   configureAppstorePcPlugins(sdkClients.app);
   configureAppstorePcConsole(sdkClients.app);
   configureAppstorePcInstall(sdkClients.app);

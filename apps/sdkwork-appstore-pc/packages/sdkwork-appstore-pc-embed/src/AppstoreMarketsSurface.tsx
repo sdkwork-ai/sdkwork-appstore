@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef } from 'react';
 import { MemoryRouter } from 'react-router-dom';
 import { I18nextProvider } from 'react-i18next';
 import {
+  DemandsPage,
   ExpertsPage,
   McpPage,
   PluginsPage,
@@ -10,7 +11,7 @@ import {
   initializeAppstorePcI18n,
   i18n,
   ThemeProvider,
-} from '@sdkwork/appstore-pc-merchandise';
+} from '@sdkwork/appstore-pc-storefront';
 import {
   createAppstorePcRuntime,
   resolveAppstorePcRuntimeConfig,
@@ -33,7 +34,7 @@ import {
  * `AppstorePcHost` router, so the storefront's catalog pages stay reusable
  * across embedding applications.
  */
-export type AppstoreMarketsPage = 'plugins' | 'experts' | 'skills' | 'mcp' | 'templates';
+export type AppstoreMarketsPage = 'plugins' | 'experts' | 'skills' | 'mcp' | 'templates' | 'demands';
 
 const MARKET_PAGE_COMPONENTS = {
   plugins: PluginsPage,
@@ -41,6 +42,7 @@ const MARKET_PAGE_COMPONENTS = {
   skills: SkillsPage,
   mcp: McpPage,
   templates: TemplatesPage,
+  demands: DemandsPage,
 } as const satisfies Record<AppstoreMarketsPage, unknown>;
 
 /** Session data accepted from the embedding application. */
@@ -84,6 +86,7 @@ function resolveMarketsConfig(props: AppstoreMarketsSurfaceProps): AppstorePcRun
           iamAppApiBaseUrl: base,
           mcpAppApiBaseUrl: base,
           skillsAppApiBaseUrl: base,
+          companyAppApiBaseUrl: base,
         }
       : {}),
     ...(locale ? { locale } : {}),
@@ -91,7 +94,7 @@ function resolveMarketsConfig(props: AppstoreMarketsSurfaceProps): AppstorePcRun
 }
 
 /**
- * Render one App Store market page (plugins, experts, skills, or MCP) through
+ * Render one App Store market page (plugins, experts, skills, MCP, or demands) through
  * its own isolated runtime, i18n provider, and host-managed theme. The surface
  * owns no navigation chrome: the host renders its own header/tabs around it.
  *

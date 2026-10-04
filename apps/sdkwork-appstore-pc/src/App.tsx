@@ -1,5 +1,5 @@
 import { BrowserRouter } from 'react-router-dom'
-import { ThemeProvider, InstallProvider } from '@sdkwork/appstore-pc-merchandise'
+import { ThemeProvider, InstallProvider } from '@sdkwork/appstore-pc-storefront'
 import { createAppstorePcRuntime } from '@sdkwork/appstore-pc-runtime'
 import { AppstorePcRoutes } from '@sdkwork/appstore-pc-embed'
 import '@sdkwork/appstore-pc-embed/styles.css'

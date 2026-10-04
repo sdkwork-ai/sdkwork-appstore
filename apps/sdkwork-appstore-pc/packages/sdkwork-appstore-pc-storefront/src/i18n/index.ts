@@ -12,6 +12,7 @@ import { expertsZhCN as expertsZh } from '@sdkwork/appstore-pc-markets/i18n';
 import { skillsZhCN as skillsZh } from '@sdkwork/appstore-pc-markets/i18n';
 import { mcpZhCN as mcpZh } from '@sdkwork/appstore-pc-markets/i18n';
 import { templates as templatesZh } from './zh-CN/appstore/storefront/templates';
+import { demands as demandsZh } from './zh-CN/appstore/storefront/demands';
 import { updates as updatesZh } from './zh-CN/appstore/storefront/updates';
 import { search as searchZh } from './zh-CN/appstore/storefront/search';
 import { charts as chartsZh } from './zh-CN/appstore/storefront/charts';
@@ -37,6 +38,7 @@ import { expertsEn as expertsEn } from '@sdkwork/appstore-pc-markets/i18n';
 import { skillsEn as skillsEn } from '@sdkwork/appstore-pc-markets/i18n';
 import { mcpEn as mcpEn } from '@sdkwork/appstore-pc-markets/i18n';
 import { templates as templatesEn } from './en/appstore/storefront/templates';
+import { demands as demandsEn } from './en/appstore/storefront/demands';
 import { updates as updatesEn } from './en/appstore/storefront/updates';
 import { search as searchEn } from './en/appstore/storefront/search';
 import { charts as chartsEn } from './en/appstore/storefront/charts';
@@ -66,6 +68,7 @@ const zhCN = {
   skills: skillsZh,
   mcp: mcpZh,
   templates: templatesZh,
+  demands: demandsZh,
   updates: updatesZh,
   search: searchZh,
   charts: chartsZh,
@@ -93,6 +96,7 @@ const en = {
   skills: skillsEn,
   mcp: mcpEn,
   templates: templatesEn,
+  demands: demandsEn,
   updates: updatesEn,
   search: searchEn,
   charts: chartsEn,

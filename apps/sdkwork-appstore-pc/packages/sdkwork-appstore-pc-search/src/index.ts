@@ -4,7 +4,7 @@ export {
   SearchFilters,
   TrendingSearches,
   SearchResults,
-} from '@sdkwork/appstore-pc-merchandise';
+} from '@sdkwork/appstore-pc-storefront';
 
 export const searchRoute = {
   path: '/search',

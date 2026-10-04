@@ -105,7 +105,8 @@ Do not use `cargo fmt --all`; optional sibling workspace paths are outside this 
 - Appstore owns marketplace catalog, publisher, listing, release, library, moderation, and store analytics APIs.
 - IAM, Drive, Comments, and commerce domains remain dependency-owned and are consumed through approved SDKs or composed facades.
 - `sdkwork-agents` is consumed only through `@sdkwork/agents-app-sdk` bound in `*-core` SDK client inventories; never add raw HTTP, manual auth headers, DTO forks, local SDK proxies, deep generated imports, or a reverse dependency on appstore sources. See `specs/AGENTS_DEPENDENCY_BOUNDARY_SPEC.md`.
-- The AI Lab sidebar group composes independent appstore pages in order 专家 (`/experts`), 扩展插件 (`/plugins`), 技能中心 (`/skills`), MCP 服务 (`/mcp`), 应用模板 (`/templates`); the 专家 page mirrors the 应用模板 page layout, and Agents runtime state never persists in appstore stores.
+- The AI Lab sidebar group composes independent appstore pages in order 专家 (`/experts`), 扩展插件 (`/plugins`), 技能中心 (`/skills`), MCP 服务 (`/mcp`), 应用模板 (`/templates`), 需求大厅 (`/demands`); the 专家 page mirrors the 应用模板 page layout, and Agents runtime state never persists in appstore stores.
+- The demand hall (需求大厅) composes the company domain only through `@sdkwork/company-app-sdk` bound in `sdkwork-appstore-pc-core`'s SDK client inventory; demand publishing/claiming data is company-owned and never persisted in appstore stores.
 - Paid checkout uses `@sdkwork/cloudrouter-app-sdk/domains`; do not add raw HTTP, manual auth headers, DTO forks, or local SDK proxies.
 - Do not change database schema or migrations without explicit user confirmation.
 - Preserve unrelated dirty work and use evidence from executable checks before completion.
@@ -117,38 +118,7 @@ Do not use `cargo fmt --all`; optional sibling workspace paths are outside this 
 - HTTP API input, output, envelope, error, and operation work routes to `../sdkwork-specs/API_SPEC.md`; run `check-api-operation-patterns.mjs` and `check-api-response-envelope.mjs` from `../sdkwork-specs/tools/`.
 - List and search work routes to `../sdkwork-specs/PAGINATION_SPEC.md`; verify store-level canonical pagination with `node ../sdkwork-specs/tools/check-pagination.mjs --workspace .`.
 
-## HTTP API Response Envelope
-
-All L2+ SDKWork-owned custom HTTP contracts, including `app-api`, `backend-api`, and SDKWork-owned business `open-api`, `MUST` follow `API_SPEC.md` section 4.5, section 14, and section 15:
-
-- **Default classification:** omitted `x-sdkwork-wire-protocol` means SDKWork-owned custom API (`sdkwork-v3`); only operation-level `x-sdkwork-wire-protocol: external` plus `x-sdkwork-external-protocol-id` identifies a third-party compatibility `open-api` operation.
-- **Input:** typed request bodies, section 14.1 list/search/command input, `SdkWorkListQuery`, and `q` for free-text search.
-- **Success output:** `SdkWorkApiResponse` with `{ "code": 0, "data": <payload>, "traceId": "<server-uuid>" }`.
-- **Error output:** HTTP 4xx/5xx `application/problem+json` (`ProblemDetail`) with numeric `code` and `traceId`; SDKWork-owned errors may include `i18nKey` and `locale` presentation metadata.
-- Success `code` is numeric `int32`; HTTP 2xx JSON bodies `MUST` use `0` only. REST semantics remain on HTTP status (`201`, `202`, etc.).
-- Platform error codes are numeric non-zero values per section 15.3 (`40001`, `40101`, `40401`, …).
-- Single resource: `data.item`
-- Lists: `data.items` + `data.pageInfo` (`PageInfo.mode` is `offset` or `cursor`)
-- Commands: `data.accepted` plus optional `resourceId` / `status`
-- Async accept (`202`): `data.operationId`, `data.status`, optional `pollUrl`
-- Operation patterns: retrieve/list/search/create/update/delete/command/async/bulk semantics follow `API_SPEC.md` section 15.4; create uses `201`, delete uses `204` with no JSON body, and `PUT`/`PATCH` use SDK action `update`.
-
-Vendor compatibility `open-api` routes that mirror upstream tool or provider wire (for example OpenAI `/v1/*`, Anthropic/Claude `/anthropic/v1/*`, Google/Gemini `/google/v1beta/*`, Claude Code, or Codex) `MAY` opt out only when every exempt operation declares operation-level `x-sdkwork-wire-protocol: external` and `x-sdkwork-external-protocol-id` per `API_SPEC.md` section 4.5.2. SDKWork-owned business `open-api` operations `MUST NOT` opt out. Mixed OpenAPI documents are validated per operation; one external operation never exempts SDKWork-owned operations in the same document.
-
-Errors `MUST` use HTTP 4xx/5xx with `application/problem+json` (`ProblemDetail`) including required numeric `code` and `traceId`. Optional `i18nKey` and `locale` are display metadata only. Business failures `MUST NOT` use HTTP 2xx with non-zero `code`, string wire codes, `success`, or human `message`.
-
-Forbidden legacy envelopes and fields: `PlusApiResult`, `AppbaseApiResult`, `StoreApiResult`, `SdkWorkResponse`, per-domain `*ApiResult`, wire field `requestId`, bare domain DTOs at the HTTP root, and top-level `{ items, pageInfo, traceId }` without `data`.
-
-Handlers `MUST` serialize success and map errors through `sdkwork-web-framework` response mapping. Generated HTTP SDKs (`--standard-profile sdkwork-v3`) unwrap `data` by default and expose typed numeric `ProblemDetail.code` / `traceId` and returned localization metadata on errors; use `.raw` when the full envelope is required.
-
-Before completing API contract, SDK generation, or frontend service work, run:
-
-```bash
-node <sdkwork-specs>/tools/check-api-operation-patterns.mjs --workspace <workspace-root>
-node <sdkwork-specs>/tools/check-api-response-envelope.mjs --workspace <workspace-root>
-```
-
-Authority: `sdkwork-specs/API_SPEC.md` section 4.5 and sections 14–16, `SDK_SPEC.md` section 4.2, `FRONTEND_SPEC.md`, `MIGRATION_SPEC.md` section 4.2.
+HTTP API input, output, envelope, error, and operation work routes to `../../../sdkwork-specs/API_SPEC.md` (section 4.5 and sections 14-16); verify with `check-api-operation-patterns.mjs` and `check-api-response-envelope.mjs` from `../../../sdkwork-specs/tools/`.
 
 ## Human Review Rules
 

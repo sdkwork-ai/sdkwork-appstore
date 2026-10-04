@@ -5,7 +5,7 @@ export {
   ManagedAppsList,
   ApiCredentialsCard,
   SecurityPolicyCard,
-} from '@sdkwork/appstore-pc-merchandise';
+} from '@sdkwork/appstore-pc-storefront';
 
 export const consoleSettingsRoute = {
   path: '/console/settings',

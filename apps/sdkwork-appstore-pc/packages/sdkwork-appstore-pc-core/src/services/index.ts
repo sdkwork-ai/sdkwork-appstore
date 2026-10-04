@@ -4,6 +4,7 @@ export * from './plugins';
 export * from './skills';
 export * from './mcp';
 export * from './templates';
+export * from './company';
 export * from './console';
 export * from './install';
 export * from './userStore';

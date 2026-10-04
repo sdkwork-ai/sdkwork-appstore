@@ -12,6 +12,10 @@ import {
   type SdkworkAppClient as CommentsAppClient,
 } from '@sdkwork/comments-app-sdk';
 import {
+  createClient as createCompanyAppClient,
+  type SdkworkAppClient as CompanyAppClient,
+} from '@sdkwork/company-app-sdk';
+import {
   createClient as createAgentsAppClient,
   type SdkworkAppClient as AgentsAppClient,
   type AgentRuntimeExecutionRecord,
@@ -37,6 +41,7 @@ export type {
   AppStoreClient,
   AppStoreOpenClient,
   CommentsAppClient,
+  CompanyAppClient,
   DownloadGrant,
   McpAppClient,
   McpServerRecord,
@@ -51,6 +56,7 @@ export interface AppstorePcSdkClientInventory {
   agents: AgentsAppClient;
   app: AppStoreClient;
   comments: CommentsAppClient;
+  company: CompanyAppClient;
   mcp: McpAppClient;
   /** Anonymous open-api client (`/store/v3/api`); public share views. */
   open: AppStoreOpenClient;
@@ -65,6 +71,7 @@ export interface AppstorePcSdkBaseUrls {
   agentsAppApiBaseUrl: string;
   appApiBaseUrl: string;
   commentsAppApiBaseUrl: string;
+  companyAppApiBaseUrl: string;
   iamAppApiBaseUrl: string;
   mcpAppApiBaseUrl: string;
   skillsAppApiBaseUrl: string;
@@ -92,6 +99,12 @@ export function createAppstorePcSdkClients(
     platform: 'pc',
     tokenManager,
   });
+  const company = createCompanyAppClient({
+    authMode: 'dual-token',
+    baseUrl: normalizeGeneratedSdkBaseUrl(config.companyAppApiBaseUrl, '/app/v3/api'),
+    platform: 'pc',
+    tokenManager,
+  });
   const skills = createSkillsAppClient({
     authMode: 'dual-token',
     baseUrl: normalizeGeneratedSdkBaseUrl(config.skillsAppApiBaseUrl, '/app/v3/api'),
@@ -114,6 +127,7 @@ export function createAppstorePcSdkClients(
     agents,
     app,
     comments,
+    company,
     mcp,
     open,
     sdkFamilies: {
@@ -125,6 +139,7 @@ export function createAppstorePcSdkClients(
         'sdkwork-skills-app-sdk',
         'sdkwork-mcp-app-sdk',
         'sdkwork-comments-app-sdk',
+        'sdkwork-company-app-sdk',
       ],
     },
     skills,

@@ -9,7 +9,7 @@ export {
   MiniGameCard,
   HandheldGamesGrid,
   HandheldGameCard,
-} from '@sdkwork/appstore-pc-merchandise';
+} from '@sdkwork/appstore-pc-storefront';
 
 export const discoverRoute = {
   path: '/',

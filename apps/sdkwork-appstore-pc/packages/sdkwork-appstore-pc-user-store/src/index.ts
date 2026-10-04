@@ -7,7 +7,7 @@ export {
   UserStoreEmptyState,
   CategoryItemsDialog,
   AddToCategoryPopover,
-} from '@sdkwork/appstore-pc-merchandise';
+} from '@sdkwork/appstore-pc-storefront';
 
 /** Authenticated management surface for the owner's custom categories. */
 export const userStoreRoute = {

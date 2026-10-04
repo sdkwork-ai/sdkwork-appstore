@@ -61,7 +61,7 @@
     "@sdkwork/appstore-pc-games": "workspace:*",
     "@sdkwork/appstore-pc-embed": "workspace:*",
     "@sdkwork/appstore-pc-library": "workspace:*",
-    "@sdkwork/appstore-pc-merchandise": "workspace:*",
+    "@sdkwork/appstore-pc-storefront": "workspace:*",
     "@sdkwork/appstore-pc-publisher": "workspace:*",
     "@sdkwork/appstore-pc-runtime": "workspace:*",
     "@sdkwork/appstore-pc-search": "workspace:*",
