@@ -57,7 +57,14 @@ export const ReviewForm: React.FC<ReviewFormProps> = ({
       }, 1500);
     } catch (err) {
       console.error('提交评价失败', err);
-      setSubmitError(err instanceof Error ? err.message : t('appDetail.reviews.submitFailed'));
+      // Anonymous sessions 401 on the rating endpoint; point the user at
+      // sign-in instead of a bare failure.
+      const raw = err instanceof Error ? err.message : '';
+      setSubmitError(
+        /401|unauthorized|auth/i.test(raw)
+          ? t('appDetail.reviews.loginRequired')
+          : raw || t('appDetail.reviews.submitFailed'),
+      );
     } finally {
       setIsSubmitting(false);
     }

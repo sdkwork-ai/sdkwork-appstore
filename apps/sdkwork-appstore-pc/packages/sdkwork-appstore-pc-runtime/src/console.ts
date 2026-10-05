@@ -270,12 +270,18 @@ function mapListingStatus(status: string): ManagedApp['status'] {
     case 'IN_REVIEW':
       return '审核中';
     case 'DRAFT':
-      return '已提交上架';
+      // A draft has not entered review yet; labeling it 已提交上架 misleads
+      // publishers into thinking the moderation round-trip already happened.
+      return '草稿';
+    case 'APPROVED':
+      return '已通过';
     case 'DELISTED':
-    case 'REJECTED':
+    case 'SUSPENDED':
       return '已下架';
+    case 'REJECTED':
+      return '未通过';
     default:
-      return '已提交上架';
+      return '草稿';
   }
 }
 

@@ -85,7 +85,7 @@ export function PublisherListingManagePage() {
   const listingImageService = useMemo(() => getPublisherUploads().createListingImageService(), []);
   const attachedMediaNodeIds = useRef<Set<string>>(new Set());
 
-  const [channelCode, setChannelCode] = useState('stable');
+  const [channelCode, setChannelCode] = useState('production');
   const [versionName, setVersionName] = useState('1.0.0');
   const [versionCode, setVersionCode] = useState('100');
   const [creatingRelease, setCreatingRelease] = useState(false);

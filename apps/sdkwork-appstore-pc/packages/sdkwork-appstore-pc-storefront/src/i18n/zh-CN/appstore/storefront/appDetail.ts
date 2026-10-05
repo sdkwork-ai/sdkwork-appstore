@@ -51,6 +51,7 @@ export const appDetail = {
     averageRating: '综合评分',
     basedOn: '基于 {{count}} 位用户打分',
     missingAppId: '无法提交评价：缺少应用 ID',
+    loginRequired: '请先登录后再评价',
     submitFailed: '提交失败，请稍后重试'
   },
   info: {

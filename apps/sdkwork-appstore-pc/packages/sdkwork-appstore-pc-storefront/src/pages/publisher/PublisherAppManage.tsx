@@ -45,7 +45,7 @@ export default function PublisherAppManage() {
   const [savedNotice, setSavedNotice] = useState(false);
 
   // release create state
-  const [releaseForm, setReleaseForm] = useState({ versionName: '', versionCode: '', channelCode: 'PRODUCTION' });
+  const [releaseForm, setReleaseForm] = useState({ versionName: '', versionCode: '', channelCode: 'production' });
   const [creatingRelease, setCreatingRelease] = useState(false);
   const [rolloutPercent, setRolloutPercent] = useState(10);
   const [applyingRollout, setApplyingRollout] = useState(false);
@@ -405,9 +405,8 @@ export default function PublisherAppManage() {
                   onChange={(event) => setReleaseForm((prev) => ({ ...prev, channelCode: event.target.value }))}
                   className="w-full px-3 rounded-store-control bg-store-field border border-store-line text-sm text-store-ink outline-none focus:border-store-brand transition-colors h-9 placeholder:text-store-ink-faint focus:ring-2 focus:ring-store-brand/25"
                 >
-                  <option value="PRODUCTION">{t('publisher.manage.releases.channelOfficial')}</option>
-                  <option value="BETA">{t('publisher.manage.releases.channelBeta')}</option>
-                  <option value="GRAY">{t('publisher.manage.releases.channelGray')}</option>
+                  {/* channel_code values come from appstore_release_channel (seed: production). */}
+                  <option value="production">{t('publisher.manage.releases.channelOfficial')}</option>
                 </select>
               </div>
             </div>

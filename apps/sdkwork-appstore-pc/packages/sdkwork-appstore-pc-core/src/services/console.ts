@@ -2,7 +2,7 @@ export interface ManagedApp {
   id: string;
   name: string;
   version: string;
-  status: '已上架' | '审核中' | '已提交上架' | '已下架';
+  status: '已上架' | '审核中' | '已提交上架' | '已下架' | '草稿' | '已通过' | '未通过';
   downloads: string;
   updatedAt?: string;
 }

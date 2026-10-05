@@ -1378,6 +1378,20 @@ where
             })?;
 
         let now = Utc::now();
+        // Crash consistency: the decision commits before the listing
+        // projection runs, and `can_decide` is terminal — a retry after a
+        // projection crash must be an idempotent success, not a conflict.
+        if request.decision_type.eq_ignore_ascii_case("APPROVE")
+            && submission.submission_status == SubmissionStatus::Approved
+            && listing.review_status == ReviewStatus::Approved
+            && listing.listing_status == ListingStatus::Active
+        {
+            return Ok(ApplyModerationDecisionResult::applied(
+                "appstore.listings.moderation.apply",
+                listing,
+                submission,
+            ));
+        }
         match request.decision_type.to_ascii_uppercase().as_str() {
             "APPROVE" => {
                 // A suspended/delisted listing must not be resurrected by a

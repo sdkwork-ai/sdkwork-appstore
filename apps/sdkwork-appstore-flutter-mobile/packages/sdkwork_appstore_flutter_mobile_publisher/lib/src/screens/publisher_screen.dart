@@ -179,10 +179,90 @@ class _ManageAppView extends StatelessWidget {
   final PublisherService service;
   final String listingId;
 
+  Future<void> _reload() async {
+    await service.loadReleases(listingId);
+  }
+
+  Future<void> _createRelease(BuildContext context) async {
+    final nameController = TextEditingController();
+    final codeController = TextEditingController();
+    final created = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext dialogContext) => AlertDialog(
+        title: const Text('创建版本'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            TextField(
+              controller: nameController,
+              decoration: const InputDecoration(labelText: '版本号（如 1.0.0）'),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: codeController,
+              decoration: const InputDecoration(labelText: '版本代码（如 100）'),
+              keyboardType: TextInputType.number,
+            ),
+          ],
+        ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text('取消'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: const Text('创建'),
+          ),
+        ],
+      ),
+    );
+    if (created != true || !context.mounted) {
+      return;
+    }
+    try {
+      await service.createRelease(
+        listingId: listingId,
+        versionName: nameController.text.trim(),
+        versionCode: codeController.text.trim(),
+      );
+      if (context.mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(const SnackBar(content: Text('版本已创建')));
+      }
+      await _reload();
+    } catch (error) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(const SnackBar(content: Text('创建失败，请稍后重试')));
+      }
+    }
+  }
+
+  Future<void> _submitRelease(BuildContext context, PublisherReleaseRow release) async {
+    try {
+      await service.submitReleaseForReview(listingId: listingId, releaseId: release.id);
+      if (context.mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(const SnackBar(content: Text('已提交审核')));
+      }
+    } catch (error) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(const SnackBar(content: Text('提交失败，请稍后重试')));
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('管理应用')),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => _createRelease(context),
+        icon: const Icon(Icons.add),
+        label: const Text('创建版本'),
+      ),
       body: FutureBuilder<List<PublisherReleaseRow>>(
         future: service.loadReleases(listingId),
         builder: (
@@ -209,13 +289,17 @@ class _ManageAppView extends StatelessWidget {
               if (releases.isEmpty)
                 const AppstoreScreenState(
                   kind: AppstoreScreenStateKind.empty,
-                  message: '该应用还没有发布版本',
+                  message: '该应用还没有发布版本，点右下角创建',
                 )
               else
                 for (final release in releases)
                   AppstoreListTileCard(
                     title: 'v' + release.version,
                     subtitle: release.notes.isEmpty ? release.status : release.notes,
+                    trailing: TextButton(
+                      onPressed: () => _submitRelease(context, release),
+                      child: const Text('提交审核'),
+                    ),
                   ),
             ],
           );

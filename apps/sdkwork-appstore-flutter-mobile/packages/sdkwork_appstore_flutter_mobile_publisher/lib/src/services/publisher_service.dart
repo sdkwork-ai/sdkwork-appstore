@@ -84,6 +84,48 @@ class PublisherService {
         ),
     ];
   }
+
+  /// Creates a new release draft for one listing (channel `production` is the
+  /// seeded channel_code).
+  Future<PublisherReleaseRow> createRelease({
+    required String listingId,
+    required String versionName,
+    required String versionCode,
+    String channelCode = 'production',
+  }) async {
+    clients.ensureTransportBound(capability);
+    final response = await clients.requireAppClient.releases.appstoreReleasesCreate(
+      listingId,
+      ReleaseCreateRequest(
+        channelCode: channelCode,
+        versionName: versionName,
+        versionCode: versionCode,
+      ),
+      DateTime.now().microsecondsSinceEpoch.toString(),
+    );
+    final row = AppstoreAppSdkClients.itemOf(response?.data) ?? const <String, dynamic>{};
+    return PublisherReleaseRow(
+      id: _text(row['id']),
+      version: _text(row['versionName'], versionName),
+      status: _text(row['releaseStatus'], _text(row['release_status'], 'draft')),
+    );
+  }
+
+  /// Submits a RELEASE review submission for one listing release.
+  Future<void> submitReleaseForReview({
+    required String listingId,
+    required String releaseId,
+  }) async {
+    clients.ensureTransportBound(capability);
+    await clients.requireAppClient.listings.appstoreListingsSubmissionsCreate(
+      listingId,
+      ListingSubmissionCreateRequest(
+        submissionType: 'RELEASE',
+        releaseId: releaseId,
+      ),
+      DateTime.now().microsecondsSinceEpoch.toString(),
+    );
+  }
 }
 
 String _text(dynamic value, [String fallback = '']) {
