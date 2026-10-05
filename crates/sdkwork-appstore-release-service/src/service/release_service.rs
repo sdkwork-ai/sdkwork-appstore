@@ -233,6 +233,15 @@ where
             RolloutStatus::Pending | RolloutStatus::InProgress => {}
         }
 
+        // Region filter first: even a Full/100% rollout must honour the
+        // configured region targeting, otherwise the filter silently drops.
+        if !rollout.region_filter.is_empty() {
+            let region = request.region_code.as_deref().unwrap_or("");
+            if !rollout.region_filter.iter().any(|r| r == region) {
+                return Ok(false);
+            }
+        }
+
         if rollout.rollout_strategy == RolloutStrategy::Full {
             return Ok(true);
         }
@@ -241,14 +250,6 @@ where
         }
         if rollout.target_percentage <= 0 {
             return Ok(false);
-        }
-
-        // Region filter: when configured, only listed regions receive updates.
-        if !rollout.region_filter.is_empty() {
-            let region = request.region_code.as_deref().unwrap_or("");
-            if !rollout.region_filter.iter().any(|r| r == region) {
-                return Ok(false);
-            }
         }
 
         // Deterministic percentage bucketing keyed on the client device.
@@ -943,6 +944,13 @@ where
                 .resolve_update_artifact(context, &release, &request)
                 .await?;
 
+            // Web/H5/miniprogram platform codes have no installer by design;
+            // an update without a resolvable artifact is not actionable, so
+            // keep scanning instead of nudging clients into a 404.
+            if artifact_id.is_empty() {
+                continue;
+            }
+
             return Ok(CheckUpdateResult::update_available(
                 "appstore.releases.checkUpdate",
                 release.id.as_str(),
@@ -997,7 +1005,7 @@ where
             .find_listing_pricing_model(context, &release.listing_id)
             .await?
             .unwrap_or_default();
-        let is_free = pricing_model.eq_ignore_ascii_case("free");
+        let is_free = pricing_is_free(&pricing_model);
 
         match &request.grant_id {
             Some(grant_id_str) => {
@@ -1024,14 +1032,21 @@ where
                     ));
                 }
 
+                // Grants are user-scoped: the consuming caller must present the
+                // owning user. An API-key caller without a user context can
+                // only spend anonymous grants — the `? = '' OR` escape inside
+                // the atomic consume must never become an ownership bypass.
+                let caller_user_id = context.user_id.as_deref().unwrap_or("").trim();
+                if grant.user_id.as_deref().unwrap_or("") != caller_user_id {
+                    return Err(AppstoreServiceError::PermissionDenied(
+                        "Download grant does not belong to the calling user".to_string(),
+                    ));
+                }
+
                 // Atomically consume the grant so a shared grant cannot be
                 // replayed after its single download allowance is spent.
                 self.repository
-                    .consume_grant_atomically(
-                        context,
-                        &grant_id,
-                        context.user_id.as_deref().unwrap_or(""),
-                    )
+                    .consume_grant_atomically(context, &grant_id, caller_user_id)
                     .await?
                     .ok_or_else(|| {
                         AppstoreServiceError::InvalidState(
@@ -1066,7 +1081,9 @@ where
         Ok(ResolveDownloadResult::resolved(
             "appstore.artifacts.resolveDownload",
             download_url,
-            Utc::now().to_rfc3339(),
+            // The presigned URL lives 300s; report the same window so clients
+            // do not treat a fresh link as already expired.
+            (Utc::now() + chrono::Duration::seconds(300)).to_rfc3339(),
             &artifact.checksum_sha256,
             &artifact.file_size_bytes,
         ))
@@ -1149,7 +1166,7 @@ where
             .find_listing_pricing_model(context, &release.listing_id)
             .await?
             .unwrap_or_else(|| "free".to_string());
-        let is_free = pricing_model.eq_ignore_ascii_case("free");
+        let is_free = pricing_is_free(&pricing_model);
         if !is_free {
             let entitled = self
                 .repository
@@ -1358,4 +1375,12 @@ where
             release_id.as_str(),
         ))
     }
+}
+
+/// FREE and FREEMIUM listings adopt their base experience without purchase;
+/// only explicit PAID pricing requires an entitlement. Case-insensitive so
+/// mixed-case seed and import data cannot flip a listing into paid gating.
+fn pricing_is_free(pricing_model: &str) -> bool {
+    let model = pricing_model.trim();
+    model.eq_ignore_ascii_case("free") || model.eq_ignore_ascii_case("freemium")
 }

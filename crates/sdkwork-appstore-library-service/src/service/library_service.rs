@@ -24,7 +24,7 @@ use crate::domain::results::{
 };
 use crate::error::{AppstoreServiceError, AppstoreServiceResult};
 use crate::ports::provider::LibraryProviderPort;
-use crate::ports::repository::{ArtifactDelivery, LibraryRepositoryPort};
+use crate::ports::repository::LibraryRepositoryPort;
 
 #[async_trait::async_trait]
 pub trait LibraryOperations {
@@ -269,6 +269,36 @@ where
             ));
         }
 
+        // Commercial gating before any library mutation: the listing must
+        // exist, the platform must be one the app ships for, and PAID
+        // listings require an active entitlement (FREEMIUM adopts like FREE).
+        let commerce = self
+            .repository
+            .find_listing_commerce_info(context, &request.listing_id)
+            .await?
+            .ok_or_else(|| {
+                AppstoreServiceError::NotFound(format!("Listing not found: {}", request.listing_id))
+            })?;
+        if !commerce.supports_platform(&request.platform) {
+            return Err(AppstoreServiceError::ValidationFailed(format!(
+                "Listing {} is not distributed for platform {}",
+                request.listing_id, request.platform
+            )));
+        }
+        if !commerce.is_free() {
+            let entitled = self
+                .repository
+                .find_active_entitlement(context, &commerce.app_id, &context.user_id)
+                .await?
+                .map(|entitlement| entitlement.is_active(Utc::now()))
+                .unwrap_or(false);
+            if !entitled {
+                return Err(AppstoreServiceError::PermissionDenied(
+                    "An active entitlement is required to install this paid listing".to_string(),
+                ));
+            }
+        }
+
         let now = Utc::now();
 
         let existing = self
@@ -477,7 +507,12 @@ where
                 .find_latest_release_for_listing(context, &library_item.listing_id)
                 .await?
             {
-                if version_code != check_item.installed_version_code {
+                // Numeric comparison matching the release-service check_update
+                // semantics: republished older versions and format differences
+                // (`1.0` vs `1.0.0`) must not produce false update nudges.
+                if version_sort_key(&version_code)
+                    > version_sort_key(&check_item.installed_version_code)
+                {
                     let artifact_result = self
                         .repository
                         .find_latest_artifact_for_release(
@@ -666,6 +701,32 @@ where
             )));
         }
 
+        // Paid content requires an active entitlement before a grant can be
+        // minted; FREE/FREEMIUM downloads mint the free grant directly. The
+        // reason code records which path authorized the download.
+        let grant_reason = match self
+            .repository
+            .find_listing_commerce_info(context, &listing_id)
+            .await?
+        {
+            Some(commerce) if !commerce.is_free() => {
+                let entitled = self
+                    .repository
+                    .find_active_entitlement(context, &commerce.app_id, user_id)
+                    .await?
+                    .map(|entitlement| entitlement.is_active(Utc::now()))
+                    .unwrap_or(false);
+                if !entitled {
+                    return Err(AppstoreServiceError::PermissionDenied(
+                        "An active entitlement is required to download this paid artifact"
+                            .to_string(),
+                    ));
+                }
+                DownloadGrantReason::Purchase
+            }
+            _ => DownloadGrantReason::FreeDownload,
+        };
+
         let now = Utc::now();
         let grant = DownloadGrant {
             id: Uuid::new_v4().to_string(),
@@ -684,7 +745,7 @@ where
             artifact_id: artifact_id.to_string(),
             user_id: Some(user_id.to_string()),
             grant_status: DownloadGrantStatus::Active,
-            grant_reason: DownloadGrantReason::FreeDownload,
+            grant_reason,
             expires_at: now + chrono::Duration::hours(24),
             consumed_at: None,
             download_count: 0,
@@ -847,4 +908,21 @@ where
             revoked,
         ))
     }
+}
+
+/// Numeric sort key matching the release-service check_update semantics
+/// (four segments, non-numeric segments count as zero) so library update
+/// nudges agree with the canonical update check.
+fn version_sort_key(code: &str) -> u64 {
+    let mut key: u64 = 0;
+    let mut segments = 0u32;
+    for part in code.split('.') {
+        let number = part.parse::<u64>().unwrap_or(0).min(999_999);
+        key = key * 1_000_000 + number;
+        segments += 1;
+        if segments >= 4 {
+            break;
+        }
+    }
+    key
 }

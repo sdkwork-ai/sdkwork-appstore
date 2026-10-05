@@ -20,3 +20,4 @@ export * from './plugins';
 export * from './skills';
 export * from './templates';
 export * from './userStore';
+export * from './paidCheckout';

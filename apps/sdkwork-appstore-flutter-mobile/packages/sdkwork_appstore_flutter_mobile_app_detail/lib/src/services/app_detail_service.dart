@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:sdkwork_appstore_flutter_mobile_core/sdkwork_appstore_flutter_mobile_core.dart';
 
 import '../models/app_detail_models.dart';
@@ -48,7 +50,9 @@ class AppDetailService {
       developer: _text(row['developerName'], _text(row['publisherName'], '')),
       rating: double.tryParse(_text(ratingValue)) ?? 0,
       ratingCount: int.tryParse(_text(row['ratingCount'], '0')) ?? 0,
-      pricingModel: _text(row['pricingModel'], 'FREE'),
+      pricingModel: _text(row['pricingModel'], _text(row['pricing_model'], 'FREE')),
+      platforms: _platformCodesOf(row),
+      accessUrl: _text(row['accessUrl'], _text(row['access_url'])),
       chartRank: int.tryParse(_text(row['chartRank'], '0')) ?? 0,
       ageRating: _text(row['ageRating'], _text(row['age_rating'], '4+')),
       size: _text(row['fileSizeBytes']),
@@ -119,4 +123,33 @@ List<AppRelatedEntry> _related(dynamic data) => <AppRelatedEntry>[
 String _text(dynamic value, [String fallback = '']) {
   final text = value?.toString().trim() ?? '';
   return text.isEmpty ? fallback : text;
+}
+
+/// Raw platform codes of the listing (list or JSON-array text; the backend
+/// serializes `platforms` without a case rename).
+List<String> _platformCodesOf(Map<String, dynamic> row) {
+  final raw = row['platforms'] ?? row['platform_codes'];
+  if (raw is List) {
+    return <String>[
+      for (final entry in raw)
+        if (entry != null && entry.toString().trim().isNotEmpty)
+          entry.toString().trim(),
+    ];
+  }
+  final text = raw?.toString().trim() ?? '';
+  if (text.startsWith('[')) {
+    try {
+      final decoded = jsonDecode(text);
+      if (decoded is List) {
+        return <String>[
+          for (final entry in decoded)
+            if (entry != null && entry.toString().trim().isNotEmpty)
+              entry.toString().trim(),
+        ];
+      }
+    } catch (_) {
+      // fall through to the empty default
+    }
+  }
+  return const <String>[];
 }

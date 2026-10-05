@@ -243,7 +243,7 @@
           </view>
           <view class="rec__rating" wx:if="{{item.rating > 0}}">★ {{item.rating}}</view>
           <view class="rec__footer">
-            <view class="rec__price">免费</view>
+            <view class="rec__price {{item.pricingModel === 'PAID' ? 'rec__price--paid' : ''}}">{{item.pricingModel === 'PAID' ? '付费' : '免费'}}</view>
             <view class="rec__get">获取</view>
           </view>
         </view>

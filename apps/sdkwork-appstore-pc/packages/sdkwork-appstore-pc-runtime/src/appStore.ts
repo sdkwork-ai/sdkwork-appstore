@@ -117,6 +117,9 @@ export function createAppStoreServicePort(
       developer: readString(item, 'developerName', 'developer_name') || 'SDKWork',
       category: categoryName(categoryId) || readString(item, 'category', 'categoryName'),
       price: pricingToPrice(readString(item, 'pricingModel', 'pricing_model')),
+      pricingModel: readString(item, 'pricingModel', 'pricing_model'),
+      commerceProductId:
+        readString(item, 'commerceProductId', 'commerce_product_id') || undefined,
       rating: readNumber(item, 'averageRating', 'average_rating') ?? 0,
       reviewsCount: readNumber(item, 'ratingCount', 'rating_count') ?? 0,
       description: readString(item, 'description') || '',

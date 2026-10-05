@@ -22,7 +22,7 @@ use sdkwork_appstore_library_service::domain::models::{
 };
 use sdkwork_appstore_library_service::error::AppstoreServiceError;
 use sdkwork_appstore_library_service::ports::repository::{
-    ArtifactDelivery, LibraryRepositoryPort,
+    ArtifactDelivery, LibraryRepositoryPort, ListingCommerceInfo,
 };
 
 #[derive(Debug, Clone)]
@@ -677,6 +677,34 @@ impl LibraryRepositoryPort for SqlxLibraryRepository {
         .map_err(|e| AppstoreServiceError::Internal(format!("Database error: {}", e)))?;
 
         Ok(row.map(|(app_key,)| app_key))
+    }
+
+    async fn find_listing_commerce_info(
+        &self,
+        context: &AppstoreRequestContext,
+        listing_id: &str,
+    ) -> Result<Option<ListingCommerceInfo>, AppstoreServiceError> {
+        let row: Option<(String, String, Option<String>)> = self
+            .db
+            .query_as::<(String, String, Option<String>)>(
+                "SELECT l.app_id, l.pricing_model, a.platforms::text \
+                 FROM appstore_listing l \
+                 LEFT JOIN appstore_app a ON a.id = l.app_id AND a.deleted_at IS NULL \
+                 WHERE l.tenant_id = ? AND l.id = ? AND l.deleted_at IS NULL",
+            )
+            .bind(&context.tenant_id)
+            .bind(listing_id)
+            .fetch_optional(&self.db)
+            .await
+            .map_err(|e| AppstoreServiceError::Internal(format!("Database error: {}", e)))?;
+
+        Ok(row.map(
+            |(app_id, pricing_model, platforms_json)| ListingCommerceInfo {
+                app_id,
+                pricing_model,
+                platforms_json: platforms_json.unwrap_or_else(|| "[]".to_string()),
+            },
+        ))
     }
 
     async fn upsert_entitlement(

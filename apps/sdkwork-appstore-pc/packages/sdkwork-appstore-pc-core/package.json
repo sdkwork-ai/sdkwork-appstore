@@ -20,6 +20,7 @@
     "@sdkwork/agents-app-sdk": "workspace:*",
     "@sdkwork/company-app-sdk": "workspace:*",
     "@sdkwork/appstore-app-sdk": "workspace:*",
+    "@sdkwork/appstore-listing-acquire-core": "workspace:*",
     "@sdkwork/appstore-sdk": "workspace:*",
     "@sdkwork/comments-app-sdk": "workspace:*",
     "@sdkwork/iam-app-sdk": "workspace:*",

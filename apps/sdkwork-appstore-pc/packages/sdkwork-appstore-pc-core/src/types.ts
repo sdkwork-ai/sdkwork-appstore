@@ -25,6 +25,10 @@ export interface AppItem {
   description: string;
   /** Raw platform codes this listing ships for (see platforms.ts display groups). */
   platforms?: string[];
+  /** Store pricing model (FREE/FREEMIUM/PAID) driving the acquisition gate. */
+  pricingModel?: string;
+  /** Commerce product id used to begin the paid checkout session. */
+  commerceProductId?: string;
   /** Direct-open URL for web/H5 distributions; the QR scan target otherwise. */
   accessUrl?: string;
   /** Verified installer artifacts of the current release (desktop download flow). */

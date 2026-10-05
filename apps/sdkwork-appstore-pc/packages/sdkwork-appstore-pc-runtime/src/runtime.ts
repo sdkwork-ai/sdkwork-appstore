@@ -8,6 +8,7 @@ import {
 import { createAppstorePcIamRuntime, type AppstorePcIamRuntime } from './iamRuntime';
 import {
   createAppstorePcSdkClients,
+  normalizeGeneratedSdkBaseUrl,
   type AppstorePcSdkClientInventory,
 } from './sdkClients';
 import { createAppstorePcSessionStore, type AppstorePcSessionStore } from './sessionStore';
@@ -26,6 +27,7 @@ import { configureAppstorePcSkills } from './skills';
 import { configureAppstorePcTemplates } from './templates';
 import { configureAppstorePcCompany } from './company';
 import { configureAppstorePcUserStore } from './userStore';
+import { configureAppstorePcPaidCheckout } from './paidCheckout';
 
 export interface AppstorePcRuntime {
   config: AppstorePcRuntimeConfig;
@@ -84,6 +86,11 @@ export function createAppstorePcRuntime(
   configureAppstorePcConsole(sdkClients.app);
   configureAppstorePcInstall(sdkClients.app);
   configureAppstorePcUserStore(sdkClients);
+  configureAppstorePcPaidCheckout({
+    // The cloudrouter domains surface rides the shared gateway origin.
+    baseUrl: normalizeGeneratedSdkBaseUrl(config.appApiBaseUrl, '/app/v3/api'),
+    tokenManager,
+  });
   configureAppstorePcAdminRuntime(config, tokenManager);
 
   return { config, iamRuntime, sdkClients, session };

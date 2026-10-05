@@ -207,6 +207,7 @@ type ListingRow = {
   name: string;
   developer: string;
   rating: number;
+  pricingModel?: string;
 };
 
 /** Describe a pending update for the shared list template's subtitle slot. */
@@ -266,6 +267,10 @@ function createPageLoaders(getClient: () => AppstoreAppClient) {
           .find((value) => typeof value === 'string' && value.trim() !== '')
           ?.toString() ?? 'SDKWork',
         rating: Number(row.averageRating ?? row.rating ?? 0) || 0,
+        pricingModel:
+          typeof row.pricingModel === 'string'
+            ? row.pricingModel
+            : 'FREE',
       };
     });
   }
@@ -560,13 +565,16 @@ function createPageLoaders(getClient: () => AppstoreAppClient) {
       return { name, apps };
     },
 
-    /** App detail: header fields plus similar listings. */
+    /** App detail: header fields, mode fields, plus similar listings. */
     async appDetail(listingId: string): Promise<{
       id: string;
       name: string;
       developer: string;
       description: string;
       rating: number;
+      pricingModel: string;
+      platforms: string[];
+      accessUrl: string;
       whatsNew: string;
       similar: ListingRow[];
     }> {
@@ -577,6 +585,13 @@ function createPageLoaders(getClient: () => AppstoreAppClient) {
       const similarResponse = await getClient().listings
         .listSimilar(listingId, { limit: 6 })
         .catch(() => undefined);
+      const platforms = Array.isArray(listing.platforms)
+        ? (listing.platforms as Array<unknown>)
+            .map((code) => String(code))
+            .filter((code) => code !== '')
+        : [];
+      const accessUrl =
+        typeof listing.accessUrl === 'string' ? listing.accessUrl : '';
       return {
         id: [listing.listingSlug, listing.id].find(
           (value) => typeof value === 'string' && value.trim() !== '',
@@ -592,10 +607,24 @@ function createPageLoaders(getClient: () => AppstoreAppClient) {
         description:
           typeof listing.description === 'string' ? listing.description : '',
         rating: Number(listing.averageRating ?? 0) || 0,
+        pricingModel:
+          typeof listing.pricingModel === 'string'
+            ? listing.pricingModel
+            : 'FREE',
+        platforms,
+        accessUrl,
         whatsNew:
           typeof listing.whatsNewSummary === 'string' ? listing.whatsNewSummary : '',
         similar: listingRows(similarResponse?.items),
       };
+    },
+
+    /** Install (acquire) one listing into the user's library (auth required). */
+    async installListing(listingId: string, platform: string): Promise<void> {
+      await getClient().library.install({
+        listingId,
+        platform: platform || 'h5',
+      });
     },
 
     /** App templates (catalog template domain, templateType filterable). */
@@ -670,7 +699,9 @@ function createPageLoaders(getClient: () => AppstoreAppClient) {
       }
       const items = installRows.map((row) => ({
         appKey: row.appKey ?? '',
-        platform: 'mini-program',
+        // Check with the platform the app was actually installed for; fall
+        // back to the mini-program surface only when the row carries none.
+        platform: row.platform ?? 'mini-program',
         installedVersionCode: row.installedVersionCode ?? '0',
       }));
       const check = await getClient().library

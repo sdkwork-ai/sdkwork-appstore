@@ -73,6 +73,8 @@ class AppDetail {
     this.screenshots = const <String>[],
     this.description = '',
     this.whatsNew = const AppWhatsNew(),
+    this.platforms = const <String>[],
+    this.accessUrl = '',
     this.infoRows = const <AppInfoRow>[],
     this.iapEntries = const <AppIapEntry>[],
     this.privacyLinked = false,
@@ -95,6 +97,11 @@ class AppDetail {
   final List<String> screenshots;
   final String description;
   final AppWhatsNew whatsNew;
+  /// Raw platform codes the app ships for (windows/web/android/...).
+  final List<String> platforms;
+
+  /// Direct-open URL for web/H5 distributions.
+  final String accessUrl;
   final List<AppInfoRow> infoRows;
   final List<AppIapEntry> iapEntries;
 

@@ -16,6 +16,37 @@ pub struct ArtifactDelivery {
     pub file_size_bytes: Option<String>,
 }
 
+/// Commerce projection of one listing used to gate installs and downloads.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ListingCommerceInfo {
+    pub app_id: String,
+    pub pricing_model: String,
+    /// Raw platform codes from appstore_app.platforms (JSON array text).
+    pub platforms_json: String,
+}
+
+impl ListingCommerceInfo {
+    /// Whether the pricing model allows adoption without purchase.
+    pub fn is_free(&self) -> bool {
+        let model = self.pricing_model.trim();
+        model.eq_ignore_ascii_case("free") || model.eq_ignore_ascii_case("freemium")
+    }
+
+    /// Whether the requested install platform is one the app ships for.
+    /// An empty projection keeps the legacy permissive behaviour so imports
+    /// without a distribution projection still install.
+    pub fn supports_platform(&self, platform: &str) -> bool {
+        let parsed: Vec<String> =
+            serde_json::from_str::<Vec<String>>(self.platforms_json.trim()).unwrap_or_default();
+        if parsed.is_empty() {
+            return true;
+        }
+        parsed
+            .iter()
+            .any(|code| code.eq_ignore_ascii_case(platform.trim()))
+    }
+}
+
 #[async_trait::async_trait]
 pub trait LibraryRepositoryPort: Send + Sync {
     async fn find_library_items_by_user(
@@ -156,6 +187,15 @@ pub trait LibraryRepositoryPort: Send + Sync {
         context: &AppstoreRequestContext,
         listing_id: &str,
     ) -> AppstoreServiceResult<Option<String>>;
+
+    /// Commerce projection of one listing for install/download gating: the
+    /// owning app id, the pricing model (FREE/FREEMIUM/PAID), and the raw
+    /// platform codes the app ships for (empty when unprojected).
+    async fn find_listing_commerce_info(
+        &self,
+        context: &AppstoreRequestContext,
+        listing_id: &str,
+    ) -> AppstoreServiceResult<Option<ListingCommerceInfo>>;
 
     /// Idempotently upserts a commerce-synced entitlement snapshot keyed by
     /// (tenant, app, subject_type, subject, entitlement_type).

@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AppstoreInstallContext, useInstall } from '@sdkwork/appstore-pc-commons';
 import {
+  beginPaidListingCheckoutForApp,
   desktopInstallCodes,
   detectDesktopOs,
+  isPaidPricingModel,
   openDistributionUrl,
   primaryDistributionAction,
   type AppPlatformGroupKey,
@@ -141,6 +143,26 @@ export function InstallProvider({ children }: { children: React.ReactNode }) {
     setInstallError(null);
     const target = appToInstall;
     if (!target) {
+      return;
+    }
+    // Commercial gate: a PAID listing must never be adopted through the free
+    // install path. The checkout walks the cloudrouter domains surface
+    // fail-closed (single-SKU, currency match, idempotent session + quote);
+    // the install record is only created once payment is in place.
+    if (isPaidPricingModel(target.pricingModel) && !installedAppIds.has(target.id)) {
+      void beginPaidListingCheckoutForApp({ commerceProductId: target.commerceProductId })
+        .then((result) => {
+          setInstallState('confirm');
+          if (result.status === 'ready') {
+            setInstallError(`${result.message} 支付完成后即可下载安装。`);
+          } else {
+            setInstallError(result.message);
+          }
+        })
+        .catch(() => {
+          setInstallState('confirm');
+          setInstallError('结算服务暂不可用，请稍后重试。');
+        });
       return;
     }
     // Drive the flow from the server-backed library record; the progress ring

@@ -9,8 +9,22 @@
         <view class="wp-detail-title-wrap">
           <view class="wp-detail-name">{{detail.name}}</view>
           <view class="wp-detail-developer">{{detail.developer}}</view>
-          <view wx:if="{{detail.rating > 0}}" class="wp-detail-rating">{{detail.rating}}★</view>
+          <view class="wp-detail-meta">
+            <view wx:if="{{detail.rating > 0}}" class="wp-detail-rating">{{detail.rating}}★</view>
+            <view class="wp-detail-price">{{detail.pricingModel === 'PAID' ? '付费' : '免费'}}</view>
+          </view>
         </view>
+      </view>
+
+      <view class="wp-detail-action-wrap">
+        <button
+          class="wp-detail-action"
+          size="mini"
+          loading="{{acquiring}}"
+          disabled="{{acquiring}}"
+          bindtap="onPrimaryAction"
+        >{{acquired ? '再次打开' : (detail.pricingModel === 'PAID' ? '购买' : '获取')}}</button>
+        <view wx:if="{{!authed}}" class="wp-detail-action-hint" bindtap="onLoginTap">登录后可获取应用</view>
       </view>
 
       <view wx:if="{{detail.description}}" class="wp-detail-section">

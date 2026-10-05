@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'package:sdkwork_appstore_flutter_mobile_commons/sdkwork_appstore_flutter_mobile_commons.dart';
 
@@ -57,13 +58,50 @@ class _AppDetailScreenState extends State<AppDetailScreen> {
       if (!mounted) {
         return;
       }
+      // The backend fails closed on paid listings without an entitlement;
+      // surface that commercially instead of a generic failure.
+      final message = error.toString().contains('entitlement')
+          ? '付费应用需先购买，支付流程即将开放'
+          : '操作失败，请稍后重试';
       ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('操作失败，请稍后重试')));
+          .showSnackBar(SnackBar(content: Text(message)));
     } finally {
       if (mounted) {
         setState(() => _actionPending = false);
       }
     }
+  }
+
+  /// Web/H5 应用免安装直达：打开访问地址。
+  Future<void> _openAccessUrl(AppDetail detail) async {
+    final url = Uri.tryParse(detail.accessUrl);
+    if (url == null || !url.hasScheme) {
+      if (mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(const SnackBar(content: Text('访问地址暂不可用')));
+      }
+      return;
+    }
+    final launched = await launchUrl(url, mode: LaunchMode.externalApplication);
+    if (!launched && mounted) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('无法打开浏览器，请稍后重试')));
+    }
+  }
+
+  /// Distribution-mode-aware action label and handler.
+  (String, void Function(AppDetail)) _primaryAction(AppDetail detail) {
+    final webDelivery =
+        (detail.platforms.contains('web') || detail.platforms.contains('h5')) &&
+            detail.accessUrl.isNotEmpty;
+    if (webDelivery) {
+      return ('打开', _openAccessUrl);
+    }
+    final pricing = detail.pricingModel.toUpperCase();
+    if (pricing == 'PAID') {
+      return ('购买', _install);
+    }
+    return ('获取', _install);
   }
 
   Future<void> _toggleWishlist(AppDetail detail) async {
@@ -121,14 +159,18 @@ class _AppDetailScreenState extends State<AppDetailScreen> {
                 child: Row(
                   children: <Widget>[
                     Expanded(
-                      child: FilledButton.icon(
-                        onPressed:
-                            _actionPending ? null : () => _install(detail),
-                        icon: const Icon(Icons.download),
-                        label: Text(
-                          detail.pricingModel == 'PAID' ? '获取' : '获取',
-                        ),
-                      ),
+                      child: Builder(builder: (BuildContext context) {
+                        final (label, action) = _primaryAction(detail);
+                        final isWebOpen = label == '打开';
+                        return FilledButton.icon(
+                          onPressed:
+                              _actionPending ? null : () => action(detail),
+                          icon: Icon(isWebOpen
+                              ? Icons.open_in_new
+                              : Icons.download),
+                          label: Text(label),
+                        );
+                      }),
                     ),
                     const SizedBox(width: 12),
                     IconButton.filledTonal(

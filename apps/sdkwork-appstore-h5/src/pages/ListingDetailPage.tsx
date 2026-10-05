@@ -22,6 +22,7 @@ import { getCommentsClient } from '@/bootstrap/sdkClients';
 import { userStoreService, type UserCategory } from '@/services/userStoreClient';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { readRecordString as readString } from '@sdkwork/appstore-h5-commons';
+import { readListingPlatformCodes } from '@/platforms';
 
 export function ListingDetailPage() {
   // Path parameter name follows the shared route contract
@@ -75,6 +76,16 @@ export function ListingDetailPage() {
     }).catch(() => undefined);
     return () => { cancelled = true; };
   }, [listingId]);
+
+  useEffect(() => {
+    if (!authed || !listingId) return;
+    let cancelled = false;
+    getStoreClient().wishlist.listItems({ limit: 200 }).then((page) => {
+      if (cancelled) return;
+      setIsWishlisted((page.items ?? []).some((item) => item.listingId === listingId));
+    }).catch(() => undefined);
+    return () => { cancelled = true; };
+  }, [authed, listingId]);
 
   function openCollectSheet() {
     if (!isAuthenticated()) { navigate('/login', { state: { from: { pathname: `/app/${slug}` } } }); return; }
@@ -151,6 +162,21 @@ export function ListingDetailPage() {
     supportUrl: readString(row, 'supportUrl', 'support_url'),
   };
 
+  // Distribution-mode resolution (mirrors the PC storefront semantics):
+  // web/h5 listings open accessUrl directly, desktop platforms install with
+  // the matching platform code, everything else installs per platform code.
+  const platformCodes = readListingPlatformCodes(row);
+  const accessUrl = readString(row, 'accessUrl', 'access_url');
+  const webDelivery =
+    (platformCodes.includes('web') || platformCodes.includes('h5')) && accessUrl !== '';
+  const desktopPlatform = ['windows', 'macos', 'linux'].find((code) =>
+    platformCodes.includes(code),
+  );
+  const mobilePlatform = ['android', 'ios', 'harmonyos'].find((code) =>
+    platformCodes.includes(code),
+  );
+  const installPlatform = desktopPlatform ?? mobilePlatform ?? platformCodes[0] ?? 'h5';
+
   const similarApps = (similarData?.items ?? []).map((item, index) => {
     const sim = item as unknown as Record<string, unknown>;
     const id = String(sim.listingSlug ?? sim.id ?? index);
@@ -161,11 +187,17 @@ export function ListingDetailPage() {
   }).filter((s) => s.id !== slug && s.id !== listingId);
 
   async function handleGetOrInstall() {
+    setActionError(null);
+    // Web/H5 应用免安装直达：打开访问地址不需要账户。
+    if (webDelivery) {
+      window.open(accessUrl, '_blank', 'noopener,noreferrer');
+      setInstalled(true);
+      return;
+    }
     if (!authed) {
       navigate('/login', { state: { from: { pathname: `/app/${slug}` } } });
       return;
     }
-    setActionError(null);
     if (isPaidPricingModel(app.pricingModel) && !owned && !installed) {
       setInstalling(true);
       try {
@@ -188,7 +220,7 @@ export function ListingDetailPage() {
     try {
       const result = await installListingAndDownload({
         listingId,
-        platform: 'ANDROID',
+        platform: installPlatform,
         appKey: appKey || undefined,
       });
       setInstalled(true);
@@ -611,45 +643,6 @@ export function ListingDetailPage() {
             {collectNotice ? (
               <p className="mt-3 px-1 text-xs text-[var(--accent)]">{collectNotice}</p>
             ) : null}
-          </div>
-        </div>
-      ) : null}
-
-      {collectOpen ? (
-        <div className="fixed inset-0 z-[60] flex items-end"
-          style={{ backgroundColor: 'color-mix(in srgb, black 40%, transparent)' }}
-          role="dialog" aria-modal="true" onClick={() => setCollectOpen(false)}
-        >
-          <div className="w-full rounded-t-3xl p-4 pb-8"
-            style={{ backgroundColor: 'var(--bg-surface)' }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="mb-3 flex items-center justify-between px-1">
-              <h3 className="text-sm font-semibold text-[var(--text-primary)]">收录到我的分类</h3>
-              <button type="button" onClick={() => setCollectOpen(false)} className="text-xs text-[var(--text-tertiary)]">关闭</button>
-            </div>
-            {collectLoading ? (
-              <div className="flex justify-center py-6"><LoadingSpinner /></div>
-            ) : collectCategories.length === 0 ? (
-              <div className="py-4 text-center text-sm text-[var(--text-secondary)]">
-                还没有分类，<Link to="/user-store" className="text-[var(--accent)]" onClick={() => setCollectOpen(false)}>去创建一个</Link>
-              </div>
-            ) : (
-              <div className="max-h-72 space-y-2 overflow-y-auto">
-                {collectCategories.map((cat) => (
-                  <button key={cat.id} type="button" disabled={collectLoading}
-                    onClick={() => void handleCollect(cat.id)}
-                    className="flex w-full items-center gap-3 rounded-2xl border p-3 text-left"
-                    style={{ borderColor: 'var(--border-subtle)' }}
-                  >
-                    <FolderPlus className="h-4 w-4 flex-shrink-0 text-[var(--accent)]" />
-                    <span className="flex-1 text-sm text-[var(--text-primary)]">{cat.name}</span>
-                    <span className="text-xs text-[var(--text-tertiary)]">{cat.itemCount} 个应用</span>
-                  </button>
-                ))}
-              </div>
-            )}
-            {collectNotice && <p className="mt-3 px-1 text-xs text-[var(--accent)]">{collectNotice}</p>}
           </div>
         </div>
       ) : null}

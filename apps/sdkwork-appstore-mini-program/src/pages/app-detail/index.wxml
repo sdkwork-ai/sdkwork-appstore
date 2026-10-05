@@ -1,2 +1,2 @@
 <import src="../../templates/detail.tpl.wxml"/>
-<template is="detailPage" data="{{ loading, error, detail }}"/>
+<template is="detailPage" data="{{ loading, error, detail, authed, acquiring, acquired }}"/>

@@ -23,8 +23,23 @@ class UpdatesService {
     if (installRows.isEmpty) {
       return const <PendingUpdateEntry>[];
     }
+    // The check contract is per-item: every installed row carries its app key,
+    // platform, and installed version so the server can match releases.
     final check = await client.library_.appstoreLibraryUpdatesCheck(
-      LibraryUpdatesCheckRequest(items: const <Map<String, dynamic>>[]),
+      LibraryUpdatesCheckRequest(
+        items: <Map<String, dynamic>>[
+          for (final row in installRows)
+            {
+              'appKey': _pick(row, const ['appKey', 'app_key']),
+              'platform': _pick(row, const ['platform'], appstorePlatformCode),
+              'installedVersionCode': _pick(
+                row,
+                const ['installedVersionCode', 'installed_version_code'],
+                '0',
+              ),
+            },
+        ],
+      ),
     );
     final checkRow = AppstoreAppSdkClients.itemOf(check?.data) ?? const <String, dynamic>{};
     final checkItems = checkRow['items'];
@@ -60,6 +75,19 @@ class UpdatesService {
 
 Map<String, dynamic> _normalize(Map row) =>
     row.map((key, value) => MapEntry(key.toString(), value));
+
+/// First non-empty value among the candidate keys (backend rows may carry
+/// camelCase or snake_case depending on the mapper), falling back when all
+/// are empty.
+String _pick(Map<String, dynamic> row, List<String> keys, [String fallback = '']) {
+  for (final key in keys) {
+    final text = row[key]?.toString().trim() ?? '';
+    if (text.isNotEmpty) {
+      return text;
+    }
+  }
+  return fallback;
+}
 
 String _text(dynamic value, [String fallback = '']) {
   final text = value?.toString().trim() ?? '';

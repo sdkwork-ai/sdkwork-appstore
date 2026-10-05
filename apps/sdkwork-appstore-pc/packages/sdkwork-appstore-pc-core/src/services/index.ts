@@ -5,6 +5,7 @@ export * from './skills';
 export * from './mcp';
 export * from './templates';
 export * from './company';
+export * from './checkout';
 export * from './console';
 export * from './install';
 export * from './userStore';
