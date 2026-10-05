@@ -301,6 +301,15 @@ where
 
         let now = Utc::now();
 
+        // Install/acquire always points the library row at the listing's
+        // latest published release: without this, a re-install after an
+        // update keeps the old installed_version_code and the updates check
+        // nags about the same pending update forever.
+        let latest_release = self
+            .repository
+            .find_latest_release_for_listing(context, &request.listing_id)
+            .await?;
+
         let existing = self
             .repository
             .find_library_item_by_listing(context, &request.listing_id)
@@ -320,6 +329,10 @@ where
             existing_item.device_id = request.device_id.clone();
             existing_item.installed_at = Some(now);
             existing_item.removed_at = None;
+            if let Some((release_id, version_code, _version_name, _published_at)) = latest_release {
+                existing_item.installed_release_id = Some(release_id);
+                existing_item.installed_version_code = Some(version_code);
+            }
             existing_item.updated_at = now;
             self.repository
                 .update_library_item(context, &existing_item)
@@ -339,8 +352,12 @@ where
                 listing_id: request.listing_id.clone(),
                 app_key,
                 library_status: LibraryStatus::Installed,
-                installed_release_id: None,
-                installed_version_code: None,
+                installed_release_id: latest_release
+                    .as_ref()
+                    .map(|(release_id, _, _, _)| release_id.clone()),
+                installed_version_code: latest_release
+                    .as_ref()
+                    .map(|(_, version_code, _, _)| version_code.clone()),
                 install_source: InstallSource::Store,
                 platform: request.platform.clone(),
                 architecture: request.architecture.clone(),

@@ -80,10 +80,28 @@ export function ListingDetailPage() {
   useEffect(() => {
     if (!authed || !listingId) return;
     let cancelled = false;
-    getStoreClient().wishlist.listItems({ limit: 200 }).then((page) => {
-      if (cancelled) return;
-      setIsWishlisted((page.items ?? []).some((item) => item.listingId === listingId));
-    }).catch(() => undefined);
+    (async () => {
+      // Page through the wishlist (bounded) so the heart stays correct beyond
+      // the first 200 rows.
+      let cursor: string | undefined;
+      try {
+        for (let page = 0; page < 5; page++) {
+          const result = await getStoreClient().wishlist.listItems({
+            limit: 200,
+            cursor,
+          });
+          if (cancelled) return;
+          if ((result.items ?? []).some((item) => item.listingId === listingId)) {
+            setIsWishlisted(true);
+            return;
+          }
+          cursor = result.pageInfo?.nextCursor ?? undefined;
+          if (!cursor) return;
+        }
+      } catch {
+        // 未登录或网络失败时保持默认（未收藏）。
+      }
+    })();
     return () => { cancelled = true; };
   }, [authed, listingId]);
 
