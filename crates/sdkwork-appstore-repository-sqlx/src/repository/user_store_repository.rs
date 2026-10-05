@@ -14,10 +14,11 @@ use crate::pool::AppstoreSqlxDb;
 
 use sdkwork_appstore_user_store_service::context::AppstoreRequestContext;
 use sdkwork_appstore_user_store_service::domain::models::{
-    UserCategory, UserCategoryId, UserCategoryItem, UserCategoryItemId, UserStoreShare,
-    UserStoreShareId,
+    ListingCard, UserCategory, UserCategoryId, UserCategoryItem, UserCategoryItemId,
+    UserStoreShare, UserStoreShareId,
 };
 use sdkwork_appstore_user_store_service::error::AppstoreServiceError;
+use sdkwork_appstore_user_store_service::ports::provider::ListingCardProviderPort;
 use sdkwork_appstore_user_store_service::ports::repository::UserStoreRepositoryPort;
 
 #[derive(Debug, Clone)]
@@ -672,5 +673,80 @@ impl UserStoreRepositoryPort for SqlxUserStoreRepository {
             .await
             .map_err(db_error)?;
         Ok(())
+    }
+}
+
+/// Production listing-card provider: resolves storefront cards directly from
+/// `appstore_listing`, enforcing the storefront visibility gate so revoked
+/// content disappears from public user-store shares.
+pub struct SqlxListingCardProvider {
+    db: AppstoreSqlxDb,
+}
+
+impl SqlxListingCardProvider {
+    pub fn new(db: AppstoreSqlxDb) -> Self {
+        Self { db }
+    }
+}
+
+#[async_trait::async_trait]
+impl ListingCardProviderPort for SqlxListingCardProvider {
+    async fn resolve_listing_card(
+        &self,
+        tenant_id: &str,
+        listing_id: &str,
+    ) -> Result<Option<ListingCard>, String> {
+        let mut cards = self
+            .resolve_listing_cards(tenant_id, &[listing_id.to_string()])
+            .await?;
+        Ok(cards.pop())
+    }
+
+    async fn resolve_listing_cards(
+        &self,
+        tenant_id: &str,
+        listing_ids: &[String],
+    ) -> Result<Vec<ListingCard>, String> {
+        if listing_ids.is_empty() {
+            return Ok(Vec::new());
+        }
+        let placeholders = listing_ids
+            .iter()
+            .map(|_| "?")
+            .collect::<Vec<_>>()
+            .join(", ");
+        let sql = format!(
+            r#"SELECT id, display_name, average_rating, download_count
+            FROM appstore_listing
+            WHERE tenant_id = ? AND id IN ({placeholders})
+              AND listing_status = 'active'
+              AND storefront_visibility = 'visible'
+              AND deleted_at IS NULL"#
+        );
+        let mut query = self
+            .db
+            .query_as::<(String, String, Option<String>, i64)>(self.db.adapt_sql(&sql).as_str())
+            .bind(tenant_id);
+        for listing_id in listing_ids {
+            query = query.bind(listing_id);
+        }
+        let rows = query
+            .fetch_all(&self.db)
+            .await
+            .map_err(|e| format!("listing card query failed: {e}"))?;
+
+        Ok(rows
+            .into_iter()
+            .map(
+                |(listing_id, display_name, average_rating, download_count)| ListingCard {
+                    listing_id,
+                    display_name,
+                    subtitle: None,
+                    icon_media_resource_id: None,
+                    average_rating,
+                    download_count: download_count as i64,
+                },
+            )
+            .collect())
     }
 }

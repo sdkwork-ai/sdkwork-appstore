@@ -23,7 +23,9 @@ use sdkwork_appstore_repository_sqlx::repository::market_repository::SqlxMarketR
 use sdkwork_appstore_repository_sqlx::repository::moderation_repository::SqlxModerationRepository;
 use sdkwork_appstore_repository_sqlx::repository::publisher_repository::SqlxPublisherRepository;
 use sdkwork_appstore_repository_sqlx::repository::release_repository::SqlxReleaseRepository;
-use sdkwork_appstore_repository_sqlx::repository::user_store_repository::SqlxUserStoreRepository;
+use sdkwork_appstore_repository_sqlx::repository::user_store_repository::{
+    SqlxListingCardProvider, SqlxUserStoreRepository,
+};
 use sdkwork_appstore_repository_sqlx::AppstoreSqlxDb;
 use sdkwork_appstore_routes_common::AppState;
 use sdkwork_appstore_service_host::integrations::http_market_channel_connector::register_http_market_connectors;
@@ -135,7 +137,10 @@ pub async fn assemble_api_router_with_pool(pool: DatabasePool) -> Result<ApiAsse
         moderation_service,
         compliance_service: ComplianceService::new(compliance_repo),
         market_service,
-        user_store_service: UserStoreService::new(user_store_repo),
+        user_store_service: {
+            let listing_cards = Arc::new(SqlxListingCardProvider::new(db.clone()));
+            UserStoreService::new(user_store_repo).with_listing_cards(listing_cards)
+        },
     };
 
     let business = Router::new()

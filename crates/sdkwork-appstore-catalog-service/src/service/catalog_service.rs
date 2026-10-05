@@ -1,6 +1,7 @@
 //! Catalog service entrypoint.
 
-use chrono::Utc;
+use chrono::{DateTime, Utc};
+
 use sdkwork_appstore_authorization::{missing_scope_message, scope_granted};
 use uuid::Uuid;
 
@@ -20,11 +21,11 @@ use crate::domain::commands::{
     TemplatesListRequest,
 };
 use crate::domain::models::{
-    AppTemplate, AppTemplateUsage, AppTemplateUsageKind, AudienceScope, CatalogCollection,
-    CatalogCollectionItem, CatalogCollectionLocalization, CatalogFeaturedSlot, Category,
-    CategoryId, CategoryLocalization, CategoryStatus, CategoryWithLocalizations, CollectionId,
-    CollectionStatus, CollectionType, CollectionWithItems, FeaturedSlotId, FeaturedSlotStatus,
-    Feedback, ListingSummary, PlatformScope, SearchHistoryEntry,
+    AppTemplate, AppTemplateUsage, AppTemplateUsageKind, AudienceScope, CatalogChartSnapshot,
+    CatalogCollection, CatalogCollectionItem, CatalogCollectionLocalization, CatalogFeaturedSlot,
+    Category, CategoryId, CategoryLocalization, CategoryStatus, CategoryWithLocalizations,
+    CollectionId, CollectionStatus, CollectionType, CollectionWithItems, FeaturedSlotId,
+    FeaturedSlotStatus, Feedback, ListingSummary, PlatformScope, SearchHistoryEntry,
 };
 use crate::domain::results::{
     AnalyticsOperatorDashboardResult, AnalyticsOperatorSearchResult,
@@ -414,14 +415,57 @@ where
         context: &AppstoreRequestContext,
         request: HomeRetrieveRequest,
     ) -> AppstoreServiceResult<HomeRetrieveResult> {
-        let featured_slots = self.repository.find_featured_slots(context).await?;
-        let collections = self.repository.find_collections(context, None, 20).await?;
+        let now = Utc::now();
+        // Public storefront home: only public-audience, in-window featured
+        // slots pointing at visible listings, published collections, and
+        // chart rankings re-checked against current visibility.
+        let featured_slots: Vec<CatalogFeaturedSlot> = self
+            .repository
+            .find_featured_slots(context)
+            .await?
+            .into_iter()
+            .filter(|slot| featured_slot_is_public(slot, now))
+            .collect();
+        let slot_visible_ids = self
+            .visible_listing_ids(
+                context,
+                featured_slots.iter().map(|slot| slot.listing_id.clone()),
+            )
+            .await;
+        let featured_slots: Vec<CatalogFeaturedSlot> = featured_slots
+            .into_iter()
+            .filter(|slot| slot_visible_ids.contains(&slot.listing_id))
+            .collect();
+
+        let collections: Vec<CatalogCollection> = self
+            .repository
+            .find_collections(context, None, 20)
+            .await?
+            .into_iter()
+            .filter(collection_is_public)
+            .collect();
+
         let chart_locale = request.locale.as_deref().unwrap_or("en-US");
         let latest_chart = self
             .repository
             .find_latest_chart_snapshot(context, "top", chart_locale, "ALL")
             .await?;
-        let charts = latest_chart.into_iter().collect();
+        let charts: Vec<CatalogChartSnapshot> = latest_chart.into_iter().collect();
+        let chart_visible_ids = self
+            .visible_listing_ids(
+                context,
+                charts
+                    .iter()
+                    .flat_map(|snapshot| chart_ranking_listing_ids(&snapshot.ranking)),
+            )
+            .await;
+        let charts: Vec<CatalogChartSnapshot> = charts
+            .into_iter()
+            .map(|mut snapshot| {
+                snapshot.ranking = filter_chart_ranking(&snapshot.ranking, &chart_visible_ids);
+                snapshot
+            })
+            .collect();
 
         Ok(HomeRetrieveResult::new(
             "appstore.catalog.home.retrieve",
@@ -440,7 +484,10 @@ where
         let categories = self
             .repository
             .find_categories(context, request.cursor.as_deref(), limit + 1)
-            .await?;
+            .await?
+            .into_iter()
+            .filter(|category| category.status == CategoryStatus::Active)
+            .collect::<Vec<_>>();
 
         let has_more = categories.len() > limit as usize;
         let categories: Vec<Category> = categories.into_iter().take(limit as usize).collect();
@@ -482,7 +529,7 @@ where
             .await?;
 
         match category {
-            Some(category) => {
+            Some(category) if category.status == CategoryStatus::Active => {
                 let localizations = self
                     .repository
                     .find_category_localizations(context, &category_id)
@@ -495,7 +542,7 @@ where
                     },
                 ))
             }
-            None => Ok(CategoryRetrieveResult::not_found(
+            _ => Ok(CategoryRetrieveResult::not_found(
                 "appstore.catalog.categories.retrieve",
             )),
         }
@@ -665,7 +712,10 @@ where
         let collections = self
             .repository
             .find_collections(context, request.cursor.as_deref(), limit + 1)
-            .await?;
+            .await?
+            .into_iter()
+            .filter(collection_is_public)
+            .collect::<Vec<_>>();
 
         let has_more = collections.len() > limit as usize;
         let collections: Vec<CatalogCollection> =
@@ -686,6 +736,7 @@ where
                 .repository
                 .find_collection_items(context, &collection.id)
                 .await?;
+            let items = self.filter_visible_collection_items(context, items).await?;
             result_collections.push(CollectionWithItems {
                 collection,
                 localizations,
@@ -713,7 +764,7 @@ where
             .await?;
 
         match collection {
-            Some(collection) => {
+            Some(collection) if collection_is_public(&collection) => {
                 let localizations = self
                     .repository
                     .find_collection_localizations(context, &collection_id)
@@ -722,6 +773,7 @@ where
                     .repository
                     .find_collection_items(context, &collection_id)
                     .await?;
+                let items = self.filter_visible_collection_items(context, items).await?;
                 Ok(CollectionRetrieveResult::found(
                     "appstore.catalog.collections.retrieve",
                     CollectionWithItems {
@@ -731,7 +783,7 @@ where
                     },
                 ))
             }
-            None => Ok(CollectionRetrieveResult::not_found(
+            _ => Ok(CollectionRetrieveResult::not_found(
                 "appstore.catalog.collections.retrieve",
             )),
         }
@@ -1096,10 +1148,19 @@ where
         };
 
         match chart {
-            Some(chart) => Ok(ChartsRetrieveResult::found(
-                "appstore.catalog.charts.retrieve",
-                chart,
-            )),
+            Some(mut chart) => {
+                // Chart snapshots are generated offline and can outlive a
+                // listing's visibility; re-check the storefront gate at read
+                // time so delisted/suspended apps drop out of public rankings.
+                let visible = self
+                    .visible_listing_ids(context, chart_ranking_listing_ids(&chart.ranking))
+                    .await;
+                chart.ranking = filter_chart_ranking(&chart.ranking, &visible);
+                Ok(ChartsRetrieveResult::found(
+                    "appstore.catalog.charts.retrieve",
+                    chart,
+                ))
+            }
             None => Ok(ChartsRetrieveResult::not_found(
                 "appstore.catalog.charts.retrieve",
             )),
@@ -1268,7 +1329,16 @@ where
             .collect();
 
         let limit = request.page_size.unwrap_or(20).clamp(1, 200) as usize;
-        let slots: Vec<CatalogFeaturedSlot> = filtered.into_iter().take(limit).collect();
+        // Public featured placements must point at storefront-visible
+        // listings: a slot for a draft/suspended app would leak its id.
+        let slot_visible_ids = self
+            .visible_listing_ids(context, filtered.iter().map(|slot| slot.listing_id.clone()))
+            .await;
+        let slots: Vec<CatalogFeaturedSlot> = filtered
+            .into_iter()
+            .filter(|slot| slot_visible_ids.contains(&slot.listing_id))
+            .take(limit)
+            .collect();
 
         Ok(PublicFeaturedListResult::new(
             "appstore.catalog.public.featured.list",
@@ -1419,6 +1489,7 @@ where
                 .repository
                 .find_collection_items(context, &collection.id)
                 .await?;
+            let items = self.filter_visible_collection_items(context, items).await?;
             events.push(CollectionWithItems {
                 collection,
                 localizations,
@@ -1460,6 +1531,7 @@ where
                     .repository
                     .find_collection_items(context, &collection_id)
                     .await?;
+                let items = self.filter_visible_collection_items(context, items).await?;
                 Ok(EventRetrieveResult::found(
                     "appstore.catalog.events.retrieve",
                     CollectionWithItems {
@@ -2061,4 +2133,104 @@ fn enrich_template_metadata(metadata: &serde_json::Value, publisher_id: &str) ->
         .entry("publisherId".to_string())
         .or_insert_with(|| serde_json::Value::String(publisher_id.to_string()));
     serde_json::Value::Object(merged)
+}
+
+/// Listing ids referenced by a chart ranking JSON array
+/// (`[{ "rank": 1, "listingId": "app-x", ... }]`).
+fn chart_ranking_listing_ids(ranking: &serde_json::Value) -> impl Iterator<Item = String> + '_ {
+    ranking
+        .as_array()
+        .into_iter()
+        .flatten()
+        .filter_map(|entry| {
+            entry
+                .get("listingId")
+                .and_then(|value| value.as_str())
+                .map(|value| value.to_string())
+        })
+}
+
+/// Drops ranking entries whose listing no longer passes the storefront
+/// visibility gate; surviving entries keep their original order.
+fn filter_chart_ranking(
+    ranking: &serde_json::Value,
+    visible: &std::collections::HashSet<String>,
+) -> serde_json::Value {
+    match ranking.as_array() {
+        Some(entries) => serde_json::Value::Array(
+            entries
+                .iter()
+                .filter(|entry| {
+                    entry
+                        .get("listingId")
+                        .and_then(|value| value.as_str())
+                        .map(|id| visible.contains(id))
+                        .unwrap_or(true)
+                })
+                .cloned()
+                .collect(),
+        ),
+        _ => ranking.clone(),
+    }
+}
+
+/// Storefront visibility gate: public collections are published and in the
+/// public audience scope.
+fn collection_is_public(collection: &CatalogCollection) -> bool {
+    collection.status == CollectionStatus::Published
+        && collection.audience_scope == AudienceScope::Public
+}
+
+/// Featured slot visible on public surfaces: active, public audience, inside
+/// its display window.
+fn featured_slot_is_public(slot: &CatalogFeaturedSlot, now: DateTime<Utc>) -> bool {
+    slot.status == FeaturedSlotStatus::Active
+        && slot.audience_scope == AudienceScope::Public
+        && slot.starts_at <= now
+        && slot.ends_at >= now
+}
+
+impl<R> CatalogService<R>
+where
+    R: CatalogRepositoryPort,
+{
+    /// IDs of listings that pass the storefront visibility gate (active +
+    /// visible, enforced by `find_listings_by_ids`).
+    async fn visible_listing_ids(
+        &self,
+        context: &AppstoreRequestContext,
+        listing_ids: impl Iterator<Item = String>,
+    ) -> std::collections::HashSet<String> {
+        let unique: Vec<String> = {
+            let mut seen = std::collections::HashSet::new();
+            listing_ids
+                .filter(|id| !id.trim().is_empty())
+                .filter(|id| seen.insert(id.clone()))
+                .collect()
+        };
+        if unique.is_empty() {
+            return std::collections::HashSet::new();
+        }
+        let listings = self
+            .repository
+            .find_listings_by_ids(context, &unique, None)
+            .await
+            .unwrap_or_default();
+        listings.into_iter().map(|summary| summary.id).collect()
+    }
+
+    /// Filters collection items to listings that pass the visibility gate.
+    async fn filter_visible_collection_items(
+        &self,
+        context: &AppstoreRequestContext,
+        items: Vec<CatalogCollectionItem>,
+    ) -> AppstoreServiceResult<Vec<CatalogCollectionItem>> {
+        let visible = self
+            .visible_listing_ids(context, items.iter().map(|item| item.listing_id.clone()))
+            .await;
+        Ok(items
+            .into_iter()
+            .filter(|item| visible.contains(&item.listing_id))
+            .collect())
+    }
 }
