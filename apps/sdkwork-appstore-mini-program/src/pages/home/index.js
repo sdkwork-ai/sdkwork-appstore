@@ -10,44 +10,87 @@ const CAPABILITIES = [
   { key: "settings", name: "设置", desc: "账户与通用偏好", path: "/pages/settings/index" },
 ];
 
+/** Deterministic gradient index per name, mirroring the cross-client palette
+ *  (UI_DESIGN_SPEC §2: brand-first vibrant system colors). */
+function gradientIndex(name) {
+  let hash = 0;
+  const text = String(name || "");
+  for (let i = 0; i < text.length; i++) {
+    hash = (hash * 31 + text.charCodeAt(i)) | 0;
+  }
+  return Math.abs(hash) % 6;
+}
+
+function withGradient(rows) {
+  return (rows || []).map((row) => ({ ...row, g: gradientIndex(row.name || row.title) }));
+}
+
+function formatEventEnds(endsAt) {
+  const parsed = Date.parse(endsAt);
+  if (!Number.isFinite(parsed)) {
+    return "";
+  }
+  const date = new Date(parsed);
+  const pad = (value) => String(value).padStart(2, "0");
+  return `${date.getMonth() + 1}月${date.getDate()}日 ${pad(date.getHours())}:${pad(date.getMinutes())}`;
+}
+
 Page({
   data: {
-    runtimeReady: false,
     loading: true,
     error: "",
+    todayLine: "",
     heroApps: [],
+    heroCurrent: 0,
     categories: [],
+    collections: [],
     events: [],
+    chartApps: [],
     recommendations: [],
     capabilities: CAPABILITIES,
   },
   onLoad() {
     try {
       bootstrapAppstoreMiniProgram({});
-      this.setData({ runtimeReady: true });
     } catch (error) {
       this.setData({
-        runtimeReady: false,
         loading: false,
         error: "运行时未构建，请先执行 pnpm run build",
       });
       return;
     }
+    this.setData({
+      todayLine: new Date().toLocaleDateString("zh-CN", {
+        month: "long",
+        day: "numeric",
+        weekday: "long",
+      }),
+    });
     this.loadFeed();
   },
   loadFeed() {
     this.setData({ loading: true, error: "" });
+    // 榜单独家加载：失败不阻塞首页其它分区（流式分区，UI_DESIGN_SPEC §5.1）。
+    pageLoaders
+      .charts("free")
+      .then((rows) => this.setData({ chartApps: rows.slice(0, 5) }))
+      .catch(() => this.setData({ chartApps: [] }));
     pageLoaders
       .discover()
-      .then((feed) =>
+      .then((feed) => {
+        const events = (feed.events || []).map((row) => ({
+          ...row,
+          endsLabel: row.endsAt ? formatEventEnds(row.endsAt) : "",
+        }));
         this.setData({
-          heroApps: feed.heroApps,
-          categories: feed.categories,
-          events: feed.events,
-          recommendations: feed.recommendations,
+          heroApps: withGradient(feed.heroApps),
+          categories: withGradient(feed.categories),
+          collections: withGradient(feed.collections),
+          events: withGradient(events),
+          recommendations: withGradient(feed.recommendations),
           loading: false,
-        }),
-      )
+        });
+      })
       .catch((error) =>
         this.setData({ loading: false, error: error?.message || "首页加载失败" }),
       );
@@ -59,20 +102,34 @@ Page({
   onRetry() {
     this.loadFeed();
   },
+  onHeroSwipe(event) {
+    this.setData({ heroCurrent: event.detail.current });
+  },
   onHeroTap(event) {
     const { id } = event.currentTarget.dataset;
     wx.navigateTo({ url: `/pages/app-detail/index?id=${id}` });
   },
-  onExploreTap() {
-    wx.navigateTo({ url: "/pages/apps/index" });
+  onSearchTap() {
+    wx.navigateTo({ url: "/pages/search/index" });
   },
   onCategoryTap(event) {
     const { id, name } = event.currentTarget.dataset;
     wx.navigateTo({ url: `/pages/category/index?id=${id}&name=${name}` });
   },
+  onCollectionTap(event) {
+    const { id } = event.currentTarget.dataset;
+    wx.navigateTo({ url: `/pages/collection/index?id=${id}` });
+  },
   onEventTap(event) {
     const { id } = event.currentTarget.dataset;
     wx.navigateTo({ url: `/pages/events/index?id=${id}` });
+  },
+  onChartAppTap(event) {
+    const { id } = event.currentTarget.dataset;
+    wx.navigateTo({ url: `/pages/app-detail/index?id=${id}` });
+  },
+  onChartsTap() {
+    wx.navigateTo({ url: "/pages/charts/index" });
   },
   onRecommendationTap(event) {
     const { id } = event.currentTarget.dataset;

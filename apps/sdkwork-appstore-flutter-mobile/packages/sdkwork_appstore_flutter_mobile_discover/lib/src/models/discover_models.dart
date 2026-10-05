@@ -20,6 +20,7 @@ class DiscoverEntry {
     required this.title,
     this.subtitle = '',
     this.endsAt = '',
+    this.rating = 0,
   });
 
   final String id;
@@ -28,6 +29,9 @@ class DiscoverEntry {
 
   /// Event deadline label (`endsAt`), empty for non-event entries.
   final String endsAt;
+
+  /// Aggregate star rating (0 = unrated; rails hide the star row then).
+  final double rating;
 }
 
 /// Discover feed mirroring the PC storefront blocks: hero picks, category

@@ -418,20 +418,25 @@ function createPageLoaders(getClient: () => AppstoreAppClient) {
     },
 
     /**
-     * Discover feed (home): hero picks, categories, active events, and
-     * recommendations — the mini-program counterpart of the PC/H5 storefront.
+     * Discover feed (home): hero picks, categories, editorial collections,
+     * active events, and recommendations — the mini-program counterpart of
+     * the PC/H5 storefront.
      */
     async discover(): Promise<{
-      heroApps: Array<{ id: string; name: string; developer: string }>;
+      heroApps: Array<{ id: string; name: string; developer: string; rating: number }>;
       categories: Array<{ id: string; name: string }>;
+      collections: Array<{ id: string; name: string; description: string }>;
       events: Array<{ id: string; title: string; endsAt: string }>;
       recommendations: ListingRow[];
     }> {
-      const [home, categoriesPage, eventsPage, recommendationsPage] =
+      const [home, categoriesPage, collectionsPage, eventsPage, recommendationsPage] =
         await Promise.all([
           getClient().catalog.getHome().catch(() => undefined),
           getClient().catalog
             .listCategories({ limit: 10, locale: 'zh-CN' })
+            .catch(() => undefined),
+          getClient().catalog
+            .listCollections({ limit: 8 })
             .catch(() => undefined),
           getClient().catalog
             .listEvents({ status: 'active', limit: 6 })
@@ -458,16 +463,25 @@ function createPageLoaders(getClient: () => AppstoreAppClient) {
       const categoriesPageItems = ((categoriesPage?.items ?? []) as unknown) as Array<
         Record<string, unknown>
       >;
+      const collectionItems = ((collectionsPage?.items ?? []) as unknown) as Array<
+        Record<string, unknown>
+      >;
       const eventItems = (eventsPage?.items ?? []) as Array<Record<string, unknown>>;
       return {
         heroApps: heroPage.rows.map((row) => ({
           id: row.id,
           name: row.name,
           developer: row.developer,
+          rating: row.rating,
         })),
         categories: categoriesPageItems.map((row) => ({
           id: String(row.id ?? ''),
           name: localizedRecordName(row, String(row.categoryCode ?? '分类')),
+        })),
+        collections: collectionItems.map((row) => ({
+          id: String(row.id ?? ''),
+          name: localizedRecordName(row, String(row.collectionCode ?? '精选合集')),
+          description: localizedField(row, 'description', ''),
         })),
         events: eventItems.map((row) => {
           const localizations = Array.isArray(row.localizations)

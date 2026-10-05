@@ -31,7 +31,9 @@ class AppstoreApp extends StatelessWidget {
       runtime: runtime,
       child: MaterialApp(
         title: 'SDKWork App Store Mobile',
-        theme: ThemeData(colorSchemeSeed: const Color(0xFF0F766E)),
+        // Brand blue seed (UI_DESIGN_SPEC §2.1 --accent #0071E3) so every
+        // Material color role derives from the shared design token.
+        theme: ThemeData(colorSchemeSeed: const Color(0xFF0071E3)),
         initialRoute: initialRoute,
         onGenerateRoute: routeStack.onGenerateRoute,
         builder: (BuildContext context, Widget? child) =>

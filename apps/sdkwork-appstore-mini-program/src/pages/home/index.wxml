@@ -1,96 +1,184 @@
 <view class="page">
-  <view class="hero">
-    <view class="hero__title">SDKWork 应用商店</view>
-    <view class="hero__subtitle">小程序精选应用市场</view>
-    <view class="hero__status hero__status--{{runtimeReady ? 'ready' : 'error'}}">
-      {{runtimeReady ? '运行时就绪' : '运行时未构建'}}
+  <!-- 顶部标题栏：Today 日期 + 大标题 + 搜索入口 -->
+  <view class="header">
+    <view class="header__meta">
+      <view class="header__date">{{todayLine}}</view>
+      <view class="header__title">发现</view>
+    </view>
+    <view class="header__search" hover-class="header__search--hover" bindtap="onSearchTap" aria-label="搜索">
+      <view class="header__search-icon">⌕</view>
     </view>
   </view>
 
-  <view wx:if="{{loading}}" class="state">首页加载中…</view>
-  <view wx:elif="{{error}}" class="state state--error">
-    <text>{{error}}</text>
-    <button class="state__retry" size="mini" bindtap="onRetry">重试</button>
+  <!-- 加载失败 -->
+  <view wx:if="{{error}}" class="error">
+    <text class="error__text">{{error}}</text>
+    <button class="error__retry" size="mini" bindtap="onRetry">重试</button>
   </view>
+
+  <!-- 分区骨架屏（UI_DESIGN_SPEC §4.9：异步加载禁止空白闪烁） -->
+  <block wx:elif="{{loading}}">
+    <view class="skeleton skeleton--hero"></view>
+    <view class="skeleton-row">
+      <view class="skeleton skeleton--circle" wx:for="{{[0,1,2,3,4]}}" wx:key="*this"></view>
+    </view>
+    <view class="skeleton skeleton--rail"></view>
+    <view class="skeleton skeleton--rail"></view>
+    <view class="skeleton skeleton--list"></view>
+  </block>
 
   <block wx:else>
-    <view class="hero-banner" bindtap="onExploreTap" hover-class="hero-banner--hover">
-      <view class="hero-banner__title">发现精彩应用</view>
-      <view class="hero-banner__subtitle">编辑精选与智能推荐，帮你找到下一款必备应用</view>
-      <view class="hero-banner__cta">立即探索</view>
-    </view>
-
-    <view wx:if="{{categories.length > 0}}" class="chips">
-      <view
-        class="chips__item"
-        wx:for="{{categories}}"
-        wx:key="id"
-        data-id="{{item.id}}"
-        data-name="{{item.name}}"
-        bindtap="onCategoryTap"
-        hover-class="chips__item--hover"
-      >{{item.name}}</view>
-    </view>
-
-    <view wx:if="{{heroApps.length > 0}}" class="section">
-      <view class="section__title">编辑精选</view>
-      <scroll-view class="rail" scroll-x enable-flex>
+    <!-- 精选轮播：真实应用实体，5s 自动轮换，可滑动 -->
+    <view wx:if="{{heroApps.length > 0}}" class="hero">
+      <swiper
+        class="hero__swiper"
+        autoplay
+        circular
+        interval="5000"
+        duration="450"
+        bindchange="onHeroSwipe"
+      >
+        <swiper-item wx:for="{{heroApps}}" wx:key="id">
+          <view
+            class="hero-card hero-card--g{{item.g}}"
+            data-id="{{item.id}}"
+            bindtap="onHeroTap"
+            hover-class="hero-card--hover"
+          >
+            <view class="hero-card__badge">{{heroCurrent === index ? '今日精选' : '编辑推荐'}}</view>
+            <view class="hero-card__icon">{{item.name[0]}}</view>
+            <view class="hero-card__name">{{item.name}}</view>
+            <view class="hero-card__developer">{{item.developer}}</view>
+            <view class="hero-card__meta">
+              <view class="hero-card__cta">查看</view>
+              <view wx:if="{{item.rating > 0}}" class="hero-card__rating">{{item.rating}}★</view>
+            </view>
+          </view>
+        </swiper-item>
+      </swiper>
+      <view class="hero__dots">
         <view
-          class="rail__card"
+          class="hero__dot {{heroCurrent === index ? 'hero__dot--active' : ''}}"
           wx:for="{{heroApps}}"
           wx:key="id"
+        ></view>
+      </view>
+    </view>
+    <view wx:else class="hero hero--fallback">
+      <view class="hero-fallback__title">发现精彩应用</view>
+      <view class="hero-fallback__subtitle">编辑精选与智能推荐，帮你找到下一款必备应用</view>
+      <view class="hero-fallback__cta" hover-class="hero-fallback__cta--hover" bindtap="onSearchTap">立即探索</view>
+    </view>
+
+    <!-- 分类入口：圆形图标 -->
+    <view wx:if="{{categories.length > 0}}" class="section">
+      <view class="section__title">分类</view>
+      <scroll-view class="rail" scroll-x enable-flex>
+        <view
+          class="category"
+          wx:for="{{categories}}"
+          wx:key="id"
           data-id="{{item.id}}"
-          bindtap="onHeroTap"
-          hover-class="rail__card--hover"
+          data-name="{{item.name}}"
+          bindtap="onCategoryTap"
+          hover-class="category--hover"
         >
-          <view class="rail__icon">{{item.name[0]}}</view>
-          <view class="rail__name">{{item.name}}</view>
-          <view class="rail__developer">{{item.developer}}</view>
+          <view class="category__circle category__circle--g{{item.g}}">{{item.name[0]}}</view>
+          <view class="category__label">{{item.name}}</view>
         </view>
       </scroll-view>
     </view>
 
+    <!-- 编辑精选合集 -->
+    <view wx:if="{{collections.length > 0}}" class="section">
+      <view class="section__title">编辑精选合集</view>
+      <scroll-view class="rail" scroll-x enable-flex>
+        <view
+          class="collection collection--g{{item.g}}"
+          wx:for="{{collections}}"
+          wx:key="id"
+          data-id="{{item.id}}"
+          bindtap="onCollectionTap"
+          hover-class="collection--hover"
+        >
+          <view class="collection__badge">合集</view>
+          <view class="collection__name">{{item.name}}</view>
+        </view>
+      </scroll-view>
+    </view>
+
+    <!-- 限时活动 -->
     <view wx:if="{{events.length > 0}}" class="section">
       <view class="section__title">限时活动</view>
       <scroll-view class="rail" scroll-x enable-flex>
         <view
-          class="event-card"
+          class="event"
           wx:for="{{events}}"
           wx:key="id"
           data-id="{{item.id}}"
           bindtap="onEventTap"
-          hover-class="event-card--hover"
+          hover-class="event--hover"
         >
-          <view class="event-card__title">{{item.title}}</view>
-          <view class="event-card__ends" wx:if="{{item.endsAt}}">截止 {{item.endsAt}}</view>
+          <view class="event__badge">限时</view>
+          <view class="event__title">{{item.title}}</view>
+          <view class="event__ends" wx:if="{{item.endsLabel}}">截止 {{item.endsLabel}}</view>
         </view>
       </scroll-view>
     </view>
 
+    <!-- 榜单速览 -->
+    <view wx:if="{{chartApps.length > 0}}" class="section">
+      <view class="section__head">
+        <view class="section__title">榜单速览</view>
+        <view class="section__more" hover-class="section__more--hover" bindtap="onChartsTap">完整榜单 ›</view>
+      </view>
+      <view class="chart card">
+        <view
+          class="chart__row"
+          wx:for="{{chartApps}}"
+          wx:key="id"
+          data-id="{{item.id}}"
+          bindtap="onChartAppTap"
+          hover-class="chart__row--hover"
+        >
+          <view class="chart__rank {{index < 3 ? 'chart__rank--top' : ''}}">{{index + 1}}</view>
+          <view class="app-icon app-icon--g{{item.g}} app-icon--sm">{{item.name[0]}}</view>
+          <view class="chart__main">
+            <view class="chart__name">{{item.name}}</view>
+            <view class="chart__developer">{{item.developer}}</view>
+          </view>
+          <view wx:if="{{item.rating > 0}}" class="chart__rating">{{item.rating}}★</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 为你推荐 -->
     <view wx:if="{{recommendations.length > 0}}" class="section">
       <view class="section__title">为你推荐</view>
       <view
-        class="rec-item"
+        class="rec card"
         wx:for="{{recommendations}}"
         wx:key="id"
         data-id="{{item.id}}"
         bindtap="onRecommendationTap"
-        hover-class="rec-item--hover"
+        hover-class="rec--hover"
       >
-        <view class="rec-item__icon">{{item.name[0]}}</view>
-        <view class="rec-item__main">
-          <view class="rec-item__name">{{item.name}}</view>
-          <view class="rec-item__developer">{{item.developer}}</view>
+        <view class="app-icon app-icon--g{{item.g}}">{{item.name[0]}}</view>
+        <view class="rec__main">
+          <view class="rec__name">{{item.name}}</view>
+          <view class="rec__developer">{{item.developer}}</view>
+          <view wx:if="{{item.rating > 0}}" class="rec__rating">{{item.rating}}★</view>
         </view>
-        <view wx:if="{{item.rating > 0}}" class="rec-item__rating">{{item.rating}}★</view>
+        <view class="rec__get">获取</view>
       </view>
     </view>
 
+    <!-- 功能入口 -->
     <view class="section">
       <view class="section__title">全部能力</view>
       <view class="grid">
         <view
-          class="grid__item"
+          class="grid__item card"
           wx:for="{{capabilities}}"
           wx:key="key"
           data-name="{{item.name}}"
@@ -104,6 +192,6 @@
       </view>
     </view>
 
-    <view class="footer">SDKWork App Store · 小程序端</view>
-  </view>
+    <view class="footer">SDKWork App Store · 每天发现新应用</view>
+  </block>
 </view>

@@ -245,6 +245,20 @@
   .scroll-x::-webkit-scrollbar {
     display: none;
   }
+
+  /* Home hero carousel (UI_DESIGN_SPEC §4.3): full-bleed slides with
+     scroll-snap so touch swipe and the 5s auto-advance share one track. */
+  .home-hero-track {
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+  .home-hero-track::-webkit-scrollbar {
+    display: none;
+  }
+  .home-hero-slide {
+    width: 100%;
+    scroll-snap-align: center;
+  }
 }
 
 @layer utilities {
