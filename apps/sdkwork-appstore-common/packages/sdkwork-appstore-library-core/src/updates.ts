@@ -11,6 +11,8 @@ export interface LibraryUpdateRow {
   releaseId: string;
   appKey: string;
   listingSlug: string;
+  /** Platform the library row was installed for (drives the update install). */
+  platform: string;
   security: boolean;
   iconUrl?: string;
 }
@@ -73,6 +75,10 @@ export function mapLibraryUpdateRow(
       readString(libraryRecord, 'listingSlug', 'listing_slug') ||
       readString(libraryRecord, 'listingId', 'listing_id') ||
       appKey,
+    platform:
+      readString(libraryRecord, 'platform') ||
+      readString(row, 'platform') ||
+      'h5',
     security: Boolean(row.securityPatch ?? row.security_patch ?? row.isSecurityUpdate),
     iconUrl: readString(libraryRecord, 'iconMediaResourceId', 'icon_media_resource_id', 'iconUrl') || undefined,
   };

@@ -7,7 +7,7 @@ import {
   RefreshCw,
   ArrowLeft,
 } from 'lucide-react';
-import { useLibraryUpdates, formatApiError, resolveArtifactDownload } from '@/hooks/useApi';
+import { useLibraryUpdates, formatApiError, installListingAndDownload } from '@/hooks/useApi';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { mapLibraryUpdateRow } from '@sdkwork/appstore-library-core';
 
@@ -32,11 +32,18 @@ export function UpdatesPage() {
     setDownloadingId(update.id);
     setActionError(null);
     try {
-      const downloadUrl = await resolveArtifactDownload({
-        artifactId: update.artifactId,
+      // Re-install through the library: the backend advances the row's
+      // installed version to the latest published release, so the update
+      // leaves the pending list, then the fresh artifact is downloaded.
+      const downloadUrl = await installListingAndDownload({
+        listingId: update.listingSlug,
+        platform: update.platform,
         appKey: update.appKey || undefined,
       });
-      window.open(downloadUrl, '_blank', 'noopener,noreferrer');
+      if (downloadUrl?.downloadUrl) {
+        window.open(downloadUrl.downloadUrl, '_blank', 'noopener,noreferrer');
+      }
+      await execute();
     } catch (err) {
       setActionError(formatApiError(err instanceof Error ? err : new Error(String(err))));
     } finally {
