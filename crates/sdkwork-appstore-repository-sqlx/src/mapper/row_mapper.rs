@@ -243,6 +243,10 @@ pub fn map_listing_row_to_domain(row: ListingRow) -> Result<Listing, String> {
         deleted_at: row.deleted_at,
         created_at: row.created_at,
         updated_at: row.updated_at,
+        // Distribution projection is enriched by the detail read path
+        // (join appstore_app); plain row loads carry none.
+        platforms: None,
+        access_url: None,
     })
 }
 

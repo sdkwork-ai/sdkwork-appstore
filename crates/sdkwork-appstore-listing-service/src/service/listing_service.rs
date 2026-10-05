@@ -442,8 +442,21 @@ where
             .await?;
 
         match listing {
-            Some(listing) => {
+            Some(mut listing) => {
                 self.ensure_listing_read_access(context, &listing).await?;
+                // Contract (openapi ListingDetail allOf ListingSummary): the
+                // detail response carries the app distribution projection so
+                // clients can resolve the acquisition mode (web open /
+                // installer download / QR). Best effort — a missing app row
+                // degrades to fields absent, not a failed read.
+                if let Ok(Some(distribution)) = self
+                    .repository
+                    .find_app_distribution(context, &listing.app_id)
+                    .await
+                {
+                    listing.platforms = Some(distribution.platforms);
+                    listing.access_url = distribution.access_url;
+                }
                 Ok(RetrieveListingResult::found(
                     "appstore.listings.retrieve",
                     listing,
@@ -539,6 +552,8 @@ where
             listing_status: ListingStatus::Draft,
             storefront_visibility: StorefrontVisibility::Hidden,
             review_status: ReviewStatus::NotSubmitted,
+            platforms: None,
+            access_url: None,
             primary_category_id: None,
             default_locale: request.default_locale,
             age_rating_code: None,
@@ -673,6 +688,8 @@ where
             listing_status: ListingStatus::Draft,
             storefront_visibility: StorefrontVisibility::Hidden,
             review_status: ReviewStatus::NotSubmitted,
+            platforms: None,
+            access_url: None,
             primary_category_id: None,
             default_locale: default_locale.to_string(),
             age_rating_code: None,

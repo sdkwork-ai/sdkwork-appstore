@@ -7,6 +7,14 @@ use crate::domain::models::{
 };
 use crate::error::AppstoreServiceResult;
 
+/// Distribution projection of one app (`appstore_app`) resolving the
+/// acquisition mode: raw platform codes plus the direct-open URL.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AppDistribution {
+    pub platforms: Vec<String>,
+    pub access_url: Option<String>,
+}
+
 #[async_trait::async_trait]
 pub trait ListingRepositoryPort: Send + Sync {
     async fn find_listing_by_id(
@@ -14,6 +22,14 @@ pub trait ListingRepositoryPort: Send + Sync {
         context: &AppstoreRequestContext,
         listing_id: &ListingId,
     ) -> AppstoreServiceResult<Option<Listing>>;
+
+    /// Distribution projection of one app (`appstore_app`): raw platform
+    /// codes plus the direct-open URL resolving the acquisition mode.
+    async fn find_app_distribution(
+        &self,
+        context: &AppstoreRequestContext,
+        app_id: &str,
+    ) -> AppstoreServiceResult<Option<AppDistribution>>;
 
     async fn find_listing_by_slug(
         &self,

@@ -98,10 +98,16 @@ export function useWishlist() {
 export function useLibraryUpdates() {
   return useApi(async () => {
     const store = getStoreClient();
-    const [libraryItems, updates] = await Promise.all([
-      store.library.listItems({ limit: 200 }),
-      store.library.checkUpdates({ items: [] }),
-    ]);
+    const libraryItems = await store.library.listItems({ limit: 200 });
+    // The check contract is per-item (appKey + platform + installed version),
+    // mirroring the server-side numeric version comparison.
+    const items = (libraryItems.items ?? []).map((row: any) => ({
+      appKey: String(row.appKey ?? ''),
+      platform: String(row.platform ?? 'h5'),
+      installedVersionCode: String(row.installedVersionCode ?? '0'),
+    }));
+    const updates =
+      items.length > 0 ? await store.library.checkUpdates({ items }) : { items: [] };
     return { libraryItems: libraryItems.items, updates: updates.items };
   });
 }

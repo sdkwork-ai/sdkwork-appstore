@@ -288,6 +288,14 @@ pub struct Listing {
     pub deleted_at: Option<DateTime<Utc>>,
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
+    /// Distribution projection from `appstore_app` (detail reads): raw
+    /// platform codes resolving the acquisition mode (web open / installer
+    /// / QR). `None` when the read path does not join the app projection.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub platforms: Option<Vec<String>>,
+    /// Direct-open URL for web/H5 distributions; the QR scan target otherwise.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub access_url: Option<String>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]

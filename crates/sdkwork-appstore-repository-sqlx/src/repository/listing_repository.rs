@@ -20,7 +20,7 @@ use sdkwork_appstore_listing_service::domain::models::{
     ListingSubmission, RegionalAvailability, StoreApp,
 };
 use sdkwork_appstore_listing_service::error::AppstoreServiceError;
-use sdkwork_appstore_listing_service::ports::repository::ListingRepositoryPort;
+use sdkwork_appstore_listing_service::ports::repository::{AppDistribution, ListingRepositoryPort};
 
 #[derive(Debug, Clone)]
 pub struct SqlxListingRepository {
@@ -104,6 +104,36 @@ impl ListingRepositoryPort for SqlxListingRepository {
         row.map(map_listing_row_to_domain)
             .transpose()
             .map_err(AppstoreServiceError::Internal)
+    }
+
+    async fn find_app_distribution(
+        &self,
+        context: &AppstoreRequestContext,
+        app_id: &str,
+    ) -> Result<Option<AppDistribution>, AppstoreServiceError> {
+        let row: Option<(String, Option<String>)> = self
+            .db
+            .query_as::<(String, Option<String>)>(
+                "SELECT platforms::text, access_url FROM appstore_app \
+                 WHERE id = ? AND tenant_id = ? AND deleted_at IS NULL",
+            )
+            .bind(app_id)
+            .bind(&context.tenant_id)
+            .fetch_optional(&self.db)
+            .await
+            .map_err(|e| AppstoreServiceError::Internal(format!("Database error: {}", e)))?;
+
+        Ok(row.map(|(platforms_json, access_url)| {
+            let platforms = serde_json::from_str::<Vec<String>>(&platforms_json)
+                .unwrap_or_default()
+                .into_iter()
+                .filter(|code| !code.trim().is_empty())
+                .collect();
+            AppDistribution {
+                platforms,
+                access_url,
+            }
+        }))
     }
 
     async fn find_listing_by_slug(

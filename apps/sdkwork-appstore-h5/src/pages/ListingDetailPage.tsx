@@ -208,6 +208,9 @@ export function ListingDetailPage() {
           setActionError(checkout.message);
         } else {
           setPurchaseNotice(checkout.message);
+          // Refresh ownership so the primary button leaves the 购买 state
+          // (entitlement → library gating now admits the install/open flow).
+          void ownershipApi.execute?.();
         }
       } catch (err) {
         setActionError(formatApiError(err instanceof Error ? err : new Error(String(err))));

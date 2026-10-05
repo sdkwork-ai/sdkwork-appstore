@@ -591,7 +591,11 @@ function createPageLoaders(getClient: () => AppstoreAppClient) {
             .filter((code) => code !== '')
         : [];
       const accessUrl =
-        typeof listing.accessUrl === 'string' ? listing.accessUrl : '';
+        typeof listing.accessUrl === 'string' && listing.accessUrl !== ''
+          ? listing.accessUrl
+          : typeof listing.access_url === 'string'
+            ? listing.access_url
+            : '';
       return {
         id: [listing.listingSlug, listing.id].find(
           (value) => typeof value === 'string' && value.trim() !== '',
