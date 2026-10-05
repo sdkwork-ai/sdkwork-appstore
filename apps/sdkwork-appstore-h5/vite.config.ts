@@ -107,10 +107,49 @@ export default defineConfig(({ command, mode }) => {
       outDir: resolveBrowserDistOutDir(resolveEnvironment(mode, process.env)),
       emptyOutDir: true,
     },
-    // The bootstrap credential reaches the renderer through the IAM Vite plugin
-    // below (dev-server HTML injection) and must never be exposed to the client
-    // bundle through `define` (`IAM_CREDENTIAL_ENTRY_SPEC.md`).
+    // Dev-serve base URL: `resolveBaseUrl` derives same-host:<dev port> when
+    // the renderer cannot see SDKWORK_API_BASE_URL (the sdk-common
+    // readRuntimeEnv import.meta.env path is unreachable in dev serve), which
+    // points clients at the local cloud-gateway port instead of the
+    // standalone gateway. Inject the non-secret base URL here when provided.
+    ...(process.env.SDKWORK_API_BASE_URL
+      ? {
+          define: {
+            'import.meta.env.SDKWORK_API_BASE_URL': JSON.stringify(
+              process.env.SDKWORK_API_BASE_URL,
+            ),
+            'import.meta.env.SDKWORK_IAM_APP_API_BASE_URL': JSON.stringify(
+              process.env.SDKWORK_API_BASE_URL,
+            ),
+            'import.meta.env.SDKWORK_APP_API_BASE_URL': JSON.stringify(
+              process.env.SDKWORK_API_BASE_URL,
+            ),
+          },
+        }
+      : {}),
+    // Topology env files name SDKWORK_-prefixed renderer variables
+    // (ENVIRONMENT_SPEC.md §6); expose them alongside VITE_ so the standalone
+    // topology env flows into the dev client (e.g. SDKWORK_API_BASE_URL).
+    envPrefix: ['VITE_', 'SDKWORK_'],
+    // Dev serve: publish the runtime-env document bridge
+    // (BROWSER_RUNTIME_ENV_SPEC.md §4) so shared resolvers see the gateway
+    // base URL at module-load time — built artifacts get the same document
+    // through the runtime-env element, but dev serve has no build step.
     plugins: [
+      {
+        name: 'sdkwork-runtime-env-bridge',
+        transformIndexHtml(html: string) {
+          const apiBase = process.env.SDKWORK_API_BASE_URL;
+          if (!apiBase) {
+            return html;
+          }
+          const injection =
+            `<script>window.SDKWORK_RUNTIME_ENV = Object.assign(` +
+            `window.SDKWORK_RUNTIME_ENV ?? {}, ` +
+            `{ SDKWORK_API_BASE_URL: ${JSON.stringify(apiBase)} });</script>`;
+          return html.replace('<head>', `<head>\n    ${injection}`);
+        },
+      },
       createSdkworkCredentialEntryBootstrapVitePlugin({
         accessToken: credentialEntryBootstrapAccessToken,
         environment: runtimeProfile.environment,

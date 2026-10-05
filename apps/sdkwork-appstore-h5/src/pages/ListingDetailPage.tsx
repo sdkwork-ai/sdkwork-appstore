@@ -231,7 +231,7 @@ export function ListingDetailPage() {
       navigate('/login', { state: { from: { pathname: `/app/${slug}` } } });
       return;
     }
-    if (isPaidPricingModel(app.pricingModel) && !owned && !installed) {
+    if (isPaidPricingModel(pricingModel) && !owned && !installed) {
       setInstalling(true);
       try {
         const checkout = await purchaseListingViaCommerce({
@@ -291,9 +291,10 @@ export function ListingDetailPage() {
     }
   }
 
-  const priceLabel = app.pricingModel === 'FREE' || app.pricingModel === 'FREEMIUM' ? '免费' : '付费';
+  const pricingModel = app.pricingModel.toUpperCase();
+  const priceLabel = pricingModel === 'FREE' || pricingModel === 'FREEMIUM' ? '免费' : '付费';
   const installState = resolveListingInstallState({
-    pricingModel: app.pricingModel,
+    pricingModel,
     owned,
     installed,
     installing,
@@ -515,7 +516,12 @@ export function ListingDetailPage() {
           ) : reviewsApi.loading ? (
             <LoadingSpinner size="sm" />
           ) : reviewsApi.error ? (
-            <p className="text-sm text-[var(--accent)]">{formatApiError(reviewsApi.error)}</p>
+            // 评论域未随独立网关部署时优雅降级，不把路由细节暴露给用户。
+            <p className="text-sm text-[var(--text-tertiary)]">
+              {/route is not registered|Failed to fetch/i.test(formatApiError(reviewsApi.error))
+                ? '评价服务暂不可用'
+                : formatApiError(reviewsApi.error)}
+            </p>
           ) : reviewItems.length === 0 ? (
             <p className="text-sm text-[var(--text-tertiary)]">暂无用户评价，成为首位评价者吧。</p>
           ) : (
