@@ -1322,6 +1322,8 @@ where
 
         let mut updated_listing = listing;
         updated_listing.review_status = ReviewStatus::Pending;
+        updated_listing.submitted_at = Some(now);
+        updated_listing.version += 1;
         updated_listing.updated_at = now;
         self.repository
             .update_listing(context, &updated_listing)
@@ -1378,6 +1380,17 @@ where
         let now = Utc::now();
         match request.decision_type.to_ascii_uppercase().as_str() {
             "APPROVE" => {
+                // A suspended/delisted listing must not be resurrected by a
+                // late decision projection; admins delist deliberately.
+                if matches!(
+                    listing.listing_status,
+                    ListingStatus::Suspended | ListingStatus::Delisted
+                ) {
+                    return Err(AppstoreServiceError::Conflict(
+                        "Listing is suspended or delisted; approval cannot reactivate it"
+                            .to_string(),
+                    ));
+                }
                 submission.submission_status = SubmissionStatus::Approved;
                 listing.review_status = ReviewStatus::Approved;
                 listing.listing_status = ListingStatus::Active;
@@ -1386,7 +1399,13 @@ where
                 }
                 listing.published_at = Some(now);
                 if let Some(release_id) = submission.release_id.clone() {
-                    listing.current_release_id = Some(release_id);
+                    listing.current_release_id = Some(release_id.clone());
+                    // Moderation approval is the act of publishing: transition
+                    // the release so check_update (which skips non-published
+                    // releases) can actually serve it.
+                    self.repository
+                        .publish_release(context, &release_id)
+                        .await?;
                 }
             }
             "REJECT" => {
@@ -1405,6 +1424,7 @@ where
         }
 
         submission.updated_at = now;
+        listing.version += 1;
         listing.updated_at = now;
 
         self.repository

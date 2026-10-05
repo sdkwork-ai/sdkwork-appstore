@@ -136,6 +136,31 @@ impl ListingRepositoryPort for SqlxListingRepository {
         }))
     }
 
+    async fn publish_release(
+        &self,
+        context: &AppstoreRequestContext,
+        release_id: &str,
+    ) -> Result<bool, AppstoreServiceError> {
+        let result = self
+            .db
+            .query(
+                r#"UPDATE appstore_release
+                   SET release_status = ?, published_at = COALESCE(published_at, ?), updated_at = ?
+                   WHERE id = ? AND tenant_id = ? AND release_status <> ?"#,
+            )
+            .bind("published")
+            .bind(Utc::now())
+            .bind(Utc::now())
+            .bind(release_id)
+            .bind(&context.tenant_id)
+            .bind("retired")
+            .execute_unified(&self.db)
+            .await
+            .map_err(|e| AppstoreServiceError::Internal(format!("Database error: {}", e)))?;
+
+        Ok(result.rows_affected() > 0)
+    }
+
     async fn find_listing_by_slug(
         &self,
         _context: &AppstoreRequestContext,

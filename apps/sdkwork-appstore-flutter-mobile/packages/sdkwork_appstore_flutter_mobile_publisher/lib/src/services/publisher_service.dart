@@ -23,8 +23,9 @@ class PublisherService {
         PublisherListingRow(
           id: _text(row['id']),
           title: _text(row['displayName'], _text(row['title'], '应用')),
-          status: _text(row['status']),
-          currentVersion: _text(row['currentVersion'], _text(row['current_version'])),
+          status: _text(row['listingStatus'], _text(row['listing_status'], _text(row['status']))),
+          currentVersion:
+              _text(row['currentVersion'], _text(row['current_version'])),
         ),
     ];
   }
@@ -32,17 +33,20 @@ class PublisherService {
   /// Bootstraps a new publisher app draft.
   ///
   /// [appType] follows the storefront app-type dictionary (`APP`/`PLUGIN`),
-  /// not a platform code.
+  /// not a platform code. [defaultLocale] is a required contract field
+  /// (PublisherAppBootstrapRequest).
   Future<PublisherListingRow> createApp({
     required String displayName,
     required String appKey,
     String appType = 'APP',
+    String defaultLocale = 'zh-CN',
   }) async {
     clients.ensureTransportBound(capability);
     final response = await clients.requireAppClient.publishers.appstorePublishersMeAppsCreate(
       PublisherAppBootstrapRequest(
         displayName: displayName,
         appKey: appKey,
+        defaultLocale: defaultLocale,
         appType: appType,
       ),
       DateTime.now().microsecondsSinceEpoch.toString(),
@@ -69,9 +73,14 @@ class PublisherService {
       for (final row in AppstoreAppSdkClients.itemsOf(response?.data))
         PublisherReleaseRow(
           id: _text(row['id']),
-          version: _text(row['version'], '0.0.0'),
-          status: _text(row['status']),
-          notes: _text(row['notes']),
+          // Release schema: versionName/versionCode/releaseStatus (snake_case
+          // fallbacks for the pass-through mapper).
+          version: _text(
+            row['versionName'],
+            _text(row['version_name'], _text(row['versionCode'], _text(row['version_code'], '0.0.0'))),
+          ),
+          status: _text(row['releaseStatus'], _text(row['release_status'])),
+          notes: _text(row['releaseNotes'], _text(row['release_notes'])),
         ),
     ];
   }

@@ -31,6 +31,15 @@ pub trait ListingRepositoryPort: Send + Sync {
         app_id: &str,
     ) -> AppstoreServiceResult<Option<AppDistribution>>;
 
+    /// Moderation approval publishes the reviewed release: transitions any
+    /// non-retired release to `published` and stamps `published_at`. Returns
+    /// whether a release row transitioned.
+    async fn publish_release(
+        &self,
+        context: &AppstoreRequestContext,
+        release_id: &str,
+    ) -> AppstoreServiceResult<bool>;
+
     async fn find_listing_by_slug(
         &self,
         context: &AppstoreRequestContext,
