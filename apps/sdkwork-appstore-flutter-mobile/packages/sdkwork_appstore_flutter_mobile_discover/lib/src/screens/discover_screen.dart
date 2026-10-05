@@ -10,13 +10,15 @@ import '../services/discover_service.dart';
 
 /// Discover screen (canonical route `app.store.discover.index`).
 ///
-/// Storefront blocks mirror the PC/H5 discover page and the shared UI design
-/// spec (§5.1): a featured-app hero carousel, circular category entries,
-/// editorial collection cards, limited-time events, recently updated rows, and
-/// a two-column recommendation grid — each section rendering its own skeleton
-/// while the feed loads, never a blank screen. Screens stay in capability
-/// packages; the root keeps only bootstrap, providers, route assembly, and
-/// shell registration (`APP_CLIENT_ARCHITECTURE_ALIGNMENT_SPEC.md` section 1).
+/// Today-grade storefront mirroring the PC/H5 discover page and the shared
+/// UI design spec (§5.1): a layered featured-app hero carousel (watermark
+/// glyph + radial glow + glass badges), crafted app icons (gloss + inner
+/// ring over the gradient), circular category entries, editorial collection
+/// and event cards, recently updated rows, and a two-column recommendation
+/// grid with real 获取 actions — each section rendering its own skeleton
+/// while the feed loads. Screens stay in capability packages; the root keeps
+/// only bootstrap, providers, route assembly, and shell registration
+/// (`APP_CLIENT_ARCHITECTURE_ALIGNMENT_SPEC.md` section 1).
 class DiscoverScreen extends StatefulWidget {
   const DiscoverScreen({required this.service, super.key});
 
@@ -85,7 +87,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
             }
             return ListView(
               physics: const AlwaysScrollableScrollPhysics(),
-              padding: const EdgeInsets.only(bottom: 24),
+              padding: const EdgeInsets.only(bottom: 32),
               children: <Widget>[
                 if (feed.heroApps.isNotEmpty)
                   _HeroCarousel(
@@ -113,7 +115,8 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                     trailingBuilder: (DiscoverEntry entry) => _TagPill(
                       label: '更新',
                       foreground: Theme.of(context).colorScheme.primary,
-                      background: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                      background:
+                          Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
                     ),
                     onTap: _openApp,
                   ),
@@ -128,10 +131,8 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
   }
 }
 
-/* ── shared visual helpers (UI_DESIGN_SPEC §2 tokens) ─────────────────────── */
+/* ═══ design primitives (UI_DESIGN_SPEC §2 tokens, Today-grade craft) ══════ */
 
-/// Deterministic vibrant gradients keyed by name — the same palette and order
-/// as the H5/mini-program home rails, so one app wears one color everywhere.
 const List<List<Color>> _appGradients = <List<Color>>[
   <Color>[Color(0xFF0071E3), Color(0xFF5856D6)],
   <Color>[Color(0xFF34C759), Color(0xFF00C7BE)],
@@ -149,37 +150,208 @@ List<Color> _gradientFor(String key) {
   return _appGradients[hash % _appGradients.length];
 }
 
-/// Continuous-corner app icon block (22.37% radius, spec §2.3).
-class _AppIcon extends StatelessWidget {
-  const _AppIcon({required this.title, this.size = 56, this.overlay = false});
+/// App icon with the full craft treatment: gradient base, top-left gloss,
+/// inner hairline ring, and a confident letterform with a soft shadow.
+class _CraftIcon extends StatelessWidget {
+  const _CraftIcon({
+    required this.title,
+    this.size = 56,
+    this.circle = false,
+  });
 
   final String title;
   final double size;
-  final bool overlay;
+  final bool circle;
 
   @override
   Widget build(BuildContext context) {
-    final List<Color> colors = overlay
-        ? const <Color>[Color(0x3DFFFFFF), Color(0x24FFFFFF)]
-        : _gradientFor(title);
+    final double radius = circle ? size / 2 : size * 0.2237;
     return Container(
       width: size,
       height: size,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(size * 0.2237),
+        borderRadius: BorderRadius.circular(radius),
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: colors,
+          colors: _gradientFor(title),
+        ),
+        boxShadow: <BoxShadow>[
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.12),
+            blurRadius: 8,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Stack(
+        children: <Widget>[
+          // Top-left gloss.
+          Positioned.fill(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(radius),
+                gradient: RadialGradient(
+                  center: const Alignment(-0.68, -0.88),
+                  radius: 1.5,
+                  colors: <Color>[
+                    Colors.white.withValues(alpha: 0.4),
+                    Colors.white.withValues(alpha: 0),
+                  ],
+                  stops: const <double>[0, 0.56],
+                ),
+              ),
+            ),
+          ),
+          // Inner hairline ring.
+          Positioned.fill(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(radius),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.26)),
+              ),
+            ),
+          ),
+          Center(
+            child: Text(
+              title.isNotEmpty ? title.characters.first.toUpperCase() : '应',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: size * 0.4,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 0.5,
+                shadows: <Shadow>[
+                  Shadow(
+                    color: Colors.black.withValues(alpha: 0.2),
+                    blurRadius: 3,
+                    offset: const Offset(0, 1),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Layered feature card: gradient base + radial glow + oversized rotated
+/// watermark glyph behind the content. Used by the hero and the compact
+/// collection/event cards.
+class _FeatureCard extends StatelessWidget {
+  const _FeatureCard({
+    required this.title,
+    required this.onTap,
+    required this.children,
+    this.gradient,
+    this.borderRadius = 24,
+  });
+
+  final String title;
+  final VoidCallback onTap;
+  final List<Widget> children;
+  final Gradient? gradient;
+  final double borderRadius;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(borderRadius),
+      onTap: onTap,
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(borderRadius),
+          gradient: gradient ??
+              LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: _gradientFor(title),
+              ),
+          boxShadow: <BoxShadow>[
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.14),
+              blurRadius: 22,
+              offset: const Offset(0, 10),
+            ),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(borderRadius),
+          child: Stack(
+            children: <Widget>[
+              // Radial glow, anchored top-right.
+              Positioned.fill(
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: RadialGradient(
+                      center: const Alignment(0.82, -0.92),
+                      radius: 1.3,
+                      colors: <Color>[
+                        Colors.white.withValues(alpha: 0.24),
+                        Colors.white.withValues(alpha: 0),
+                      ],
+                      stops: const <double>[0, 0.62],
+                    ),
+                  ),
+                ),
+              ),
+              // Oversized watermark glyph.
+              Positioned(
+                right: -12,
+                bottom: -30,
+                child: Transform.rotate(
+                  angle: -0.21,
+                  child: Text(
+                    title.isNotEmpty ? title.characters.first.toUpperCase() : 'S',
+                    style: TextStyle(
+                      fontSize: 150,
+                      fontWeight: FontWeight.w800,
+                      height: 1,
+                      color: Colors.white.withValues(alpha: 0.13),
+                    ),
+                  ),
+                ),
+              ),
+              // Content.
+              Positioned.fill(
+                child: Padding(
+                  padding: const EdgeInsets.all(18),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: children,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
-      alignment: Alignment.center,
+    );
+  }
+}
+
+/// Frosted badge over feature cards.
+class _GlassBadge extends StatelessWidget {
+  const _GlassBadge(this.label);
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.22),
+        borderRadius: BorderRadius.circular(999),
+      ),
       child: Text(
-        title.isNotEmpty ? title.characters.first.toUpperCase() : '应',
-        style: TextStyle(
+        label,
+        style: const TextStyle(
           color: Colors.white,
-          fontSize: size * 0.42,
+          fontSize: 10,
           fontWeight: FontWeight.w700,
+          letterSpacing: 2,
         ),
       ),
     );
@@ -210,7 +382,7 @@ class _TagPill extends StatelessWidget {
         style: TextStyle(
           color: foreground,
           fontSize: 11,
-          fontWeight: FontWeight.w600,
+          fontWeight: FontWeight.w700,
         ),
       ),
     );
@@ -231,13 +403,17 @@ class _RatingBadge extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        Icon(Icons.star_rounded, size: 14, color: onDark ? const Color(0xFFFFD60A) : const Color(0xFFFFCE00)),
+        Icon(
+          Icons.star_rounded,
+          size: 14,
+          color: onDark ? const Color(0xFFFFD60A) : const Color(0xFFFFCE00),
+        ),
         const SizedBox(width: 2),
         Text(
           rating.toStringAsFixed(1),
           style: TextStyle(
             fontSize: 12,
-            fontWeight: FontWeight.w600,
+            fontWeight: FontWeight.w700,
             color: onDark ? Colors.white : Theme.of(context).colorScheme.onSurfaceVariant,
           ),
         ),
@@ -246,7 +422,7 @@ class _RatingBadge extends StatelessWidget {
   }
 }
 
-/* ── hero carousel (UI_DESIGN_SPEC §4.3: 5s auto-rotation + swipe) ────────── */
+/* ═══ hero carousel (§4.3: 5s auto-rotation + swipe + progress dots) ═══════ */
 
 class _HeroCarousel extends StatefulWidget {
   const _HeroCarousel({required this.entries, required this.onOpen});
@@ -298,10 +474,9 @@ class _HeroCarouselState extends State<_HeroCarousel> {
     return Column(
       children: <Widget>[
         GestureDetector(
-          // A user-driven swipe restarts the auto-rotation window.
           onPanDown: (DragDownDetails details) => _startTimer(),
           child: SizedBox(
-            height: 210,
+            height: 232,
             child: PageView.builder(
               controller: _controller,
               itemCount: widget.entries.length,
@@ -310,91 +485,82 @@ class _HeroCarouselState extends State<_HeroCarousel> {
                 final entry = widget.entries[index];
                 return Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 6),
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(24),
+                  child: _FeatureCard(
+                    title: entry.title,
                     onTap: () => widget.onOpen(entry.id),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(24),
-                        gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: _gradientFor(entry.title),
-                        ),
-                        boxShadow: <BoxShadow>[
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.12),
-                            blurRadius: 18,
-                            offset: const Offset(0, 8),
-                          ),
+                    children: <Widget>[
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          _GlassBadge(index == 0 ? '今日精选' : '编辑推荐'),
+                          if (entry.rating > 0)
+                            _RatingBadge(rating: entry.rating, onDark: true),
                         ],
                       ),
-                      padding: const EdgeInsets.all(20),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      const Spacer(),
+                      Row(
                         children: <Widget>[
-                          Row(
-                            children: <Widget>[
-                              _AppIcon(title: entry.title, size: 60, overlay: true),
-                              const Spacer(),
-                              Text(
-                                index == 0 ? '今日精选' : '编辑推荐',
-                                style: TextStyle(
-                                  color: Colors.white.withValues(alpha: 0.8),
-                                  fontSize: 12,
-                                  letterSpacing: 2,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ],
-                          ),
-                          const Spacer(),
-                          Text(
-                            entry.title,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 22,
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: -0.5,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            entry.subtitle,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.85),
-                              fontSize: 13,
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                          Row(
-                            children: <Widget>[
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withValues(alpha: 0.95),
-                                  borderRadius: BorderRadius.circular(999),
-                                ),
-                                child: const Text(
-                                  '查看',
-                                  style: TextStyle(
-                                    color: Color(0xFF1D1D1F),
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w600,
+                          _CraftIcon(title: entry.title, size: 58),
+                          const SizedBox(width: 14),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                Text(
+                                  entry.title,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.w800,
+                                    letterSpacing: -0.6,
                                   ),
                                 ),
-                              ),
-                              const SizedBox(width: 12),
-                              _RatingBadge(rating: entry.rating, onDark: true),
-                            ],
+                                const SizedBox(height: 2),
+                                Text(
+                                  entry.subtitle,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    color: Colors.white.withValues(alpha: 0.82),
+                                    fontSize: 13,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ],
                       ),
-                    ),
+                      if (entry.subtitle.length > 24) ...<Widget>[
+                        const SizedBox(height: 10),
+                        Text(
+                          entry.subtitle,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: Colors.white.withValues(alpha: 0.85),
+                            fontSize: 13,
+                          ),
+                        ),
+                      ],
+                      const SizedBox(height: 14),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(999),
+                        ),
+                        child: const Text(
+                          '立即查看',
+                          style: TextStyle(
+                            color: Color(0xFF1D1D1F),
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 );
               },
@@ -409,13 +575,13 @@ class _HeroCarouselState extends State<_HeroCarousel> {
               AnimatedContainer(
                 duration: const Duration(milliseconds: 250),
                 margin: const EdgeInsets.symmetric(horizontal: 3),
-                width: index == _index ? 18 : 6,
-                height: 6,
+                width: index == _index ? 20 : 6,
+                height: 4,
                 decoration: BoxDecoration(
                   color: index == _index
                       ? Theme.of(context).colorScheme.primary
                       : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.18),
-                  borderRadius: BorderRadius.circular(6),
+                  borderRadius: BorderRadius.circular(4),
                 ),
               ),
           ],
@@ -425,7 +591,7 @@ class _HeroCarouselState extends State<_HeroCarousel> {
   }
 }
 
-/* ── circular category rail ───────────────────────────────────────────────── */
+/* ═══ circular category rail ════════════════════════════════════════════════ */
 
 class _CategoryRail extends StatelessWidget {
   const _CategoryRail({required this.categories});
@@ -439,7 +605,7 @@ class _CategoryRail extends StatelessWidget {
       children: <Widget>[
         const AppstoreSectionHeader(title: '分类'),
         SizedBox(
-          height: 84,
+          height: 92,
           child: ListView.separated(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             scrollDirection: Axis.horizontal,
@@ -447,42 +613,14 @@ class _CategoryRail extends StatelessWidget {
             separatorBuilder: (BuildContext context, int index) => const SizedBox(width: 14),
             itemBuilder: (BuildContext context, int index) {
               final category = categories[index];
-              final colors = _gradientFor(category.title);
               return InkWell(
                 borderRadius: BorderRadius.circular(16),
                 onTap: () => Navigator.pushNamed(context, '/category/${category.id}'),
                 child: SizedBox(
-                  width: 60,
+                  width: 62,
                   child: Column(
                     children: <Widget>[
-                      Container(
-                        width: 56,
-                        height: 56,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          gradient: LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: colors,
-                          ),
-                          boxShadow: <BoxShadow>[
-                            BoxShadow(
-                              color: colors.last.withValues(alpha: 0.25),
-                              blurRadius: 8,
-                              offset: const Offset(0, 3),
-                            ),
-                          ],
-                        ),
-                        alignment: Alignment.center,
-                        child: Text(
-                          category.title.isNotEmpty ? category.title.characters.first : '分',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 20,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ),
+                      _CraftIcon(title: category.title, size: 58, circle: true),
                       const SizedBox(height: 6),
                       Text(
                         category.title,
@@ -490,6 +628,7 @@ class _CategoryRail extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           fontSize: 12,
+                          fontWeight: FontWeight.w500,
                           color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
                       ),
@@ -505,7 +644,7 @@ class _CategoryRail extends StatelessWidget {
   }
 }
 
-/* ── editorial collection rail ─────────────────────────────────────────────── */
+/* ═══ editorial collection rail ═════════════════════════════════════════════ */
 
 class _CollectionRail extends StatelessWidget {
   const _CollectionRail({required this.collections, required this.onOpen});
@@ -520,7 +659,7 @@ class _CollectionRail extends StatelessWidget {
       children: <Widget>[
         const AppstoreSectionHeader(title: '编辑精选合集'),
         SizedBox(
-          height: 148,
+          height: 150,
           child: ListView.separated(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             scrollDirection: Axis.horizontal,
@@ -528,48 +667,37 @@ class _CollectionRail extends StatelessWidget {
             separatorBuilder: (BuildContext context, int index) => const SizedBox(width: 12),
             itemBuilder: (BuildContext context, int index) {
               final collection = collections[index];
-              return InkWell(
-                borderRadius: BorderRadius.circular(20),
-                onTap: () => onOpen(collection.id),
-                child: Container(
-                  width: 176,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: _gradientFor(collection.title),
+              return SizedBox(
+                width: 200,
+                child: _FeatureCard(
+                  title: collection.title,
+                  borderRadius: 20,
+                  onTap: () => onOpen(collection.id),
+                  children: <Widget>[
+                    _GlassBadge('合集'),
+                    const Spacer(),
+                    Text(
+                      collection.title,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                        height: 1.3,
+                      ),
                     ),
-                  ),
-                  padding: const EdgeInsets.all(14),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.25),
-                          borderRadius: BorderRadius.circular(999),
-                        ),
-                        child: const Text(
-                          '合集',
-                          style: TextStyle(color: Colors.white, fontSize: 10, letterSpacing: 2),
-                        ),
+                    const SizedBox(height: 2),
+                    Text(
+                      collection.subtitle.isNotEmpty ? collection.subtitle : '编辑精心挑选',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.75),
+                        fontSize: 11,
                       ),
-                      const Spacer(),
-                      Text(
-                        collection.title,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 15,
-                          fontWeight: FontWeight.w700,
-                          height: 1.3,
-                        ),
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               );
             },
@@ -580,7 +708,7 @@ class _CollectionRail extends StatelessWidget {
   }
 }
 
-/* ── limited-time event rail ──────────────────────────────────────────────── */
+/* ═══ limited-time event rail ═══════════════════════════════════════════════ */
 
 class _EventRail extends StatelessWidget {
   const _EventRail({required this.events, required this.onOpen});
@@ -595,7 +723,7 @@ class _EventRail extends StatelessWidget {
       children: <Widget>[
         const AppstoreSectionHeader(title: '限时活动'),
         SizedBox(
-          height: 148,
+          height: 150,
           child: ListView.separated(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             scrollDirection: Axis.horizontal,
@@ -603,70 +731,41 @@ class _EventRail extends StatelessWidget {
             separatorBuilder: (BuildContext context, int index) => const SizedBox(width: 12),
             itemBuilder: (BuildContext context, int index) {
               final event = events[index];
-              return InkWell(
-                borderRadius: BorderRadius.circular(20),
-                onTap: () => onOpen(event.id),
-                child: Container(
-                  width: 192,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
-                    gradient: const LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: <Color>[Color(0xFFFF9500), Color(0xFFFF3B30)],
+              return SizedBox(
+                width: 200,
+                child: _FeatureCard(
+                  title: event.title,
+                  borderRadius: 20,
+                  gradient: const LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: <Color>[Color(0xFFFF9500), Color(0xFFFF3B30)],
+                  ),
+                  onTap: () => onOpen(event.id),
+                  children: <Widget>[
+                    const _GlassBadge('限时'),
+                    const Spacer(),
+                    Text(
+                      event.title,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                        height: 1.3,
+                      ),
                     ),
-                    boxShadow: <BoxShadow>[
-                      BoxShadow(
-                        color: const Color(0xFFFF3B30).withValues(alpha: 0.18),
-                        blurRadius: 14,
-                        offset: const Offset(0, 6),
+                    const SizedBox(height: 2),
+                    Text(
+                      event.endsAt.isNotEmpty ? '截止 ${event.endsAt}' : '正在进行',
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.85),
+                        fontSize: 11,
+                        fontWeight: FontWeight.w500,
                       ),
-                    ],
-                  ),
-                  padding: const EdgeInsets.all(14),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.28),
-                          borderRadius: BorderRadius.circular(999),
-                        ),
-                        child: const Text(
-                          '限时',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 10,
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: 2,
-                          ),
-                        ),
-                      ),
-                      const Spacer(),
-                      Text(
-                        event.title,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 15,
-                          fontWeight: FontWeight.w700,
-                          height: 1.3,
-                        ),
-                      ),
-                      if (event.endsAt.isNotEmpty) ...<Widget>[
-                        const SizedBox(height: 4),
-                        Text(
-                          '截止 ${event.endsAt}',
-                          style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.9),
-                            fontSize: 11,
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               );
             },
@@ -677,7 +776,7 @@ class _EventRail extends StatelessWidget {
   }
 }
 
-/* ── recently-updated rows ────────────────────────────────────────────────── */
+/* ═══ recently-updated rows ═════════════════════════════════════════════════ */
 
 class _EntryList extends StatelessWidget {
   const _EntryList({
@@ -711,7 +810,7 @@ class _EntryList extends StatelessWidget {
   }
 }
 
-/* ── recommendation grid ──────────────────────────────────────────────────── */
+/* ═══ recommendation grid ═══════════════════════════════════════════════════ */
 
 class _RecommendationGrid extends StatelessWidget {
   const _RecommendationGrid({required this.entries, required this.onOpen});
@@ -736,7 +835,7 @@ class _RecommendationGrid extends StatelessWidget {
               crossAxisCount: 2,
               mainAxisSpacing: 12,
               crossAxisSpacing: 12,
-              childAspectRatio: 1.58,
+              childAspectRatio: 1.5,
             ),
             itemBuilder: (BuildContext context, int index) {
               final entry = entries[index];
@@ -757,7 +856,7 @@ class _RecommendationGrid extends StatelessWidget {
                     children: <Widget>[
                       Row(
                         children: <Widget>[
-                          _AppIcon(title: entry.title, size: 44),
+                          _CraftIcon(title: entry.title, size: 44),
                           const SizedBox(width: 10),
                           Expanded(
                             child: Column(
@@ -792,18 +891,36 @@ class _RecommendationGrid extends StatelessWidget {
                         children: <Widget>[
                           _RatingBadge(rating: entry.rating),
                           const Spacer(),
+                          // 免费 price pill.
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                             decoration: BoxDecoration(
-                              color: colorScheme.primary.withValues(alpha: 0.1),
+                              color: const Color(0xFF34C759).withValues(alpha: 0.13),
+                              borderRadius: BorderRadius.circular(999),
+                            ),
+                            child: const Text(
+                              '免费',
+                              style: TextStyle(
+                                color: Color(0xFF34C759),
+                                fontSize: 10,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          // 获取 filled action.
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
+                            decoration: BoxDecoration(
+                              color: colorScheme.primary,
                               borderRadius: BorderRadius.circular(999),
                             ),
                             child: Text(
                               '获取',
                               style: TextStyle(
-                                color: colorScheme.primary,
+                                color: colorScheme.onPrimary,
                                 fontSize: 12,
-                                fontWeight: FontWeight.w600,
+                                fontWeight: FontWeight.w700,
                               ),
                             ),
                           ),
@@ -821,7 +938,7 @@ class _RecommendationGrid extends StatelessWidget {
   }
 }
 
-/* ── skeleton (UI_DESIGN_SPEC §4.9: no blank flash while loading) ─────────── */
+/* ═══ skeleton (§4.9: no blank flash while loading) ═════════════════════════ */
 
 class _DiscoverSkeleton extends StatefulWidget {
   const _DiscoverSkeleton();
@@ -864,24 +981,30 @@ class _DiscoverSkeletonState extends State<_DiscoverSkeleton>
       physics: const NeverScrollableScrollPhysics(),
       padding: const EdgeInsets.all(16),
       children: <Widget>[
-        block(double.infinity, 210, radius: 24),
-        const SizedBox(height: 24),
+        block(double.infinity, 232, radius: 24),
+        const SizedBox(height: 28),
         Row(
           children: <Widget>[
             for (var index = 0; index < 5; index++) ...<Widget>[
-              block(56, 56, radius: 28),
+              block(58, 58, radius: 29),
               const SizedBox(width: 14),
             ],
           ],
         ),
-        const SizedBox(height: 24),
-        block(double.infinity, 148, radius: 20),
+        const SizedBox(height: 28),
+        Row(
+          children: <Widget>[
+            Expanded(child: block(double.infinity, 150, radius: 20)),
+            const SizedBox(width: 12),
+            Expanded(child: block(double.infinity, 150, radius: 20)),
+          ],
+        ),
         const SizedBox(height: 16),
         Row(
           children: <Widget>[
-            Expanded(child: block(double.infinity, 96)),
+            Expanded(child: block(double.infinity, 100)),
             const SizedBox(width: 12),
-            Expanded(child: block(double.infinity, 96)),
+            Expanded(child: block(double.infinity, 100)),
           ],
         ),
       ],

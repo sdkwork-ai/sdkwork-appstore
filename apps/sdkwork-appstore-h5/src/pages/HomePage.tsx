@@ -4,7 +4,6 @@ import {
   CalendarClock,
   ChevronRight,
   Clock,
-  Flame,
   FolderHeart,
   LayoutGrid,
   Search,
@@ -28,14 +27,10 @@ import {
   type StoreListingCard,
 } from '@/hooks/catalog';
 import { ErrorRetry } from '@/components/common/ErrorRetry';
-import { PlatformBadges } from '@/components/common/PlatformBadges';
 import { readListingPlatformCodes } from '@/platforms';
 
-/* ── shared visual helpers (UI_DESIGN_SPEC §2/§4) ─────────────────────────── */
+/* ═══ design primitives (UI_DESIGN_SPEC §2 tokens, Today-grade craft) ══════ */
 
-/** Deterministic vibrant gradients keyed by name, so an app always wears the
- *  same color across rails. Palette follows the iOS system-color feel of the
- *  design spec while keeping the brand blue first. */
 const GRADIENTS: ReadonlyArray<readonly [string, string]> = [
   ['#0071e3', '#5856d6'],
   ['#34c759', '#00c7be'],
@@ -51,27 +46,23 @@ function gradientFor(key: string): string {
     hash = (hash * 31 + key.charCodeAt(index)) | 0;
   }
   const [from, to] = GRADIENTS[Math.abs(hash) % GRADIENTS.length];
-  return `linear-gradient(135deg, ${from}, ${to})`;
+  return `linear-gradient(140deg, ${from} 8%, ${to} 92%)`;
 }
 
-function AppIcon({
-  name,
-  size = 56,
-  radius,
-}: {
-  name: string;
-  size?: number;
-  radius?: number;
-}) {
+/** App icon with the full craft treatment: gradient base, top-left gloss,
+ *  inner hairline ring, and a confident letterform — reads as an app icon,
+ *  not a colored block. */
+function AppIcon({ name, size = 56 }: { name: string; size?: number }) {
   return (
     <div
-      className="flex flex-shrink-0 items-center justify-center font-bold text-white"
+      className="app-icon-craft flex items-center justify-center font-extrabold text-white"
       style={{
         width: size,
         height: size,
-        borderRadius: radius ?? Math.round(size * 0.2237),
         background: gradientFor(name),
-        fontSize: Math.round(size * 0.42),
+        fontSize: Math.round(size * 0.4),
+        letterSpacing: '0.02em',
+        textShadow: '0 1px 2px rgba(0, 0, 0, 0.18)',
       }}
       aria-hidden="true"
     >
@@ -80,18 +71,26 @@ function AppIcon({
   );
 }
 
-function RatingRow({ rating }: { rating: number }) {
+function RatingRow({ rating, size = 'sm' }: { rating: number; size?: 'sm' | 'md' }) {
   if (!(rating > 0)) {
     return null;
   }
   return (
-    <span className="inline-flex items-center gap-0.5 text-xs font-medium text-[var(--text-secondary)]">
-      <Star className="h-3 w-3" style={{ color: 'var(--star)', fill: 'var(--star)' }} />
+    <span
+      className={`inline-flex items-center gap-0.5 font-semibold text-[var(--text-secondary)] ${
+        size === 'md' ? 'text-[13px]' : 'text-xs'
+      }`}
+    >
+      <Star
+        className={size === 'md' ? 'h-3.5 w-3.5' : 'h-3 w-3'}
+        style={{ color: 'var(--star)', fill: 'var(--star)' }}
+      />
       {rating.toFixed(1)}
     </span>
   );
 }
 
+/** Section header: 20px/700 editorial title + optional trailing action. */
 function SectionHeader({
   icon,
   title,
@@ -104,33 +103,38 @@ function SectionHeader({
   moreLabel?: string;
 }) {
   return (
-    <div className="mb-3 flex items-center justify-between">
-      <h2 className="section-title flex items-center gap-2">
+    <div className="mb-3.5 flex items-baseline justify-between px-1">
+      <h2 className="flex items-center gap-2 text-[20px] font-bold tracking-[-0.02em] text-[var(--text-primary)]">
         {icon}
         {title}
       </h2>
       {moreHref ? (
         <Link
           to={moreHref}
-          className="flex items-center text-xs font-medium text-[var(--accent)]"
+          className="flex items-center text-[13px] font-medium text-[var(--accent)]"
         >
           {moreLabel ?? '查看全部'}
-          <ChevronRight className="h-3.5 w-3.5" />
+          <ChevronRight className="h-4 w-4" />
         </Link>
       ) : null}
     </div>
   );
 }
 
-function SectionSkeleton({ variant }: { variant: 'rail' | 'grid' | 'list' }) {
+function SkeletonBox({ className }: { className: string }) {
+  return <div className={`skeleton ${className}`} />;
+}
+
+function SectionSkeleton({ variant }: { variant: 'rail' | 'grid' | 'list' | 'chips' }) {
   if (variant === 'grid') {
     return (
       <div className="grid grid-cols-2 gap-3">
         {[0, 1, 2, 3].map((key) => (
-          <div key={key} className="card p-3">
-            <div className="skeleton h-14 w-14 rounded-[14px]" />
-            <div className="skeleton mt-3 h-3.5 w-3/4" />
-            <div className="skeleton mt-2 h-3 w-1/2" />
+          <div key={key} className="card p-3.5">
+            <SkeletonBox className="h-14 w-14 rounded-[16px]" />
+            <SkeletonBox className="mt-3 h-3.5 w-3/4" />
+            <SkeletonBox className="mt-2 h-3 w-1/2" />
+            <SkeletonBox className="mt-3 h-7 w-full rounded-full" />
           </div>
         ))}
       </div>
@@ -138,26 +142,38 @@ function SectionSkeleton({ variant }: { variant: 'rail' | 'grid' | 'list' }) {
   }
   if (variant === 'list') {
     return (
-      <div className="card divide-y" style={{ borderColor: 'var(--border-subtle)' }}>
+      <div className="card overflow-hidden">
         {[0, 1, 2].map((key) => (
           <div key={key} className="flex items-center gap-3 p-3">
-            <div className="skeleton h-11 w-11 rounded-[10px]" />
+            <SkeletonBox className="h-11 w-11 rounded-[12px]" />
             <div className="flex-1">
-              <div className="skeleton h-3.5 w-2/3" />
-              <div className="skeleton mt-2 h-3 w-1/3" />
+              <SkeletonBox className="h-3.5 w-2/3" />
+              <SkeletonBox className="mt-2 h-3 w-1/3" />
             </div>
           </div>
         ))}
       </div>
     );
   }
+  if (variant === 'chips') {
+    return (
+      <div className="flex gap-5">
+        {[0, 1, 2, 3, 4].map((key) => (
+          <div key={key} className="flex flex-col items-center gap-2">
+            <SkeletonBox className="h-16 w-16 rounded-full" />
+            <SkeletonBox className="h-3 w-11" />
+          </div>
+        ))}
+      </div>
+    );
+  }
   return (
-    <div className="scroll-x flex gap-3 pb-1">
-      {[0, 1, 2].map((key) => (
-        <div key={key} className="card flex-shrink-0 overflow-hidden" style={{ width: 176 }}>
-          <div className="skeleton h-24 rounded-none" />
+    <div className="flex gap-3 overflow-hidden">
+      {[0, 1].map((key) => (
+        <div key={key} className="card flex-shrink-0 overflow-hidden" style={{ width: 200 }}>
+          <SkeletonBox className="h-28 rounded-none" />
           <div className="p-3">
-            <div className="skeleton h-3.5 w-3/4" />
+            <SkeletonBox className="h-3.5 w-3/4" />
           </div>
         </div>
       ))}
@@ -165,9 +181,8 @@ function SectionSkeleton({ variant }: { variant: 'rail' | 'grid' | 'list' }) {
   );
 }
 
-/* ── data shaping ─────────────────────────────────────────────────────────── */
+/* ═══ data shaping ══════════════════════════════════════════════════════════ */
 
-/** Home card: shared store card plus the platform codes for the badge row. */
 type HomeAppCard = StoreListingCard & { platforms: string[] };
 
 function readListingCard(item: unknown, index: number): HomeAppCard {
@@ -219,7 +234,7 @@ function formatEventEnds(row: Record<string, unknown>): string {
   });
 }
 
-/* ── hero carousel (UI_DESIGN_SPEC §4.3: 5s auto-rotation, swipe, dots) ──── */
+/* ═══ hero carousel (§4.3) — layered editorial feature card ════════════════ */
 
 function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
   const trackRef = useRef<HTMLDivElement>(null);
@@ -247,21 +262,31 @@ function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
 
   if (slides.length === 0) {
     return (
-      <section className="px-4 pt-3">
+      <section className="px-4 pt-2">
         <div
-          className="flex min-h-[200px] flex-col justify-end overflow-hidden rounded-[var(--radius-2xl)] p-6 text-white"
-          style={{ background: 'linear-gradient(135deg, var(--accent), #5856d6)' }}
+          className="hero-card-craft flex min-h-[232px] flex-col justify-end p-6"
+          style={{ background: gradientFor('sdkwork') }}
         >
-          <p className="text-xs font-medium uppercase tracking-widest text-white/70">Today</p>
-          <h2 className="mt-1 text-[var(--text-2xl)] font-bold tracking-tight">发现精彩应用</h2>
-          <p className="mt-2 text-sm text-white/85">编辑精选与智能推荐，帮你找到下一款必备应用</p>
+          <div className="hero-glow" />
+          <div className="hero-watermark" aria-hidden="true">
+            S
+          </div>
+          <p className="relative text-[11px] font-semibold uppercase tracking-[0.22em] text-white/70">
+            Today
+          </p>
+          <h2 className="relative mt-1.5 text-[30px] font-extrabold leading-tight tracking-[-0.02em] text-white">
+            发现精彩应用
+          </h2>
+          <p className="relative mt-1.5 text-sm text-white/85">
+            编辑精选与智能推荐，帮你找到下一款必备应用
+          </p>
         </div>
       </section>
     );
   }
 
   return (
-    <section aria-label="精选推荐" className="pt-3">
+    <section aria-label="精选推荐" className="pt-2">
       <div
         ref={trackRef}
         className="home-hero-track flex overflow-x-auto"
@@ -281,55 +306,57 @@ function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
             <Link
               to={`/app/${slide.id}`}
               aria-label={`${slide.name} 详情`}
-              className="relative flex h-full min-h-[210px] flex-col justify-end overflow-hidden rounded-[var(--radius-2xl)] p-5 text-white shadow-[var(--shadow-md)]"
+              className="hero-card-craft press block min-h-[232px] p-5"
               style={{ background: gradientFor(slide.name) }}
             >
-              <div
-                className="app-icon flex items-center justify-center text-2xl font-bold text-white"
-                style={{
-                  width: 64,
-                  height: 64,
-                  borderRadius: 16,
-                  background: 'rgba(255, 255, 255, 0.22)',
-                  position: 'absolute',
-                  top: 20,
-                  left: 20,
-                }}
-                aria-hidden="true"
-              >
+              <div className="hero-glow" />
+              <div className="hero-watermark" aria-hidden="true">
                 {slide.name.charAt(0).toUpperCase()}
               </div>
-              <p className="text-xs font-medium uppercase tracking-widest text-white/70">
-                {index === 0 ? '今日精选' : '编辑推荐'}
-              </p>
-              <h2 className="mt-1 truncate text-[22px] font-bold tracking-tight">{slide.name}</h2>
-              <p className="mt-1 truncate text-sm text-white/85">{slide.tagline || slide.developer}</p>
-              <div className="mt-3 flex items-center gap-2">
-                <span
-                  className="rounded-full bg-white/95 px-4 py-1.5 text-xs font-semibold"
-                  style={{ color: '#1d1d1f' }}
-                >
-                  查看
+              <div className="relative flex items-start justify-between">
+                <span className="glass-chip rounded-full px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-white">
+                  {index === 0 ? '今日精选' : '编辑推荐'}
                 </span>
                 {slide.rating > 0 ? (
-                  <span className="flex items-center gap-1 text-xs font-medium text-white/90">
-                    <Star className="h-3.5 w-3.5" style={{ color: '#ffd60a', fill: '#ffd60a' }} />
+                  <span className="glass-chip flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold text-white">
+                    <Star className="h-3 w-3" style={{ color: '#ffd60a', fill: '#ffd60a' }} />
                     {slide.rating.toFixed(1)}
                   </span>
                 ) : null}
+              </div>
+              <div className="relative mt-9">
+                <div className="flex items-center gap-3.5">
+                  <AppIcon name={slide.name} size={58} />
+                  <div className="min-w-0">
+                    <h2 className="truncate text-[24px] font-extrabold leading-tight tracking-[-0.02em] text-white">
+                      {slide.name}
+                    </h2>
+                    <p className="mt-0.5 truncate text-[13px] text-white/80">{slide.developer}</p>
+                  </div>
+                </div>
+                {slide.tagline ? (
+                  <p className="mt-3 line-clamp-2 text-[13px] leading-relaxed text-white/85">
+                    {slide.tagline}
+                  </p>
+                ) : null}
+                <span
+                  className="mt-4 inline-flex items-center rounded-full bg-white px-5 py-2 text-[13px] font-bold text-[#1d1d1f]"
+                >
+                  立即查看
+                </span>
               </div>
             </Link>
           </div>
         ))}
       </div>
       {slides.length > 1 ? (
-        <div className="mt-2 flex justify-center gap-1.5">
+        <div className="mt-2.5 flex justify-center gap-1.5">
           {slides.map((slide, index) => (
             <span
               key={slide.id}
-              className="h-1.5 rounded-full transition-all"
+              className="h-1 rounded-full transition-all duration-300"
               style={{
-                width: index === activeIndex ? 16 : 6,
+                width: index === activeIndex ? 20 : 6,
                 backgroundColor:
                   index === activeIndex ? 'var(--accent)' : 'var(--border-default)',
               }}
@@ -341,7 +368,7 @@ function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
   );
 }
 
-/* ── page ─────────────────────────────────────────────────────────────────── */
+/* ═══ page ══════════════════════════════════════════════════════════════════ */
 
 export function HomePage() {
   const { data: homeFeed, loading: feedLoading, error: feedError, execute: feedExecute } = useHomeFeed();
@@ -433,29 +460,41 @@ export function HomePage() {
   });
 
   return (
-    <div className="animate-fade-in pb-6">
-      <header className="page-header px-4 py-3">
+    <div className="animate-fade-in pb-8">
+      <header className="page-header px-4 pb-3 pt-4">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-[11px] font-medium uppercase tracking-widest text-[var(--text-tertiary)]">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--text-tertiary)]">
               {todayLine}
             </p>
-            <h1 className="text-[26px] font-bold tracking-tight text-[var(--text-primary)]">发现</h1>
+            <h1 className="mt-0.5 text-[32px] font-extrabold leading-tight tracking-[-0.03em] text-[var(--text-primary)]">
+              发现
+            </h1>
           </div>
-          <Link
-            to="/search"
-            aria-label="搜索"
-            className="flex h-10 w-10 items-center justify-center rounded-full"
-            style={{ backgroundColor: 'var(--accent-subtle)', color: 'var(--accent)' }}
-          >
-            <Search className="h-5 w-5" />
-          </Link>
+          <div className="flex items-center gap-2">
+            <Link
+              to="/charts"
+              aria-label="排行榜"
+              className="press flex h-10 w-10 items-center justify-center rounded-full border text-[var(--accent)]"
+              style={{ borderColor: 'var(--border-subtle)', backgroundColor: 'var(--bg-surface)' }}
+            >
+              <TrendingUp className="h-[18px] w-[18px]" />
+            </Link>
+            <Link
+              to="/search"
+              aria-label="搜索"
+              className="press flex h-10 w-10 items-center justify-center rounded-full border text-[var(--accent)]"
+              style={{ borderColor: 'var(--border-subtle)', backgroundColor: 'var(--bg-surface)' }}
+            >
+              <Search className="h-[18px] w-[18px]" />
+            </Link>
+          </div>
         </div>
       </header>
 
       {heroResolving || feedLoading ? (
-        <section className="px-4 pt-3">
-          <div className="skeleton min-h-[210px] rounded-[var(--radius-2xl)]" />
+        <section className="px-4 pt-2">
+          <SkeletonBox className="min-h-[232px] rounded-[var(--radius-2xl)]" />
         </section>
       ) : (
         <HeroCarousel slides={heroSlides} />
@@ -468,21 +507,14 @@ export function HomePage() {
       ) : null}
 
       {/* 分类入口 */}
-      <section className="px-4 pt-5">
-        <SectionHeader icon={<LayoutGrid className="h-4 w-4 text-[var(--accent)]" />} title="分类" />
+      <section className="px-4 pt-7">
+        <SectionHeader icon={<LayoutGrid className="h-5 w-5 text-[var(--accent)]" />} title="分类" />
         {categoriesLoading ? (
-          <div className="flex gap-4">
-            {[0, 1, 2, 3, 4].map((key) => (
-              <div key={key} className="flex flex-col items-center gap-1.5">
-                <div className="skeleton h-14 w-14 rounded-full" />
-                <div className="skeleton h-3 w-10" />
-              </div>
-            ))}
-          </div>
+          <SectionSkeleton variant="chips" />
         ) : categoriesError ? (
           <ErrorRetry message={formatApiError(categoriesError)} onRetry={categoriesExecute} />
         ) : (
-          <div className="scroll-x flex gap-4 pb-1">
+          <div className="rail-fade scroll-x flex gap-5 pb-1">
             {categoryItems.map((row, index) => {
               const id = String(row.id ?? index);
               const label = localizedText(row, 'displayName', String(row.categoryCode ?? '分类'));
@@ -490,16 +522,12 @@ export function HomePage() {
                 <Link
                   key={id}
                   to={`/category/${id}`}
-                  className="flex w-14 flex-shrink-0 flex-col items-center gap-1.5"
+                  className="press flex w-16 flex-shrink-0 flex-col items-center gap-2"
                 >
-                  <span
-                    className="flex h-14 w-14 items-center justify-center rounded-full text-lg font-bold text-white shadow-[var(--shadow-sm)] transition-transform active:scale-95"
-                    style={{ background: gradientFor(label) }}
-                    aria-hidden="true"
-                  >
-                    {label.charAt(0)}
+                  <span className="app-icon-craft flex h-16 w-16 items-center justify-center rounded-full !text-[22px] shadow-[var(--shadow-sm)]">
+                    <span className="relative z-[3] text-white">{label.charAt(0)}</span>
                   </span>
-                  <span className="w-full truncate text-center text-xs text-[var(--text-secondary)]">
+                  <span className="w-full truncate text-center text-xs font-medium text-[var(--text-secondary)]">
                     {label}
                   </span>
                 </Link>
@@ -510,17 +538,18 @@ export function HomePage() {
       </section>
 
       {/* 编辑精选合集 */}
-      <section className="px-4 pt-6">
+      <section className="px-4 pt-8">
         <SectionHeader
-          icon={<FolderHeart className="h-4 w-4 text-[var(--accent)]" />}
+          icon={<FolderHeart className="h-5 w-5 text-[var(--accent)]" />}
           title="编辑精选合集"
+          moreHref="/apps"
         />
         {collectionsLoading ? (
           <SectionSkeleton variant="rail" />
         ) : collectionsError ? (
           <ErrorRetry message={formatApiError(collectionsError)} onRetry={collectionsExecute} />
         ) : collectionItems.length === 0 ? null : (
-          <div className="scroll-x flex gap-3 pb-1">
+          <div className="rail-fade scroll-x flex gap-3 pb-1">
             {collectionItems.slice(0, 8).map((row, index) => {
               const id = String(row.id ?? index);
               const label = localizedText(row, 'displayName', String(row.collectionCode ?? '精选合集'));
@@ -529,25 +558,28 @@ export function HomePage() {
                 <Link
                   key={id}
                   to={`/collection/${id}`}
-                  className="card card-press flex-shrink-0 overflow-hidden"
-                  style={{ width: 176 }}
+                  className="hero-card-craft press relative flex-shrink-0 flex-col justify-between p-4"
+                  style={{
+                    width: 200,
+                    height: 132,
+                    background: gradientFor(label),
+                    display: 'flex',
+                  }}
                 >
-                  <div
-                    className="flex h-24 flex-col justify-between p-3 text-white"
-                    style={{ background: gradientFor(label) }}
-                  >
-                    <span className="text-[10px] font-medium uppercase tracking-widest text-white/75">
-                      合集
-                    </span>
-                    <span className="line-clamp-2 text-sm font-bold leading-snug">{label}</span>
+                  <div className="hero-watermark" style={{ fontSize: 96, bottom: -24 }} aria-hidden="true">
+                    {label.charAt(0)}
                   </div>
-                  {description ? (
-                    <p className="line-clamp-2 px-3 py-2.5 text-xs leading-relaxed text-[var(--text-secondary)]">
-                      {description}
-                    </p>
-                  ) : (
-                    <p className="px-3 py-2.5 text-xs text-[var(--text-tertiary)]">编辑精心挑选</p>
-                  )}
+                  <span className="glass-chip relative w-fit rounded-full px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-white">
+                    合集
+                  </span>
+                  <span className="relative">
+                    <span className="line-clamp-2 block text-[15px] font-bold leading-snug text-white">
+                      {label}
+                    </span>
+                    <span className="mt-0.5 block truncate text-[11px] text-white/75">
+                      {description || '编辑精心挑选'}
+                    </span>
+                  </span>
                 </Link>
               );
             })}
@@ -556,9 +588,9 @@ export function HomePage() {
       </section>
 
       {/* 限时活动 */}
-      <section className="px-4 pt-6">
+      <section className="px-4 pt-8">
         <SectionHeader
-          icon={<CalendarClock className="h-4 w-4 text-[var(--warning)]" />}
+          icon={<CalendarClock className="h-5 w-5 text-[var(--warning)]" />}
           title="限时活动"
         />
         {eventsLoading ? (
@@ -566,9 +598,9 @@ export function HomePage() {
         ) : eventsError ? (
           <ErrorRetry message={formatApiError(eventsError)} onRetry={eventsExecute} />
         ) : eventItems.length === 0 ? (
-          <p className="py-2 text-sm text-[var(--text-tertiary)]">当前没有进行中的活动</p>
+          <p className="px-1 py-1 text-[13px] text-[var(--text-tertiary)]">当前没有进行中的活动</p>
         ) : (
-          <div className="scroll-x flex gap-3 pb-1">
+          <div className="rail-fade scroll-x flex gap-3 pb-1">
             {eventItems.slice(0, 6).map((row, index) => {
               const id = String(row.id ?? index);
               const label = localizedText(row, 'displayName', String(row.title ?? '限时活动'));
@@ -577,24 +609,28 @@ export function HomePage() {
                 <Link
                   key={id}
                   to={`/events/${id}`}
-                  className="card card-press flex-shrink-0 overflow-hidden"
-                  style={{ width: 192 }}
+                  className="hero-card-craft press relative flex-shrink-0 flex-col justify-between p-4"
+                  style={{
+                    width: 200,
+                    height: 132,
+                    display: 'flex',
+                    background: 'linear-gradient(140deg, #ff9500 8%, #ff3b30 92%)',
+                  }}
                 >
-                  <div
-                    className="flex h-24 flex-col justify-between p-3 text-white"
-                    style={{ background: 'linear-gradient(135deg, #ff9500, #ff3b30)' }}
-                  >
-                    <span
-                      className="w-fit rounded-full px-2 py-0.5 text-[10px] font-semibold"
-                      style={{ backgroundColor: 'rgba(255,255,255,0.25)' }}
-                    >
-                      限时
-                    </span>
-                    <span className="line-clamp-2 text-sm font-bold leading-snug">{label}</span>
+                  <div className="hero-watermark" style={{ fontSize: 96, bottom: -24 }} aria-hidden="true">
+                    {label.charAt(0)}
                   </div>
-                  <p className="px-3 py-2 text-xs text-[var(--text-secondary)]">
-                    {ends ? `截止 ${ends}` : '正在进行'}
-                  </p>
+                  <span className="glass-chip relative w-fit rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-[0.18em] text-white">
+                    限时
+                  </span>
+                  <span className="relative">
+                    <span className="line-clamp-2 block text-[15px] font-bold leading-snug text-white">
+                      {label}
+                    </span>
+                    <span className="mt-0.5 block text-[11px] font-medium text-white/85">
+                      {ends ? `截止 ${ends}` : '正在进行'}
+                    </span>
+                  </span>
                 </Link>
               );
             })}
@@ -603,9 +639,9 @@ export function HomePage() {
       </section>
 
       {/* 榜单速览 */}
-      <section className="px-4 pt-6">
+      <section className="px-4 pt-8">
         <SectionHeader
-          icon={<TrendingUp className="h-4 w-4 text-[var(--warning)]" />}
+          icon={<TrendingUp className="h-5 w-5 text-[var(--warning)]" />}
           title="榜单速览"
           moreHref="/charts"
           moreLabel="完整榜单"
@@ -615,25 +651,23 @@ export function HomePage() {
         ) : chartError ? (
           <ErrorRetry message={formatApiError(chartError)} onRetry={chartExecute} />
         ) : (chartApps ?? []).length === 0 ? (
-          <p className="py-2 text-sm text-[var(--text-tertiary)]">榜单暂无内容</p>
+          <p className="px-1 py-1 text-[13px] text-[var(--text-tertiary)]">榜单暂无内容</p>
         ) : (
           <div className="card overflow-hidden">
             {(chartApps ?? []).slice(0, 5).map((app, index) => (
               <Link
                 key={app.id}
                 to={`/app/${app.id}`}
-                className="flex items-center gap-3 px-3 py-2.5 active:bg-[var(--bg-muted)]"
-                style={{
-                  borderTop: index === 0 ? 'none' : '1px solid var(--border-subtle)',
-                }}
+                className="press flex items-center gap-3 py-2.5 pl-3 pr-4"
+                style={{ borderTop: index === 0 ? 'none' : '1px solid var(--border-subtle)' }}
               >
                 <span
-                  className="w-5 flex-shrink-0 text-center text-sm font-bold"
+                  className="w-6 flex-shrink-0 text-center text-[17px] font-extrabold tabular-nums"
                   style={{ color: index < 3 ? 'var(--accent)' : 'var(--text-tertiary)' }}
                 >
                   {index + 1}
                 </span>
-                <AppIcon name={app.name} size={40} radius={10} />
+                <AppIcon name={app.name} size={44} />
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-sm font-semibold text-[var(--text-primary)]">
                     {app.name}
@@ -643,6 +677,7 @@ export function HomePage() {
                   </span>
                 </span>
                 <RatingRow rating={app.rating} />
+                <ChevronRight className="h-4 w-4 flex-shrink-0 text-[var(--text-tertiary)]" />
               </Link>
             ))}
           </div>
@@ -650,48 +685,50 @@ export function HomePage() {
       </section>
 
       {/* 为你推荐 */}
-      <section className="px-4 pt-6">
-        <SectionHeader icon={<Sparkles className="h-4 w-4 text-[var(--accent)]" />} title="为你推荐" />
+      <section className="px-4 pt-8">
+        <SectionHeader icon={<Sparkles className="h-5 w-5 text-[var(--accent)]" />} title="为你推荐" />
         {recLoading ? (
           <SectionSkeleton variant="grid" />
         ) : recError ? (
           <ErrorRetry message={formatApiError(recError)} onRetry={recExecute} />
         ) : recItems.length === 0 ? (
-          <p className="py-8 text-center text-sm text-[var(--text-tertiary)]">暂无推荐应用</p>
+          <p className="py-8 text-center text-[13px] text-[var(--text-tertiary)]">暂无推荐应用</p>
         ) : (
           <div className="grid grid-cols-2 gap-3">
             {recItems.slice(0, 8).map((app) => (
-              <div key={app.id} className="card card-press flex flex-col p-3">
-                <Link to={`/app/${app.id}`} className="flex gap-3" aria-label={`${app.name} 详情`}>
-                  <AppIcon name={app.name} size={52} />
-                  <span className="min-w-0 flex-1">
-                    <span className="block truncate text-sm font-semibold text-[var(--text-primary)]">
-                      {app.name}
-                    </span>
-                    <span className="block truncate text-xs text-[var(--text-tertiary)]">
-                      {app.developer}
-                    </span>
-                    <span className="mt-1 block">
-                      <RatingRow rating={app.rating} />
-                    </span>
-                  </span>
+              <div key={app.id} className="card press flex flex-col p-3.5">
+                <Link to={`/app/${app.id}`} className="block" aria-label={`${app.name} 详情`}>
+                  <div className="flex items-center gap-3">
+                    <AppIcon name={app.name} size={52} />
+                    <div className="min-w-0 flex-1">
+                      <h3 className="truncate text-sm font-semibold text-[var(--text-primary)]">
+                        {app.name}
+                      </h3>
+                      <p className="mt-0.5 truncate text-xs text-[var(--text-tertiary)]">
+                        {app.developer}
+                      </p>
+                    </div>
+                  </div>
                 </Link>
-                <PlatformBadges platforms={app.platforms} max={2} className="mt-1" />
-                <div className="mt-2.5 flex items-center justify-between">
+                <div className="mt-2.5 flex min-h-[20px] items-center">
+                  <RatingRow rating={app.rating} />
+                  <PlatformBadgesInline platforms={app.platforms} />
+                </div>
+                <div className="mt-2.5 flex items-center justify-between gap-2">
                   <span
-                    className="rounded-full px-2 py-0.5 text-[11px] font-semibold"
+                    className="rounded-full px-2 py-0.5 text-[11px] font-bold"
                     style={
                       app.pricingModel === 'FREE'
-                        ? { color: 'var(--success)', backgroundColor: 'rgba(52, 199, 89, 0.12)' }
-                        : { color: 'var(--warning)', backgroundColor: 'rgba(255, 149, 0, 0.12)' }
+                        ? { color: 'var(--success)', backgroundColor: 'rgba(52, 199, 89, 0.13)' }
+                        : { color: 'var(--warning)', backgroundColor: 'rgba(255, 149, 0, 0.14)' }
                     }
                   >
                     {app.pricingModel === 'FREE' ? '免费' : '付费'}
                   </span>
                   <Link
                     to={`/app/${app.id}`}
-                    className="rounded-full px-3.5 py-1 text-xs font-semibold active:scale-95"
-                    style={{ color: 'var(--accent)', backgroundColor: 'var(--accent-subtle)' }}
+                    className="press rounded-full px-4 py-1.5 text-xs font-bold text-white"
+                    style={{ backgroundColor: 'var(--accent)' }}
                   >
                     获取
                   </Link>
@@ -704,21 +741,22 @@ export function HomePage() {
 
       {/* 最近更新 */}
       {updatedItems.length > 0 || updatedLoading ? (
-        <section className="px-4 pt-6">
-          <SectionHeader icon={<Clock className="h-4 w-4 text-[var(--accent)]" />} title="最近更新" />
+        <section className="px-4 pt-8">
+          <SectionHeader icon={<Clock className="h-5 w-5 text-[var(--accent)]" />} title="最近更新" />
           {updatedLoading ? (
             <SectionSkeleton variant="list" />
           ) : updatedError ? (
             <ErrorRetry message={formatApiError(updatedError)} onRetry={updatedExecute} />
           ) : (
-            <div className="grid grid-cols-1 gap-2">
-              {updatedItems.slice(0, 4).map((app) => (
+            <div className="card overflow-hidden">
+              {updatedItems.slice(0, 4).map((app, index) => (
                 <Link
                   key={app.id}
                   to={`/app/${app.id}`}
-                  className="card card-press flex items-center gap-3 p-3"
+                  className="press flex items-center gap-3 py-2.5 pl-3 pr-4"
+                  style={{ borderTop: index === 0 ? 'none' : '1px solid var(--border-subtle)' }}
                 >
-                  <AppIcon name={app.name} size={44} radius={12} />
+                  <AppIcon name={app.name} size={44} />
                   <span className="min-w-0 flex-1">
                     <span className="block truncate text-sm font-semibold text-[var(--text-primary)]">
                       {app.name}
@@ -728,7 +766,7 @@ export function HomePage() {
                     </span>
                   </span>
                   <span
-                    className="rounded-full px-2.5 py-1 text-[11px] font-semibold"
+                    className="rounded-full px-2.5 py-1 text-[11px] font-bold"
                     style={{ color: 'var(--accent)', backgroundColor: 'var(--accent-subtle)' }}
                   >
                     更新
@@ -740,11 +778,29 @@ export function HomePage() {
         </section>
       ) : null}
 
-      {/* 底部提示 */}
-      <p className="mt-8 flex items-center justify-center gap-1.5 text-xs text-[var(--text-tertiary)]">
-        <Flame className="h-3.5 w-3.5" />
+      <p className="mt-10 text-center text-xs text-[var(--text-tertiary)]">
         SDKWork App Store · 每天发现新应用
       </p>
     </div>
+  );
+}
+
+/** Compact platform badge row inline with the rating. */
+function PlatformBadgesInline({ platforms }: { platforms: string[] }) {
+  if (platforms.length === 0) {
+    return null;
+  }
+  return (
+    <span className="ml-2 inline-flex items-center gap-1">
+      {platforms.slice(0, 2).map((code) => (
+        <span
+          key={code}
+          className="rounded px-1 py-px text-[10px] font-medium text-[var(--text-tertiary)]"
+          style={{ backgroundColor: 'var(--bg-muted)' }}
+        >
+          {code}
+        </span>
+      ))}
+    </span>
   );
 }

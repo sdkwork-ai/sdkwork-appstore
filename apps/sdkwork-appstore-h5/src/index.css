@@ -259,6 +259,97 @@
     width: 100%;
     scroll-snap-align: center;
   }
+
+  /* ── Home v2 craft layer ────────────────────────────────────────────────
+     App icons read as icons (gloss + inner ring over the gradient), hero
+     cards carry layered depth (watermark glyph + radial glow), and chips get
+     a glass treatment. All colors ride the design tokens, so dark mode
+     follows [data-theme]. */
+
+  .app-icon-craft {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    border-radius: var(--radius-icon);
+    flex-shrink: 0;
+  }
+  .app-icon-craft::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: radial-gradient(
+      130% 100% at 16% 6%,
+      rgba(255, 255, 255, 0.38),
+      rgba(255, 255, 255, 0) 56%
+    );
+  }
+  .app-icon-craft::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    border-radius: inherit;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.26);
+  }
+
+  .hero-card-craft {
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--radius-2xl);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.14);
+  }
+  .hero-card-craft .hero-glow {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      95% 75% at 88% -4%,
+      rgba(255, 255, 255, 0.22),
+      rgba(255, 255, 255, 0) 62%
+    );
+  }
+  .hero-card-craft .hero-watermark {
+    position: absolute;
+    right: -14px;
+    bottom: -38px;
+    font-size: 176px;
+    font-weight: 800;
+    line-height: 1;
+    color: rgba(255, 255, 255, 0.13);
+    transform: rotate(-12deg);
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .glass-chip {
+    background: rgba(255, 255, 255, 0.22);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+
+  .press {
+    transition: transform var(--transition-fast);
+  }
+  .press:active {
+    transform: scale(0.97);
+  }
+
+  /* Horizontal rail edge fade, so scrolled content dissolves instead of
+     clipping at the gutter. */
+  .rail-fade {
+    -webkit-mask-image: linear-gradient(
+      to right,
+      #000 0,
+      #000 calc(100% - 20px),
+      transparent 100%
+    );
+    mask-image: linear-gradient(
+      to right,
+      #000 0,
+      #000 calc(100% - 20px),
+      transparent 100%
+    );
+  }
 }
 
 @layer utilities {

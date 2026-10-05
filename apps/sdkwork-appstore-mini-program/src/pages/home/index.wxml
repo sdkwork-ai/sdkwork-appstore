@@ -1,12 +1,17 @@
 <view class="page">
-  <!-- 顶部标题栏：Today 日期 + 大标题 + 搜索入口 -->
+  <!-- 编辑式页头：Today 日期 + 大标题 + 圆形操作 -->
   <view class="header">
     <view class="header__meta">
       <view class="header__date">{{todayLine}}</view>
       <view class="header__title">发现</view>
     </view>
-    <view class="header__search" hover-class="header__search--hover" bindtap="onSearchTap" aria-label="搜索">
-      <view class="header__search-icon">⌕</view>
+    <view class="header__actions">
+      <view class="header__action" hover-class="header__action--hover" bindtap="onChartsTap" aria-label="排行榜">
+        <view class="header__action-icon">榜</view>
+      </view>
+      <view class="header__action" hover-class="header__action--hover" bindtap="onSearchTap" aria-label="搜索">
+        <view class="header__action-icon">⌕</view>
+      </view>
     </view>
   </view>
 
@@ -16,19 +21,19 @@
     <button class="error__retry" size="mini" bindtap="onRetry">重试</button>
   </view>
 
-  <!-- 分区骨架屏（UI_DESIGN_SPEC §4.9：异步加载禁止空白闪烁） -->
+  <!-- 分区骨架屏 -->
   <block wx:elif="{{loading}}">
     <view class="skeleton skeleton--hero"></view>
     <view class="skeleton-row">
       <view class="skeleton skeleton--circle" wx:for="{{[0,1,2,3,4]}}" wx:key="*this"></view>
     </view>
     <view class="skeleton skeleton--rail"></view>
-    <view class="skeleton skeleton--rail"></view>
+    <view class="skeleton skeleton--grid"></view>
     <view class="skeleton skeleton--list"></view>
   </block>
 
   <block wx:else>
-    <!-- 精选轮播：真实应用实体，5s 自动轮换，可滑动 -->
+    <!-- 精选轮播：分层编辑卡（水印 + 辉光 + 玻璃徽章） -->
     <view wx:if="{{heroApps.length > 0}}" class="hero">
       <swiper
         class="hero__swiper"
@@ -40,18 +45,29 @@
       >
         <swiper-item wx:for="{{heroApps}}" wx:key="id">
           <view
-            class="hero-card hero-card--g{{item.g}}"
+            class="feature feature--g{{item.g}}"
             data-id="{{item.id}}"
             bindtap="onHeroTap"
-            hover-class="hero-card--hover"
+            hover-class="feature--hover"
           >
-            <view class="hero-card__badge">{{heroCurrent === index ? '今日精选' : '编辑推荐'}}</view>
-            <view class="hero-card__icon">{{item.name[0]}}</view>
-            <view class="hero-card__name">{{item.name}}</view>
-            <view class="hero-card__developer">{{item.developer}}</view>
-            <view class="hero-card__meta">
-              <view class="hero-card__cta">查看</view>
-              <view wx:if="{{item.rating > 0}}" class="hero-card__rating">{{item.rating}}★</view>
+            <view class="feature__glow"></view>
+            <view class="feature__watermark">{{item.name[0]}}</view>
+            <view class="feature__top">
+              <view class="glass">{{heroCurrent === index ? '今日精选' : '编辑推荐'}}</view>
+              <view wx:if="{{item.rating > 0}}" class="glass feature__star">★ {{item.rating}}</view>
+            </view>
+            <view class="feature__body">
+              <view class="feature__identity">
+                <view class="craft-icon craft-icon--lg">
+                  <view class="craft-icon__gloss"></view>
+                  <view class="craft-icon__letter">{{item.name[0]}}</view>
+                </view>
+                <view class="feature__named">
+                  <view class="feature__name">{{item.name}}</view>
+                  <view class="feature__developer">{{item.developer}}</view>
+                </view>
+              </view>
+              <view class="feature__cta">立即查看</view>
             </view>
           </view>
         </swiper-item>
@@ -64,13 +80,16 @@
         ></view>
       </view>
     </view>
-    <view wx:else class="hero hero--fallback">
-      <view class="hero-fallback__title">发现精彩应用</view>
-      <view class="hero-fallback__subtitle">编辑精选与智能推荐，帮你找到下一款必备应用</view>
-      <view class="hero-fallback__cta" hover-class="hero-fallback__cta--hover" bindtap="onSearchTap">立即探索</view>
+    <view wx:else class="feature feature--fallback">
+      <view class="feature__glow"></view>
+      <view class="feature__watermark">S</view>
+      <view class="feature-fallback__badge glass">Today</view>
+      <view class="feature-fallback__title">发现精彩应用</view>
+      <view class="feature-fallback__subtitle">编辑精选与智能推荐，帮你找到下一款必备应用</view>
+      <view class="feature-fallback__cta" hover-class="hero-fallback__cta--hover" bindtap="onSearchTap">立即探索</view>
     </view>
 
-    <!-- 分类入口：圆形图标 -->
+    <!-- 分类入口：工艺圆形 -->
     <view wx:if="{{categories.length > 0}}" class="section">
       <view class="section__title">分类</view>
       <scroll-view class="rail" scroll-x enable-flex>
@@ -83,7 +102,10 @@
           bindtap="onCategoryTap"
           hover-class="category--hover"
         >
-          <view class="category__circle category__circle--g{{item.g}}">{{item.name[0]}}</view>
+          <view class="craft-icon craft-icon--circle craft-icon--md g{{item.g}}">
+            <view class="craft-icon__gloss"></view>
+            <view class="craft-icon__letter">{{item.name[0]}}</view>
+          </view>
           <view class="category__label">{{item.name}}</view>
         </view>
       </scroll-view>
@@ -94,15 +116,20 @@
       <view class="section__title">编辑精选合集</view>
       <scroll-view class="rail" scroll-x enable-flex>
         <view
-          class="collection collection--g{{item.g}}"
+          class="feature feature--compact feature--g{{item.g}}"
           wx:for="{{collections}}"
           wx:key="id"
           data-id="{{item.id}}"
           bindtap="onCollectionTap"
-          hover-class="collection--hover"
+          hover-class="feature--hover"
         >
-          <view class="collection__badge">合集</view>
-          <view class="collection__name">{{item.name}}</view>
+          <view class="feature__glow"></view>
+          <view class="feature__watermark feature__watermark--sm">{{item.name[0]}}</view>
+          <view class="glass feature__tag">合集</view>
+          <view class="feature__compact-body">
+            <view class="feature__compact-name">{{item.name}}</view>
+            <view class="feature__compact-sub">{{item.description || '编辑精心挑选'}}</view>
+          </view>
         </view>
       </scroll-view>
     </view>
@@ -112,16 +139,20 @@
       <view class="section__title">限时活动</view>
       <scroll-view class="rail" scroll-x enable-flex>
         <view
-          class="event"
+          class="feature feature--compact feature--event"
           wx:for="{{events}}"
           wx:key="id"
           data-id="{{item.id}}"
           bindtap="onEventTap"
-          hover-class="event--hover"
+          hover-class="feature--hover"
         >
-          <view class="event__badge">限时</view>
-          <view class="event__title">{{item.title}}</view>
-          <view class="event__ends" wx:if="{{item.endsLabel}}">截止 {{item.endsLabel}}</view>
+          <view class="feature__glow"></view>
+          <view class="feature__watermark feature__watermark--sm">{{item.title[0]}}</view>
+          <view class="glass feature__tag">限时</view>
+          <view class="feature__compact-body">
+            <view class="feature__compact-name">{{item.title}}</view>
+            <view class="feature__compact-sub">{{item.endsLabel ? '截止 ' + item.endsLabel : '正在进行'}}</view>
+          </view>
         </view>
       </scroll-view>
     </view>
@@ -142,52 +173,69 @@
           hover-class="chart__row--hover"
         >
           <view class="chart__rank {{index < 3 ? 'chart__rank--top' : ''}}">{{index + 1}}</view>
-          <view class="app-icon app-icon--g{{item.g}} app-icon--sm">{{item.name[0]}}</view>
+          <view class="craft-icon craft-icon--sm g{{item.g}}">
+            <view class="craft-icon__gloss"></view>
+            <view class="craft-icon__letter">{{item.name[0]}}</view>
+          </view>
           <view class="chart__main">
             <view class="chart__name">{{item.name}}</view>
             <view class="chart__developer">{{item.developer}}</view>
           </view>
-          <view wx:if="{{item.rating > 0}}" class="chart__rating">{{item.rating}}★</view>
+          <view wx:if="{{item.rating > 0}}" class="chart__rating">★ {{item.rating}}</view>
+          <view class="chart__chevron">›</view>
         </view>
       </view>
     </view>
 
-    <!-- 为你推荐 -->
+    <!-- 为你推荐：双列卡片 -->
     <view wx:if="{{recommendations.length > 0}}" class="section">
       <view class="section__title">为你推荐</view>
-      <view
-        class="rec card"
-        wx:for="{{recommendations}}"
-        wx:key="id"
-        data-id="{{item.id}}"
-        bindtap="onRecommendationTap"
-        hover-class="rec--hover"
-      >
-        <view class="app-icon app-icon--g{{item.g}}">{{item.name[0]}}</view>
-        <view class="rec__main">
-          <view class="rec__name">{{item.name}}</view>
-          <view class="rec__developer">{{item.developer}}</view>
-          <view wx:if="{{item.rating > 0}}" class="rec__rating">{{item.rating}}★</view>
+      <view class="rec-grid">
+        <view
+          class="rec card"
+          wx:for="{{recommendations}}"
+          wx:key="id"
+          data-id="{{item.id}}"
+          bindtap="onRecommendationTap"
+          hover-class="rec--hover"
+        >
+          <view class="rec__head">
+            <view class="craft-icon g{{item.g}}">
+              <view class="craft-icon__gloss"></view>
+              <view class="craft-icon__letter">{{item.name[0]}}</view>
+            </view>
+            <view class="rec__named">
+              <view class="rec__name">{{item.name}}</view>
+              <view class="rec__developer">{{item.developer}}</view>
+            </view>
+          </view>
+          <view class="rec__rating" wx:if="{{item.rating > 0}}">★ {{item.rating}}</view>
+          <view class="rec__footer">
+            <view class="rec__price">免费</view>
+            <view class="rec__get">获取</view>
+          </view>
         </view>
-        <view class="rec__get">获取</view>
       </view>
     </view>
 
-    <!-- 功能入口 -->
+    <!-- 快捷入口 -->
     <view class="section">
-      <view class="section__title">全部能力</view>
-      <view class="grid">
+      <view class="section__title">快捷入口</view>
+      <view class="quicknav">
         <view
-          class="grid__item card"
+          class="quicknav__item card"
           wx:for="{{capabilities}}"
           wx:key="key"
           data-name="{{item.name}}"
           data-path="{{item.path}}"
           bindtap="onCapabilityTap"
-          hover-class="grid__item--hover"
+          hover-class="quicknav__item--hover"
         >
-          <view class="grid__name">{{item.name}}</view>
-          <view class="grid__desc">{{item.desc}}</view>
+          <view class="craft-icon craft-icon--circle craft-icon--md g{{index % 6}}">
+            <view class="craft-icon__gloss"></view>
+            <view class="craft-icon__letter">{{item.name[0]}}</view>
+          </view>
+          <view class="quicknav__name">{{item.name}}</view>
         </view>
       </view>
     </view>
