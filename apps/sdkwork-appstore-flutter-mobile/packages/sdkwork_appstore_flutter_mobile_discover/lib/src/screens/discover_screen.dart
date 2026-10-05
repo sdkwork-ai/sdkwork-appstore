@@ -51,6 +51,47 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
       appBar: AppBar(
         title: Text(discoverMessages['titleZh'] ?? discoverMessages['title'] ?? '发现'),
         actions: <Widget>[
+          // Creation hub: new app / new website / new promo app, each carrying
+          // its store application type into the publisher create flow.
+          PopupMenuButton<String>(
+            tooltip: '新建',
+            icon: Icon(
+              Icons.add_circle,
+              size: 28,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+            onSelected: (String type) =>
+                Navigator.pushNamed(context, '/publisher/apps/new?type=$type'),
+            itemBuilder: (BuildContext context) => const <PopupMenuEntry<String>>[
+              PopupMenuItem<String>(
+                value: 'app',
+                child: ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: Icon(Icons.apps),
+                  title: Text('新建应用'),
+                  subtitle: Text('发布一个全新的应用'),
+                ),
+              ),
+              PopupMenuItem<String>(
+                value: 'website',
+                child: ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: Icon(Icons.language),
+                  title: Text('新建官网'),
+                  subtitle: Text('搭建并发布官方网站'),
+                ),
+              ),
+              PopupMenuItem<String>(
+                value: 'promo',
+                child: ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: Icon(Icons.campaign),
+                  title: Text('新建宣传应用'),
+                  subtitle: Text('创建宣传页应用'),
+                ),
+              ),
+            ],
+          ),
           IconButton(
             icon: const Icon(Icons.leaderboard_outlined),
             tooltip: '排行榜',

@@ -1,11 +1,15 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
+  AppWindow,
   CalendarClock,
   ChevronRight,
   Clock,
   FolderHeart,
+  Globe,
   LayoutGrid,
+  Megaphone,
+  Plus,
   Search,
   Sparkles,
   Star,
@@ -370,6 +374,85 @@ function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
 
 /* ═══ page ══════════════════════════════════════════════════════════════════ */
 
+/** Creation hub entries surfaced by the header plus button; each preset maps
+ *  to a store application type carried into the publisher bootstrap. */
+const CREATE_TARGETS = [
+  { type: 'app', label: '新建应用', desc: '发布一个全新的应用', icon: AppWindow },
+  { type: 'website', label: '新建官网', desc: '搭建并发布官方网站', icon: Globe },
+  { type: 'promo', label: '新建宣传应用', desc: '创建宣传页应用', icon: Megaphone },
+] as const;
+
+function HeaderCreateMenu() {
+  const navigate = useNavigate();
+  const [open, setOpen] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+    const onPointerDown = (event: PointerEvent) => {
+      if (rootRef.current && !rootRef.current.contains(event.target as Node)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener('pointerdown', onPointerDown);
+    return () => document.removeEventListener('pointerdown', onPointerDown);
+  }, [open]);
+
+  return (
+    <div ref={rootRef} className="relative">
+      <button
+        type="button"
+        aria-label="新建"
+        aria-haspopup="menu"
+        aria-expanded={open}
+        onClick={() => setOpen((value) => !value)}
+        className="press flex h-10 w-10 items-center justify-center rounded-full text-white shadow-[var(--shadow-sm)]"
+        style={{ backgroundColor: 'var(--accent)' }}
+      >
+        <Plus
+          className={`h-5 w-5 transition-transform duration-200 ${open ? 'rotate-45' : ''}`}
+        />
+      </button>
+      {open ? (
+        <div
+          role="menu"
+          aria-label="新建"
+          className="absolute right-0 top-12 z-50 w-60 overflow-hidden rounded-2xl border bg-[var(--bg-surface)] shadow-[var(--shadow-md)]"
+          style={{ borderColor: 'var(--border-subtle)' }}
+        >
+          {CREATE_TARGETS.map(({ type, label, desc, icon: Icon }) => (
+            <button
+              key={type}
+              type="button"
+              role="menuitem"
+              onClick={() => {
+                setOpen(false);
+                navigate(`/publisher/apps/new?type=${type}`);
+              }}
+              className="flex w-full items-center gap-3 px-4 py-3 text-left active:bg-[var(--bg-muted)]"
+            >
+              <span
+                className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl"
+                style={{ backgroundColor: 'var(--accent-subtle)', color: 'var(--accent)' }}
+              >
+                <Icon className="h-[18px] w-[18px]" />
+              </span>
+              <span className="min-w-0">
+                <span className="block text-sm font-semibold text-[var(--text-primary)]">
+                  {label}
+                </span>
+                <span className="block truncate text-xs text-[var(--text-tertiary)]">{desc}</span>
+              </span>
+            </button>
+          ))}
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 export function HomePage() {
   const { data: homeFeed, loading: feedLoading, error: feedError, execute: feedExecute } = useHomeFeed();
   const { data: categories, loading: categoriesLoading, error: categoriesError, execute: categoriesExecute } = useCategories(12);
@@ -472,6 +555,7 @@ export function HomePage() {
             </h1>
           </div>
           <div className="flex items-center gap-2">
+            <HeaderCreateMenu />
             <Link
               to="/charts"
               aria-label="排行榜"

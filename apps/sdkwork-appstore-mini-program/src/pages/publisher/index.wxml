@@ -3,6 +3,39 @@
   <button class="auth-gate__button" bindtap="onLoginTap">去登录</button>
 </view>
 <block wx:else>
+  <!-- 新建面板：从首页加号菜单进入（create = app | website | promo） -->
+  <view wx:if="{{createPanel}}" class="create card">
+    <view class="create__title">新建{{createTypeName}}</view>
+    <view class="create__subtitle">填写基础信息，保存为草稿后可继续完善并提交审核。</view>
+    <input
+      class="create__input"
+      placeholder="应用名称"
+      value="{{createName}}"
+      bindinput="onCreateNameInput"
+    />
+    <input
+      class="create__input"
+      placeholder="App Key（如 my-first-app）"
+      value="{{createKey}}"
+      bindinput="onCreateKeyInput"
+    />
+    <view class="create__actions">
+      <button class="create__cancel" size="mini" bindtap="onCreateCancel">取消</button>
+      <button
+        class="create__submit"
+        size="mini"
+        loading="{{creating}}"
+        disabled="{{creating}}"
+        bindtap="onCreateSubmit"
+      >保存草稿</button>
+    </view>
+    <view wx:if="{{createError}}" class="create__error">{{createError}}</view>
+  </view>
+
 <import src="../../templates/list.tpl.wxml"/>
 <template is="listPage" data="{{ loading, error, items, emptyText: '还没有上架的应用' }}"/>
+
+<view wx:if="{{!creating}}" class="fab" bindtap="onCreateFabTap" hover-class="fab--hover" aria-label="新建">
+  <view class="fab__plus">＋</view>
+</view>
 </block>

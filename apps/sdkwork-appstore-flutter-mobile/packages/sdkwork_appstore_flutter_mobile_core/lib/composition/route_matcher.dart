@@ -22,16 +22,44 @@ AppstoreRouteMatch? resolveAppstoreRoute(String path) {
   for (final route in listAppstoreRouteIdentities()) {
     if (_normalize(route.path) == candidate) {
       final params = _matchPattern(_normalize(route.path), candidate);
-      return AppstoreRouteMatch(route: route, params: params ?? const <String, String>{});
+      return AppstoreRouteMatch(
+        route: route,
+        params: <String, String>{
+          ...?params,
+          ..._queryParamsOf(path),
+        },
+      );
     }
   }
   for (final route in listAppstoreRouteIdentities()) {
     final match = _matchPattern(_normalize(route.path), candidate);
     if (match != null) {
-      return AppstoreRouteMatch(route: route, params: match);
+      return AppstoreRouteMatch(
+        route: route,
+        params: <String, String>{
+          ...match,
+          ..._queryParamsOf(path),
+        },
+      );
     }
   }
   return null;
+}
+
+/// Query parameters of the raw path (`/publisher/apps/new?type=website` ->
+/// `{'type': 'website'}`), merged into the route match so screens can receive
+/// navigation hints without polluting the canonical path patterns.
+Map<String, String> _queryParamsOf(String path) {
+  final query = path.split('?').last.split('#').first;
+  if (query.isEmpty || !path.contains('?')) {
+    return const <String, String>{};
+  }
+  return <String, String>{
+    for (final pair in query.split('&'))
+      if (pair.contains('='))
+        Uri.decodeComponent(pair.split('=').first):
+            Uri.decodeComponent(pair.split('=').last),
+  };
 }
 
 String _normalize(String path) {

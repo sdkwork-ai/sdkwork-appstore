@@ -26,6 +26,15 @@ export const publisher = {
     statusDraft: 'Draft',
     statusOffline: 'Delisted'
   },
+  createMenu: {
+    label: 'Create',
+    app: 'New App',
+    appDesc: 'Publish a brand-new app',
+    website: 'New Website',
+    websiteDesc: 'Build and publish an official site',
+    promo: 'New Promo App',
+    promoDesc: 'Create a promotional page app'
+  },
   createApp: {
     title: 'Create App',
     subtitle: 'Bind a registered app and fill in the basics.',

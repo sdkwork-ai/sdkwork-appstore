@@ -1,12 +1,21 @@
 import { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft } from 'lucide-react';
 import { AppStoreService, ConsoleService } from '../../services/api';
 
+/** Navbar create-menu presets (`?type=`) mapped to store application types. */
+const APP_TYPE_BY_PARAM: Record<string, string> = {
+  app: 'APP',
+  website: 'WEBSITE',
+  promo: 'PROMO',
+};
+
 export default function PublisherCreateApp() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const appType = APP_TYPE_BY_PARAM[searchParams.get('type') ?? ''] ?? 'APP';
   const [categories, setCategories] = useState<{ id: string; name: string; icon: string }[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -37,6 +46,7 @@ export default function PublisherCreateApp() {
         category: form.category || categories[0]?.name || '',
         version: '1.0.0',
         description: form.subtitle,
+        appType,
       });
       navigate(`/publisher/apps/${created.id}`, { replace: true });
     } catch (err) {

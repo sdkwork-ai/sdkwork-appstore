@@ -26,6 +26,15 @@ export const publisher = {
     statusDraft: '草稿',
     statusOffline: '已下架'
   },
+  createMenu: {
+    label: '新建',
+    app: '新建应用',
+    appDesc: '发布一个全新的应用',
+    website: '新建官网',
+    websiteDesc: '搭建并发布官方网站',
+    promo: '新建宣传应用',
+    promoDesc: '创建宣传页应用'
+  },
   createApp: {
     title: '创建应用',
     subtitle: '绑定已注册应用并填写基础信息。',

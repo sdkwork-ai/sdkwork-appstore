@@ -43,12 +43,13 @@ export function createConsoleServicePort(client: AppStoreClient): ConsoleService
       category: string;
       version: string;
       description: string;
+      appType?: string;
     }): Promise<ManagedApp> {
       const result = await client.publishers.bootstrapApp({
         appKey: `dev-${slugify(appData.name)}-${Date.now().toString(36)}`,
         displayName: appData.name,
         defaultLocale: 'zh-CN',
-        appType: 'APP',
+        appType: appData.appType ?? 'APP',
         listingSlug: `dev-${slugify(appData.name)}-${Date.now().toString(36)}`,
       });
       const listing = readObject(result as unknown as Record<string, unknown>, 'listing');

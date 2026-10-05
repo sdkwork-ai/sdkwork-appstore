@@ -51,6 +51,12 @@
   border: 1rpx solid rgba(0, 0, 0, 0.06);
 }
 
+.header__action--accent {
+  background: linear-gradient(140deg, #0071e3 8%, #5856d6 92%);
+  border: none;
+  box-shadow: 0 8rpx 20rpx rgba(0, 113, 227, 0.32);
+}
+
 .header__action--hover {
   transform: scale(0.94);
   opacity: 0.85;
@@ -60,6 +66,82 @@
   font-size: 32rpx;
   font-weight: 700;
   color: #0071e3;
+}
+
+.header__action-plus {
+  color: #ffffff;
+  font-size: 40rpx;
+  font-weight: 500;
+  line-height: 1;
+  transition: transform 200ms ease;
+}
+
+.header__action-plus--open {
+  transform: rotate(45deg);
+}
+
+/* ── 新建下拉菜单 ───────────────────────────── */
+
+.create-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 55;
+}
+
+.create-menu {
+  position: fixed;
+  top: 200rpx;
+  right: 32rpx;
+  z-index: 60;
+  width: 420rpx;
+  padding: 12rpx;
+  animation: create-in 180ms ease-out;
+}
+
+@keyframes create-in {
+  from {
+    opacity: 0;
+    transform: translateY(-12rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.create-menu__item {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  padding: 18rpx 20rpx;
+  border-radius: 20rpx;
+}
+
+.create-menu__item--hover {
+  background-color: #f5f5f7;
+}
+
+.create-menu__text {
+  min-width: 0;
+  flex: 1;
+}
+
+.create-menu__name {
+  font-size: 27rpx;
+  font-weight: 600;
+  color: #1d1d1f;
+}
+
+.create-menu__desc {
+  margin-top: 4rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 21rpx;
+  color: #8e8e93;
 }
 
 /* ── 骨架屏 ─────────────────────────────────── */

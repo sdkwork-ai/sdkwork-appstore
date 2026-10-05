@@ -17,6 +17,7 @@ class PublisherScreen extends StatelessWidget {
     required this.service,
     required this.screen,
     this.listingId,
+    this.appType = 'APP',
     super.key,
   });
 
@@ -27,10 +28,13 @@ class PublisherScreen extends StatelessWidget {
 
   final String? listingId;
 
+  /// Store application type preset for the create flow (APP | WEBSITE | PROMO).
+  final String appType;
+
   @override
   Widget build(BuildContext context) {
     if (screen == 'app-create') {
-      return _CreateAppView(service: service);
+      return _CreateAppView(service: service, appType: appType);
     }
     if (screen == 'app-manage') {
       return _ManageAppView(service: service, listingId: listingId ?? '');
@@ -104,9 +108,12 @@ class _OverviewView extends StatelessWidget {
 }
 
 class _CreateAppView extends StatelessWidget {
-  const _CreateAppView({required this.service});
+  const _CreateAppView({required this.service, this.appType = 'APP'});
 
   final PublisherService service;
+
+  /// Store application type preset (APP | WEBSITE | PROMO).
+  final String appType;
 
   @override
   Widget build(BuildContext context) {
@@ -143,7 +150,11 @@ class _CreateAppView extends StatelessWidget {
                 return;
               }
               try {
-                await service.createApp(displayName: name, appKey: appKey);
+                await service.createApp(
+                  displayName: name,
+                  appKey: appKey,
+                  appType: appType,
+                );
                 if (context.mounted) {
                   Navigator.pop(context);
                 }

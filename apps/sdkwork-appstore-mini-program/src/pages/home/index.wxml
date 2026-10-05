@@ -6,11 +6,43 @@
       <view class="header__title">发现</view>
     </view>
     <view class="header__actions">
+      <view
+        class="header__action header__action--accent"
+        hover-class="header__action--hover"
+        bindtap="onCreateMenuToggle"
+        aria-label="新建"
+        aria-haspopup="menu"
+        aria-expanded="{{createMenuOpen}}"
+      >
+        <view class="header__action-plus {{createMenuOpen ? 'header__action-plus--open' : ''}}">＋</view>
+      </view>
       <view class="header__action" hover-class="header__action--hover" bindtap="onChartsTap" aria-label="排行榜">
         <view class="header__action-icon">榜</view>
       </view>
       <view class="header__action" hover-class="header__action--hover" bindtap="onSearchTap" aria-label="搜索">
         <view class="header__action-icon">⌕</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 新建下拉菜单：新建应用 / 新建官网 / 新建宣传应用 -->
+  <view wx:if="{{createMenuOpen}}" class="create-mask" bindtap="onCreateMenuClose"></view>
+  <view wx:if="{{createMenuOpen}}" class="create-menu card" aria-label="新建">
+    <view
+      class="create-menu__item"
+      wx:for="{{createTargets}}"
+      wx:key="type"
+      data-type="{{item.type}}"
+      bindtap="onCreateTargetTap"
+      hover-class="create-menu__item--hover"
+    >
+      <view class="craft-icon craft-icon--sm g{{index}}">
+        <view class="craft-icon__gloss"></view>
+        <view class="craft-icon__letter">{{item.name[2]}}</view>
+      </view>
+      <view class="create-menu__text">
+        <view class="create-menu__name">{{item.name}}</view>
+        <view class="create-menu__desc">{{item.desc}}</view>
       </view>
     </view>
   </view>

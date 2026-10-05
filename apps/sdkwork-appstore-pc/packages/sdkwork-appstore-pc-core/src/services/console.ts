@@ -73,7 +73,14 @@ export interface ConsoleAuditLog {
 
 export interface IConsoleSDK {
   getManagedApps(): Promise<ManagedApp[]>;
-  publishApp(appData: { name: string; category: string; version: string; description: string }): Promise<ManagedApp>;
+  publishApp(appData: {
+    name: string;
+    category: string;
+    version: string;
+    description: string;
+    /** Store application type preset (`APP` | `WEBSITE` | `PROMO`); defaults to APP. */
+    appType?: string;
+  }): Promise<ManagedApp>;
   getPublisherProfile(): Promise<PublisherProfile | undefined>;
   registerPublisher(data: { displayName: string; legalName?: string; supportEmail?: string; websiteUrl?: string }): Promise<PublisherProfile>;
   submitVerification(data: { verificationType: string; evidenceMediaResourceId?: string }): Promise<boolean>;

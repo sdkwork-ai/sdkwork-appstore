@@ -1,5 +1,5 @@
 import { FormEvent, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import {
   formatApiError,
@@ -9,8 +9,17 @@ import {
 } from '@sdkwork/appstore-publisher-console-core';
 import { LoadingSpinner } from '@sdkwork/appstore-h5-commons';
 
+/** Storefront create-menu presets (`?type=`) mapped to store application types. */
+const APP_TYPE_BY_PARAM: Record<string, string> = {
+  app: 'APP',
+  website: 'WEBSITE',
+  promo: 'PROMO',
+};
+
 export function PublisherNewAppPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const appType = APP_TYPE_BY_PARAM[searchParams.get('type') ?? ''] ?? 'APP';
   const { data: publisherData, loading: publisherLoading } = usePublisher();
   const [appKey, setAppKey] = useState('');
   const [displayName, setDisplayName] = useState('');
@@ -32,7 +41,7 @@ export function PublisherNewAppPage() {
         appKey: appKey.trim(),
         displayName: displayName.trim(),
         defaultLocale: defaultLocale.trim(),
-        appType: 'APP_REACT',
+        appType,
       });
       const listingId = (result.listing as { id?: string })?.id;
       if (listingId) {

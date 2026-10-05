@@ -227,7 +227,17 @@ class AppstoreMobileRuntime {
         BuildContext context,
         AppstoreRouteMatch match,
       ) =>
-          PublisherScreen(service: publisherService, screen: 'app-create'),
+          PublisherScreen(
+            service: publisherService,
+            screen: 'app-create',
+            // Store application type preset from the creation hub
+            // (`?type=app|website|promo`); defaults to APP.
+            appType: switch (match.params['type']) {
+              'website' => 'WEBSITE',
+              'promo' => 'PROMO',
+              _ => 'APP',
+            },
+          ),
       'console.store.publisher.app-manage': (
         BuildContext context,
         AppstoreRouteMatch match,

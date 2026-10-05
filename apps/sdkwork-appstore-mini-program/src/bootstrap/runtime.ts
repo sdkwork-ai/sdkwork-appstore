@@ -762,6 +762,31 @@ function createPageLoaders(getClient: () => AppstoreAppClient) {
         };
       });
     },
+
+    /**
+     * Publisher: bootstrap a new app draft (publishers domain, auth required).
+     * `appType` presets the store application type (APP | WEBSITE | PROMO)
+     * selected from the creation hub.
+     */
+    async createPublisherApp(input: {
+      displayName: string;
+      appKey: string;
+      appType: 'APP' | 'WEBSITE' | 'PROMO';
+    }): Promise<{ listingId: string; displayName: string; status: string }> {
+      const result = await getClient().publishers.bootstrapApp({
+        appKey: input.appKey,
+        displayName: input.displayName,
+        defaultLocale: 'zh-CN',
+        appType: input.appType,
+      });
+      const payload = (result ?? {}) as unknown as Record<string, unknown>;
+      const listing = (payload.listing ?? payload) as Record<string, unknown>;
+      return {
+        listingId: String(listing.id ?? ''),
+        displayName: String(listing.displayName ?? input.displayName),
+        status: publisherStatusLabel(String(listing.status ?? 'draft')),
+      };
+    },
   };
 }
 

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { HeaderSearchBar } from './HeaderSearchBar';
+import { HeaderCreateMenu } from './HeaderCreateMenu';
 import { HeaderUserBadge } from './HeaderUserBadge';
 import { HeaderWindowControls } from './HeaderWindowControls';
 import { HeaderUpdateNav } from './HeaderUpdateNav';
@@ -74,6 +75,9 @@ export function DesktopHeader({ pendingUpdatesCount: initialCount = 0, showActio
       {/* Right User & Window Actions */}
       {showActions && (
         <div className="flex items-center gap-1 xl:gap-3 shrink-0">
+          {/* Sub-component: Creation hub (new app / website / promo app) */}
+          <HeaderCreateMenu />
+
           {/* Sub-component: Language Switcher */}
           <HeaderLanguageToggle />
 

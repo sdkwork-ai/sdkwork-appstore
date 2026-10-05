@@ -10,6 +10,14 @@ const CAPABILITIES = [
   { key: "settings", name: "设置", desc: "账户与通用偏好", path: "/pages/settings/index" },
 ];
 
+/** Creation hub entries surfaced by the header plus button; each preset maps
+ *  to a store application type handled by the publisher create flow. */
+const CREATE_TARGETS = [
+  { type: "app", name: "新建应用", desc: "发布一个全新的应用" },
+  { type: "website", name: "新建官网", desc: "搭建并发布官方网站" },
+  { type: "promo", name: "新建宣传应用", desc: "创建宣传页应用" },
+];
+
 /** Deterministic gradient index per name, mirroring the cross-client palette
  *  (UI_DESIGN_SPEC §2: brand-first vibrant system colors). */
 function gradientIndex(name) {
@@ -48,6 +56,8 @@ Page({
     chartApps: [],
     recommendations: [],
     capabilities: CAPABILITIES,
+    createTargets: CREATE_TARGETS,
+    createMenuOpen: false,
   },
   onLoad() {
     try {
@@ -111,6 +121,17 @@ Page({
   },
   onSearchTap() {
     wx.navigateTo({ url: "/pages/search/index" });
+  },
+  onCreateMenuToggle() {
+    this.setData({ createMenuOpen: !this.data.createMenuOpen });
+  },
+  onCreateMenuClose() {
+    this.setData({ createMenuOpen: false });
+  },
+  onCreateTargetTap(event) {
+    const { type } = event.currentTarget.dataset;
+    this.setData({ createMenuOpen: false });
+    wx.navigateTo({ url: `/pages/publisher/index?create=${type}` });
   },
   onCategoryTap(event) {
     const { id, name } = event.currentTarget.dataset;
