@@ -107,9 +107,20 @@ export function ListingDetailPage() {
     setReviewSubmitting(true); setReviewError('');
     try {
       const client = getStoreClient();
-      await client.listings.updateRating(listingId, { rating: reviewRating });
+      // Comment text lives in the comments domain, the star rating in the
+      // listing domain — write the review first, then the rating, and report
+      // a partial failure honestly instead of losing the review text.
       await getCommentsClient().comments.comments.create(commentsThreadId, { body: text });
+      let ratingNotice: string | null = null;
+      try {
+        await client.listings.updateRating(listingId, { rating: reviewRating });
+      } catch (ratingErr) {
+        ratingNotice = `评价已发布，但评分保存失败：${formatApiError(ratingErr instanceof Error ? ratingErr : new Error(String(ratingErr)))}`;
+      }
       setReviewBody(''); setReviewRating(5); reviewsApi.execute();
+      if (ratingNotice) {
+        setReviewError(ratingNotice);
+      }
     } catch (err) { setReviewError(formatApiError(err instanceof Error ? err : new Error(String(err)))); }
     finally { setReviewSubmitting(false); }
   }

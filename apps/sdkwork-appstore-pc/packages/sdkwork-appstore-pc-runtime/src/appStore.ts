@@ -502,15 +502,18 @@ export function createAppStoreServicePort(
         'commentsThreadId',
         'comments_thread_id',
       );
-      const rating = await client.listings.updateRating(reviewData.appId, {
-        rating: reviewData.rating,
-        title: reviewData.title,
-      });
+      // Review text (comments domain) first, then the rating (listing
+      // domain): the caller's error path keeps their text on a rating
+      // failure instead of silently dropping a written review.
       if (threadId) {
         await comments.comments.comments.create(threadId, {
           body: reviewData.comment,
         });
       }
+      const rating = await client.listings.updateRating(reviewData.appId, {
+        rating: reviewData.rating,
+        title: reviewData.title,
+      });
       return {
         id: readString(rating as unknown as Record<string, unknown>, 'id'),
         appId: reviewData.appId,

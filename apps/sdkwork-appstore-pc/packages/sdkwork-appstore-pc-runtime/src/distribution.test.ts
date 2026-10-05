@@ -153,7 +153,7 @@ describe('install service port platform', () => {
     expect(install).toHaveBeenCalledWith({ listingId: 'app-cursor', platform: 'macos' });
   });
 
-  it('defaults to the PC storefront context without a platform code', async () => {
+  it('defaults to the windows storefront platform without a platform code', async () => {
     const install = vi.fn(async () => ({}));
     const client = {
       library: { install },
@@ -162,6 +162,6 @@ describe('install service port platform', () => {
     const port = createInstallServicePort(client);
     await port.installApp('app-cursor');
 
-    expect(install).toHaveBeenCalledWith({ listingId: 'app-cursor', platform: 'pc' });
+    expect(install).toHaveBeenCalledWith({ listingId: 'app-cursor', platform: 'windows' });
   });
 });

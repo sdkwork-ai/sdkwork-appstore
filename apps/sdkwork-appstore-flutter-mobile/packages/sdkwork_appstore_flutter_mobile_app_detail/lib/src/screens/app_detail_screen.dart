@@ -52,6 +52,24 @@ class _AppDetailScreenState extends State<AppDetailScreen> {
       if (!mounted) {
         return;
       }
+      // Desktop/mobile installers resolve a presigned download through the
+      // download-grant flow; web/H5 listings open accessUrl instead (the
+      // primary action already branches).
+      String? downloadUrl;
+      try {
+        downloadUrl = await widget.service.resolveInstallerDownload(detail.id);
+      } catch (error) {
+        // Download resolution is additive; the install record stands alone.
+      }
+      if (!mounted) {
+        return;
+      }
+      if (downloadUrl != null && downloadUrl.isNotEmpty) {
+        final url = Uri.tryParse(downloadUrl);
+        if (url != null && url.hasScheme) {
+          await launchUrl(url, mode: LaunchMode.externalApplication);
+        }
+      }
       ScaffoldMessenger.of(context)
           .showSnackBar(const SnackBar(content: Text('已开始获取，请在我的库中查看')));
     } catch (error) {

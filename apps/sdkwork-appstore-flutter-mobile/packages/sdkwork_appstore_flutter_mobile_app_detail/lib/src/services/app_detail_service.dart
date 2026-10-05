@@ -113,6 +113,69 @@ class AppDetailService {
     }
     return add;
   }
+
+  /// Resolves a presigned installer download for [listingId] on this
+  /// platform: latest published artifact → download grant → consume → URL.
+  /// Returns null when the listing has no installer artifact (web/H5
+  /// distributions open accessUrl instead).
+  Future<String?> resolveInstallerDownload(String listingId) async {
+    clients.ensureTransportBound(capability);
+    final client = clients.requireAppClient;
+
+    final check = await client.library_.appstoreLibraryUpdatesCheck(
+      LibraryUpdatesCheckRequest(
+        items: <Map<String, dynamic>>[
+          {
+            'appKey': listingId,
+            'platform': appstorePlatformCode,
+            'installedVersionCode': '0',
+          },
+        ],
+      ),
+    );
+    final checkRow = AppstoreAppSdkClients.itemOf(check?.data) ?? const <String, dynamic>{};
+    final checkItems = checkRow['items'];
+    String? artifactId;
+    if (checkItems is List) {
+      for (final row in checkItems) {
+        if (row is Map &&
+            _text(row['appKey']) == listingId &&
+            _text(row['artifactId']).isNotEmpty) {
+          artifactId = _text(row['artifactId']);
+          break;
+        }
+      }
+    }
+    if (artifactId == null) {
+      return null;
+    }
+
+    final idempotencyKey = DateTime.now().microsecondsSinceEpoch.toString();
+    final grantResponse = await client.downloadGrants.appstoreDownloadGrantsCreate(
+      DownloadGrantCreateRequest(artifactId: artifactId),
+      idempotencyKey,
+    );
+    final grantRow = AppstoreAppSdkClients.itemOf(grantResponse?.data) ?? const <String, dynamic>{};
+    final grantId = _text(grantRow['id']);
+    if (grantId.isEmpty) {
+      return null;
+    }
+
+    final consumed = await client.downloadGrants
+        .appstoreDownloadGrantsConsume(grantId)
+        .catchError((Object error) => null);
+    final consumedRow = AppstoreAppSdkClients.itemOf(consumed?.data) ?? const <String, dynamic>{};
+    final delivery = consumedRow['delivery'];
+    if (delivery is Map) {
+      final normalized =
+          delivery.map((key, value) => MapEntry(key.toString(), value));
+      final url = _text(normalized['downloadUrl'], _text(normalized['download_url']));
+      if (url.isNotEmpty) {
+        return url;
+      }
+    }
+    return null;
+  }
 }
 
 Map<String, dynamic>? _firstRow(dynamic data) {
