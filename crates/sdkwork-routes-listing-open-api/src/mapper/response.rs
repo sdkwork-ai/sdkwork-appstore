@@ -28,7 +28,7 @@ pub(crate) struct PublicListingResponse {
     commerce_product_id: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     current_release_id: Option<String>,
-    download_count: i32,
+    download_count: i64,
     #[serde(skip_serializing_if = "Option::is_none")]
     average_rating: Option<String>,
     rating_count: i32,

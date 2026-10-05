@@ -86,7 +86,7 @@ pub struct ListingRow {
     pub commerce_product_id: Option<String>,
     pub current_release_id: Option<String>,
     pub featured_score: i32,
-    pub download_count: i32,
+    pub download_count: i64,
     pub average_rating: Option<String>,
     pub rating_count: i32,
     pub version: i32,

@@ -39,7 +39,7 @@ impl ListingStatus {
     pub fn from_str(s: &str) -> Option<Self> {
         match s {
             "draft" => Some(Self::Draft),
-            "active" => Some(Self::Active),
+            "active" | "published" => Some(Self::Active),
             "delisted" => Some(Self::Delisted),
             "suspended" => Some(Self::Suspended),
             "deleted" => Some(Self::Deleted),
@@ -278,7 +278,7 @@ pub struct Listing {
     pub commerce_product_id: Option<String>,
     pub current_release_id: Option<String>,
     pub featured_score: i32,
-    pub download_count: i32,
+    pub download_count: i64,
     pub average_rating: Option<String>,
     pub rating_count: i32,
     pub version: i32,
