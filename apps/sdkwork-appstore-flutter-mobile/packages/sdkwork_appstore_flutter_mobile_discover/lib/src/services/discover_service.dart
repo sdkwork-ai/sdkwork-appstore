@@ -90,6 +90,7 @@ class DiscoverService {
             title: _text(row['displayName'], _text(row['title'], '应用')),
             subtitle: _text(row['developerName'], _text(row['publisherName'], '')),
             rating: double.tryParse(_text(row['averageRating'], _text(row['rating']))) ?? 0,
+            pricingModel: _text(row['pricingModel'], _text(row['pricing_model'], 'FREE')),
           ),
       ];
 }

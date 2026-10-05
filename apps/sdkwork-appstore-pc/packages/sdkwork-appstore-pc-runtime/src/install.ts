@@ -20,7 +20,7 @@ export function createInstallServicePort(client: AppStoreClient): InstallService
     },
 
     async installApp(appId: string, platform?: string): Promise<boolean> {
-      await client.library.install({ listingId: appId, platform: platform?.trim() || 'pc' });
+      await client.library.install({ listingId: appId, platform: platform?.trim() || 'windows' });
       return true;
     },
 
@@ -68,11 +68,13 @@ export function createInstallServicePort(client: AppStoreClient): InstallService
           usedMb += bytes / (1024 * 1024);
         }
       }
+      // Only truthful values: the storefront surface tracks installed size
+      // and count; total disk and cache sizes are not measured anywhere.
       return {
         usedMb: Math.round(usedMb),
-        totalMb: 51200,
+        totalMb: 0,
         appsCount,
-        cacheMb: 1420,
+        cacheMb: 0,
       };
     },
   };

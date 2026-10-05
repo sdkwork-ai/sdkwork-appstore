@@ -581,7 +581,7 @@ export function createAppStoreServicePort(
       const checkItems = libraryItems
         .map((item) => ({
           appKey: readString(item, 'appKey', 'app_key'),
-          platform: readString(item, 'platform') || 'pc',
+          platform: readString(item, 'platform') || 'windows',
           installedVersionCode: readString(item, 'installedVersionCode', 'installed_version_code'),
         }))
         .filter((item) => item.appKey);
@@ -619,7 +619,7 @@ export function createAppStoreServicePort(
     },
 
     async updateApp(id: string, platform?: string): Promise<boolean> {
-      await client.library.install({ listingId: id, platform: platform?.trim() || 'pc' });
+      await client.library.install({ listingId: id, platform: platform?.trim() || 'windows' });
       return true;
     },
 

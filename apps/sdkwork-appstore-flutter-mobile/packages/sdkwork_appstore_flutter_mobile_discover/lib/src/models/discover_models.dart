@@ -21,6 +21,7 @@ class DiscoverEntry {
     this.subtitle = '',
     this.endsAt = '',
     this.rating = 0,
+    this.pricingModel = 'FREE',
   });
 
   final String id;
@@ -32,6 +33,9 @@ class DiscoverEntry {
 
   /// Aggregate star rating (0 = unrated; rails hide the star row then).
   final double rating;
+
+  /// Store pricing model (FREE/FREEMIUM/PAID) for price pills.
+  final String pricingModel;
 }
 
 /// Discover feed mirroring the PC storefront blocks: hero picks, category

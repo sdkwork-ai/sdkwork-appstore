@@ -932,17 +932,21 @@ class _RecommendationGrid extends StatelessWidget {
                         children: <Widget>[
                           _RatingBadge(rating: entry.rating),
                           const Spacer(),
-                          // 免费 price pill.
+                          // 免费/付费 price pill by pricing model.
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF34C759).withValues(alpha: 0.13),
+                              color: entry.pricingModel.toUpperCase() == 'PAID'
+                                  ? const Color(0xFFFF9500).withValues(alpha: 0.14)
+                                  : const Color(0xFF34C759).withValues(alpha: 0.13),
                               borderRadius: BorderRadius.circular(999),
                             ),
-                            child: const Text(
-                              '免费',
+                            child: Text(
+                              entry.pricingModel.toUpperCase() == 'PAID' ? '付费' : '免费',
                               style: TextStyle(
-                                color: Color(0xFF34C759),
+                                color: entry.pricingModel.toUpperCase() == 'PAID'
+                                    ? const Color(0xFFFF9500)
+                                    : const Color(0xFF34C759),
                                 fontSize: 10,
                                 fontWeight: FontWeight.w700,
                               ),

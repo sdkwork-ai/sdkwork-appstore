@@ -229,6 +229,8 @@ export function ListingDetailPage() {
         listingId,
         platform: installPlatform,
         appKey: appKey || undefined,
+        // 已在库中（owned/installed）时直接刷新最新下载，避免后端重复安装报错。
+        skipInstall: owned || installed,
       });
       setInstalled(true);
       if (result.downloadUrl) {

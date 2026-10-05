@@ -299,6 +299,9 @@ export interface InstallListingAndDownloadParams {
   listingId: string;
   platform: string;
   appKey?: string;
+  /** Already owned: refresh the latest download instead of re-installing
+   *  (the backend rejects duplicate installs). */
+  skipInstall?: boolean;
 }
 
 export interface InstallListingAndDownloadResult {
@@ -310,30 +313,37 @@ export async function installListingAndDownload(
   params: InstallListingAndDownloadParams,
 ): Promise<InstallListingAndDownloadResult> {
   const store = getStoreClient();
-  const result = await store.library.install({
-    listingId: params.listingId,
-    platform: params.platform,
-  });
-  const libraryItem = result.libraryItem;
+  let appKey = params.appKey ?? '';
+  let installedVersionCode = '0';
+  if (params.skipInstall) {
+    // Owned listing: resolve the latest artifact directly; the check payload
+    // uses a zero base version so the newest published release is returned.
+    appKey = appKey || params.listingId;
+  } else {
+    const result = await store.library.install({
+      listingId: params.listingId,
+      platform: params.platform,
+    });
+    appKey = appKey || result.libraryItem.appKey;
+    installedVersionCode = result.libraryItem.installedVersionCode ?? '0';
+  }
 
   const check = await store.library.checkUpdates({
     items: [
       {
-        appKey: libraryItem.appKey,
+        appKey,
         platform: params.platform,
-        installedVersionCode: libraryItem.installedVersionCode ?? '0',
+        installedVersionCode,
       },
     ],
   });
-  const update = check.items.find(
-    (item) => item.appKey === libraryItem.appKey && item.artifactId,
-  );
+  const update = check.items.find((item) => item.appKey === appKey && item.artifactId);
   if (!update?.artifactId) {
     return { downloadUrl: undefined };
   }
   const downloadUrl = await resolveArtifactDownload({
     artifactId: update.artifactId,
-    appKey: params.appKey ?? libraryItem.appKey,
+    appKey,
   });
   return { downloadUrl };
 }
