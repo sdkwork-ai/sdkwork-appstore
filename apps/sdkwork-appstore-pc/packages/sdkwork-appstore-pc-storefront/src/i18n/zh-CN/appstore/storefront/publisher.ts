@@ -97,6 +97,9 @@ export const publisher = {
       rolloutFull: '全量发布',
       rolloutPause: '暂停发布',
       applyRollout: '应用灰度',
+      uploadArtifact: '上传制品',
+      uploading: '上传中 {{percent}}%',
+      uploadFailed: '制品上传失败，请稍后重试',
       submitReview: '提交审核',
       submittingReview: '提交中...',
       reviewSubmitted: '已提交审核'

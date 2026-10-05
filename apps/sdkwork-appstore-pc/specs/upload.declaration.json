@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "appId": "sdkwork-appstore-pc",
+  "declarations": [
+    {
+      "appResourceType": "appstore.artifact",
+      "appResourceIdKind": "entity",
+      "scene": "appstore",
+      "source": "artifact-upload",
+      "uploadProfileCode": "archive",
+      "retention": "long_term",
+      "purpose": "Application release artifact uploaded so an app-store release can reference a downloadable package."
+    }
+  ]
+}

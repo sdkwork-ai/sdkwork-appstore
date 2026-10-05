@@ -1,3 +1,4 @@
+export * from './artifactUpload';
 export * from './api';
 export * from './aihub';
 export * from './plugins';

@@ -2,7 +2,12 @@ import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, CheckCircle2, Send } from 'lucide-react';
-import { ConsoleService } from '../../services/api';
+import {
+    ConsoleService,
+    uploadAndAttachReleaseArtifact,
+    detectDesktopOs,
+  } from '@sdkwork/appstore-pc-core';
+import type { ArtifactUploadPort } from '@sdkwork/appstore-pc-core';
 import { Tabs } from '@sdkwork/appstore-pc-commons';
 import { ManagedAppDetail, PublisherMember, PublisherProfile, ReleaseItem } from '../../types';
 import { LoadingSpinner } from '../../components/common/LoadingSpinner';
@@ -50,6 +55,9 @@ export default function PublisherAppManage() {
   const [rolloutPercent, setRolloutPercent] = useState(10);
   const [applyingRollout, setApplyingRollout] = useState(false);
   const [submittingReview, setSubmittingReview] = useState(false);
+  const [uploadingReleaseId, setUploadingReleaseId] = useState<string | null>(null);
+  const [uploadPercent, setUploadPercent] = useState(0);
+  const [uploadError, setUploadError] = useState<string | null>(null);
   const [releaseNotice, setReleaseNotice] = useState<string | null>(null);
 
   // member invite state
@@ -158,6 +166,28 @@ export default function PublisherAppManage() {
       console.error('Failed to update rollout', error);
     } finally {
       setApplyingRollout(false);
+    }
+  };
+
+  const handleArtifactUpload = async (releaseId: string, file: File) => {
+    setUploadingReleaseId(releaseId);
+    setUploadPercent(0);
+    setUploadError(null);
+    try {
+      await uploadAndAttachReleaseArtifact({
+        releaseId,
+        platform: detectDesktopOs() || 'windows',
+        architecture: 'x64',
+        packageFormat: 'archive',
+        file,
+        onProgress: (percent) => setUploadPercent(percent),
+      });
+    } catch (error) {
+      setUploadError(
+        error instanceof Error ? error.message : t('publisher.manage.releases.uploadFailed'),
+      );
+    } finally {
+      setUploadingReleaseId(null);
     }
   };
 
@@ -449,6 +479,25 @@ export default function PublisherAppManage() {
                       <Send className="w-3 h-3" />
                       {t('publisher.manage.releases.submitReview')}
                     </button>
+                    <label
+                      className={`px-3 py-1.5 border border-store-line hover:border-store-brand text-store-ink rounded-store-control text-xs font-medium transition-all flex items-center gap-1 cursor-pointer ${uploadingReleaseId === release.id ? 'opacity-50' : ''}`}
+                    >
+                      <input
+                        type="file"
+                        className="hidden"
+                        disabled={uploadingReleaseId !== null}
+                        onChange={(event) => {
+                          const file = event.target.files?.[0];
+                          event.target.value = '';
+                          if (file) {
+                            void handleArtifactUpload(release.id, file);
+                          }
+                        }}
+                      />
+                      {uploadingReleaseId === release.id
+                        ? t('publisher.manage.releases.uploading', { percent: uploadPercent })
+                        : t('publisher.manage.releases.uploadArtifact')}
+                    </label>
                   </div>
                 </div>
                 <div className="flex items-center gap-3 pt-3 border-t border-store-line ">

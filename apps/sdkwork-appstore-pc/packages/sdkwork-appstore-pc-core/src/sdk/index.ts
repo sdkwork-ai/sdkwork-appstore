@@ -6,3 +6,4 @@ export type AppstorePcSdkPortFactory<TClients = unknown> = () =>
   AppstorePcSdkPort<TClients>;
 
 export * from './clients';
+export * from './drive';

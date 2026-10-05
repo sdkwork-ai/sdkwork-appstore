@@ -97,6 +97,9 @@ export const publisher = {
       rolloutFull: 'Full rollout',
       rolloutPause: 'Pause rollout',
       applyRollout: 'Apply rollout',
+      uploadArtifact: 'Upload artifact',
+      uploading: 'Uploading {{percent}}%',
+      uploadFailed: 'Artifact upload failed, please try again',
       submitReview: 'Submit for review',
       submittingReview: 'Submitting...',
       reviewSubmitted: 'Submitted for review'
