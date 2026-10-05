@@ -682,19 +682,26 @@ impl ListingRepositoryPort for SqlxListingRepository {
         listing_id: &ListingId,
         cursor: Option<&str>,
         limit: i32,
+        published_only: bool,
     ) -> Result<Vec<serde_json::Value>, AppstoreServiceError> {
         let release_cols = r#"id, tenant_id, organization_id, listing_id, release_no, channel_id,
             version_name, version_code, build_number, release_status, minimum_os_version,
             release_notes_default_locale, manifest_snapshot_json, submitted_at, approved_at,
             published_at, retired_at, version, created_at, updated_at"#;
+        // Public reads only ever see published releases; draft/approved/retired
+        // management states stay in the publisher view.
+        let status_filter = if published_only {
+            " AND release_status = 'published'"
+        } else {
+            ""
+        };
 
         let rows = if let Some(cursor_id) = cursor {
             self.db
                 .query_as::<ReleaseRow>(&format!(
                     r#"SELECT {} FROM appstore_release
-                WHERE tenant_id = ? AND listing_id = ? AND id > ?
-                ORDER BY id ASC LIMIT ?"#,
-                    release_cols
+                WHERE tenant_id = ? AND listing_id = ? AND id > ?{}"#,
+                    release_cols, status_filter
                 ))
                 .bind(&context.tenant_id)
                 .bind(listing_id.as_str())
@@ -707,9 +714,8 @@ impl ListingRepositoryPort for SqlxListingRepository {
             self.db
                 .query_as::<ReleaseRow>(&format!(
                     r#"SELECT {} FROM appstore_release
-                WHERE tenant_id = ? AND listing_id = ?
-                ORDER BY id ASC LIMIT ?"#,
-                    release_cols
+                WHERE tenant_id = ? AND listing_id = ?{}"#,
+                    release_cols, status_filter
                 ))
                 .bind(&context.tenant_id)
                 .bind(listing_id.as_str())

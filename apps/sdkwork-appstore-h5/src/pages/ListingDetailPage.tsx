@@ -115,12 +115,16 @@ export function ListingDetailPage() {
   }
   async function handleReviewLike(commentId: string) {
     const client = getCommentsClient();
-    if (likedComments.has(commentId)) {
-      await getCommentsClient().engagement.likes.delete('comment', commentId);
-      setLikedComments((prev) => { const s = new Set(prev); s.delete(commentId); return s; });
-    } else {
-      await getCommentsClient().engagement.likes.update('comment', commentId);
-      setLikedComments((prev) => new Set(prev).add(commentId));
+    try {
+      if (likedComments.has(commentId)) {
+        await client.engagement.likes.delete('comment', commentId);
+        setLikedComments((prev) => { const s = new Set(prev); s.delete(commentId); return s; });
+      } else {
+        await client.engagement.likes.update('comment', commentId);
+        setLikedComments((prev) => new Set(prev).add(commentId));
+      }
+    } catch {
+      // 点赞失败保持原状态；评论点赞是非关键交互，不打断浏览。
     }
   }
 
@@ -290,9 +294,20 @@ export function ListingDetailPage() {
               type="button"
               className="flex h-10 w-10 items-center justify-center"
               aria-label="分享"
-              onClick={() => {
-                if (navigator.share) {
-                  void navigator.share({ title: app.name, url: window.location.href });
+              onClick={async () => {
+                const url = window.location.href;
+                if (typeof navigator.share === 'function') {
+                  try {
+                    await navigator.share({ title: app.name, url });
+                    return;
+                  } catch {
+                    // 用户取消或分享失败时回退到剪贴板复制。
+                  }
+                }
+                try {
+                  await navigator.clipboard.writeText(url);
+                } catch {
+                  // 剪贴板不可用时静默；分享是非关键路径。
                 }
               }}
             >

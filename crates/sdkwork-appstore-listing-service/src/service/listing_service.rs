@@ -1153,10 +1153,24 @@ where
             })?;
         self.ensure_listing_read_access(context, &listing).await?;
 
+        // Publisher callers manage all release states; every other reader of a
+        // public listing sees published releases only.
+        let publisher_view = !Self::listing_is_visible_to_public(&listing)
+            || self
+                .ensure_listing_publisher_access(context, &listing)
+                .await
+                .is_ok();
+
         let limit = request.page_size.unwrap_or(20).clamp(1, 200);
         let releases = self
             .repository
-            .find_releases_by_listing(context, &listing_id, request.cursor.as_deref(), limit + 1)
+            .find_releases_by_listing(
+                context,
+                &listing_id,
+                request.cursor.as_deref(),
+                limit + 1,
+                !publisher_view,
+            )
             .await?;
 
         let has_more = releases.len() > limit as usize;

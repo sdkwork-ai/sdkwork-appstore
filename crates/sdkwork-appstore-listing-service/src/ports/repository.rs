@@ -142,6 +142,9 @@ pub trait ListingRepositoryPort: Send + Sync {
         listing_id: &ListingId,
         cursor: Option<&str>,
         limit: i32,
+        // Public reads only ever see `published` releases; the publisher view
+        // also carries draft/approved/retired management states.
+        published_only: bool,
     ) -> AppstoreServiceResult<Vec<serde_json::Value>>;
 
     async fn insert_submission(

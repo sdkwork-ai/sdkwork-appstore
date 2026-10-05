@@ -36,6 +36,14 @@ class AppDetailService {
     final ratings = await client.listings
         .appstoreListingsRatingsList(listingId, null, 1)
         .catchError((Object error) => null);
+    // Hydrate the wishlist heart from the server; unauthenticated callers
+    // keep the default (unsaved) state.
+    final wishlist = await client.wishlist.appstoreWishlistItemsList(null, 200).catchError(
+        (Object error) => null);
+    final wishlistRows = AppstoreAppSdkClients.itemsOf(wishlist?.data);
+    final inWishlist = wishlistRows.any(
+      (row) => _text(row['listingId'], _text(row['listing_id'])) == listingId,
+    );
 
     final whatsNewRow = _firstRow(releases?.data);
     final ratingRow = AppstoreAppSdkClients.itemOf(ratings?.data);
@@ -50,6 +58,7 @@ class AppDetailService {
       developer: _text(row['developerName'], _text(row['publisherName'], '')),
       rating: double.tryParse(_text(ratingValue)) ?? 0,
       ratingCount: int.tryParse(_text(row['ratingCount'], '0')) ?? 0,
+      inWishlist: inWishlist,
       pricingModel: _text(row['pricingModel'], _text(row['pricing_model'], 'FREE')),
       platforms: _platformCodesOf(row),
       accessUrl: _text(row['accessUrl'], _text(row['access_url'])),
