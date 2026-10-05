@@ -229,8 +229,24 @@ export function useListingOwnership(listingId: string, authed: boolean) {
       if (!authed || !listingId) {
         return null;
       }
-      const page = await getStoreClient().library.listItems({ limit: 200 });
-      return page.items.some((item) => item.listingId === listingId);
+      // Page through the library (bounded) so ownership stays correct beyond
+      // the first 200 rows.
+      let cursor: string | undefined;
+      for (let page = 0; page < 5; page++) {
+        const result = await getStoreClient().library.listItems({
+          limit: 200,
+          cursor,
+        });
+        const items = result.items ?? [];
+        if (items.some((item) => item.listingId === listingId)) {
+          return true;
+        }
+        cursor = result.pageInfo?.nextCursor ?? undefined;
+        if (!cursor) {
+          return false;
+        }
+      }
+      return false;
     },
     { refreshKey: `${authed}:${listingId}` },
   );

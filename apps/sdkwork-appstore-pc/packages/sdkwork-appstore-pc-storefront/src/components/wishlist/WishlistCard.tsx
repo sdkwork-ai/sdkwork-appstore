@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { HeartOff } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { paidPricing } from '@sdkwork/appstore-pc-core';
 import { AppItem } from '../../types';
 import { DynamicIcon } from '../DynamicIcon';
 import { formatPrice } from '../../lib/utils';
@@ -30,7 +31,7 @@ export function WishlistCard({ app, onRemove }: WishlistCardProps) {
             {app.developer} · {app.category}
           </p>
           <span className="inline-block mt-1 px-2.5 py-0.5 rounded-full bg-store-brand/10 text-store-brand text-xs font-medium ">
-            {app.price === 0 ? t('wishlist.grid.free') : formatPrice(app.price, i18n.language)}
+            {paidPricing(app.pricingModel) ? t('publisher.pricingPaid') : t('wishlist.grid.free')}
           </span>
         </div>
       </Link>

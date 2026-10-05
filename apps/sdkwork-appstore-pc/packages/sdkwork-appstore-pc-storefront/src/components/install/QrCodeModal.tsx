@@ -33,7 +33,14 @@ export function QrCodeModal({ qr, onClose }: QrCodeModalProps) {
     return null;
   }
   const { app, group } = qr;
-  const qrAction = resolveDistributionActions(app).find((action) => action.kind === 'qr');
+  // Resolve the URL for the *requested* platform group — listings may carry
+  // distinct per-platform links (android vs ios vs miniprogram), and taking
+  // the first QR action would encode the wrong deep link.
+  const qrActions = resolveDistributionActions(app).filter(
+    (action) => action.kind === 'qr',
+  );
+  const qrAction =
+    (group && qrActions.find((action) => action.group === group)) || qrActions[0];
   const target = qrAction?.url ?? app.accessUrl;
   if (!target) {
     return null;

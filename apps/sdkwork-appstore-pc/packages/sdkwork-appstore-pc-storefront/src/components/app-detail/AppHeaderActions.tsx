@@ -3,8 +3,7 @@ import { Heart, Share } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { AppItem, DistributionAction } from '@sdkwork/appstore-pc-core';
 import { DistributionActions } from '@sdkwork/appstore-pc-commons';
-import { openDistributionUrl, primaryDistributionAction } from '@sdkwork/appstore-pc-core';
-import { formatPrice } from '../../lib/utils';
+import { openDistributionUrl, paidPricing, primaryDistributionAction } from '@sdkwork/appstore-pc-core';
 import { useInstall } from '../../providers/InstallProvider';
 import { AppStoreService } from '../../services/api';
 import { AddToCategoryPopover } from '../user-store/AddToCategoryPopover';
@@ -65,9 +64,9 @@ export const AppHeaderActions: React.FC<AppHeaderActionsProps> = ({ app }) => {
         >
           {primary?.kind === 'open'
             ? t('common.distribution.openPcWeb')
-            : app.price === 0
-              ? t('appDetail.header.get')
-              : formatPrice(app.price, i18n.language)}
+            : paidPricing(app.pricingModel)
+              ? t('publisher.pricingPaid')
+              : t('appDetail.header.get')}
         </button>
         <button
           type="button"

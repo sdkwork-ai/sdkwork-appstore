@@ -31,6 +31,7 @@ import {
   type StoreListingCard,
 } from '@/hooks/catalog';
 import { ErrorRetry } from '@/components/common/ErrorRetry';
+import { PlatformBadges } from '@/components/common/PlatformBadges';
 import { readListingPlatformCodes } from '@/platforms';
 
 /* ═══ design primitives (UI_DESIGN_SPEC §2 tokens, Today-grade craft) ══════ */
@@ -874,17 +875,7 @@ function PlatformBadgesInline({ platforms }: { platforms: string[] }) {
   if (platforms.length === 0) {
     return null;
   }
-  return (
-    <span className="ml-2 inline-flex items-center gap-1">
-      {platforms.slice(0, 2).map((code) => (
-        <span
-          key={code}
-          className="rounded px-1 py-px text-[10px] font-medium text-[var(--text-tertiary)]"
-          style={{ backgroundColor: 'var(--bg-muted)' }}
-        >
-          {code}
-        </span>
-      ))}
-    </span>
-  );
+  // Grouped Chinese labels (安卓 / PC网页 / H5网页 / ...) via the shared
+  // badges component instead of raw platform codes.
+  return <PlatformBadges platforms={platforms} max={2} className="ml-2" />;
 }

@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { paidPricing } from '@sdkwork/appstore-pc-core';
 import { AppItem } from '../../types';
 import { formatPrice } from '../../lib/utils';
 import { DynamicIcon } from '../DynamicIcon';
@@ -39,7 +40,7 @@ export function AppMoreByDeveloper({ developer, apps }: AppMoreByDeveloperProps)
               className="bg-store-raised hover:bg-store-raised text-store-brand font-medium text-xs px-4 py-1.5 rounded-full transition-colors uppercase cursor-pointer "
               onClick={(e) => { e.stopPropagation(); installApp(otherApp); }}
             >
-              {otherApp.price === 0 ? t('appDetail.header.get') : formatPrice(otherApp.price, i18n.language)}
+              {paidPricing(otherApp.pricingModel) ? t('publisher.pricingPaid') : t('appDetail.header.get')}
             </button>
           </div>
         ))}

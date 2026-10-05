@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { motion } from 'motion/react'
 import type { AppItem } from '@sdkwork/appstore-pc-core'
-import { openDistributionUrl, primaryDistributionAction } from '@sdkwork/appstore-pc-core'
+import { openDistributionUrl, paidPricing, primaryDistributionAction } from '@sdkwork/appstore-pc-core'
 import { DynamicIcon } from './DynamicIcon'
 import { PlatformBadges } from './PlatformBadges'
 import { formatPrice } from '../formatPrice'
@@ -92,9 +92,9 @@ export function AppRow({ app, showRank, hideButton }: AppRowProps) {
                 ? t('common.distribution.openShort')
                 : installed
                   ? t('common.actions.open')
-                  : app.price === 0
-                    ? t('common.labels.free')
-                    : formatPrice(app.price, i18n.language)}
+                  : paidPricing(app.pricingModel)
+                    ? t('publisher.pricingPaid')
+                    : t('common.labels.free')}
           </button>
         )}
       </motion.div>

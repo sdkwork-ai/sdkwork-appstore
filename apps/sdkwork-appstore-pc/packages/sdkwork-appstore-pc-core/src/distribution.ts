@@ -90,13 +90,17 @@ function firstCodeForGroup(
   return undefined;
 }
 
-/** QR fallback target: this storefront's own listing anchor on the current origin. */
+/**
+ * QR fallback target: this storefront's own listing route on the current
+ * origin. The standalone app uses BrowserRouter, so the listing path is part
+ * of the URL path — a hash anchor would decode to whatever page the scanner
+ * was on, not the listing.
+ */
 function listingFallbackUrl(appId: string): string {
   if (typeof window === 'undefined' || !window.location) {
     return `/app/${appId}`;
   }
-  const { origin, pathname, search } = window.location;
-  return `${origin}${pathname}${search}#/app/${appId}`;
+  return `${window.location.origin}/app/${encodeURIComponent(appId)}`;
 }
 
 /**
@@ -171,4 +175,10 @@ export function openDistributionUrl(url: string | undefined): boolean {
   }
   const opened = window.open(target, '_blank', 'noopener,noreferrer');
   return opened !== null && opened !== undefined;
+}
+
+/** Whether the listing's pricing model gates adoption behind purchase.
+ *  FREE/FREEMIUM adopt like free; only explicit PAID pricing is gated. */
+export function paidPricing(pricingModel: string | undefined): boolean {
+  return (pricingModel?.trim().toUpperCase() ?? 'FREE') === 'PAID';
 }
