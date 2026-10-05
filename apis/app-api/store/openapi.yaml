@@ -459,6 +459,15 @@ paths:
           - APP
           - PLUGIN
           - AGENT
+      - name: template_platform
+        in: query
+        schema:
+          type: string
+          enum:
+          - H5
+          - PC
+          - FLUTTER
+          - MINIPROGRAM
       - $ref: '#/components/parameters/Cursor'
       - $ref: '#/components/parameters/PageSize'
       responses:
@@ -3735,6 +3744,13 @@ components:
           - APP
           - PLUGIN
           - AGENT
+        templatePlatform:
+          type: string
+          enum:
+          - H5
+          - PC
+          - FLUTTER
+          - MINIPROGRAM
         categoryCode:
           type: string
         framework:
@@ -3784,6 +3800,13 @@ components:
           - APP
           - PLUGIN
           - AGENT
+        templatePlatform:
+          type: string
+          enum:
+          - H5
+          - PC
+          - FLUTTER
+          - MINIPROGRAM
         categoryCode:
           type: string
         framework:

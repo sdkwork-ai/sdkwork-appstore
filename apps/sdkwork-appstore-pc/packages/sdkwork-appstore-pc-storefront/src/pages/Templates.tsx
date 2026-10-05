@@ -7,6 +7,7 @@ import { TemplateCard } from '../components/templates/TemplateCard';
 import { PublishTemplateModal } from '../components/templates/PublishTemplateModal';
 import { TemplatesHeaderBanner } from '../components/templates/TemplatesHeaderBanner';
 import { TemplatesCategoryFilter } from '../components/templates/TemplatesCategoryFilter';
+import { TemplatesPlatformFilter } from '../components/templates/TemplatesPlatformFilter';
 import { TemplatesSearchBar } from '../components/templates/TemplatesSearchBar';
 import { TemplatesEmptyState } from '../components/templates/TemplatesEmptyState';
 import { TemplatesService } from '../services/api';
@@ -17,6 +18,7 @@ export function TemplatesPage() {
   const [templates, setTemplates] = useState<TemplateItem[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState(t('templates.categories.all'));
+  const [selectedPlatform, setSelectedPlatform] = useState('');
   const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -31,7 +33,7 @@ export function TemplatesPage() {
 
   const loadTemplates = async () => {
     try {
-      const data = await TemplatesService.getTemplates(selectedCategory, searchQuery);
+      const data = await TemplatesService.getTemplates(selectedCategory, searchQuery, selectedPlatform);
       setTemplates(data);
     } catch (err) {
       console.error('Failed to load templates', err);
@@ -42,7 +44,7 @@ export function TemplatesPage() {
 
   useEffect(() => {
     loadTemplates();
-  }, [selectedCategory, searchQuery]);
+  }, [selectedCategory, searchQuery, selectedPlatform]);
 
   const handlePublish = async (newTmpl: TemplateItem) => {
     const published = await TemplatesService.publishTemplate({
@@ -53,6 +55,7 @@ export function TemplatesPage() {
       tags: newTmpl.tags,
       repoUrl: newTmpl.repoUrl,
       previewUrl: newTmpl.previewUrl,
+      platform: newTmpl.platform,
     });
     setTemplates((prev) => [published, ...prev]);
   };
@@ -72,6 +75,9 @@ export function TemplatesPage() {
         onSearchChange={setSearchQuery}
         onPublishClick={() => setIsPublishModalOpen(true)}
       />
+
+      {/* Template target-platform filter (H5 / PC / Flutter / mini program); '' shows every template. */}
+      <TemplatesPlatformFilter selected={selectedPlatform} onSelect={setSelectedPlatform} />
 
       {/* Categories Horizontal Filter Subcomponent */}
       <TemplatesCategoryFilter

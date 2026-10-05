@@ -967,6 +967,7 @@ pub struct TemplatesListRequest {
     pub query: Option<String>,
     pub category_code: Option<String>,
     pub template_type: Option<String>,
+    pub template_platform: Option<String>,
     pub cursor: Option<String>,
     pub page_size: Option<i32>,
 }
@@ -977,6 +978,7 @@ impl TemplatesListRequest {
             query: None,
             category_code: None,
             template_type: None,
+            template_platform: None,
             cursor: None,
             page_size: None,
         }
@@ -994,6 +996,11 @@ impl TemplatesListRequest {
 
     pub fn with_template_type(mut self, template_type: impl Into<String>) -> Self {
         self.template_type = Some(template_type.into());
+        self
+    }
+
+    pub fn with_template_platform(mut self, template_platform: impl Into<String>) -> Self {
+        self.template_platform = Some(template_platform.into());
         self
     }
 
@@ -1029,6 +1036,7 @@ pub struct TemplateCreateRequest {
     pub template_name: String,
     pub description: Option<String>,
     pub template_type: String,
+    pub template_platform: Option<String>,
     pub category_code: Option<String>,
     pub framework: Option<String>,
     pub language: Option<String>,
@@ -1045,6 +1053,7 @@ impl TemplateCreateRequest {
             template_name: template_name.into(),
             description: None,
             template_type: template_type.into(),
+            template_platform: None,
             category_code: None,
             framework: None,
             language: None,

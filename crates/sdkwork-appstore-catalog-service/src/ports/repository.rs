@@ -292,6 +292,7 @@ pub trait CatalogRepositoryPort: Send + Sync {
         query: Option<&str>,
         category_code: Option<&str>,
         template_type: Option<&str>,
+        template_platform: Option<&str>,
         cursor: Option<&str>,
         limit: i32,
         user_id: Option<&str>,

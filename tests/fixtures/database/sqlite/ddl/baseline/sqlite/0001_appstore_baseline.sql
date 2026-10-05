@@ -776,6 +776,7 @@ CREATE TABLE IF NOT EXISTS appstore_app_template (
   category_id TEXT,
   category_code TEXT,
   template_type TEXT,
+  template_platform TEXT,
   runtime TEXT,
   framework TEXT,
   language TEXT,
@@ -808,6 +809,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS uk_appstore_app_template_no ON appstore_app_te
 CREATE UNIQUE INDEX IF NOT EXISTS uk_appstore_app_template_code ON appstore_app_template (tenant_id, organization_id, template_code);
 CREATE INDEX IF NOT EXISTS idx_appstore_app_template_scope_status ON appstore_app_template (tenant_id, organization_id, visibility, publish_status, status, updated_at, id);
 CREATE INDEX IF NOT EXISTS idx_appstore_app_template_category ON appstore_app_template (tenant_id, organization_id, category_id, publish_status, sort_weight, id);
+CREATE INDEX IF NOT EXISTS idx_appstore_app_template_platform ON appstore_app_template (tenant_id, organization_id, template_platform, publish_status, id);
 
 CREATE TABLE IF NOT EXISTS appstore_app_template_version (
   id TEXT PRIMARY KEY,

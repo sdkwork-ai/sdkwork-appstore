@@ -22,6 +22,11 @@ export const TemplateCardHeader: React.FC<TemplateCardHeaderProps> = ({ template
             {template.isOfficial && (
               <CheckCircle2 className="w-4 h-4 text-store-brand shrink-0" />
             )}
+            {template.platform && (
+              <span className="px-1.5 py-0.5 rounded-full bg-store-subtle border border-store-line text-store-ink-soft text-[10px] font-medium leading-none shrink-0">
+                {template.platform}
+              </span>
+            )}
           </div>
           <p className="text-xs text-store-ink-faint truncate mt-0.5">
             {template.author} · {template.framework}

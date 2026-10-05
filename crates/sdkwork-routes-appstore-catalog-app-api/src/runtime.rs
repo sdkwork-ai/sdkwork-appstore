@@ -101,6 +101,7 @@ struct CatalogTemplatesListQuery {
     q: Option<String>,
     category_code: Option<String>,
     template_type: Option<String>,
+    template_platform: Option<String>,
     cursor: Option<String>,
     page_size: Option<i32>,
 }
@@ -112,6 +113,7 @@ struct CatalogTemplateCreateBody {
     template_name: String,
     description: Option<String>,
     template_type: String,
+    template_platform: Option<String>,
     category_code: Option<String>,
     framework: Option<String>,
     language: Option<String>,
@@ -627,6 +629,7 @@ async fn catalog_templates_list_handler(
         query.q,
         query.category_code,
         query.template_type,
+        query.template_platform,
         query.cursor,
         query.page_size,
     )
@@ -681,6 +684,7 @@ async fn catalog_template_create_handler(
         body.template_name,
         body.description,
         body.template_type,
+        body.template_platform,
         body.category_code,
         body.framework,
         body.language,

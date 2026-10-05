@@ -3,6 +3,7 @@ export interface AppTemplateCreateRequest {
   templateName: string;
   description?: string;
   templateType: 'APP' | 'PLUGIN' | 'AGENT';
+  templatePlatform?: 'H5' | 'PC' | 'FLUTTER' | 'MINIPROGRAM';
   categoryCode?: string;
   framework?: string;
   language?: string;

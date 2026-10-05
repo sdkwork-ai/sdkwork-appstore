@@ -321,11 +321,18 @@ pub async fn catalog_templates_list<S: CatalogOperations>(
     query: Option<String>,
     category_code: Option<String>,
     template_type: Option<String>,
+    template_platform: Option<String>,
     cursor: Option<String>,
     page_size: Option<i32>,
 ) -> Result<TemplatesListResult, AppstoreServiceError> {
-    let cmd =
-        mapper::request::map_templates_list(query, category_code, template_type, cursor, page_size);
+    let cmd = mapper::request::map_templates_list(
+        query,
+        category_code,
+        template_type,
+        template_platform,
+        cursor,
+        page_size,
+    );
     service.templates_list(context, cmd).await
 }
 
@@ -345,6 +352,7 @@ pub async fn catalog_template_create<S: CatalogOperations>(
     template_name: String,
     description: Option<String>,
     template_type: String,
+    template_platform: Option<String>,
     category_code: Option<String>,
     framework: Option<String>,
     language: Option<String>,
@@ -358,6 +366,7 @@ pub async fn catalog_template_create<S: CatalogOperations>(
         template_name,
         description,
         template_type,
+        template_platform,
         category_code,
         framework,
         language,

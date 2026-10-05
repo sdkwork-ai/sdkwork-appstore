@@ -62,8 +62,8 @@ function createCatalogFacade(client: SdkworkAppstoreAppClient) {
     listSearchHistory: (p?: { cursor?: string; limit?: number }) => api.search.history.list(pageParams(p)),
     upsertSearchHistory: (body: SearchHistoryUpsertRequest) => api.search.history.update(body),
     clearSearchHistory: () => api.search.history.delete(),
-    listTemplates: (p?: { q?: string; categoryCode?: string; templateType?: 'APP' | 'PLUGIN' | 'AGENT'; cursor?: string; limit?: number }) =>
-      api.templates.list({ q: p?.q, categoryCode: p?.categoryCode, templateType: p?.templateType, cursor: p?.cursor, pageSize: p?.limit }),
+    listTemplates: (p?: { q?: string; categoryCode?: string; templateType?: 'APP' | 'PLUGIN' | 'AGENT'; templatePlatform?: 'H5' | 'PC' | 'FLUTTER' | 'MINIPROGRAM'; cursor?: string; limit?: number }) =>
+      api.templates.list({ q: p?.q, categoryCode: p?.categoryCode, templateType: p?.templateType, templatePlatform: p?.templatePlatform, cursor: p?.cursor, pageSize: p?.limit }),
     getTemplate: (id: string) => api.templates.retrieve(id),
     createTemplate: (body: AppTemplateCreateRequest) => api.templates.create(body, commandOptions()),
     recordTemplateUsage: (id: string, body: AppTemplateUsageCreateRequest) =>

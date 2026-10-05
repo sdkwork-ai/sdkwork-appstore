@@ -693,6 +693,7 @@ pub struct AppTemplateRow {
     pub template_name: String,
     pub description: Option<String>,
     pub template_type: String,
+    pub template_platform: Option<String>,
     pub category_code: Option<String>,
     pub framework: Option<String>,
     pub language: Option<String>,

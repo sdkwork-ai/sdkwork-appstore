@@ -22,6 +22,13 @@ export const templates = {
     eCommerce: 'E-Commerce',
     ecommerce: 'E-Commerce'
   },
+  platforms: {
+    all: 'All Platforms',
+    h5: 'H5',
+    pc: 'PC',
+    flutter: 'Flutter',
+    miniprogram: 'Mini Program'
+  },
   form: {
     selectApp: 'Select Target Application to Package',
     tmplTitle: 'Template Title',
@@ -44,6 +51,7 @@ export const templates = {
     titleLabel: 'Template Title',
     titlePlaceholder: 'e.g. Gemini 3D Smart Metaverse CS Framework',
     categoryLabel: 'Category',
+    platformLabel: 'Target Platform',
     frameworkLabel: 'Tech Stack',
     frameworkPlaceholder: 'e.g. React 18 + Vite + Tailwind',
     repoUrlLabel: 'Git Repository URL',

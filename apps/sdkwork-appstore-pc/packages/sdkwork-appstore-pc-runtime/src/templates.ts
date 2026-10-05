@@ -4,9 +4,24 @@ import {
   type TemplatesServicePort,
 } from '@sdkwork/appstore-pc-core';
 
+import { TEMPLATE_PLATFORMS, type TemplatePlatform } from '@sdkwork/appstore-pc-core';
 import type { TemplateItem } from '../types';
 
 const templatePageSize = 200;
+
+/**
+ * Narrow a raw platform code to the generated wire union. The catalog's
+ * platform set is open-ended while the API contract is an enum, so codes the
+ * current contract does not know return undefined and filter client-side.
+ */
+function isTemplatePlatform(value: string | undefined): value is TemplatePlatform {
+  return !!value && (TEMPLATE_PLATFORMS as readonly string[]).includes(value);
+}
+
+function asTemplatePlatform(value: string | undefined): TemplatePlatform | undefined {
+  const code = value?.trim();
+  return code && isTemplatePlatform(code) ? code : undefined;
+}
 
 /** Template metadata keys shared with the storefront template API. */
 const metaKeys = {
@@ -32,10 +47,12 @@ export function configureAppstorePcTemplates(client: AppStoreClient): void {
 
 export function createTemplatesServicePort(client: AppStoreClient): TemplatesServicePort {
   return {
-    async getTemplates(category = '全部', query = ''): Promise<TemplateItem[]> {
+    async getTemplates(category = '全部', query = '', platform = ''): Promise<TemplateItem[]> {
+      const requested = asTemplatePlatform(platform);
       const response = await client.catalog.listTemplates({
         limit: templatePageSize,
         q: query.trim() || undefined,
+        ...(requested ? { templatePlatform: requested } : {}),
       });
       const templates = readPageItems<Record<string, unknown>>(response);
       const filtered = category === '全部' || category === 'All'
@@ -46,7 +63,11 @@ export function createTemplatesServicePort(client: AppStoreClient): TemplatesSer
               readString(template, 'categoryCode', 'category_code');
             return templateCategory.toLocaleLowerCase().includes(category.toLocaleLowerCase());
           });
-      return filtered.map(mapTemplateRecord);
+      const mapped = filtered.map(mapTemplateRecord);
+      const raw = platform.trim();
+      return raw && !requested
+        ? mapped.filter((template) => template.platform === raw)
+        : mapped;
     },
 
     async getTemplateById(id: string): Promise<TemplateItem | null> {
@@ -59,6 +80,9 @@ export function createTemplatesServicePort(client: AppStoreClient): TemplatesSer
         templateName: templateData.title || '未命名模板',
         description: templateData.description,
         templateType: 'APP',
+        ...(asTemplatePlatform(templateData.platform)
+          ? { templatePlatform: asTemplatePlatform(templateData.platform) }
+          : {}),
         categoryCode: templateData.category,
         framework: templateData.framework,
         gitRepoUrl: templateData.repoUrl || templateData.githubUrl,
@@ -117,6 +141,7 @@ function mapTemplateRecord(record: Record<string, unknown>): TemplateItem {
     id,
     title: readString(record, 'templateName', 'template_name'),
     author: readString(meta, metaKeys.authorName) || 'SDKWork',
+    platform: readString(record, 'templatePlatform', 'template_platform') || undefined,
     framework: readString(record, 'framework') || 'React + Vite + Tailwind',
     category: readString(meta, metaKeys.category) ||
       readString(record, 'categoryCode', 'category_code') ||

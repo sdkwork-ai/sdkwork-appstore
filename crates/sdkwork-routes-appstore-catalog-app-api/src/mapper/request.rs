@@ -268,6 +268,7 @@ pub fn map_templates_list(
     query: Option<String>,
     category_code: Option<String>,
     template_type: Option<String>,
+    template_platform: Option<String>,
     cursor: Option<String>,
     page_size: Option<i32>,
 ) -> TemplatesListRequest {
@@ -280,6 +281,9 @@ pub fn map_templates_list(
     }
     if let Some(v) = template_type {
         req = req.with_template_type(v);
+    }
+    if let Some(v) = template_platform {
+        req = req.with_template_platform(v);
     }
     if let Some(v) = cursor {
         req = req.with_cursor(v);
@@ -299,6 +303,7 @@ pub fn map_template_create(
     template_name: String,
     description: Option<String>,
     template_type: String,
+    template_platform: Option<String>,
     category_code: Option<String>,
     framework: Option<String>,
     language: Option<String>,
@@ -310,6 +315,7 @@ pub fn map_template_create(
     let mut req = TemplateCreateRequest::new(template_name, template_type);
     req.template_code = template_code;
     req.description = description;
+    req.template_platform = template_platform;
     req.category_code = category_code;
     req.framework = framework;
     req.language = language;

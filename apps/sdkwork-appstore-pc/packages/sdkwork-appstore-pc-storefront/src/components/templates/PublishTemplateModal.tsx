@@ -20,6 +20,7 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({
   const [appSource, setAppSource] = useState('app-qwen');
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState('SaaS 全栈');
+  const [platform, setPlatform] = useState('PC');
   const [framework, setFramework] = useState('React + Vite + Tailwind');
   const [description, setDescription] = useState('');
   const [tags, setTags] = useState('React, AI, SaaS');
@@ -37,6 +38,7 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({
       author: 'Developer',
       framework,
       category,
+      platform,
       description: description || 'AI architecture & code template.',
       icon: 'Boxes',
       iconColor: 'bg-store-brand',
@@ -82,12 +84,14 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({
             appSource={appSource}
             title={title}
             category={category}
+            platform={platform}
             framework={framework}
             description={description}
             tags={tags}
             onAppSourceChange={setAppSource}
             onTitleChange={setTitle}
             onCategoryChange={setCategory}
+            onPlatformChange={setPlatform}
             onFrameworkChange={setFramework}
             onDescriptionChange={setDescription}
             onTagsChange={setTags}

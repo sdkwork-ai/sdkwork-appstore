@@ -56,6 +56,7 @@ export interface CatalogAppstoreCatalogTemplatesListParams {
   q?: string;
   categoryCode?: string;
   templateType?: 'APP' | 'PLUGIN' | 'AGENT';
+  templatePlatform?: 'H5' | 'PC' | 'FLUTTER' | 'MINIPROGRAM';
   cursor?: string;
   pageSize?: number;
 }
@@ -80,6 +81,7 @@ export class CatalogAppstoreCatalogTemplatesApi {
       { name: 'q', value: params?.q, style: 'form', explode: true, allowReserved: false },
       { name: 'category_code', value: params?.categoryCode, style: 'form', explode: true, allowReserved: false },
       { name: 'template_type', value: params?.templateType, style: 'form', explode: true, allowReserved: false },
+      { name: 'template_platform', value: params?.templatePlatform, style: 'form', explode: true, allowReserved: false },
       { name: 'cursor', value: params?.cursor, style: 'form', explode: true, allowReserved: false },
       { name: 'page_size', value: params?.pageSize, style: 'form', explode: true, allowReserved: false },
     ]);

@@ -1,17 +1,20 @@
 import React from 'react';
 import { Sparkles } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { TEMPLATE_PLATFORMS } from '@sdkwork/appstore-pc-core';
 
 interface PublishTemplateFormFieldsProps {
   appSource: string;
   title: string;
   category: string;
+  platform: string;
   framework: string;
   description: string;
   tags: string;
   onAppSourceChange: (v: string) => void;
   onTitleChange: (v: string) => void;
   onCategoryChange: (v: string) => void;
+  onPlatformChange: (v: string) => void;
   onFrameworkChange: (v: string) => void;
   onDescriptionChange: (v: string) => void;
   onTagsChange: (v: string) => void;
@@ -23,12 +26,14 @@ export const PublishTemplateFormFields: React.FC<PublishTemplateFormFieldsProps>
   appSource,
   title,
   category,
+  platform,
   framework,
   description,
   tags,
   onAppSourceChange,
   onTitleChange,
   onCategoryChange,
+  onPlatformChange,
   onFrameworkChange,
   onDescriptionChange,
   onTagsChange,
@@ -85,6 +90,23 @@ export const PublishTemplateFormFields: React.FC<PublishTemplateFormFieldsProps>
             <option value="电商应用">{t('templates.categories.ecommerce')}</option>
           </select>
         </div>
+      </div>
+
+      <div>
+        <label className="block text-xs font-bold text-store-ink-faint uppercase mb-1">
+          {t('templates.publishModal.platformLabel')}
+        </label>
+        <select
+          value={platform}
+          onChange={(e) => onPlatformChange(e.target.value)}
+          className="w-full px-3 bg-store-field border border-store-line rounded-store-control text-sm text-store-ink focus:outline-none focus:border-store-brand h-9 placeholder:text-store-ink-faint outline-none transition-colors focus:ring-2 focus:ring-store-brand/25"
+        >
+          {TEMPLATE_PLATFORMS.map((code) => (
+            <option key={code} value={code}>
+              {t(`templates.platforms.${code.toLowerCase()}`)}
+            </option>
+          ))}
+        </select>
       </div>
 
       <div>

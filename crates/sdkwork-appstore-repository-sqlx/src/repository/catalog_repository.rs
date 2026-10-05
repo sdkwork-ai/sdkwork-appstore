@@ -1831,6 +1831,7 @@ impl CatalogRepositoryPort for SqlxCatalogRepository {
         query: Option<&str>,
         category_code: Option<&str>,
         template_type: Option<&str>,
+        template_platform: Option<&str>,
         cursor: Option<&str>,
         limit: i32,
         user_id: Option<&str>,
@@ -1838,8 +1839,9 @@ impl CatalogRepositoryPort for SqlxCatalogRepository {
         let mut sql = String::from(
             r#"
             SELECT t.id, t.tenant_id::text, t.organization_id::text, t.template_code,
-                   t.template_name, t.description, t.template_type, t.category_code,
-                   t.framework, t.language, t.icon_media_resource_id, t.git_repo_url,
+                   t.template_name, t.description, t.template_type, t.template_platform,
+                   t.category_code, t.framework, t.language, t.icon_media_resource_id,
+                   t.git_repo_url,
                    COALESCE(t.capability_manifest::text, '{}') AS capability_manifest, COALESCE(t.metadata::text, '{}') AS metadata,
                    t.published_at, t.created_at, t.updated_at,
                    COALESCE(star_counts.cnt, 0) AS star_count,
@@ -1884,6 +1886,9 @@ impl CatalogRepositoryPort for SqlxCatalogRepository {
         if template_type.is_some() {
             sql.push_str("  AND t.template_type = ?\n");
         }
+        if template_platform.is_some() {
+            sql.push_str("  AND t.template_platform = ?\n");
+        }
         if category_code.is_some() {
             sql.push_str("  AND t.category_code = ?\n");
         }
@@ -1911,6 +1916,9 @@ impl CatalogRepositoryPort for SqlxCatalogRepository {
             .bind(context.tenant_id.parse::<i64>().unwrap_or(0));
         if let Some(tt) = template_type {
             q = q.bind(tt);
+        }
+        if let Some(tp) = template_platform {
+            q = q.bind(tp);
         }
         if let Some(cc) = category_code {
             q = q.bind(cc);
@@ -1945,8 +1953,9 @@ impl CatalogRepositoryPort for SqlxCatalogRepository {
             .query_as::<AppTemplateRow>(&self.db.adapt_sql(
                 r#"
                 SELECT t.id, t.tenant_id::text, t.organization_id::text, t.template_code,
-                       t.template_name, t.description, t.template_type, t.category_code,
-                       t.framework, t.language, t.icon_media_resource_id, t.git_repo_url,
+                       t.template_name, t.description, t.template_type, t.template_platform,
+                       t.category_code, t.framework, t.language, t.icon_media_resource_id,
+                       t.git_repo_url,
                        COALESCE(t.capability_manifest::text, '{}') AS capability_manifest, COALESCE(t.metadata::text, '{}') AS metadata,
                        t.published_at, t.created_at, t.updated_at,
                        COALESCE(star_counts.cnt, 0) AS star_count,
@@ -2012,7 +2021,7 @@ impl CatalogRepositoryPort for SqlxCatalogRepository {
                     id, uuid, tenant_id, organization_id, data_scope, status,
                     created_at, updated_at, version, metadata,
                     template_no, template_code, template_name, description,
-                    category_code, template_type, framework, language,
+                    category_code, template_type, template_platform, framework, language,
                     icon_media_resource_id, visibility, publish_status, featured,
                     sort_weight, owner_user_id, git_repo_url, capability_manifest,
                     published_at
@@ -2038,6 +2047,7 @@ impl CatalogRepositoryPort for SqlxCatalogRepository {
             .bind(template.description.as_deref().unwrap_or(""))
             .bind(template.category_code.as_deref().unwrap_or(""))
             .bind(&template.template_type)
+            .bind(template.template_platform.as_deref())
             .bind(template.framework.as_deref().unwrap_or(""))
             .bind(template.language.as_deref().unwrap_or(""))
             .bind(template.icon_media_resource_id.as_deref().unwrap_or(""))

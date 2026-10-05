@@ -22,6 +22,13 @@ export const templates = {
     eCommerce: '电商应用',
     ecommerce: '电商应用'
   },
+  platforms: {
+    all: '全部平台',
+    h5: 'H5',
+    pc: 'PC',
+    flutter: 'Flutter',
+    miniprogram: '小程序'
+  },
   form: {
     selectApp: '选择要提取发布的目标应用项目',
     tmplTitle: '模板标题',
@@ -44,6 +51,7 @@ export const templates = {
     titleLabel: '模板标题',
     titlePlaceholder: '例如: Gemini 3D 智能元宇宙客服框架',
     categoryLabel: '应用分类',
+    platformLabel: '应用平台',
     frameworkLabel: '底层技术栈',
     frameworkPlaceholder: '例如: React 18 + Vite + Tailwind',
     repoUrlLabel: 'Git 源码仓库 URL',

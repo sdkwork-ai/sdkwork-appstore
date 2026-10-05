@@ -1780,6 +1780,7 @@ where
                 request.query.as_deref(),
                 request.category_code.as_deref(),
                 request.template_type.as_deref(),
+                request.template_platform.as_deref(),
                 request.cursor.as_deref(),
                 limit + 1,
                 context.user_id.as_deref(),
@@ -1830,6 +1831,12 @@ where
         let publisher_id = resolve_publisher_id(&self.repository, context).await?;
         let now = Utc::now();
         let template_type = request.template_type.to_ascii_uppercase();
+        let template_platform = request
+            .template_platform
+            .as_deref()
+            .map(str::trim)
+            .filter(|platform| !platform.is_empty())
+            .map(str::to_ascii_uppercase);
         let template_code = request.template_code.clone().or_else(|| {
             let base = slugify_template_name(&request.template_name);
             Some(format!(
@@ -1856,6 +1863,7 @@ where
             template_name: request.template_name.clone(),
             description: request.description.clone(),
             template_type,
+            template_platform,
             category_code: request.category_code.clone(),
             framework: request.framework.clone(),
             language: request.language.clone(),

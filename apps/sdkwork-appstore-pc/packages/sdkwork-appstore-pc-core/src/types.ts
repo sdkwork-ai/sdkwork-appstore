@@ -138,12 +138,23 @@ export interface McpServerItem {
   status: 'active' | 'idle' | 'disconnected' | 'error';
 }
 
+/**
+ * Template target-platform codes, in the library filter-row order. The set is
+ * open: the catalog may carry other codes, which the UI renders verbatim.
+ */
+export const TEMPLATE_PLATFORMS = ['H5', 'PC', 'FLUTTER', 'MINIPROGRAM'] as const;
+
+/** One {@link TEMPLATE_PLATFORMS} code. */
+export type TemplatePlatform = (typeof TEMPLATE_PLATFORMS)[number];
+
 export interface TemplateItem {
   id: string;
   title: string;
   author: string;
   framework: string;
   category: string;
+  /** Target application form the template scaffolds (H5, PC, ...); absent when undeclared. */
+  platform?: string;
   description: string;
   icon: string;
   iconColor: string;

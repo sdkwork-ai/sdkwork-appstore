@@ -1221,6 +1221,7 @@ pub fn map_app_template_row_to_domain(row: AppTemplateRow) -> Result<AppTemplate
         template_name: row.template_name,
         description: row.description,
         template_type: row.template_type,
+        template_platform: row.template_platform,
         category_code: row.category_code,
         framework: row.framework,
         language: row.language,

@@ -135,3 +135,7 @@ __pycache__/
 
 # Local one-off Flutter pub probe scratch (never committed)
 /tmp-pub-probe/
+
+# Local SQL scratch dump (never committed).
+# Added by repo-commit sweep; targeted rules only.
+/cols.txt
