@@ -207,8 +207,8 @@ export function createAppstoreAdminModerationPort(
       const decisionId = requireAdminIdentifier(input.decisionId, 'decisionId');
       await executeAdminOperation(operations.createAppeal, () =>
         client.moderation.appstore.moderation.appeals.create({
-          decision_id: decisionId,
-          appeal_reason: input.appealReason,
+          decisionId,
+          appealReason: input.appealReason,
         }),
       );
     },

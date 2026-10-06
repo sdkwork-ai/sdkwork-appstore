@@ -99,7 +99,8 @@
     }
   },
   "devDependencies": {
-    "@sdkwork/app-topology": "workspace:*"
+    "@sdkwork/app-topology": "workspace:*",
+    "@sdkwork/sdk-common": "workspace:*"
   },
   "pnpm": {
     "overrides": {

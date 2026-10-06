@@ -4,6 +4,10 @@ import { resolveBrowserDistOutDir } from '../../../sdkwork-specs/tools/browser-d
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import { createSdkworkCredentialEntryBootstrapVitePlugin } from '@sdkwork/iam-credential-entry/vite';
+import {
+  createBrowserRuntimeEnvVitePlugin,
+  serializeBrowserRuntimeEnvScript,
+} from '../../../sdkwork-specs/tools/browser-runtime-env-vite.mjs';
 import { mergeRepoDevBootstrapAccessTokenEnv } from '@sdkwork/iam-credential-entry/node-bootstrap';
 import path from 'path';
 import { fileURLToPath } from 'node:url';
@@ -102,6 +106,38 @@ export default defineConfig(({ mode }) => {
     // never be exposed to the client bundle through `define`
     // (`IAM_CREDENTIAL_ENTRY_SPEC.md` section 4/5).
     plugins: [
+      // BROWSER_RUNTIME_ENV_SPEC.md §2/§4: the dev server serves the runtime
+      // document from a serve-only middleware (never the stale public/ file)
+      // and injects the SDKWORK_RUNTIME_ENV bridge so shared SDK resolvers
+      // see the standalone same-origin contract instead of deriving the
+      // cloud-gateway dev port.
+      createBrowserRuntimeEnvVitePlugin({
+        name: 'sdkwork-appstore-browser-runtime-env',
+        path: '/runtime-env.js',
+        resolveServeDocument: () =>
+          serializeBrowserRuntimeEnvScript([
+            [
+              'SDKWORK_RUNTIME_ENV',
+              {
+                // Standalone dev is same-origin: the deployment mode alone
+                // makes shared resolvers derive the page's own origin (the
+                // Vite server proxies app-api/backend-api to the gateway).
+                // Publishing SDKWORK_API_BASE_URL '/' here instead would let
+                // SDK clients reduce it to an empty origin and fail their
+                // own non-empty base validation.
+                SDKWORK_DEPLOYMENT_MODE: 'standalone',
+                VITE_SDKWORK_ENVIRONMENT: environment,
+                VITE_SDKWORK_DEPLOYMENT_PROFILE: deploymentProfile,
+                VITE_SDKWORK_RUNTIME_TARGET: 'browser',
+              },
+            ],
+          ]),
+        transformIndexHtml: (html) =>
+          html.replace(
+            '<head>',
+            '<head>\n    <script src="/runtime-env.js"></script>',
+          ),
+      }),
       createSdkworkCredentialEntryBootstrapVitePlugin({
         accessToken: bootstrapAccessToken,
         environment,

@@ -4,6 +4,7 @@ import {
   resolveLucideReactEntry,
 } from '../../../sdkwork-specs/tools/vite-runtime-profile.mjs';
 import { resolveBrowserDistOutDir } from '../../../sdkwork-specs/tools/browser-dist-layout.mjs';
+import { createBrowserRuntimeEnvVitePlugin } from '../../../sdkwork-specs/tools/browser-runtime-env-vite.mjs';
 
 import tailwindcss from '@tailwindcss/vite';
 import { createSdkworkCredentialEntryBootstrapVitePlugin } from '@sdkwork/iam-credential-entry/vite';
@@ -136,20 +137,35 @@ export default defineConfig(({ command, mode }) => {
     // base URL at module-load time — built artifacts get the same document
     // through the runtime-env element, but dev serve has no build step.
     plugins: [
-      {
+      // BROWSER_RUNTIME_ENV_SPEC.md section 2/4: the canonical serve-only
+      // middleware publishes the SDKWORK_RUNTIME_ENV bridge with the
+      // standalone same-origin contract (the H5 dev server proxies the API
+      // prefixes to the application gateway), replacing the env-conditional
+      // hand-rolled injection.
+      createBrowserRuntimeEnvVitePlugin({
         name: 'sdkwork-runtime-env-bridge',
-        transformIndexHtml(html: string) {
-          const apiBase = process.env.SDKWORK_API_BASE_URL;
-          if (!apiBase) {
-            return html;
-          }
-          const injection =
-            `<script>window.SDKWORK_RUNTIME_ENV = Object.assign(` +
-            `window.SDKWORK_RUNTIME_ENV ?? {}, ` +
-            `{ SDKWORK_API_BASE_URL: ${JSON.stringify(apiBase)} });</script>`;
-          return html.replace('<head>', `<head>\n    ${injection}`);
+        path: '/runtime-env.js',
+        resolveServeDocument: () => {
+          // Standalone dev is same-origin: the deployment mode alone makes
+          // shared resolvers derive the page's own origin. An SDKWORK_API_BASE_URL
+          // of '/' would reduce to an empty origin for SDK clients that validate
+          // their base, so only an explicitly configured absolute URL passes
+          // through.
+          const deploymentMode = process.env.SDKWORK_DEPLOYMENT_MODE ?? 'standalone';
+          const configuredApiBase = process.env.SDKWORK_API_BASE_URL ?? '';
+          return `window.SDKWORK_RUNTIME_ENV = Object.freeze({${JSON.stringify(
+            'SDKWORK_DEPLOYMENT_MODE',
+          )}: ${JSON.stringify(deploymentMode)}, ${JSON.stringify(
+            'SDKWORK_API_BASE_URL',
+          )}: ${JSON.stringify(configuredApiBase)}});`;
         },
-      },
+        transformIndexHtml(html: string) {
+          return html.replace(
+            '<head>',
+            `<head>\n    <script src="/runtime-env.js"></script>`,
+          );
+        },
+      }),
       createSdkworkCredentialEntryBootstrapVitePlugin({
         accessToken: credentialEntryBootstrapAccessToken,
         environment: runtimeProfile.environment,

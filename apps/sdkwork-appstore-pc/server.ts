@@ -13,7 +13,11 @@ async function startServer() {
     next();
   });
 
-  app.use(express.json({ limit: '10mb' }));
+  // Body parsing is scoped to the express-owned /api routes. A global
+  // express.json() would consume request bodies before the Vite middleware
+  // proxies them, and the gateway proxy then streams an already-consumed
+  // request: every POST/PUT to the gateway hangs until timeout.
+  app.use('/api', express.json({ limit: '10mb' }));
 
   // --- API Health Endpoint ---
   app.get('/api/health', (req, res) => {
