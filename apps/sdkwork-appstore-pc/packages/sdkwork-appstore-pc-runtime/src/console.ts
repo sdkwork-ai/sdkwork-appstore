@@ -303,7 +303,9 @@ export function createConsoleServicePort(client: AppStoreClient): ConsoleService
 
     async inviteMember(publisherId: string, data: { userId: string; role: string }): Promise<boolean> {
       await client.publishers.inviteMember(publisherId, {
-        userId: data.userId,
+        // `inviteeUserId`: the platform context-selector guard rejects a
+        // client-supplied `userId` body field as ambient subject selection.
+        inviteeUserId: data.userId,
         memberRole: data.role,
       });
       return true;

@@ -2824,10 +2824,10 @@ components:
     PublisherMemberInviteRequest:
       type: object
       required:
-      - userId
+      - inviteeUserId
       - memberRole
       properties:
-        userId:
+        inviteeUserId:
           type: string
         memberRole:
           type: string

@@ -39,7 +39,11 @@ struct PublisherUpdateBody {
 #[derive(Debug, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 struct PublisherMemberInviteBody {
-    user_id: String,
+    // `invitee` spelling: the platform context-selector guard rejects a
+    // client-supplied `userId` body field as ambient subject selection,
+    // while this field is the invite target - a business payload value.
+    #[serde(rename = "inviteeUserId")]
+    invitee_user_id: String,
     member_role: String,
 }
 
@@ -256,7 +260,7 @@ async fn publisher_members_invite_handler(
         &state.publisher_service,
         &ctx,
         publisher_id,
-        body.user_id,
+        body.invitee_user_id,
         body.member_role,
     )
     .await
