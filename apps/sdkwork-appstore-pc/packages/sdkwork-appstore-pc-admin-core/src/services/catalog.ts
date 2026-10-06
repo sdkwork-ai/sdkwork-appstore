@@ -289,18 +289,23 @@ function readLocalizedDisplayName(record: Record<string, unknown>): string | und
 }
 
 function projectCategoryRow(record: Record<string, unknown>): AppstoreAdminCategoryRow | undefined {
-  const categoryId = readId(record, 'id', 'categoryId', 'category_id');
+  // The wire item wraps the category and its localizations
+  // (`{category, localizations}`); probe the wrapper first, then the flat shape.
+  const categoryRecord = readRecord(record, 'category') ?? record;
+  const categoryId = readId(categoryRecord, 'id', 'categoryId', 'category_id');
   if (!categoryId) {
     return undefined;
   }
-  const parentCategoryId = readId(record, 'parentCategoryId', 'parent_category_id');
-  const sortOrder = readNumber(record, 'sortOrder', 'sort_order');
+  const parentCategoryId = readId(categoryRecord, 'parentCategoryId', 'parent_category_id');
+  const sortOrder = readNumber(categoryRecord, 'sortOrder', 'sort_order');
   const displayName = readLocalizedDisplayName(record);
   return {
     categoryId,
-    categoryCode: readString(record, 'categoryCode', 'category_code') || categoryId,
+    categoryCode: readString(categoryRecord, 'categoryCode', 'category_code') || categoryId,
     ...(parentCategoryId ? { parentCategoryId } : {}),
-    ...(readString(record, 'status') ? { status: readString(record, 'status') } : {}),
+    ...(readString(categoryRecord, 'status')
+      ? { status: readString(categoryRecord, 'status') }
+      : {}),
     ...(sortOrder === undefined ? {} : { sortOrder }),
     ...(displayName ? { displayName } : {}),
   };
