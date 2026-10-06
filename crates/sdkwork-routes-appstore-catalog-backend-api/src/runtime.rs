@@ -152,8 +152,13 @@ async fn admin_collections_list(
         Ok(ctx) => ctx,
         Err(resp) => return resp,
     };
-    match catalog_admin_collections_list(&state.catalog_service, &ctx, query.cursor, query.page_size)
-        .await
+    match catalog_admin_collections_list(
+        &state.catalog_service,
+        &ctx,
+        query.cursor,
+        query.page_size,
+    )
+    .await
     {
         Ok(result) => ok_page(
             context.as_ref(),

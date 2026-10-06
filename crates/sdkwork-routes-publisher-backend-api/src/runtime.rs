@@ -27,10 +27,7 @@ struct AdminListPublishersQuery {
 
 pub fn routes() -> Router<AppState> {
     Router::new()
-        .route(
-            "/backend/v3/api/publishers",
-            get(admin_list_publishers),
-        )
+        .route("/backend/v3/api/publishers", get(admin_list_publishers))
         .route(
             "/backend/v3/api/publishers/{publisherId}/verify",
             post(admin_verify_publisher),
@@ -46,7 +43,13 @@ async fn admin_list_publishers(
         Ok(ctx) => ctx,
         Err(resp) => return resp,
     };
-    match publishers_admin_list(&state.publisher_service, &ctx, query.cursor, query.page_size).await
+    match publishers_admin_list(
+        &state.publisher_service,
+        &ctx,
+        query.cursor,
+        query.page_size,
+    )
+    .await
     {
         Ok(result) => ok_page(
             context.as_ref(),

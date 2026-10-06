@@ -5,8 +5,8 @@ use sdkwork_appstore_catalog_service::domain::commands::{
 };
 use sdkwork_appstore_catalog_service::domain::results::{
     CategoriesListResult, CategoryCreateResult, CategoryUpdateResult, CollectionCreateResult,
-    CollectionItemsUpsertResult, CollectionUpdateResult, CollectionsListResult,
-    FeaturedListResult, FeaturedUpsertResult,
+    CollectionItemsUpsertResult, CollectionUpdateResult, CollectionsListResult, FeaturedListResult,
+    FeaturedUpsertResult,
 };
 use sdkwork_appstore_catalog_service::error::AppstoreServiceError;
 use sdkwork_appstore_catalog_service::CatalogOperations;
