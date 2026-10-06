@@ -635,7 +635,9 @@ pub struct CatalogTrendingTermRow {
     pub term: String,
     pub locale: String,
     pub rank: i32,
-    pub score: f64,
+    /// `appstore_catalog_trending_term.score` is `REAL` (`FLOAT4`); sqlx decodes
+    /// Postgres `REAL` into `f32`, not `f64`.
+    pub score: f32,
     pub snapshot_date: String,
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,

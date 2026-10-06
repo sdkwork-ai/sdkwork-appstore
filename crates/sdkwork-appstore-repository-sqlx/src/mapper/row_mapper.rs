@@ -1201,7 +1201,7 @@ pub fn map_trending_term_row_to_domain(row: CatalogTrendingTermRow) -> TrendingT
         term: row.term,
         locale: row.locale,
         rank: row.rank,
-        score: row.score,
+        score: f64::from(row.score),
         snapshot_date: row.snapshot_date,
         created_at: row.created_at,
         updated_at: row.updated_at,

@@ -128,7 +128,7 @@ SELECT
     l.app_key,
     r.version_code,
     'production',
-    'released',
+    'published',
     100,
     '["CN", "US"]',
     'https://appstore.sdkwork.local/apps/' || l.listing_slug,
