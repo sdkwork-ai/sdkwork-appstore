@@ -60,7 +60,7 @@ export function DesktopSidebar() {
   const adminTabs: SidebarNavItem[] = [
     { name: t('nav.menu.publisher'), path: '/publisher', icon: Store },
     { name: t('nav.menu.console'), path: '/console/settings', icon: Sliders },
-    { name: t('nav.menu.admin'), path: '/admin/monitor', icon: Activity },
+    { name: t('nav.menu.admin'), path: '/admin/dashboard', icon: Activity },
   ];
 
   const bottomTabs: SidebarNavItem[] = [

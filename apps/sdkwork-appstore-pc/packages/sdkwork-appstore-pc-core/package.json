@@ -23,6 +23,7 @@
     "@sdkwork/appstore-listing-acquire-core": "workspace:*",
     "@sdkwork/appstore-sdk": "workspace:*",
     "@sdkwork/comments-app-sdk": "workspace:*",
+    "@sdkwork/documents-app-sdk": "workspace:*",
     "@sdkwork/drive-app-sdk": "workspace:*",
     "@sdkwork/iam-app-sdk": "workspace:*",
     "@sdkwork/mcp-app-sdk": "workspace:*",

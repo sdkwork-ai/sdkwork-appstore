@@ -19,18 +19,8 @@ import {
   publicSdkReferenceMessages,
 } from '@sdkwork/documents-pc-i18n';
 
-const developerMarketShellZhCN = {
-  'developerMarket.loading': '正在加载开发者市场…',
-  'developerMarket.unavailable.title': '开发者市场暂不可用',
-  'developerMarket.unavailable.subtitle': '应用商店运行时未绑定开发者市场服务，请重启应用商店后重试。',
-};
-
-const developerMarketShellEn = {
-  'developerMarket.loading': 'Loading the developer market…',
-  'developerMarket.unavailable.title': 'Developer market is unavailable',
-  'developerMarket.unavailable.subtitle':
-    'The App Store runtime has no developer-market binding. Restart the App Store and try again.',
-};
+import { developerMarketShellZhCN } from './zh-CN/appstore/developer-market/shell';
+import { developerMarketShellEn } from './en-US/appstore/developer-market/shell';
 
 /** Flat documents copy for the `en` locale, merged at the translation root. */
 export const developerMarketEn = {

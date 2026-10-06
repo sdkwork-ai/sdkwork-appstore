@@ -1,4 +1,5 @@
 import { configureAppstorePcDeveloperMarket } from '@sdkwork/appstore-pc-developer-market/runtime';
+import { createAppstorePcDocumentsAppClient } from '@sdkwork/appstore-pc-core';
 import type { AuthTokenManager } from '@sdkwork/sdk-common';
 
 /**
@@ -10,5 +11,10 @@ export function configureAppstorePcDeveloperMarketSurface(config: {
   baseUrl: string;
   tokenManager: AuthTokenManager;
 }): void {
-  configureAppstorePcDeveloperMarket(config);
+  configureAppstorePcDeveloperMarket({
+    documentsAppClient: createAppstorePcDocumentsAppClient(
+      { appApiBaseUrl: config.baseUrl },
+      config.tokenManager,
+    ),
+  });
 }

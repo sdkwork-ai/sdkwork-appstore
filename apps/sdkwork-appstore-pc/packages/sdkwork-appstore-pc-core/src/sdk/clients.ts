@@ -32,6 +32,7 @@ import {
   type SkillInstallationRecord,
   type SkillRecord,
 } from '@sdkwork/skills-app-sdk';
+import { createClient as createDocumentsAppClient, type SdkworkDocumentsAppClient } from '@sdkwork/documents-app-sdk';
 import { createClient as createIamAppClient, type SdkworkAppClient } from '@sdkwork/iam-app-sdk';
 import type { AuthTokenManager } from '@sdkwork/sdk-common';
 
@@ -144,6 +145,21 @@ export function createAppstorePcSdkClients(
     },
     skills,
   };
+}
+
+/**
+ * Documents app client owned by the app core layer. The developer-market
+ * reference surfaces consume it through this inventory instead of binding the
+ * generated SDK package directly.
+ */
+export function createAppstorePcDocumentsAppClient(
+  config: Pick<AppstorePcSdkBaseUrls, 'appApiBaseUrl'>,
+  tokenManager: AuthTokenManager,
+): SdkworkDocumentsAppClient {
+  return createDocumentsAppClient({
+    baseUrl: normalizeGeneratedSdkBaseUrl(config.appApiBaseUrl, '/app/v3/api'),
+    tokenManager,
+  });
 }
 
 /** IAM app client owned by the app core layer (used by auth runtime wiring). */

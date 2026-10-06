@@ -12,23 +12,22 @@
  * `createAppstorePcRuntime` (the same lane as `configureAppstorePcPaidCheckout`)
  * without pulling the documents UI into the runtime bundle graph.
  */
-import { createClient } from '@sdkwork/documents-app-sdk';
 import type {
+  DocumentsAppSdkClient,
   DocumentsGeneratedSdkMetadata,
   DocumentsReferenceRuntime,
 } from '@sdkwork/documents-pc-commons';
-import { normalizeGeneratedSdkBaseUrl } from '@sdkwork/appstore-pc-core';
-import type { AuthTokenManager } from '@sdkwork/sdk-common';
 
 /** Documents surfaces resolve relative schema URLs against the app API root. */
 export const DEVELOPER_MARKET_APP_API_PREFIX = '/app/v3/api';
 
 /** Wiring accepted by `configureAppstorePcDeveloperMarket`. */
 export interface AppstorePcDeveloperMarketConfig {
-  /** Gateway origin the documents app SDK client dispatches against. */
-  baseUrl: string;
-  /** Token manager shared with every App Store SDK client. */
-  tokenManager: AuthTokenManager;
+  /**
+   * Documents app SDK client bound by the app core SDK inventory; this
+   * feature package never constructs generated SDK transports itself.
+   */
+  documentsAppClient: DocumentsAppSdkClient;
 }
 
 // Bundlers that cannot keep `import.meta` semantics collapse the expression to
@@ -226,21 +225,14 @@ let developerMarketRuntime: DocumentsReferenceRuntime | null = null;
  * wire it through one lane.
  */
 export function configureAppstorePcDeveloperMarket(config: AppstorePcDeveloperMarketConfig): void {
-  const baseUrl = config.baseUrl.trim();
-  let documentsAppSdkClient: ReturnType<typeof createClient> | null = null;
   developerMarketRuntime = {
     readRuntimeEnv: readDeveloperMarketRuntimeEnv,
     resolveRuntimeBoolean: resolveDeveloperMarketRuntimeBoolean,
     sdkSystemConfig: DEVELOPER_MARKET_SDK_SYSTEM_CONFIG,
-    getDocumentsAppSdkClient: () => {
-      if (!documentsAppSdkClient) {
-        documentsAppSdkClient = createClient({
-          baseUrl,
-          tokenManager: config.tokenManager,
-        });
-      }
-      return documentsAppSdkClient;
-    },
+    // The generated client satisfies `DocumentsAppSdkClient` directly; the
+    // documents reference runtime consumes its `documents.sdkReference`
+    // surface, so no reshaping adapter sits in between.
+    getDocumentsAppSdkClient: () => config.documentsAppClient,
     playgroundUserAgent: 'SDKWork-AppStore-DeveloperMarket/1.0.0',
   };
 }
