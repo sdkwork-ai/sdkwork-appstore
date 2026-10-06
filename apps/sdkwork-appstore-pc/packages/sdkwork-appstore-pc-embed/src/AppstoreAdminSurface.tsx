@@ -1,9 +1,11 @@
 import { useMemo, useSyncExternalStore } from 'react';
 import {
   APPSTORE_ADMIN_ROUTE_PREFIX,
+  evaluateAppstoreAdminAccess,
   projectAppstoreAdminOperator,
   toAppstoreAdminOperatorSession,
 } from '@sdkwork/appstore-pc-admin-core';
+import { AppstoreAdminShellProvider } from '@sdkwork/appstore-pc-admin-shell';
 import { appstoreAdminCatalogI18nBundle, appstoreAdminCatalogModule } from '@sdkwork/appstore-pc-admin-catalog';
 import { appstoreAdminDashboardI18nBundle, appstoreAdminDashboardModule } from '@sdkwork/appstore-pc-admin-dashboard';
 import { appstoreAdminListingsI18nBundle, appstoreAdminListingsModule } from '@sdkwork/appstore-pc-admin-listings';
@@ -93,18 +95,24 @@ export function AppstoreAdminSurface({
   );
   const session = useMemo(() => toAppstoreAdminOperatorSession(snapshot), [snapshot]);
   const operator = useMemo(() => projectAppstoreAdminOperator(snapshot), [snapshot]);
+  const access = useMemo(() => evaluateAppstoreAdminAccess(session), [session]);
   const identity = {
     ...(operator.operatorName ? { operatorName: operator.operatorName } : {}),
     ...(operator.tenantId ? { tenantLabel: operator.tenantId } : {}),
   };
 
   return (
-    <AppstoreAdminShell
-      modules={APPSTORE_ADMIN_MODULES}
-      session={session}
-      platform={platform}
-      prefix={prefix}
-      {...identity}
-    />
+    // The shell context carries the operator session + access to every
+    // capability page: permission hooks (useAppstoreAdminPermission) throw
+    // without it, blanking whole pages.
+    <AppstoreAdminShellProvider session={session} access={access}>
+      <AppstoreAdminShell
+        modules={APPSTORE_ADMIN_MODULES}
+        session={session}
+        platform={platform}
+        prefix={prefix}
+        {...identity}
+      />
+    </AppstoreAdminShellProvider>
   );
 }
