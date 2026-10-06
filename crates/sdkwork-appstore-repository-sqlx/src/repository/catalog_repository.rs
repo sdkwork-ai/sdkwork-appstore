@@ -893,7 +893,11 @@ impl CatalogRepositoryPort for SqlxCatalogRepository {
     ) -> Result<Vec<ListingSummary>, AppstoreServiceError> {
         let mut sql = String::from(
             r#"
-            SELECT l.id, l.app_id, l.app_key, ll.display_name, ll.subtitle,
+            SELECT l.id, l.app_id, l.app_key, COALESCE(ll.display_name,
+                       (SELECT lld.display_name FROM appstore_listing_localization lld
+                        WHERE lld.listing_id = l.id AND lld.tenant_id = l.tenant_id
+                        ORDER BY (lld.locale = l.default_locale) DESC, lld.id ASC LIMIT 1),
+                       l.app_key) AS display_name, ll.subtitle,
                    l.listing_slug, l.pricing_model,
                    (SELECT m.media_resource_id FROM appstore_listing_media m
                     WHERE m.listing_id = l.id AND m.media_role = 'ICON' AND m.tenant_id = l.tenant_id
@@ -1051,7 +1055,11 @@ impl CatalogRepositoryPort for SqlxCatalogRepository {
             .join(", ");
         let sql = format!(
             r#"
-            SELECT l.id, l.app_id, l.app_key, ll.display_name, ll.subtitle,
+            SELECT l.id, l.app_id, l.app_key, COALESCE(ll.display_name,
+                       (SELECT lld.display_name FROM appstore_listing_localization lld
+                        WHERE lld.listing_id = l.id AND lld.tenant_id = l.tenant_id
+                        ORDER BY (lld.locale = l.default_locale) DESC, lld.id ASC LIMIT 1),
+                       l.app_key) AS display_name, ll.subtitle,
                    l.listing_slug, l.pricing_model,
                    (SELECT m.media_resource_id FROM appstore_listing_media m
                     WHERE m.listing_id = l.id AND m.media_role = 'ICON' AND m.tenant_id = l.tenant_id
@@ -1118,7 +1126,11 @@ impl CatalogRepositoryPort for SqlxCatalogRepository {
         let locale_filter = locale.unwrap_or("en-US");
         let mut sql = String::from(
             r#"
-            SELECT l.id, l.app_id, l.app_key, ll.display_name, ll.subtitle,
+            SELECT l.id, l.app_id, l.app_key, COALESCE(ll.display_name,
+                       (SELECT lld.display_name FROM appstore_listing_localization lld
+                        WHERE lld.listing_id = l.id AND lld.tenant_id = l.tenant_id
+                        ORDER BY (lld.locale = l.default_locale) DESC, lld.id ASC LIMIT 1),
+                       l.app_key) AS display_name, ll.subtitle,
                    l.listing_slug, l.pricing_model,
                    (SELECT m.media_resource_id FROM appstore_listing_media m
                     WHERE m.listing_id = l.id AND m.media_role = 'ICON' AND m.tenant_id = l.tenant_id
