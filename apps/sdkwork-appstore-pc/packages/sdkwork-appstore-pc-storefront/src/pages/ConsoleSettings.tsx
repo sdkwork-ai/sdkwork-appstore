@@ -44,6 +44,8 @@ export default function ConsoleSettings({ session }: ConsoleSettingsProps) {
   const [publishedApps, setPublishedApps] = useState<PublishedApp[]>([]);
   const [categoryOptions, setCategoryOptions] = useState<ConsoleCategoryOption[]>([]);
   const [successMsg, setSuccessMsg] = useState('');
+  const [publishError, setPublishError] = useState('');
+  const [appsError, setAppsError] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const tenantLabel = useSyncExternalStore(
@@ -53,21 +55,26 @@ export default function ConsoleSettings({ session }: ConsoleSettingsProps) {
   );
 
   const loadConsoleData = async () => {
-    try {
-      // Managed apps and live catalog categories are both real reads; a
-      // category outage must not block the page, so it degrades to an empty
-      // picker instead of fabricated options.
-      const [apps, categories] = await Promise.all([
-        ConsoleService.getManagedApps().catch(() => [] as ManagedApp[]),
-        ConsoleService.listCategories().catch(() => [] as ConsoleCategoryOption[]),
-      ]);
-      setPublishedApps(apps);
-      setCategoryOptions(categories);
-    } catch (err) {
-      console.error('Failed to load console settings', err);
-    } finally {
-      setLoading(false);
-    }
+    // Managed apps are the primary surface: a failed load must read as a
+    // failure, not as an empty store. Category options are optional for the
+    // publish form, so that read alone degrades to an empty picker.
+    const [apps, categories] = await Promise.all([
+      ConsoleService.getManagedApps().then(
+        (apps) => {
+          setAppsError(false);
+          return apps;
+        },
+        (error: unknown) => {
+          console.error('Failed to load managed apps', error);
+          setAppsError(true);
+          return [] as ManagedApp[];
+        },
+      ),
+      ConsoleService.listCategories().catch(() => [] as ConsoleCategoryOption[]),
+    ]);
+    setPublishedApps(apps);
+    setCategoryOptions(categories);
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -77,21 +84,31 @@ export default function ConsoleSettings({ session }: ConsoleSettingsProps) {
   const handlePublish = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!appName.trim()) return;
-
-    const created = await ConsoleService.publishApp({
+    setSuccessMsg('');
+    setPublishError('');
+    try {
+      const created = await ConsoleService.publishApp({
       name: appName,
-      categoryId: categoryId || undefined,
-      version,
-      description,
-    });
+        categoryId: categoryId || undefined,
+        version,
+        description,
+      });
 
-    setPublishedApps((prev) => [created, ...prev]);
-    setSuccessMsg(t('console.alert.success', { appName }));
-    setAppName('');
-    setDescription('');
-    setVersion('1.0.0');
-    setCategoryId('');
-    setTimeout(() => setSuccessMsg(''), 4000);
+      setPublishedApps((prev) => [created, ...prev]);
+      setSuccessMsg(t('console.alert.success', { appName }));
+      setAppName('');
+      setDescription('');
+      setVersion('1.0.0');
+      setCategoryId('');
+      setTimeout(() => setSuccessMsg(''), 4000);
+    } catch (error) {
+      console.error('Failed to publish app', error);
+      setPublishError(
+        t('console.alert.publishFailed', {
+          message: error instanceof Error ? error.message : String(error),
+        }),
+      );
+    }
   };
 
   return (
@@ -100,6 +117,7 @@ export default function ConsoleSettings({ session }: ConsoleSettingsProps) {
       <ConsoleHeader tenantLabel={tenantLabel} />
 
       {/* Sub-component: Notification Alert */}
+      <ConsoleNotificationAlert message={publishError} tone="error" />
       <ConsoleNotificationAlert message={successMsg} />
 
       {loading ? (
@@ -125,6 +143,14 @@ export default function ConsoleSettings({ session }: ConsoleSettingsProps) {
               onSubmit={handlePublish}
             />
 
+            {appsError ? (
+              <div
+                role="alert"
+                className="px-3.5 py-2.5 border border-store-danger/30 bg-store-danger/10 text-store-danger rounded-store-control text-xs"
+              >
+                {t('console.apps.loadFailed', '托管应用列表加载失败，请刷新重试；若持续失败请重新登录。')}
+              </div>
+            ) : null}
             {/* Sub-component: App List */}
             <ManagedAppsList apps={publishedApps} />
           </div>
