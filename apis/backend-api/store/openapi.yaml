@@ -937,12 +937,12 @@ components:
     ModerationAppealCreateRequest:
       type: object
       required:
-      - decision_id
-      - appeal_reason
+      - decisionId
+      - appealReason
       properties:
-        decision_id:
+        decisionId:
           type: string
-        appeal_reason:
+        appealReason:
           type: string
     ModerationAppealDecideRequest:
       type: object
