@@ -39,7 +39,7 @@ export function CatalogStatusBadge({ status }: { status?: string }) {
   const label = t(translationKey, { defaultValue: token });
   return (
     <span
-      className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium ${tone}`}
+      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${tone}`}
     >
       {label}
     </span>
