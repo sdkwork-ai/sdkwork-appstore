@@ -1,4 +1,3 @@
-use sdkwork_appstore_repository_sqlx::AppstoreSqlxDb;
 use sdkwork_appstore_repository_sqlx::repository::catalog_repository::SqlxCatalogRepository;
 use sdkwork_appstore_repository_sqlx::repository::compliance_repository::SqlxComplianceRepository;
 use sdkwork_appstore_repository_sqlx::repository::library_repository::SqlxLibraryRepository;
@@ -7,6 +6,7 @@ use sdkwork_appstore_repository_sqlx::repository::market_repository::SqlxMarketR
 use sdkwork_appstore_repository_sqlx::repository::moderation_repository::SqlxModerationRepository;
 use sdkwork_appstore_repository_sqlx::repository::publisher_repository::SqlxPublisherRepository;
 use sdkwork_appstore_repository_sqlx::repository::release_repository::SqlxReleaseRepository;
+use sdkwork_appstore_repository_sqlx::AppstoreSqlxDb;
 
 #[derive(Debug, Clone)]
 pub struct AppstoreRepositories {

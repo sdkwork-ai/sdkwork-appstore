@@ -1,4 +1,4 @@
-use crate::integrations::registry::{IntegrationCapability, integration_capabilities};
+use crate::integrations::registry::{integration_capabilities, IntegrationCapability};
 
 pub struct ServiceContainer {
     capabilities: &'static [IntegrationCapability],
