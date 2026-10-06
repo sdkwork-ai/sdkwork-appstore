@@ -145,16 +145,18 @@ function buildRangeParams(
 }
 
 /**
- * The operator dashboard payload has no typed schema on the wire, and different
- * backend revisions have shipped both flat and `summary`-nested layouts, so
- * probe the known locations before falling back to zeroed KPIs.
+ * The operator dashboard payload has no typed schema on the wire, and backend
+ * revisions have shipped `summary`-nested, flat, and `item`-wrapped layouts
+ * with differing field spellings, so probe the known locations before falling
+ * back to zeroed KPIs.
  */
 function projectDashboardSummary(payload: unknown): AppstoreAdminDashboardSummary | undefined {
   const root = asRecord(payload);
   if (!root || Object.keys(root).length === 0) {
     return undefined;
   }
-  const summary = readRecord(root, 'summary', 'kpis', 'metrics', 'overview') ?? root;
+  const summary =
+    readRecord(root, 'summary', 'kpis', 'metrics', 'overview', 'item') ?? root;
   return {
     totalListings:
       readNumber(summary, 'totalListings', 'total_listings', 'listingCount', 'listing_count') ?? 0,
@@ -163,9 +165,23 @@ function projectDashboardSummary(payload: unknown): AppstoreAdminDashboardSummar
     totalReviews:
       readNumber(summary, 'totalReviews', 'total_reviews', 'reviewCount', 'review_count') ?? 0,
     pendingModeration:
-      readNumber(summary, 'pendingModeration', 'pending_moderation', 'pendingReviews', 'pending_reviews') ?? 0,
+      readNumber(
+        summary,
+        'pendingModeration',
+        'pending_moderation',
+        'pendingReviews',
+        'pending_reviews',
+        'pendingReviewCount',
+        'pending_review_count',
+      ) ?? 0,
     activePublishers:
-      readNumber(summary, 'activePublishers', 'active_publishers', 'publisherCount', 'publisher_count') ?? 0,
+      readNumber(
+        summary,
+        'activePublishers',
+        'active_publishers',
+        'publisherCount',
+        'publisher_count',
+      ) ?? 0,
     dailyInstalls:
       readNumber(summary, 'dailyInstalls', 'daily_installs', 'installsToday', 'installs_today') ?? 0,
   };

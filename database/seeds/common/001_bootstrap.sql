@@ -5,7 +5,7 @@
 INSERT INTO appstore_market_channel
     (id, tenant_id, organization_id, channel_code, channel_type, provider, channel_status, external_store_code, api_capability_json, config_json, created_at, updated_at)
 VALUES
-    ('mch-sdkwork-pc', '100001', '0', 'sdkwork-pc', 'first_party', 'sdkwork-appstore', 'active', 'sdkwork-pc-store', '{"download": true, "install": true, "update": true, "presignDownload": true}', '{"surface": "pc", "runtimeFamily": "PC"}', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+    ('mch-sdkwork-pc', '100001', '0', 'sdkwork-pc', 'EXTERNAL', 'sdkwork-appstore', 'active', 'sdkwork-pc-store', '{"download": true, "install": true, "update": true, "presignDownload": true}', '{"surface": "pc", "runtimeFamily": "PC"}', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
 ON CONFLICT (id) DO UPDATE SET
     channel_status = EXCLUDED.channel_status,
     api_capability_json = EXCLUDED.api_capability_json,
