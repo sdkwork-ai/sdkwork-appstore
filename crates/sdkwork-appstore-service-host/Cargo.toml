@@ -20,6 +20,10 @@ reqwest = { version = "0.12", default-features = false, features = ["json", "rus
 uuid = { version = "1", features = ["v4"] }
 urlencoding = "2"
 sdkwork-utils-rust = { workspace = true }
+sdkwork-web-bootstrap.workspace = true
+sdkwork-web-core.workspace = true
+sdkwork-database-sqlx.workspace = true
+tracing = "0.1"
 sdkwork-appstore-repository-sqlx.workspace = true
 sdkwork-appstore-publisher-service.workspace = true
 sdkwork-appstore-listing-service.workspace = true

@@ -23,6 +23,16 @@ use sdkwork_appstore_release_service::domain::models::{
 use sdkwork_appstore_release_service::error::AppstoreServiceError;
 use sdkwork_appstore_release_service::ports::repository::ReleaseRepositoryPort;
 
+/// The release listing queries join the channel table, so every selected
+/// column must carry the release alias or Postgres rejects the ambiguous `id`.
+fn release_columns_aliased(alias: &str) -> String {
+    APPSTORE_RELEASE_COLUMNS
+        .iter()
+        .map(|column| format!("{alias}.{column}"))
+        .collect::<Vec<_>>()
+        .join(", ")
+}
+
 const INSERT_RELEASE_SQL: &str = r#"INSERT INTO appstore_release (
     id, tenant_id, organization_id, listing_id, release_no, channel_id,
     version_name, version_code, build_number, release_status, minimum_os_version,
@@ -151,7 +161,7 @@ impl ReleaseRepositoryPort for SqlxReleaseRepository {
             INNER JOIN appstore_release_channel c ON r.channel_id = c.id
             WHERE r.tenant_id = ? AND r.listing_id = ? AND c.channel_code = ?
             ORDER BY r.version DESC LIMIT 1"#,
-                columns_csv(APPSTORE_RELEASE_COLUMNS)
+                release_columns_aliased("r")
             ))
             .bind(&context.tenant_id)
             .bind(listing_id)
@@ -177,7 +187,7 @@ impl ReleaseRepositoryPort for SqlxReleaseRepository {
                 r#"SELECT {} FROM appstore_release r
             INNER JOIN appstore_release_channel c ON r.channel_id = c.id
             WHERE r.tenant_id = ? AND r.listing_id = ? AND c.channel_code = ?"#,
-                columns_csv(APPSTORE_RELEASE_COLUMNS)
+                release_columns_aliased("r")
             ))
             .bind(&context.tenant_id)
             .bind(listing_id)

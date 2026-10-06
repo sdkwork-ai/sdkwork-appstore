@@ -95,10 +95,21 @@ where
         context: &AppstoreRequestContext,
         _request: RetrieveCurrentPublisherRequest,
     ) -> AppstoreServiceResult<RetrieveCurrentPublisherResult> {
-        let publisher = self
+        // Owner first; invited members compose the same console surface, so a
+        // membership resolves too instead of dead-ending on a create that the
+        // one-publisher-per-organization rule would reject with 409.
+        let publisher = match self
             .repository
             .find_publisher_by_owner(context, &context.user_id)
-            .await?;
+            .await?
+        {
+            Some(publisher) => Some(publisher),
+            None => {
+                self.repository
+                    .find_publisher_by_member(context, context.user_id.as_str())
+                    .await?
+            }
+        };
 
         match publisher {
             Some(publisher) => Ok(RetrieveCurrentPublisherResult::found(

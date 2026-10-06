@@ -24,6 +24,13 @@ pub trait PublisherRepositoryPort: Send + Sync {
         organization_id: &str,
     ) -> AppstoreServiceResult<Option<Publisher>>;
 
+    /// Finds the publisher whose member roster contains `user_id` (owner aside).
+    async fn find_publisher_by_member(
+        &self,
+        context: &AppstoreRequestContext,
+        user_id: &str,
+    ) -> AppstoreServiceResult<Option<Publisher>>;
+
     /// Lists every non-deleted publisher of the tenant ordered by id, cursor paginated.
     async fn list_publishers(
         &self,

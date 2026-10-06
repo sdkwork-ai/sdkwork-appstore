@@ -61,6 +61,47 @@ impl PublisherRepositoryPort for SqlxPublisherRepository {
             })
     }
 
+    async fn find_publisher_by_member(
+        &self,
+        context: &sdkwork_appstore_publisher_service::context::AppstoreRequestContext,
+        user_id: &str,
+    ) -> Result<Option<Publisher>, sdkwork_appstore_publisher_service::error::AppstoreServiceError>
+    {
+        let row =
+            self.db
+                .query_as::<PublisherRow>(&format!(
+                    r#"
+            SELECT {}
+            FROM appstore_publisher p
+            JOIN appstore_publisher_member m
+              ON m.publisher_id = p.id AND m.tenant_id = p.tenant_id
+            WHERE p.tenant_id = ? AND p.deleted_at IS NULL AND m.user_id = ?
+            ORDER BY p.id ASC
+            LIMIT 1
+            "#,
+                    APPSTORE_PUBLISHER_COLUMNS
+                        .iter()
+                        .map(|column| format!("p.{column}"))
+                        .collect::<Vec<_>>()
+                        .join(", ")
+                ))
+                .bind(&context.tenant_id)
+                .bind(user_id)
+                .fetch_optional(&self.db)
+                .await
+                .map_err(|e| {
+                    sdkwork_appstore_publisher_service::error::AppstoreServiceError::Internal(
+                        format!("Database error: {}", e),
+                    )
+                })?;
+
+        row.map(map_publisher_row_to_domain)
+            .transpose()
+            .map_err(|e| {
+                sdkwork_appstore_publisher_service::error::AppstoreServiceError::Internal(e)
+            })
+    }
+
     async fn list_publishers(
         &self,
         context: &sdkwork_appstore_publisher_service::context::AppstoreRequestContext,
