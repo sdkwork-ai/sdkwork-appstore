@@ -55,8 +55,13 @@ export function mergeAppstoreAdminI18nBundles(
 /**
  * Register merged admin locale bundles into the application i18n provider.
  *
- * Existing keys are preserved (`overwrite: false`) so an embedding host that
- * already overrode an admin fragment wins over the package default.
+ * A bundle authors one namespace object per admin package (`adminShell`,
+ * `adminDashboard`, …) under each locale; the console reads dotted keys from
+ * the default `translation` namespace root (`t('adminShell.brand.title')`), so
+ * the merged `locale -> package namespace` map is registered as the namespace
+ * content itself. Existing keys are preserved (`overwrite: false`) so an
+ * embedding host that already overrode an admin fragment wins over the package
+ * default.
  * @param instance - the application's single runtime i18n instance.
  * @param bundles - locale bundles contributed by admin packages.
  * @param namespace - i18next namespace to merge into; defaults to `translation`.
@@ -67,11 +72,10 @@ export function registerAppstoreAdminI18nBundles(
   namespace = 'translation',
 ): void {
   const merged = mergeAppstoreAdminI18nBundles(bundles);
-  for (const [locale, namespaces] of Object.entries(merged)) {
-    const messages = namespaces[namespace];
-    if (!messages) {
+  for (const [locale, packageNamespaces] of Object.entries(merged)) {
+    if (Object.keys(packageNamespaces).length === 0) {
       continue;
     }
-    instance.addResourceBundle(locale, namespace, messages, true, false);
+    instance.addResourceBundle(locale, namespace, packageNamespaces, true, false);
   }
 }
