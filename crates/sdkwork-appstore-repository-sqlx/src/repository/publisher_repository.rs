@@ -61,6 +61,66 @@ impl PublisherRepositoryPort for SqlxPublisherRepository {
             })
     }
 
+    async fn list_publishers(
+        &self,
+        context: &sdkwork_appstore_publisher_service::context::AppstoreRequestContext,
+        cursor: Option<&str>,
+        limit: i32,
+    ) -> Result<Vec<Publisher>, sdkwork_appstore_publisher_service::error::AppstoreServiceError>
+    {
+        let rows = if let Some(cursor_id) = cursor {
+            self.db
+                .query_as::<PublisherRow>(&format!(
+                    r#"
+            SELECT {}
+            FROM appstore_publisher
+            WHERE tenant_id = ? AND deleted_at IS NULL AND id > ?
+            ORDER BY id ASC
+            LIMIT ?
+            "#,
+                    columns_csv(APPSTORE_PUBLISHER_COLUMNS)
+                ))
+                .bind(&context.tenant_id)
+                .bind(cursor_id)
+                .bind(limit)
+                .fetch_all(&self.db)
+                .await
+                .map_err(|e| {
+                    sdkwork_appstore_publisher_service::error::AppstoreServiceError::Internal(
+                        format!("Database error: {}", e),
+                    )
+                })?
+        } else {
+            self.db
+                .query_as::<PublisherRow>(&format!(
+                    r#"
+            SELECT {}
+            FROM appstore_publisher
+            WHERE tenant_id = ? AND deleted_at IS NULL
+            ORDER BY id ASC
+            LIMIT ?
+            "#,
+                    columns_csv(APPSTORE_PUBLISHER_COLUMNS)
+                ))
+                .bind(&context.tenant_id)
+                .bind(limit)
+                .fetch_all(&self.db)
+                .await
+                .map_err(|e| {
+                    sdkwork_appstore_publisher_service::error::AppstoreServiceError::Internal(
+                        format!("Database error: {}", e),
+                    )
+                })?
+        };
+
+        rows.into_iter()
+            .map(map_publisher_row_to_domain)
+            .collect::<Result<Vec<_>, _>>()
+            .map_err(|e| {
+                sdkwork_appstore_publisher_service::error::AppstoreServiceError::Internal(e)
+            })
+    }
+
     async fn find_publisher_by_owner(
         &self,
         context: &sdkwork_appstore_publisher_service::context::AppstoreRequestContext,

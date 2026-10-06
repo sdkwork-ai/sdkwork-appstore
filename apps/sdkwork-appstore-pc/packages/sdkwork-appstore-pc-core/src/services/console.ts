@@ -71,15 +71,27 @@ export interface ConsoleAuditLog {
   ip: string;
 }
 
+/** One storefront category option resolved from the live catalog. */
+export interface ConsoleCategoryOption {
+  categoryId: string;
+  categoryCode: string;
+  displayName: string;
+}
+
 export interface IConsoleSDK {
   getManagedApps(): Promise<ManagedApp[]>;
+  listCategories(): Promise<ConsoleCategoryOption[]>;
   publishApp(appData: {
     name: string;
-    category: string;
-    version: string;
-    description: string;
+    /** Live catalog category id picked by the publisher; optional. */
+    categoryId?: string;
+    /** Initial release version; persisted as a draft release when present. */
+    version?: string;
+    description?: string;
     /** Store application type preset (`APP` | `WEBSITE` | `PROMO`); defaults to APP. */
     appType?: string;
+    /** Storefront pricing model (`FREE` | `FREEMIUM` | `PAID`); defaults to FREE. */
+    pricingModel?: string;
   }): Promise<ManagedApp>;
   getPublisherProfile(): Promise<PublisherProfile | undefined>;
   registerPublisher(data: { displayName: string; legalName?: string; supportEmail?: string; websiteUrl?: string }): Promise<PublisherProfile>;
@@ -92,12 +104,6 @@ export interface IConsoleSDK {
   submitListingForReview(listingId: string, releaseId?: string): Promise<boolean>;
   listMembers(publisherId: string): Promise<PublisherMember[]>;
   inviteMember(publisherId: string, data: { userId: string; role: string }): Promise<boolean>;
-  getApiCredentials(): Promise<ApiCredential[]>;
-  generateApiKey(name: string): Promise<ApiCredential>;
-  revokeApiKey(id: string): Promise<boolean>;
-  getSecurityPolicy(): Promise<SecurityPolicy>;
-  updateSecurityPolicy(policy: Partial<SecurityPolicy>): Promise<SecurityPolicy>;
-  getConsoleAuditLogs(): Promise<ConsoleAuditLog[]>;
 }
 
 export type ConsoleServicePort = IConsoleSDK;
@@ -111,6 +117,7 @@ export function configureConsoleServicePort(port: ConsoleServicePort): void {
 
 export const ConsoleService: IConsoleSDK = {
   getManagedApps: () => consolePort.getManagedApps(),
+  listCategories: () => consolePort.listCategories(),
   publishApp: (appData) => consolePort.publishApp(appData),
   getPublisherProfile: () => consolePort.getPublisherProfile(),
   registerPublisher: (data) => consolePort.registerPublisher(data),
@@ -124,12 +131,6 @@ export const ConsoleService: IConsoleSDK = {
   submitListingForReview: (listingId, releaseId) => consolePort.submitListingForReview(listingId, releaseId),
   listMembers: (publisherId) => consolePort.listMembers(publisherId),
   inviteMember: (publisherId, data) => consolePort.inviteMember(publisherId, data),
-  getApiCredentials: () => consolePort.getApiCredentials(),
-  generateApiKey: (name) => consolePort.generateApiKey(name),
-  revokeApiKey: (id) => consolePort.revokeApiKey(id),
-  getSecurityPolicy: () => consolePort.getSecurityPolicy(),
-  updateSecurityPolicy: (policy) => consolePort.updateSecurityPolicy(policy),
-  getConsoleAuditLogs: () => consolePort.getConsoleAuditLogs(),
 };
 
 function createUnconfiguredConsolePort(): ConsoleServicePort {
@@ -138,6 +139,7 @@ function createUnconfiguredConsolePort(): ConsoleServicePort {
   };
   return {
     getManagedApps: async () => unavailable(),
+    listCategories: async () => unavailable(),
     publishApp: async () => unavailable(),
     getPublisherProfile: async () => unavailable(),
     registerPublisher: async () => unavailable(),
@@ -150,11 +152,5 @@ function createUnconfiguredConsolePort(): ConsoleServicePort {
     submitListingForReview: async () => unavailable(),
     listMembers: async () => unavailable(),
     inviteMember: async () => unavailable(),
-    getApiCredentials: async () => unavailable(),
-    generateApiKey: async () => unavailable(),
-    revokeApiKey: async () => unavailable(),
-    getSecurityPolicy: async () => unavailable(),
-    updateSecurityPolicy: async () => unavailable(),
-    getConsoleAuditLogs: async () => unavailable(),
   };
 }

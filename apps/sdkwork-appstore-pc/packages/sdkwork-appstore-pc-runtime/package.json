@@ -18,6 +18,7 @@
   },
   "dependencies": {
     "@sdkwork/appstore-pc-core": "workspace:*",
+    "@sdkwork/appstore-pc-developer-market": "workspace:*",
     "@sdkwork/auth-runtime-pc-react": "workspace:*",
     "@sdkwork/iam-contracts": "workspace:*",
     "@sdkwork/iam-credential-entry": "workspace:*",

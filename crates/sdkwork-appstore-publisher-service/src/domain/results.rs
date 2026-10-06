@@ -154,3 +154,28 @@ impl AdminVerifyPublisherResult {
         }
     }
 }
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct AdminListPublishersResult {
+    pub operation_id: &'static str,
+    pub publishers: Vec<Publisher>,
+    pub next_cursor: Option<String>,
+    pub has_more: bool,
+}
+
+impl AdminListPublishersResult {
+    pub fn new(
+        operation_id: &'static str,
+        publishers: Vec<Publisher>,
+        next_cursor: Option<String>,
+        has_more: bool,
+    ) -> Self {
+        Self {
+            operation_id,
+            publishers,
+            next_cursor,
+            has_more,
+        }
+    }
+}

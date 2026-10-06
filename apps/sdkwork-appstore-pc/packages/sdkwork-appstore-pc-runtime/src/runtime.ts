@@ -29,6 +29,7 @@ import { configureAppstorePcCompany } from './company';
 import { configureAppstorePcUserStore } from './userStore';
 import { configureAppstorePcPaidCheckout } from './paidCheckout';
 import { configureAppstorePcArtifactUpload } from './artifactUpload';
+import { configureAppstorePcDeveloperMarketSurface } from './developerMarket';
 
 export interface AppstorePcRuntime {
   config: AppstorePcRuntimeConfig;
@@ -94,6 +95,11 @@ export function createAppstorePcRuntime(
   });
   configureAppstorePcPaidCheckout({
     // The cloudrouter domains surface rides the shared gateway origin.
+    baseUrl: normalizeGeneratedSdkBaseUrl(config.appApiBaseUrl, '/app/v3/api'),
+    tokenManager,
+  });
+  configureAppstorePcDeveloperMarketSurface({
+    // The documents reference surfaces ride the shared gateway origin.
     baseUrl: normalizeGeneratedSdkBaseUrl(config.appApiBaseUrl, '/app/v3/api'),
     tokenManager,
   });

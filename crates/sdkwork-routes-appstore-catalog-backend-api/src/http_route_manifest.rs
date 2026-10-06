@@ -4,6 +4,24 @@ use sdkwork_web_core::{HttpMethod, HttpRoute, HttpRouteManifest};
 
 const HTTP_ROUTES: &[HttpRoute] = &[
     HttpRoute::dual_token(
+        HttpMethod::Get,
+        "/backend/v3/api/appstore/catalog/categories",
+        "appstore",
+        "appstore.catalog.admin.categories.list",
+    ),
+    HttpRoute::dual_token(
+        HttpMethod::Get,
+        "/backend/v3/api/appstore/catalog/collections",
+        "appstore",
+        "appstore.catalog.admin.collections.list",
+    ),
+    HttpRoute::dual_token(
+        HttpMethod::Get,
+        "/backend/v3/api/appstore/catalog/featured",
+        "appstore",
+        "appstore.catalog.admin.featured.list",
+    ),
+    HttpRoute::dual_token(
         HttpMethod::Post,
         "/backend/v3/api/appstore/catalog/collections",
         "appstore",

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   APPSTORE_ADMIN_CATALOG_OPERATIONS,
@@ -16,17 +16,24 @@ import {
 
 import { CatalogFormNotice } from './CatalogFormNotice';
 
+interface CatalogCategoryUpdateFormProps {
+  /** Category id picked from the browse table; remounts prefill it. */
+  presetCategoryId?: string;
+}
+
 /**
  * Updates a category (`appstore.catalog.categories.update`).
  *
- * The category id is operator-supplied: the operator console has no category
- * read port to pick an id from, and an empty status or sort order is omitted so
- * a targeted edit never overwrites the other field.
+ * The category id comes from the browse table (or manual entry); an empty
+ * status or sort order is omitted so a targeted edit never overwrites the
+ * other field.
  */
-export function CatalogCategoryUpdateForm() {
+export function CatalogCategoryUpdateForm({
+  presetCategoryId = '',
+}: CatalogCategoryUpdateFormProps) {
   const { t } = useTranslation();
   const services = useAppstoreAdminServices();
-  const [categoryId, setCategoryId] = useState('');
+  const [categoryId, setCategoryId] = useState(presetCategoryId);
   const [categoryStatus, setCategoryStatus] = useState('');
   const [sortOrder, setSortOrder] = useState('');
   const [validationError, setValidationError] = useState('');

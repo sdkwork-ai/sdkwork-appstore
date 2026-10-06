@@ -8,7 +8,18 @@ export const adminPublishers = {
   title: 'Publishers',
   verification: {
     title: 'Publisher verification',
-    description: 'Record verification decisions against publisher profiles.',
+    description: 'Browse publisher profiles and record verification decisions against them.',
+    browse: {
+      title: 'Existing publishers',
+      empty: 'No publisher profiles yet.',
+      pick: 'Pick for decision',
+      columns: {
+        publisher: 'Publisher',
+        verificationStatus: 'Verification status',
+        status: 'Profile status',
+        actions: 'Actions',
+      },
+    },
     publisherId: 'Publisher id',
     publisherIdPlaceholder: 'Enter the publisher id',
     publisherIdHint: 'Use the store publisher id so the decision lands on the right record.',

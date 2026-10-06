@@ -7,9 +7,12 @@ import { DescriptionTextArea } from './DescriptionTextArea';
 
 interface PublishAppFormProps {
   appName: string;
-  category: string;
+  /** Live catalog category id selected by the publisher. */
+  categoryId: string;
   version: string;
   description: string;
+  /** Options resolved from `appstore.catalog.categories.list`. */
+  categoryOptions: readonly { value: string; label: string }[];
   onAppNameChange: (value: string) => void;
   onCategoryChange: (value: string) => void;
   onVersionChange: (value: string) => void;
@@ -19,9 +22,10 @@ interface PublishAppFormProps {
 
 export const PublishAppForm: React.FC<PublishAppFormProps> = ({
   appName,
-  category,
+  categoryId,
   version,
   description,
+  categoryOptions,
   onAppNameChange,
   onCategoryChange,
   onVersionChange,
@@ -29,14 +33,6 @@ export const PublishAppForm: React.FC<PublishAppFormProps> = ({
   onSubmit,
 }) => {
   const { t } = useTranslation();
-
-  const categoriesList = [
-    { value: '高效工作', label: t('console.categories.productivity', '高效工作') },
-    { value: '实用程序与工具', label: t('console.categories.utilities', '实用程序与工具') },
-    { value: '娱乐影音', label: t('console.categories.entertainment', '娱乐影音') },
-    { value: 'AI 智能', label: t('console.categories.ai', 'AI 智能') },
-    { value: '游戏', label: t('console.categories.games', '游戏') },
-  ];
 
   return (
     <div className="bg-store-subtle/50 dark:bg-store-surface border border-store-line rounded-store-card p-5 shadow-sm ">
@@ -57,8 +53,12 @@ export const PublishAppForm: React.FC<PublishAppFormProps> = ({
 
           <CategorySelectField
             label={t('console.form.category')}
-            value={category}
-            options={categoriesList}
+            value={categoryId}
+            options={
+              categoryOptions.length > 0
+                ? [...categoryOptions]
+                : [{ value: '', label: t('console.form.categoryUnavailable', '类目加载不可用') }]
+            }
             onChange={onCategoryChange}
           />
 
@@ -89,4 +89,3 @@ export const PublishAppForm: React.FC<PublishAppFormProps> = ({
     </div>
   );
 };
-

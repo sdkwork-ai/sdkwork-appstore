@@ -140,6 +140,7 @@ const openApiSurfaces = [
     sourcePath: "apis/app-api/store/openapi.yaml",
     materializedPath:
       "sdks/sdkwork-appstore-app-sdk/openapi/sdkwork-appstore-app-api.openapi.yaml",
+    generationInputSpec: "openapi/sdkwork-appstore-app-api.sdkgen.yaml",
     prefix: "/app/v3/api",
     authority: "sdkwork-appstore-app-api",
     sdkFamily: "sdkwork-appstore-app-sdk",
@@ -150,6 +151,7 @@ const openApiSurfaces = [
     sourcePath: "apis/backend-api/store/openapi.yaml",
     materializedPath:
       "sdks/sdkwork-appstore-backend-sdk/openapi/sdkwork-appstore-backend-api.openapi.yaml",
+    generationInputSpec: "openapi/sdkwork-appstore-backend-api.sdkgen.yaml",
     prefix: "/backend/v3/api",
     authority: "sdkwork-appstore-backend-api",
     sdkFamily: "sdkwork-appstore-backend-sdk",
@@ -160,6 +162,7 @@ const openApiSurfaces = [
     sourcePath: "apis/open-api/store/openapi.yaml",
     materializedPath:
       "sdks/sdkwork-appstore-sdk/openapi/sdkwork-appstore-open-api.openapi.yaml",
+    generationInputSpec: "openapi/sdkwork-appstore-open-api.sdkgen.yaml",
     prefix: "/store/v3/api",
     authority: "sdkwork-appstore-open-api",
     sdkFamily: "sdkwork-appstore-sdk",
@@ -307,7 +310,6 @@ for (const surface of openApiSurfaces) {
   if (surface.manifest) {
     const manifestDir = dirname(join(root, surface.manifestPath));
     const resolvedGenerationInput = resolve(manifestDir, surface.manifest.generationInputSpec ?? "");
-    const expectedGenerationInput = join(root, surface.sourcePath);
 
     if (surface.manifest.sdkOwner !== "sdkwork-appstore") {
       errors.push(`${surface.manifestPath} sdkOwner must be sdkwork-appstore`);
@@ -318,14 +320,17 @@ for (const surface of openApiSurfaces) {
     if (surface.manifest.sdkFamily !== surface.sdkFamily) {
       errors.push(`${surface.manifestPath} sdkFamily must be ${surface.sdkFamily}`);
     }
-    if (surface.manifest.generationInputSpec !== `../../${surface.sourcePath}`) {
-      errors.push(`${surface.manifestPath} generationInputSpec must be ../../${surface.sourcePath}`);
+    if (surface.manifest.generationInputSpec !== surface.generationInputSpec) {
+      errors.push(
+        `${surface.manifestPath} generationInputSpec must be ${surface.generationInputSpec}`,
+      );
     }
+    const expectedGenerationInput = join(root, surface.manifestPath, "..", surface.generationInputSpec);
     if (resolvedGenerationInput !== expectedGenerationInput) {
       errors.push(
         `${surface.manifestPath} generationInputSpec resolves to ${toPosixPath(
           relative(root, resolvedGenerationInput),
-        )}, expected ${surface.sourcePath}`,
+        )}, expected ${surface.generationInputSpec}`,
       );
     }
     if (surface.manifest.apiPrefix !== surface.prefix) {

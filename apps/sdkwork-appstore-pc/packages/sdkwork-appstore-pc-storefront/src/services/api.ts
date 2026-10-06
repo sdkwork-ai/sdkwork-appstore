@@ -36,6 +36,7 @@ export type {
   AIModelInfo,
   AICompletionResult,
   ManagedApp,
+  ConsoleCategoryOption,
   ApiCredential,
   SecurityPolicy,
   ConsoleAuditLog,

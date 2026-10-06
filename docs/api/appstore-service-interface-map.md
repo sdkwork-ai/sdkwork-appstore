@@ -23,6 +23,9 @@ This document maps each route operation to its generated handler and service met
 | `appstore.catalog.collections.update` | `sdkwork-routes-appstore-catalog-backend-api` | `catalog_collections_update` | `sdkwork-appstore-catalog-service` | `catalog_collections_update` | Implemented |
 | `appstore.catalog.collections.items.update` | `sdkwork-routes-appstore-catalog-backend-api` | `catalog_collections_items_upsert` | `sdkwork-appstore-catalog-service` | `catalog_collections_items_upsert` | Implemented |
 | `appstore.catalog.featured.update` | `sdkwork-routes-appstore-catalog-backend-api` | `catalog_featured_upsert` | `sdkwork-appstore-catalog-service` | `catalog_featured_upsert` | Implemented |
+| `appstore.catalog.admin.categories.list` | `sdkwork-routes-appstore-catalog-backend-api` | `catalog_admin_categories_list` | `sdkwork-appstore-catalog-service` | `admin_categories_list` | Implemented |
+| `appstore.catalog.admin.collections.list` | `sdkwork-routes-appstore-catalog-backend-api` | `catalog_admin_collections_list` | `sdkwork-appstore-catalog-service` | `admin_collections_list` | Implemented |
+| `appstore.catalog.admin.featured.list` | `sdkwork-routes-appstore-catalog-backend-api` | `catalog_admin_featured_list` | `sdkwork-appstore-catalog-service` | `admin_featured_list` | Implemented |
 | `appstore.catalog.categories.create` | `sdkwork-routes-appstore-catalog-backend-api` | `catalog_categories_create` | `sdkwork-appstore-catalog-service` | `catalog_categories_create` | Implemented |
 | `appstore.catalog.categories.update` | `sdkwork-routes-appstore-catalog-backend-api` | `catalog_categories_update` | `sdkwork-appstore-catalog-service` | `catalog_categories_update` | Implemented |
 | `appstore.metrics.listings.retrieve` | `sdkwork-routes-metrics-backend-api` | `metrics_listings_retrieve` | `sdkwork-appstore-catalog-service` | `metrics_listings_retrieve` | Implemented |
@@ -148,6 +151,7 @@ This document maps each route operation to its generated handler and service met
 | `appstore.publishers.members.list` | `sdkwork-routes-publisher-app-api` | `publishers_members_list` | `sdkwork-appstore-publisher-service` | `publishers_members_list` | Implemented |
 | `appstore.publishers.members.create` | `sdkwork-routes-publisher-app-api` | `publishers_members_invite` | `sdkwork-appstore-publisher-service` | `publishers_members_invite` | Implemented |
 | `appstore.publishers.verifications.create` | `sdkwork-routes-publisher-app-api` | `publishers_verifications_submit` | `sdkwork-appstore-publisher-service` | `publishers_verifications_submit` | Implemented |
+| `appstore.publishers.admin.list` | `sdkwork-routes-publisher-backend-api` | `publishers_admin_list` | `sdkwork-appstore-publisher-service` | `admin_list_publishers` | Implemented |
 | `appstore.publishers.admin.verify` | `sdkwork-routes-publisher-backend-api` | `publishers_admin_verify` | `sdkwork-appstore-publisher-service` | `publishers_admin_verify` | Implemented |
 
 ## sdkwork-appstore-release-service

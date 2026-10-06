@@ -12,10 +12,18 @@ export const adminCatalog = {
   },
   categories: {
     title: 'Categories',
-    description: 'Create categories and adjust the status and ordering of existing ones.',
-    readGapNotice: {
-      title: 'This page is an authoring console and cannot browse existing categories',
-      description: 'The operator API currently exposes catalog writes only and has no category read endpoint, so this page cannot list or search existing categories. Obtain the category id elsewhere, then fill it in below and submit.',
+    description: 'Browse existing categories, create new ones, and adjust status and ordering.',
+    browse: {
+      title: 'Existing categories',
+      empty: 'No categories yet.',
+      pick: 'Pick for update',
+      columns: {
+        category: 'Category',
+        status: 'Status',
+        sortOrder: 'Sort order',
+        categoryId: 'Category id',
+        actions: 'Actions',
+      },
     },
     create: {
       title: 'Create category',
@@ -50,10 +58,19 @@ export const adminCatalog = {
   },
   collections: {
     title: 'Collections',
-    description: 'Create collections, adjust status and ordering, and maintain collection items.',
-    readGapNotice: {
-      title: 'This page is an authoring console and cannot browse existing collections',
-      description: 'The operator API currently exposes catalog writes only and has no collection read endpoint, so this page cannot list or search existing collections. Obtain the collection id elsewhere, then fill it in below and submit.',
+    description: 'Browse existing collections, create new ones, adjust status and ordering, and maintain collection items.',
+    browse: {
+      title: 'Existing collections',
+      empty: 'No collections yet.',
+      pick: 'Pick for editing',
+      columns: {
+        collection: 'Collection',
+        collectionType: 'Type',
+        status: 'Status',
+        itemCount: 'Items',
+        collectionId: 'Collection id',
+        actions: 'Actions',
+      },
     },
     create: {
       title: 'Create collection',
@@ -111,10 +128,17 @@ export const adminCatalog = {
   },
   featured: {
     title: 'Featured slots',
-    description: 'Schedule the listing and publication window of a featured slot.',
-    readGapNotice: {
-      title: 'This page is an authoring console and cannot browse existing featured slots',
-      description: 'The operator API currently exposes catalog writes only and has no featured-slot read endpoint, so this page cannot list or search existing slots. Obtain the slot code elsewhere, then fill it in below and submit.',
+    description: 'Browse existing featured slots and schedule their listing and publication window.',
+    browse: {
+      title: 'Existing featured slots',
+      empty: 'No featured slots yet.',
+      columns: {
+        slotCode: 'Slot code',
+        listingId: 'Listing id',
+        status: 'Status',
+        window: 'Publication window',
+        audienceScope: 'Audience scope',
+      },
     },
     slot: {
       title: 'Featured slot scheduling',
@@ -142,6 +166,16 @@ export const adminCatalog = {
     DRAFT: 'Draft',
     ACTIVE: 'Active',
     ARCHIVED: 'Archived',
+  },
+  lifecycleStatus: {
+    ACTIVE: 'Active',
+    INACTIVE: 'Inactive',
+    DRAFT: 'Draft',
+    PUBLISHED: 'Published',
+    ARCHIVED: 'Archived',
+    SCHEDULED: 'Scheduled',
+    PAUSED: 'Paused',
+    EXPIRED: 'Expired',
   },
   collectionType: {
     EDITORIAL: 'Editorial',

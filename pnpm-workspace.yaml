@@ -47,6 +47,14 @@ packages:
   - "../sdkwork-company/sdks/sdkwork-company-app-sdk/sdkwork-company-app-sdk-typescript"
   - "../sdkwork-skills/sdks/sdkwork-skills-app-sdk/sdkwork-skills-app-sdk-typescript"
   - "../sdkwork-mcp/sdks/sdkwork-mcp-app-sdk/sdkwork-mcp-app-sdk-typescript"
+  # The developer-market surfaces embed the sdkwork-documents reference
+  # packages (API market / SDK market) as workspace sources, mirroring the
+  # sdkwork-cloudrouter integration.
+  - "../sdkwork-documents/apps/sdkwork-documents-pc/packages/sdkwork-documents-pc-commons"
+  - "../sdkwork-documents/apps/sdkwork-documents-pc/packages/sdkwork-documents-pc-api-reference"
+  - "../sdkwork-documents/apps/sdkwork-documents-pc/packages/sdkwork-documents-pc-sdk-reference"
+  - "../sdkwork-documents/apps/sdkwork-documents-pc/packages/sdkwork-documents-pc-i18n"
+  - "../sdkwork-documents/sdks/sdkwork-documents-app-sdk/sdkwork-documents-app-sdk-typescript"
 
 catalog:
   "@tailwindcss/vite": ^4.3.3

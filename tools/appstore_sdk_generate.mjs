@@ -35,7 +35,7 @@ const targets = [
       generationInputSpec: 'openapi/sdkwork-appstore-backend-api.sdkgen.yaml',
       standardProfile: 'sdkwork-v3',
       apiPrefix: '/backend/v3/api',
-      ownerOnlyOperationCount: 29,
+      ownerOnlyOperationCount: 33,
     },
   },
   {

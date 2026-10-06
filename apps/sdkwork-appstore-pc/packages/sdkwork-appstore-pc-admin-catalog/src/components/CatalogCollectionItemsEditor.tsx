@@ -33,14 +33,20 @@ interface CollectionItemRow {
  * (`appstore.catalog.collections.items.update`).
  *
  * The operation is a whole-list replacement and rejects an empty list, so rows
- * are staged locally, submitted only once at least one row exists, and the
- * collection id is operator-supplied because no collection read endpoint
- * exists to load the current items from.
+ * are staged locally and submitted only once at least one row exists. The
+ * collection id comes from the browse table (or manual entry).
  */
-export function CatalogCollectionItemsEditor() {
+interface CatalogCollectionItemsEditorProps {
+  /** Collection id picked from the browse table; remounts prefill it. */
+  presetCollectionId?: string;
+}
+
+export function CatalogCollectionItemsEditor({
+  presetCollectionId = '',
+}: CatalogCollectionItemsEditorProps) {
   const { t } = useTranslation();
   const services = useAppstoreAdminServices();
-  const [collectionId, setCollectionId] = useState('');
+  const [collectionId, setCollectionId] = useState(presetCollectionId);
   const [rows, setRows] = useState<readonly CollectionItemRow[]>([]);
   const [nextRowId, setNextRowId] = useState(1);
   const [validationError, setValidationError] = useState('');

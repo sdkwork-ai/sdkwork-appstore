@@ -43,10 +43,11 @@ export default function PublisherCreateApp() {
     try {
       const created = await ConsoleService.publishApp({
         name: form.name.trim(),
-        category: form.category || categories[0]?.name || '',
+        categoryId: form.category || categories[0]?.id || undefined,
         version: '1.0.0',
         description: form.subtitle,
         appType,
+        pricingModel: form.pricing,
       });
       navigate(`/publisher/apps/${created.id}`, { replace: true });
     } catch (err) {
@@ -109,7 +110,7 @@ export default function PublisherCreateApp() {
               className="w-full px-3 rounded-store-control bg-store-field border border-store-line text-sm text-store-ink outline-none focus:border-store-brand transition-colors h-9 placeholder:text-store-ink-faint focus:ring-2 focus:ring-store-brand/25"
             >
               {categories.map((category) => (
-                <option key={category.id} value={category.name}>
+                <option key={category.id} value={category.id}>
                   {category.name}
                 </option>
               ))}

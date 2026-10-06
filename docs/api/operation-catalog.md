@@ -142,6 +142,9 @@ Prefix lock:
 
 | operationId | Method | Path | Permission |
 | --- | --- | --- | --- |
+| `appstore.catalog.admin.categories.list` | GET | `/backend/v3/api/appstore/catalog/categories` | `appstore.catalog.admin` |
+| `appstore.catalog.admin.collections.list` | GET | `/backend/v3/api/appstore/catalog/collections` | `appstore.catalog.admin` |
+| `appstore.catalog.admin.featured.list` | GET | `/backend/v3/api/appstore/catalog/featured` | `appstore.catalog.admin` |
 | `appstore.catalog.collections.create` | POST | `/backend/v3/api/appstore/catalog/collections` | `appstore.catalog.admin` |
 | `appstore.catalog.collections.update` | PATCH | `/backend/v3/api/appstore/catalog/collections/{collectionId}` | `appstore.catalog.admin` |
 | `appstore.catalog.collections.items.update` | PUT | `/backend/v3/api/appstore/catalog/collections/{collectionId}/items` | `appstore.catalog.admin` |
@@ -156,6 +159,7 @@ Prefix lock:
 | `appstore.listings.admin.list` | GET | `/backend/v3/api/listings` | `appstore.listings.admin.read` |
 | `appstore.listings.admin.retrieve` | GET | `/backend/v3/api/listings/{listingId}` | `appstore.listings.admin.read` |
 | `appstore.listings.admin.visibility.update` | PATCH | `/backend/v3/api/listings/{listingId}/visibility` | `appstore.listings.admin` |
+| `appstore.publishers.admin.list` | GET | `/backend/v3/api/publishers` | `appstore.publishers.admin` |
 | `appstore.publishers.admin.verify` | POST | `/backend/v3/api/publishers/{publisherId}/verify` | `appstore.publishers.admin` |
 | `appstore.metrics.listings.retrieve` | GET | `/backend/v3/api/metrics/listings/{listingId}` | `appstore.metrics.read` |
 | `appstore.analytics.publisher.overview.retrieve` | GET | `/backend/v3/api/analytics/publisher/overview` | `appstore.analytics.publisher` |

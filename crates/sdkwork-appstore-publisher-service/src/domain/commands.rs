@@ -263,3 +263,35 @@ impl AdminVerifyPublisherRequest {
         self
     }
 }
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct AdminListPublishersRequest {
+    pub cursor: Option<String>,
+    pub page_size: Option<i32>,
+}
+
+impl AdminListPublishersRequest {
+    pub fn new() -> Self {
+        Self {
+            cursor: None,
+            page_size: None,
+        }
+    }
+
+    pub fn with_cursor(mut self, cursor: impl Into<String>) -> Self {
+        self.cursor = Some(cursor.into());
+        self
+    }
+
+    pub fn with_page_size(mut self, page_size: i32) -> Self {
+        self.page_size = Some(page_size);
+        self
+    }
+}
+
+impl Default for AdminListPublishersRequest {
+    fn default() -> Self {
+        Self::new()
+    }
+}

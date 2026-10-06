@@ -8,7 +8,18 @@ export const adminPublishers = {
   title: '开发者运营',
   verification: {
     title: '开发者认证',
-    description: '对开发者主体资料作出认证决议。',
+    description: '浏览开发者主体并对其资料作出认证决议。',
+    browse: {
+      title: '已有开发者',
+      empty: '还没有任何开发者主体。',
+      pick: '选入决议',
+      columns: {
+        publisher: '开发者',
+        verificationStatus: '认证状态',
+        status: '主体状态',
+        actions: '操作',
+      },
+    },
     publisherId: '开发者编号',
     publisherIdPlaceholder: '请输入开发者编号',
     publisherIdHint: '请使用商店开发者编号，与后台记录保持一致。',

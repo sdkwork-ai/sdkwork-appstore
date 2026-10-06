@@ -21,6 +21,7 @@ import {
  * `appstore.analytics.publisher`).
  */
 export const APPSTORE_ADMIN_PUBLISHER_OPERATIONS = {
+  listPublishers: 'appstore.publishers.admin.list',
   verifyPublisher: 'appstore.publishers.admin.verify',
   publisherOverview: 'appstore.analytics.publisher.overview.retrieve',
   publisherListings: 'appstore.analytics.publisher.listings.list',
@@ -47,6 +48,18 @@ export interface AppstoreAdminVerificationOutcome {
   accepted: boolean;
   resourceId?: string;
   status?: string;
+}
+
+/** One operator-visible publisher row from the admin listing. */
+export interface AppstoreAdminPublisherRow {
+  publisherId: string;
+  displayName: string;
+  publisherType?: string;
+  status?: string;
+  verificationStatus?: string;
+  supportEmail?: string;
+  websiteUrl?: string;
+  createdAt?: string;
 }
 
 export interface AppstoreAdminPublisherOverview {
@@ -83,6 +96,9 @@ export interface AppstoreAdminPublisherListingQuery {
 }
 
 export interface AppstoreAdminPublishersPort {
+  listPublishers(
+    query?: AppstoreAdminPublisherListingQuery,
+  ): Promise<AppstoreAdminPage<AppstoreAdminPublisherRow>>;
   verifyPublisher(
     publisherId: string,
     input: AppstoreAdminVerifyPublisherInput,
@@ -105,6 +121,19 @@ export function createAppstoreAdminPublishersPort(
   const operations = APPSTORE_ADMIN_PUBLISHER_OPERATIONS;
 
   return {
+    async listPublishers(query) {
+      const payload = await executeAdminOperation(operations.listPublishers, () =>
+        client.publishers.appstore.publishers.admin.list({
+          ...(query?.cursor ? { cursor: query.cursor } : {}),
+          ...(query?.pageSize === undefined ? {} : { pageSize: query.pageSize }),
+        }),
+      );
+      if (!payload) {
+        return emptyPage<AppstoreAdminPublisherRow>();
+      }
+      return mapPage(payload, projectPublisherRow);
+    },
+
     async verifyPublisher(publisherId, input) {
       const id = requireAdminIdentifier(publisherId, 'publisherId');
       const verificationType = requireAdminIdentifier(input.verificationType, 'verificationType');
@@ -178,6 +207,35 @@ export function createAppstoreAdminPublishersPort(
       const record = readSingleRecord(payload);
       return record ? projectPublisherListing(record, id) : undefined;
     },
+  };
+}
+
+function projectPublisherRow(
+  record: Record<string, unknown>,
+): AppstoreAdminPublisherRow | undefined {
+  const publisherId = readString(record, 'id', 'publisherId', 'publisher_id');
+  if (!publisherId) {
+    return undefined;
+  }
+  const createdAt = readString(record, 'createdAt', 'created_at');
+  return {
+    publisherId,
+    displayName:
+      readString(record, 'displayName', 'display_name') || publisherId,
+    ...(readString(record, 'publisherType', 'publisher_type')
+      ? { publisherType: readString(record, 'publisherType', 'publisher_type') }
+      : {}),
+    ...(readString(record, 'status') ? { status: readString(record, 'status') } : {}),
+    ...(readString(record, 'verificationStatus', 'verification_status')
+      ? { verificationStatus: readString(record, 'verificationStatus', 'verification_status') }
+      : {}),
+    ...(readString(record, 'supportEmail', 'support_email')
+      ? { supportEmail: readString(record, 'supportEmail', 'support_email') }
+      : {}),
+    ...(readString(record, 'websiteUrl', 'website_url')
+      ? { websiteUrl: readString(record, 'websiteUrl', 'website_url') }
+      : {}),
+    ...(createdAt ? { createdAt } : {}),
   };
 }
 

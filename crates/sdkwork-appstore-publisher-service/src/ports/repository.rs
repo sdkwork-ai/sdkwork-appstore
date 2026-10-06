@@ -24,6 +24,14 @@ pub trait PublisherRepositoryPort: Send + Sync {
         organization_id: &str,
     ) -> AppstoreServiceResult<Option<Publisher>>;
 
+    /// Lists every non-deleted publisher of the tenant ordered by id, cursor paginated.
+    async fn list_publishers(
+        &self,
+        context: &AppstoreRequestContext,
+        cursor: Option<&str>,
+        limit: i32,
+    ) -> AppstoreServiceResult<Vec<Publisher>>;
+
     async fn insert_publisher(
         &self,
         context: &AppstoreRequestContext,

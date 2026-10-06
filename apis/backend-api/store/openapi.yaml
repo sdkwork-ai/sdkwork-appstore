@@ -209,6 +209,24 @@ paths:
               schema:
                 $ref: '#/components/schemas/SdkWorkResourceResponse'
   /backend/v3/api/appstore/catalog/collections:
+    get:
+      tags:
+      - catalog
+      operationId: appstore.catalog.admin.collections.list
+      security:
+      - AuthToken: []
+        AccessToken: []
+      summary: List editorial collections for operators (every non-deleted status)
+      parameters:
+      - $ref: '#/components/parameters/Cursor'
+      - $ref: '#/components/parameters/PageSize'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SdkWorkListResponse'
     post:
       tags:
       - catalog
@@ -293,6 +311,23 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SdkWorkResourceResponse'
+  /backend/v3/api/appstore/catalog/featured:
+    get:
+      tags:
+      - catalog
+      operationId: appstore.catalog.admin.featured.list
+      security:
+      - AuthToken: []
+        AccessToken: []
+      summary: List featured slots for operators (every slot regardless of window)
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SdkWorkListResponse'
+      parameters: []
   /backend/v3/api/appstore/catalog/featured/{slotCode}:
     put:
       tags:
@@ -322,6 +357,24 @@ paths:
               schema:
                 $ref: '#/components/schemas/SdkWorkResourceResponse'
   /backend/v3/api/appstore/catalog/categories:
+    get:
+      tags:
+      - catalog
+      operationId: appstore.catalog.admin.categories.list
+      security:
+      - AuthToken: []
+        AccessToken: []
+      summary: List store categories for operators (every non-deleted status)
+      parameters:
+      - $ref: '#/components/parameters/Cursor'
+      - $ref: '#/components/parameters/PageSize'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SdkWorkListResponse'
     post:
       tags:
       - catalog
@@ -437,6 +490,25 @@ paths:
                   type: string
                 reason:
                   type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SdkWorkListResponse'
+  /backend/v3/api/publishers:
+    get:
+      tags:
+      - publishers
+      operationId: appstore.publishers.admin.list
+      security:
+      - AuthToken: []
+        AccessToken: []
+      summary: List publisher profiles for operators (every non-deleted status)
+      parameters:
+      - $ref: '#/components/parameters/Cursor'
+      - $ref: '#/components/parameters/PageSize'
       responses:
         '200':
           description: Success

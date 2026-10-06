@@ -5,6 +5,30 @@ use sdkwork_web_core::RouteAuth;
 
 pub const ROUTES: &[RouteDefinition] = &[
     RouteDefinition {
+        method: "GET",
+        path: "/backend/v3/api/appstore/catalog/categories",
+        operation_id: "appstore.catalog.admin.categories.list",
+        auth: RouteAuth::DualToken,
+        handler: "catalog_admin_categories_list",
+        service_method: "catalog_admin_categories_list",
+    },
+    RouteDefinition {
+        method: "GET",
+        path: "/backend/v3/api/appstore/catalog/collections",
+        operation_id: "appstore.catalog.admin.collections.list",
+        auth: RouteAuth::DualToken,
+        handler: "catalog_admin_collections_list",
+        service_method: "catalog_admin_collections_list",
+    },
+    RouteDefinition {
+        method: "GET",
+        path: "/backend/v3/api/appstore/catalog/featured",
+        operation_id: "appstore.catalog.admin.featured.list",
+        auth: RouteAuth::DualToken,
+        handler: "catalog_admin_featured_list",
+        service_method: "catalog_admin_featured_list",
+    },
+    RouteDefinition {
         method: "POST",
         path: "/backend/v3/api/appstore/catalog/collections",
         operation_id: "appstore.catalog.collections.create",

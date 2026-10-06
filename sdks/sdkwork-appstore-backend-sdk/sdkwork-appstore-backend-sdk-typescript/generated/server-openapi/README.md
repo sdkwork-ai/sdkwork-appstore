@@ -27,11 +27,7 @@ client.setAuthToken('your-auth-token');
 client.setAccessToken('your-access-token');
 
 // Use the SDK
-const params = {
-  date_from: 'date_from',
-  date_to: 'date_to',
-};
-const result = await client.analytics.appstore.analytics.publisher.overview.retrieve(params);
+const result = await client.catalog.appstore.catalog.admin.featured.list();
 ```
 
 ## Authentication
@@ -83,13 +79,8 @@ const result = await client.moderation.appstore.moderation.queue.list(params);
 ### catalog
 
 ```typescript
-// Create editorial collection
-const body = {
-  collectionCode: 'collectionCode',
-  collectionType: 'collectionType',
-  audienceScope: 'audienceScope',
-};
-const result = await client.catalog.appstore.catalog.collections.create(body);
+// List featured slots for operators (every slot regardless of window)
+const result = await client.catalog.appstore.catalog.admin.featured.list();
 ```
 
 ### listings
@@ -108,13 +99,12 @@ const result = await client.listings.appstore.listings.admin.list(params);
 ### publishers
 
 ```typescript
-// Approve publisher verification
-const publisherId = '1';
-const body = {
-  verificationType: 'verificationType',
-  decision: 'decision',
+// List publisher profiles for operators (every non-deleted status)
+const params = {
+  cursor: 'cursor',
+  page_size: 2,
 };
-const result = await client.publishers.appstore.publishers.admin.verify(publisherId, body);
+const result = await client.publishers.appstore.publishers.admin.list(params);
 ```
 
 ### metrics
@@ -158,11 +148,7 @@ const result = await client.market.appstore.marketChannels.list(params);
 import { SdkworkAppstoreBackendClient, NetworkError, TimeoutError, AuthenticationError } from '@sdkwork/appstore-backend-sdk';
 
 try {
-  const params = {
-    date_from: 'date_from',
-    date_to: 'date_to',
-  };
-  const result = await client.analytics.appstore.analytics.publisher.overview.retrieve(params);
+  const result = await client.catalog.appstore.catalog.admin.featured.list();
 } catch (error) {
   if (error instanceof AuthenticationError) {
     console.error('Authentication failed:', error.message);

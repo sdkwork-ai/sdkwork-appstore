@@ -7,6 +7,7 @@ import {
   AppstoreAuthShell,
   AppsPage,
   AIHubPage,
+  ApiMarketPage,
   AuthGate,
   CategoryPage,
   ChartsPage,
@@ -24,6 +25,7 @@ import {
   PublisherAppManagePage,
   PublisherCreateAppPage,
   PublisherOverviewPage,
+  SdkMarketPage,
   SearchPage,
   SkillsPage,
   TemplateDetailPage,
@@ -123,6 +125,8 @@ export function AppstorePcRoutes({
             <Route path="demands" element={<DemandsPage />} />
             <Route path="template/:id" element={<TemplateDetailPage />} />
             <Route path="templates/:id" element={<TemplateDetailPage />} />
+            <Route path="api-market" element={<ApiMarketPage />} />
+            <Route path="sdk-market" element={<SdkMarketPage />} />
             <Route path="charts" element={<ChartsPage />} />
             <Route path="search" element={<SearchPage />} />
             <Route path="category/:id" element={<CategoryPage />} />
@@ -137,7 +141,7 @@ export function AppstorePcRoutes({
             <Route path="store/:shareToken" element={<PublicUserStorePage />} />
             <Route path="updates" element={<UpdatesPage />} />
             <Route path="app/:id" element={<AppDetailPage />} />
-            <Route path="console/settings" element={<ConsoleSettingsPage />} />
+            <Route path="console/settings" element={<ConsoleSettingsPage session={runtime.session} />} />
             <Route path="console" element={<Navigate to="/console/settings" replace />} />
             <Route path="publisher" element={<PublisherOverviewPage />} />
             <Route path="publisher/apps/new" element={<PublisherCreateAppPage />} />

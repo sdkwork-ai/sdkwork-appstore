@@ -5,8 +5,8 @@ use uuid::Uuid;
 
 use crate::context::AppstoreRequestContext;
 use crate::domain::commands::{
-    AdminVerifyPublisherRequest, CreatePublisherRequest, InvitePublisherMemberRequest,
-    ListPublisherMembersRequest, RetrieveCurrentPublisherRequest,
+    AdminListPublishersRequest, AdminVerifyPublisherRequest, CreatePublisherRequest,
+    InvitePublisherMemberRequest, ListPublisherMembersRequest, RetrieveCurrentPublisherRequest,
     SubmitPublisherVerificationRequest, UpdatePublisherRequest,
 };
 use crate::domain::models::{
@@ -15,9 +15,9 @@ use crate::domain::models::{
     VerificationType,
 };
 use crate::domain::results::{
-    AdminVerifyPublisherResult, CreatePublisherResult, InvitePublisherMemberResult,
-    ListPublisherMembersResult, RetrieveCurrentPublisherResult, SubmitPublisherVerificationResult,
-    UpdatePublisherResult,
+    AdminListPublishersResult, AdminVerifyPublisherResult, CreatePublisherResult,
+    InvitePublisherMemberResult, ListPublisherMembersResult, RetrieveCurrentPublisherResult,
+    SubmitPublisherVerificationResult, UpdatePublisherResult,
 };
 use crate::error::{AppstoreServiceError, AppstoreServiceResult};
 use crate::ports::repository::PublisherRepositoryPort;
@@ -65,6 +65,13 @@ pub trait PublisherOperations {
         context: &AppstoreRequestContext,
         request: AdminVerifyPublisherRequest,
     ) -> AppstoreServiceResult<AdminVerifyPublisherResult>;
+
+    /// Operator-facing publisher listing that returns every non-deleted status.
+    async fn admin_list_publishers(
+        &self,
+        context: &AppstoreRequestContext,
+        request: AdminListPublishersRequest,
+    ) -> AppstoreServiceResult<AdminListPublishersResult>;
 }
 
 #[derive(Debug, Clone)]
@@ -612,6 +619,44 @@ where
         Ok(AdminVerifyPublisherResult::verified(
             "appstore.publishers.admin.verify",
             verification,
+        ))
+    }
+
+    async fn admin_list_publishers(
+        &self,
+        context: &AppstoreRequestContext,
+        request: AdminListPublishersRequest,
+    ) -> AppstoreServiceResult<AdminListPublishersResult> {
+        if !sdkwork_appstore_authorization::scope_granted(
+            &context.permission_scopes,
+            "appstore.publishers.admin",
+        ) {
+            return Err(AppstoreServiceError::PermissionDenied(
+                sdkwork_appstore_authorization::missing_scope_message("appstore.publishers.admin"),
+            ));
+        }
+
+        let limit = request.page_size.unwrap_or(20).clamp(1, 200);
+        let mut publishers = self
+            .repository
+            .list_publishers(context, request.cursor.as_deref(), limit + 1)
+            .await?;
+
+        let has_more = publishers.len() > limit as usize;
+        if has_more {
+            publishers.truncate(limit as usize);
+        }
+        let next_cursor = if has_more {
+            publishers.last().map(|p| p.id.as_str().to_string())
+        } else {
+            None
+        };
+
+        Ok(AdminListPublishersResult::new(
+            "appstore.publishers.admin.list",
+            publishers,
+            next_cursor,
+            has_more,
         ))
     }
 }

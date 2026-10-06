@@ -12,13 +12,15 @@ import {
   Zap,
   Network,
   Boxes,
-  Sliders, 
-  Activity, 
-  Download, 
+  Sliders,
+  Activity,
+  Download,
   FolderHeart,
   Heart,
   Store,
-  Sparkle
+  Sparkle,
+  Braces,
+  Package
 } from 'lucide-react';
 import { SidebarBrand } from './SidebarBrand';
 import { SidebarNavGroup, SidebarNavItem } from './SidebarNavGroup';
@@ -48,6 +50,11 @@ export function DesktopSidebar() {
     { name: t('nav.menu.mcp'), path: '/mcp', icon: Network },
     { name: t('nav.menu.templates'), path: '/templates', icon: Boxes },
     { name: t('nav.menu.demands'), path: '/demands', icon: Megaphone },
+  ];
+
+  const developerTabs: SidebarNavItem[] = [
+    { name: t('nav.menu.apiMarket'), path: '/api-market', icon: Braces },
+    { name: t('nav.menu.sdkMarket'), path: '/sdk-market', icon: Package },
   ];
 
   const adminTabs: SidebarNavItem[] = [
@@ -117,6 +124,13 @@ export function DesktopSidebar() {
         <SidebarNavGroup
           title={t('nav.menu.aiHub')}
           items={aiTabs}
+          isTabActive={isTabActive}
+        />
+
+        {/* Sub-component: Developer Market Section (documents API/SDK surfaces) */}
+        <SidebarNavGroup
+          title={t('nav.menu.developerMarket')}
+          items={developerTabs}
           isTabActive={isTabActive}
         />
 

@@ -1,6 +1,7 @@
 import type { AppStoreClient } from '@sdkwork/appstore-pc-core';
 import {
   configureConsoleServicePort,
+  type ConsoleCategoryOption,
   type ConsoleServicePort,
   type ManagedApp,
   type ManagedAppDetail,
@@ -38,26 +39,98 @@ export function createConsoleServicePort(client: AppStoreClient): ConsoleService
       return results.filter((app) => app.id);
     },
 
+    async listCategories(): Promise<ConsoleCategoryOption[]> {
+      const response = await client.catalog.listCategories({ locale: 'zh-CN', limit: 200 });
+      const items = readPageItems<Record<string, unknown>>(response as unknown);
+      return items
+        .map((item) => {
+          const categoryId = readString(item, 'id');
+          if (!categoryId) {
+            return undefined;
+          }
+          const localizations = Array.isArray(item.localizations) ? item.localizations : [];
+          const preferred = localizations.find(
+            (entry) => readString(entry as Record<string, unknown>, 'locale') === 'zh-CN',
+          ) ?? localizations[0];
+          return {
+            categoryId,
+            categoryCode: readString(item, 'categoryCode', 'category_code') || categoryId,
+            displayName:
+              readString(preferred as Record<string, unknown> | undefined, 'displayName', 'display_name')
+              || readString(item, 'displayName', 'display_name')
+              || categoryId,
+          } satisfies ConsoleCategoryOption;
+        })
+        .filter((option): option is ConsoleCategoryOption => option !== undefined);
+    },
+
     async publishApp(appData: {
       name: string;
-      category: string;
-      version: string;
-      description: string;
+      categoryId?: string;
+      version?: string;
+      description?: string;
       appType?: string;
+      pricingModel?: string;
     }): Promise<ManagedApp> {
+      // The bootstrap mints the app and draft listing; the follow-up calls
+      // persist the form fields the publisher entered instead of dropping
+      // them, so what the page shows matches what the backend stores.
+      const slug = `${slugify(appData.name)}-${Date.now().toString(36)}`;
+      const pricingModel = appData.pricingModel?.trim().toLocaleUpperCase();
       const result = await client.publishers.bootstrapApp({
-        appKey: `dev-${slugify(appData.name)}-${Date.now().toString(36)}`,
+        appKey: `dev-${slug}`,
         displayName: appData.name,
         defaultLocale: 'zh-CN',
         appType: appData.appType ?? 'APP',
-        listingSlug: `dev-${slugify(appData.name)}-${Date.now().toString(36)}`,
+        listingSlug: `dev-${slug}`,
+        ...(pricingModel === 'FREEMIUM' || pricingModel === 'PAID'
+          ? { pricingModel }
+          : {}),
       });
       const listing = readObject(result as unknown as Record<string, unknown>, 'listing');
+      const listingId = readString(listing, 'id');
+
+      if (listingId) {
+        const description = appData.description?.trim();
+        if (description) {
+          await client.listings
+            .upsertLocalization(listingId, 'zh-CN', {
+              displayName: appData.name,
+              shortDescription: description.slice(0, 120),
+              fullDescription: description,
+            })
+            .catch(() => undefined);
+        }
+        const categoryId = appData.categoryId?.trim();
+        if (categoryId) {
+          await client.listings
+            .bindCategories(listingId, {
+              categoryIds: [categoryId],
+              primaryCategoryId: categoryId,
+            })
+            .catch(() => undefined);
+        }
+        const version = appData.version?.trim();
+        if (version) {
+          // `production` is the seeded stable channel; the quick-publish form
+          // stages the initial version there as a draft release.
+          await client.releases
+            .create(listingId, {
+              channelCode: 'production',
+              versionName: version,
+              versionCode: version,
+            })
+            .catch(() => undefined);
+        }
+      }
+
       return {
-        id: readString(listing, 'id') || Date.now().toString(),
+        id: listingId || Date.now().toString(),
         name: readString(listing, 'displayName', 'display_name') || appData.name,
-        version: appData.version || '1.0.0',
-        status: '已提交上架',
+        version: appData.version?.trim() || '1.0.0',
+        status: mapListingStatus(
+          readString(listing, 'listingStatus', 'listing_status') || 'DRAFT',
+        ),
         downloads: '0',
         updatedAt: new Date().toISOString().slice(0, 10),
       };
@@ -234,30 +307,6 @@ export function createConsoleServicePort(client: AppStoreClient): ConsoleService
         memberRole: data.role,
       });
       return true;
-    },
-
-    async getApiCredentials() {
-      throw new Error('Store API credential management is not exposed by the App Store app API.');
-    },
-
-    async generateApiKey() {
-      throw new Error('Store API credential management is not exposed by the App Store app API.');
-    },
-
-    async revokeApiKey() {
-      throw new Error('Store API credential management is not exposed by the App Store app API.');
-    },
-
-    async getSecurityPolicy() {
-      throw new Error('Security policy management is not exposed by the App Store app API.');
-    },
-
-    async updateSecurityPolicy() {
-      throw new Error('Security policy management is not exposed by the App Store app API.');
-    },
-
-    async getConsoleAuditLogs() {
-      throw new Error('Console audit logs are not exposed by the App Store app API.');
     },
   };
 }

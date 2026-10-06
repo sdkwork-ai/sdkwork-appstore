@@ -1,7 +1,8 @@
 use sdkwork_appstore_catalog_service::domain::commands::{
-    CategoryCreateRequest, CategoryLocalizationInput, CategoryUpdateRequest,
+    CategoriesListRequest, CategoryCreateRequest, CategoryLocalizationInput, CategoryUpdateRequest,
     CollectionCreateRequest, CollectionItemInput, CollectionItemsUpsertRequest,
-    CollectionLocalizationInput, CollectionUpdateRequest, FeaturedUpsertRequest,
+    CollectionLocalizationInput, CollectionUpdateRequest, CollectionsListRequest,
+    FeaturedListRequest, FeaturedUpsertRequest,
 };
 
 pub fn map_collection_create(
@@ -151,4 +152,36 @@ pub fn map_category_update(
         req = req.with_localizations(v);
     }
     req
+}
+
+pub fn map_admin_categories_list(
+    cursor: Option<String>,
+    page_size: Option<i32>,
+) -> CategoriesListRequest {
+    let mut req = CategoriesListRequest::new();
+    if let Some(v) = cursor {
+        req = req.with_cursor(v);
+    }
+    if let Some(v) = page_size {
+        req = req.with_page_size(v);
+    }
+    req
+}
+
+pub fn map_admin_collections_list(
+    cursor: Option<String>,
+    page_size: Option<i32>,
+) -> CollectionsListRequest {
+    let mut req = CollectionsListRequest::new();
+    if let Some(v) = cursor {
+        req = req.with_cursor(v);
+    }
+    if let Some(v) = page_size {
+        req = req.with_page_size(v);
+    }
+    req
+}
+
+pub fn map_admin_featured_list() -> FeaturedListRequest {
+    FeaturedListRequest::new()
 }

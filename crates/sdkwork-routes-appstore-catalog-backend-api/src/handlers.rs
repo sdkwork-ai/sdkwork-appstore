@@ -4,8 +4,9 @@ use sdkwork_appstore_catalog_service::domain::commands::{
     CategoryLocalizationInput, CollectionItemInput, CollectionLocalizationInput,
 };
 use sdkwork_appstore_catalog_service::domain::results::{
-    CategoryCreateResult, CategoryUpdateResult, CollectionCreateResult,
-    CollectionItemsUpsertResult, CollectionUpdateResult, FeaturedUpsertResult,
+    CategoriesListResult, CategoryCreateResult, CategoryUpdateResult, CollectionCreateResult,
+    CollectionItemsUpsertResult, CollectionUpdateResult, CollectionsListResult,
+    FeaturedListResult, FeaturedUpsertResult,
 };
 use sdkwork_appstore_catalog_service::error::AppstoreServiceError;
 use sdkwork_appstore_catalog_service::CatalogOperations;
@@ -18,6 +19,21 @@ pub struct RouteHandlerPlan {
 }
 
 pub const ROUTE_HANDLER_PLANS: &[RouteHandlerPlan] = &[
+    RouteHandlerPlan {
+        operation_id: "appstore.catalog.admin.categories.list",
+        handler_name: "catalog_admin_categories_list",
+        service_method: "admin_categories_list",
+    },
+    RouteHandlerPlan {
+        operation_id: "appstore.catalog.admin.collections.list",
+        handler_name: "catalog_admin_collections_list",
+        service_method: "admin_collections_list",
+    },
+    RouteHandlerPlan {
+        operation_id: "appstore.catalog.admin.featured.list",
+        handler_name: "catalog_admin_featured_list",
+        service_method: "admin_featured_list",
+    },
     RouteHandlerPlan {
         operation_id: "appstore.catalog.collections.create",
         handler_name: "catalog_collections_create",
@@ -181,4 +197,32 @@ pub async fn catalog_categories_update<S: CatalogOperations>(
         localizations,
     );
     service.category_update(context, cmd).await
+}
+
+pub async fn catalog_admin_categories_list<S: CatalogOperations>(
+    service: &S,
+    context: &AppstoreRequestContext,
+    cursor: Option<String>,
+    page_size: Option<i32>,
+) -> Result<CategoriesListResult, AppstoreServiceError> {
+    let cmd = mapper::request::map_admin_categories_list(cursor, page_size);
+    service.admin_categories_list(context, cmd).await
+}
+
+pub async fn catalog_admin_collections_list<S: CatalogOperations>(
+    service: &S,
+    context: &AppstoreRequestContext,
+    cursor: Option<String>,
+    page_size: Option<i32>,
+) -> Result<CollectionsListResult, AppstoreServiceError> {
+    let cmd = mapper::request::map_admin_collections_list(cursor, page_size);
+    service.admin_collections_list(context, cmd).await
+}
+
+pub async fn catalog_admin_featured_list<S: CatalogOperations>(
+    service: &S,
+    context: &AppstoreRequestContext,
+) -> Result<FeaturedListResult, AppstoreServiceError> {
+    let cmd = mapper::request::map_admin_featured_list();
+    service.admin_featured_list(context, cmd).await
 }

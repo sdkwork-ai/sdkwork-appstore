@@ -11,14 +11,14 @@
   "language": "typescript",
   "apiPrefix": "/backend/v3/api",
   "authoritySpec": "openapi/sdkwork-appstore-backend-api.openapi.yaml",
-  "generationInputSpec": "../../apis/backend-api/store/openapi.yaml",
+  "generationInputSpec": "openapi/sdkwork-appstore-backend-api.sdkgen.yaml",
   "derivedSpecs": {
     "default": "openapi/sdkwork-appstore-backend-api.sdkgen.yaml"
   },
   "generatedOutput": "sdkwork-appstore-backend-sdk-typescript/generated/server-openapi",
   "standardProfile": "sdkwork-v3",
   "fixedSdkVersion": "0.1.0",
-  "ownerOnlyOperationCount": 29,
+  "ownerOnlyOperationCount": 33,
   "sdkDependencies": [
     "sdkwork-iam-backend-sdk"
   ],

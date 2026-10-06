@@ -19,14 +19,21 @@ import { CatalogFormNotice } from './CatalogFormNotice';
 /**
  * Updates a collection (`appstore.catalog.collections.update`).
  *
- * The collection id is operator-supplied because the operator contract has no
- * collection read endpoint; an empty status or sort order is omitted so a
- * targeted edit never overwrites the other field.
+ * The collection id comes from the browse table (or manual entry); an empty
+ * status or sort order is omitted so a targeted edit never overwrites the
+ * other field.
  */
-export function CatalogCollectionUpdateForm() {
+interface CatalogCollectionUpdateFormProps {
+  /** Collection id picked from the browse table; remounts prefill it. */
+  presetCollectionId?: string;
+}
+
+export function CatalogCollectionUpdateForm({
+  presetCollectionId = '',
+}: CatalogCollectionUpdateFormProps) {
   const { t } = useTranslation();
   const services = useAppstoreAdminServices();
-  const [collectionId, setCollectionId] = useState('');
+  const [collectionId, setCollectionId] = useState(presetCollectionId);
   const [collectionStatus, setCollectionStatus] = useState('');
   const [sortOrder, setSortOrder] = useState('');
   const [validationError, setValidationError] = useState('');

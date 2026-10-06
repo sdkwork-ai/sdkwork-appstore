@@ -1,33 +1,41 @@
 import { useState, type FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
-import { CheckCircle2 } from 'lucide-react';
+import { CheckCircle2, RefreshCw } from 'lucide-react';
 import {
   APPSTORE_ADMIN_PERMISSIONS,
   APPSTORE_ADMIN_PUBLISHER_OPERATIONS,
   APPSTORE_ADMIN_VERIFICATION_DECISIONS,
   APPSTORE_ADMIN_VERIFICATION_TYPES,
+  useAppstoreAdminQuery,
   useAppstoreAdminServices,
+  type AppstoreAdminPublisherRow,
   type AppstoreAdminVerificationOutcome,
 } from '@sdkwork/appstore-pc-admin-core';
 import {
   ADMIN_INPUT_CLASS,
   AdminActionButton,
   AdminCommandError,
+  AdminDataTable,
   AdminDetailList,
   AdminFormField,
   AdminPageHeader,
+  AdminPaginationBar,
   AdminSection,
+  AdminStatePlaceholder,
   useAdminCommand,
   useAppstoreAdminPermission,
+  type AdminTableColumn,
 } from '@sdkwork/appstore-pc-admin-shell';
 
+const PUBLISHERS_PAGE_SIZE = 50;
+
 /**
- * `appstore.publishers.admin.verify` — publisher verification decisions.
+ * `appstore.publishers.admin.list` + `appstore.publishers.admin.verify` —
+ * publisher verification decisions.
  *
- * The command is gated by `appstore.publishers.admin`; every recorded decision
- * is written back to the publisher profile and stays auditable, so the outcome
- * returned by the operation is shown verbatim instead of being summarized into
- * a generic success toast.
+ * The listing read feeds the decision form: the operator picks a publisher
+ * row (or types an id) and records a verification decision that is written
+ * back to the publisher profile and shown verbatim.
  */
 export function PublisherVerificationPage() {
   const { t } = useTranslation();
@@ -35,6 +43,7 @@ export function PublisherVerificationPage() {
   const canVerify = useAppstoreAdminPermission(APPSTORE_ADMIN_PERMISSIONS.publishersManage);
 
   const [publisherId, setPublisherId] = useState('');
+  const [cursor, setCursor] = useState('');
   const [verificationType, setVerificationType] = useState<string>(
     APPSTORE_ADMIN_VERIFICATION_TYPES[0],
   );
@@ -42,6 +51,68 @@ export function PublisherVerificationPage() {
   const [validationError, setValidationError] = useState('');
   const [outcome, setOutcome] = useState<AppstoreAdminVerificationOutcome | undefined>(undefined);
   const command = useAdminCommand(APPSTORE_ADMIN_PUBLISHER_OPERATIONS.verifyPublisher);
+
+  const publishersQuery = useAppstoreAdminQuery(
+    APPSTORE_ADMIN_PUBLISHER_OPERATIONS.listPublishers,
+    () =>
+      services.publishers.listPublishers({
+        ...(cursor ? { cursor } : {}),
+        pageSize: PUBLISHERS_PAGE_SIZE,
+      }),
+    [services, cursor],
+  );
+
+  const publisherRows = publishersQuery.data?.items ?? [];
+  const pageInfo = publishersQuery.data?.pageInfo ?? { mode: 'cursor' as const };
+
+  const publisherColumns: AdminTableColumn<AppstoreAdminPublisherRow>[] = [
+    {
+      key: 'publisher',
+      header: t('adminPublishers.verification.browse.columns.publisher'),
+      render: (item) => (
+        <div className="min-w-0">
+          <p className="truncate font-medium text-store-ink ">{item.displayName}</p>
+          <p className="truncate font-mono text-[11px] text-store-ink-faint ">
+            {item.publisherId}
+          </p>
+        </div>
+      ),
+    },
+    {
+      key: 'verificationStatus',
+      header: t('adminPublishers.verification.browse.columns.verificationStatus'),
+      width: 'w-32',
+      render: (item) => (
+        <span className="text-xs text-store-ink-soft">
+          {item.verificationStatus || t('adminShell.common.notAvailable')}
+        </span>
+      ),
+    },
+    {
+      key: 'status',
+      header: t('adminPublishers.verification.browse.columns.status'),
+      width: 'w-28',
+      hideBelowLarge: true,
+      render: (item) => (
+        <span className="text-xs text-store-ink-soft">
+          {item.status || t('adminShell.common.notAvailable')}
+        </span>
+      ),
+    },
+    {
+      key: 'actions',
+      header: t('adminPublishers.verification.browse.columns.actions'),
+      width: 'w-24',
+      align: 'right',
+      render: (item) => (
+        <AdminActionButton
+          onClick={() => setPublisherId(item.publisherId)}
+        >
+          {t('adminPublishers.verification.browse.pick')}
+        </AdminActionButton>
+      ),
+    },
+  ];
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -180,6 +251,56 @@ export function PublisherVerificationPage() {
             />
           </div>
         ) : null}
+      </AdminSection>
+
+      <AdminSection
+        actions={
+          <AdminActionButton
+            disabled={publishersQuery.loading}
+            onClick={publishersQuery.reload}
+          >
+            <RefreshCw
+              className={`h-3.5 w-3.5 ${publishersQuery.loading ? 'animate-spin' : ''}`}
+            />
+            {t('adminShell.common.refresh')}
+          </AdminActionButton>
+        }
+        title={t('adminPublishers.verification.browse.title')}
+      >
+        {publishersQuery.error && publisherRows.length === 0 ? (
+          <AdminStatePlaceholder
+            error={publishersQuery.error}
+            kind="error"
+            onRetry={publishersQuery.reload}
+          />
+        ) : (
+          <>
+            <AdminDataTable
+              caption={t('adminPublishers.verification.browse.title')}
+              columns={publisherColumns}
+              dense
+              emptyContent={
+                <AdminStatePlaceholder
+                  inline
+                  kind="empty"
+                  description={t('adminPublishers.verification.browse.empty')}
+                />
+              }
+              loading={publishersQuery.loading && publisherRows.length === 0}
+              loadingContent={<AdminStatePlaceholder inline kind="loading" />}
+              rowKey={(item) => item.publisherId}
+              rows={publisherRows}
+            />
+            <AdminPaginationBar
+              cursorApplied={Boolean(cursor)}
+              loadedCount={publisherRows.length}
+              loading={publishersQuery.loading}
+              onNext={setCursor}
+              onReset={() => setCursor('')}
+              pageInfo={pageInfo}
+            />
+          </>
+        )}
       </AdminSection>
     </div>
   );

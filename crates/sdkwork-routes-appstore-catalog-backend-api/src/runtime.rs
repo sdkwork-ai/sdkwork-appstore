@@ -1,10 +1,11 @@
 use crate::handlers::{
+    catalog_admin_categories_list, catalog_admin_collections_list, catalog_admin_featured_list,
     catalog_categories_create, catalog_categories_update, catalog_collections_create,
     catalog_collections_items_upsert, catalog_collections_update, catalog_featured_upsert,
 };
-use axum::extract::{Extension, Json, Path, State};
+use axum::extract::{Extension, Json, Path, Query, State};
 use axum::response::Response;
-use axum::routing::{patch, post, put};
+use axum::routing::{get, patch, put};
 use axum::Router;
 use sdkwork_appstore_catalog_service::domain::commands::{
     CategoryLocalizationInput, CollectionItemInput, CollectionLocalizationInput,
@@ -81,11 +82,26 @@ struct CategoryUpdateBody {
     localizations: Option<Vec<CategoryLocalizationInput>>,
 }
 
+#[derive(Debug, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct AdminListQuery {
+    cursor: Option<String>,
+    page_size: Option<i32>,
+}
+
 pub fn routes() -> Router<AppState> {
     Router::new()
         .route(
+            "/backend/v3/api/appstore/catalog/categories",
+            get(admin_categories_list).post(categories_create),
+        )
+        .route(
             "/backend/v3/api/appstore/catalog/collections",
-            post(collections_create),
+            get(admin_collections_list).post(collections_create),
+        )
+        .route(
+            "/backend/v3/api/appstore/catalog/featured",
+            get(admin_featured_list),
         )
         .route(
             "/backend/v3/api/appstore/catalog/collections/{collectionId}",
@@ -100,13 +116,67 @@ pub fn routes() -> Router<AppState> {
             put(featured_upsert),
         )
         .route(
-            "/backend/v3/api/appstore/catalog/categories",
-            post(categories_create),
-        )
-        .route(
             "/backend/v3/api/appstore/catalog/categories/{categoryId}",
             patch(categories_update),
         )
+}
+
+async fn admin_categories_list(
+    State(state): State<AppState>,
+    context: Option<Extension<WebRequestContext>>,
+    Query(query): Query<AdminListQuery>,
+) -> Response {
+    let ctx = match to_catalog_context_auth(context.as_ref()) {
+        Ok(ctx) => ctx,
+        Err(resp) => return resp,
+    };
+    match catalog_admin_categories_list(&state.catalog_service, &ctx, query.cursor, query.page_size)
+        .await
+    {
+        Ok(result) => ok_page(
+            context.as_ref(),
+            result.categories,
+            result.next_cursor,
+            result.has_more,
+        ),
+        Err(error) => map_catalog_error(context.as_ref(), error),
+    }
+}
+
+async fn admin_collections_list(
+    State(state): State<AppState>,
+    context: Option<Extension<WebRequestContext>>,
+    Query(query): Query<AdminListQuery>,
+) -> Response {
+    let ctx = match to_catalog_context_auth(context.as_ref()) {
+        Ok(ctx) => ctx,
+        Err(resp) => return resp,
+    };
+    match catalog_admin_collections_list(&state.catalog_service, &ctx, query.cursor, query.page_size)
+        .await
+    {
+        Ok(result) => ok_page(
+            context.as_ref(),
+            result.collections,
+            result.next_cursor,
+            result.has_more,
+        ),
+        Err(error) => map_catalog_error(context.as_ref(), error),
+    }
+}
+
+async fn admin_featured_list(
+    State(state): State<AppState>,
+    context: Option<Extension<WebRequestContext>>,
+) -> Response {
+    let ctx = match to_catalog_context_auth(context.as_ref()) {
+        Ok(ctx) => ctx,
+        Err(resp) => return resp,
+    };
+    match catalog_admin_featured_list(&state.catalog_service, &ctx).await {
+        Ok(result) => ok_page(context.as_ref(), result.slots, None, false),
+        Err(error) => map_catalog_error(context.as_ref(), error),
+    }
 }
 
 async fn collections_create(

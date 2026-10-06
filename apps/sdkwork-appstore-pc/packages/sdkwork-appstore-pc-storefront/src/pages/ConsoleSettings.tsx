@@ -1,34 +1,68 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useSyncExternalStore } from 'react';
 import { useTranslation } from 'react-i18next';
+import { KeyRound, ShieldCheck } from 'lucide-react';
 import { ConsoleHeader } from '../components/console/ConsoleHeader';
 import { ConsoleNotificationAlert } from '../components/console/ConsoleNotificationAlert';
 import { PublishAppForm } from '../components/console/PublishAppForm';
 import { ManagedAppsList, PublishedApp } from '../components/console/ManagedAppsList';
-import { ApiCredentialsCard } from '../components/console/ApiCredentialsCard';
-import { SecurityPolicyCard } from '../components/console/SecurityPolicyCard';
-import { ConsoleService, ManagedApp, ApiCredential } from '../services/api';
+import {
+  ConsoleService,
+  ManagedApp,
+  type ConsoleCategoryOption,
+} from '../services/api';
+import type { AppstorePcSessionStore } from '@sdkwork/appstore-pc-runtime/session';
 
-export default function ConsoleSettings() {
+interface ConsoleSettingsProps {
+  /**
+   * Session store from the app runtime; the tenant badge reads the live
+   * snapshot instead of a hardcoded label. Optional so embedders without a
+   * runtime handle still render the page (badge hidden).
+   */
+  session?: AppstorePcSessionStore;
+}
+
+/**
+ * Resolves the tenant badge label from the session context. Returns
+ * `undefined` while signed out so the header hides the badge instead of
+ * showing a fabricated tenant.
+ */
+function readSessionTenantLabel(session: AppstorePcSessionStore | undefined): string | undefined {
+  if (!session) {
+    return undefined;
+  }
+  const context = session.getSnapshot().context;
+  const tenantId = context?.tenantId?.trim();
+  return tenantId ? tenantId : undefined;
+}
+
+export default function ConsoleSettings({ session }: ConsoleSettingsProps) {
   const { t } = useTranslation();
   const [appName, setAppName] = useState('');
-  const [category, setCategory] = useState('高效工作');
+  const [categoryId, setCategoryId] = useState('');
   const [version, setVersion] = useState('1.0.0');
   const [description, setDescription] = useState('');
   const [publishedApps, setPublishedApps] = useState<PublishedApp[]>([]);
-  const [credentials, setCredentials] = useState<ApiCredential[]>([]);
+  const [categoryOptions, setCategoryOptions] = useState<ConsoleCategoryOption[]>([]);
   const [successMsg, setSuccessMsg] = useState('');
   const [loading, setLoading] = useState(true);
 
+  const tenantLabel = useSyncExternalStore(
+    (listener) => session?.subscribe(listener) ?? (() => {}),
+    () => readSessionTenantLabel(session),
+    () => readSessionTenantLabel(session),
+  );
+
   const loadConsoleData = async () => {
     try {
-      // Managed apps are the primary surface; API credentials are a
-      // fail-closed capability that must never block the page load.
-      const [apps, creds] = await Promise.all([
-        ConsoleService.getManagedApps().catch(() => []),
-        ConsoleService.getApiCredentials().catch(() => []),
+      // Managed apps and live catalog categories are both real reads; a
+      // category outage must not block the page, so it degrades to an empty
+      // picker instead of fabricated options.
+      const [apps, categories] = await Promise.all([
+        ConsoleService.getManagedApps().catch(() => [] as ManagedApp[]),
+        ConsoleService.listCategories().catch(() => [] as ConsoleCategoryOption[]),
       ]);
       setPublishedApps(apps);
-      setCredentials(creds);
+      setCategoryOptions(categories);
     } catch (err) {
       console.error('Failed to load console settings', err);
     } finally {
@@ -46,7 +80,7 @@ export default function ConsoleSettings() {
 
     const created = await ConsoleService.publishApp({
       name: appName,
-      category,
+      categoryId: categoryId || undefined,
       version,
       description,
     });
@@ -55,35 +89,15 @@ export default function ConsoleSettings() {
     setSuccessMsg(t('console.alert.success', { appName }));
     setAppName('');
     setDescription('');
+    setVersion('1.0.0');
+    setCategoryId('');
     setTimeout(() => setSuccessMsg(''), 4000);
-  };
-
-  const handleGenerateKey = async (name: string) => {
-    try {
-      const cred = await ConsoleService.generateApiKey(name);
-      setCredentials((prev) => [cred, ...prev]);
-    } catch (err) {
-      console.error('Failed to generate API key', err);
-    }
-  };
-
-  const handleRevokeKey = async (id: string) => {
-    try {
-      const success = await ConsoleService.revokeApiKey(id);
-      if (success) {
-        setCredentials((prev) =>
-          prev.map((c) => (c.id === id ? { ...c, status: 'revoked' as const } : c))
-        );
-      }
-    } catch (err) {
-      console.error('Failed to revoke API key', err);
-    }
   };
 
   return (
     <div className="p-6 md:p-8 w-full max-w-full space-y-6 select-none animate-fade-in">
       {/* Sub-component: Console Header */}
-      <ConsoleHeader />
+      <ConsoleHeader tenantLabel={tenantLabel} />
 
       {/* Sub-component: Notification Alert */}
       <ConsoleNotificationAlert message={successMsg} />
@@ -97,11 +111,15 @@ export default function ConsoleSettings() {
             {/* Sub-component: Form */}
             <PublishAppForm
               appName={appName}
-              category={category}
+              categoryId={categoryId}
               version={version}
               description={description}
+              categoryOptions={categoryOptions.map((option) => ({
+                value: option.categoryId,
+                label: option.displayName,
+              }))}
               onAppNameChange={setAppName}
-              onCategoryChange={setCategory}
+              onCategoryChange={setCategoryId}
               onVersionChange={setVersion}
               onDescriptionChange={setDescription}
               onSubmit={handlePublish}
@@ -111,22 +129,43 @@ export default function ConsoleSettings() {
             <ManagedAppsList apps={publishedApps} />
           </div>
 
-          {/* Right 1 Col: Credentials & Security Status */}
+          {/* Right 1 Col: platform capability notices. The App Store app API
+            does not expose store API credentials, security policy, or console
+            audit logs, so these render as explicit static states instead of
+            interactive forms whose calls can never succeed. */}
           <div className="space-y-6">
-            {/* Sub-component: API Key Card */}
-            <ApiCredentialsCard
-              credentials={credentials}
-              onGenerateKey={handleGenerateKey}
-              onRevokeKey={handleRevokeKey}
-            />
+            <div className="bg-store-subtle/50 dark:bg-store-surface border border-store-line rounded-store-card p-5 shadow-sm space-y-2 ">
+              <div className="flex items-center gap-2">
+                <KeyRound className="w-4 h-4 text-store-ink-faint" />
+                <h2 className="text-sm font-bold text-store-ink ">
+                  {t('console.apiKeys.cardTitle', 'API 密钥与 SDK 凭证')}
+                </h2>
+              </div>
+              <p className="text-xs text-store-ink-faint ">
+                {t(
+                  'console.apiKeys.unavailable',
+                  '商店 API 凭证由平台统一签发，应用商店暂不提供发布者自助创建，请通过平台控制台管理。',
+                )}
+              </p>
+            </div>
 
-            {/* Sub-component: Security Policy Card */}
-            <SecurityPolicyCard />
+            <div className="bg-store-subtle/50 dark:bg-store-surface border border-store-line rounded-store-card p-5 shadow-sm space-y-2 ">
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="w-4 h-4 text-store-ink-faint" />
+                <h2 className="text-sm font-bold text-store-ink ">
+                  {t('console.security.title')}
+                </h2>
+              </div>
+              <p className="text-xs text-store-ink-faint ">
+                {t(
+                  'console.security.unavailable',
+                  '安全策略能力暂未由 App Store 后端提供，当前保持安全默认配置。',
+                )}
+              </p>
+            </div>
           </div>
         </div>
       )}
     </div>
   );
 }
-
-

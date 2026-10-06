@@ -17,6 +17,7 @@ export {
   ExpertsPage,
   McpPage,
 } from '@sdkwork/appstore-pc-markets'
+export { ApiMarketPage, SdkMarketPage } from '@sdkwork/appstore-pc-developer-market'
 export { default as TemplatesPage } from './pages/Templates'
 export { default as DemandsPage } from './pages/Demands'
 export { default as TemplateDetailPage } from './pages/TemplateDetail'

@@ -256,6 +256,28 @@ pub trait CatalogOperations {
         context: &AppstoreRequestContext,
         request: FeedbackCreateRequest,
     ) -> AppstoreServiceResult<FeedbackCreateResult>;
+
+    /// Operator-facing category listing that returns every non-deleted status.
+    async fn admin_categories_list(
+        &self,
+        context: &AppstoreRequestContext,
+        request: CategoriesListRequest,
+    ) -> AppstoreServiceResult<CategoriesListResult>;
+
+    /// Operator-facing collection listing that returns every non-deleted status.
+    async fn admin_collections_list(
+        &self,
+        context: &AppstoreRequestContext,
+        request: CollectionsListRequest,
+    ) -> AppstoreServiceResult<CollectionsListResult>;
+
+    /// Operator-facing featured-slot listing that returns every slot regardless
+    /// of its visibility window.
+    async fn admin_featured_list(
+        &self,
+        context: &AppstoreRequestContext,
+        request: FeaturedListRequest,
+    ) -> AppstoreServiceResult<FeaturedListResult>;
 }
 
 #[derive(Clone)]
@@ -1052,6 +1074,106 @@ where
 
         Ok(FeaturedListResult::new(
             "appstore.catalog.featured.list",
+            slots,
+        ))
+    }
+
+    async fn admin_categories_list(
+        &self,
+        context: &AppstoreRequestContext,
+        request: CategoriesListRequest,
+    ) -> AppstoreServiceResult<CategoriesListResult> {
+        require_scope(context, "appstore.catalog.admin")?;
+        let limit = request.page_size.unwrap_or(20).clamp(1, 200);
+        let categories = self
+            .repository
+            .find_categories(context, request.cursor.as_deref(), limit + 1)
+            .await?;
+
+        let has_more = categories.len() > limit as usize;
+        let categories: Vec<Category> = categories.into_iter().take(limit as usize).collect();
+        let next_cursor = if has_more {
+            categories.last().map(|c| c.id.as_str().to_string())
+        } else {
+            None
+        };
+
+        let mut result_categories = Vec::new();
+        for category in categories {
+            let localizations = self
+                .repository
+                .find_category_localizations(context, &category.id)
+                .await?;
+            result_categories.push(CategoryWithLocalizations {
+                category,
+                localizations,
+            });
+        }
+
+        Ok(CategoriesListResult::new(
+            "appstore.catalog.admin.categories.list",
+            result_categories,
+            next_cursor,
+            has_more,
+        ))
+    }
+
+    async fn admin_collections_list(
+        &self,
+        context: &AppstoreRequestContext,
+        request: CollectionsListRequest,
+    ) -> AppstoreServiceResult<CollectionsListResult> {
+        require_scope(context, "appstore.catalog.admin")?;
+        let limit = request.page_size.unwrap_or(20).clamp(1, 200);
+        let collections = self
+            .repository
+            .find_collections(context, request.cursor.as_deref(), limit + 1)
+            .await?;
+
+        let has_more = collections.len() > limit as usize;
+        let collections: Vec<CatalogCollection> =
+            collections.into_iter().take(limit as usize).collect();
+        let next_cursor = if has_more {
+            collections.last().map(|c| c.id.as_str().to_string())
+        } else {
+            None
+        };
+
+        let mut result_collections = Vec::new();
+        for collection in collections {
+            let localizations = self
+                .repository
+                .find_collection_localizations(context, &collection.id)
+                .await?;
+            let items = self
+                .repository
+                .find_collection_items(context, &collection.id)
+                .await?;
+            result_collections.push(CollectionWithItems {
+                collection,
+                localizations,
+                items,
+            });
+        }
+
+        Ok(CollectionsListResult::new(
+            "appstore.catalog.admin.collections.list",
+            result_collections,
+            next_cursor,
+            has_more,
+        ))
+    }
+
+    async fn admin_featured_list(
+        &self,
+        context: &AppstoreRequestContext,
+        _request: FeaturedListRequest,
+    ) -> AppstoreServiceResult<FeaturedListResult> {
+        require_scope(context, "appstore.catalog.admin")?;
+        let slots = self.repository.find_featured_slots(context).await?;
+
+        Ok(FeaturedListResult::new(
+            "appstore.catalog.admin.featured.list",
             slots,
         ))
     }

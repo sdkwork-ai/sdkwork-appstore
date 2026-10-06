@@ -12,10 +12,18 @@ export const adminCatalog = {
   },
   categories: {
     title: '分类管理',
-    description: '创建分类，并调整已有分类的状态与排序。',
-    readGapNotice: {
-      title: '本页为编写控制台，无法浏览已有分类',
-      description: '后端运营接口目前只提供目录写入操作，尚未提供分类读取接口，因此本页不能列出或检索已有分类。请先在其它系统中取得分类编号，再在下方填写并提交。',
+    description: '浏览已有分类，创建新分类，并调整状态与排序。',
+    browse: {
+      title: '已有分类',
+      empty: '还没有任何分类。',
+      pick: '选入更新',
+      columns: {
+        category: '分类',
+        status: '状态',
+        sortOrder: '排序值',
+        categoryId: '分类编号',
+        actions: '操作',
+      },
     },
     create: {
       title: '新建分类',
@@ -50,10 +58,19 @@ export const adminCatalog = {
   },
   collections: {
     title: '合集管理',
-    description: '创建合集、调整已有合集的状态与排序，并维护合集条目。',
-    readGapNotice: {
-      title: '本页为编写控制台，无法浏览已有合集',
-      description: '后端运营接口目前只提供目录写入操作，尚未提供合集读取接口，因此本页不能列出或检索已有合集。请先在其它系统中取得合集编号，再在下方填写并提交。',
+    description: '浏览已有合集，创建合集、调整状态与排序，并维护合集条目。',
+    browse: {
+      title: '已有合集',
+      empty: '还没有任何合集。',
+      pick: '选入编辑',
+      columns: {
+        collection: '合集',
+        collectionType: '类型',
+        status: '状态',
+        itemCount: '条目数',
+        collectionId: '合集编号',
+        actions: '操作',
+      },
     },
     create: {
       title: '新建合集',
@@ -111,10 +128,17 @@ export const adminCatalog = {
   },
   featured: {
     title: '精选位',
-    description: '为精选位编排投放应用与生效时段。',
-    readGapNotice: {
-      title: '本页为编写控制台，无法浏览已有精选位',
-      description: '后端运营接口目前只提供目录写入操作，尚未提供精选位读取接口，因此本页不能列出或检索已有精选位。请先在其它系统中取得精选位编码，再在下方填写并提交。',
+    description: '浏览已有精选位，为精选位编排投放应用与生效时段。',
+    browse: {
+      title: '已有精选位',
+      empty: '还没有任何精选位。',
+      columns: {
+        slotCode: '精选位编码',
+        listingId: '应用编号',
+        status: '状态',
+        window: '生效时段',
+        audienceScope: '可见范围',
+      },
     },
     slot: {
       title: '精选位编排',
@@ -142,6 +166,16 @@ export const adminCatalog = {
     DRAFT: '草稿',
     ACTIVE: '生效',
     ARCHIVED: '已归档',
+  },
+  lifecycleStatus: {
+    ACTIVE: '生效',
+    INACTIVE: '未启用',
+    DRAFT: '草稿',
+    PUBLISHED: '已发布',
+    ARCHIVED: '已归档',
+    SCHEDULED: '已排期',
+    PAUSED: '已暂停',
+    EXPIRED: '已过期',
   },
   collectionType: {
     EDITORIAL: '编辑精选',

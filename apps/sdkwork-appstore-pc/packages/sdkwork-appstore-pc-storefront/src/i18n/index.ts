@@ -26,6 +26,7 @@ import { events as eventsZh } from './zh-CN/appstore/storefront/events';
 import { publisher as publisherZh } from './zh-CN/appstore/storefront/publisher';
 import { consoleLocales as consoleLocalesZh } from './zh-CN/appstore/console/console';
 import { install as installZh } from './zh-CN/appstore/system/install';
+import { developerMarketZhCN } from '@sdkwork/appstore-pc-developer-market/i18n';
 
 import { nav as navEn } from './en/appstore/storefront/nav';
 import { common as commonEn } from './en/appstore/storefront/common';
@@ -52,11 +53,15 @@ import { events as eventsEn } from './en/appstore/storefront/events';
 import { publisher as publisherEn } from './en/appstore/storefront/publisher';
 import { consoleLocales as consoleLocalesEn } from './en/appstore/console/console';
 import { install as installEn } from './en/appstore/system/install';
+import { developerMarketEn } from '@sdkwork/appstore-pc-developer-market/i18n';
 
 const SAVED_LANG_KEY = 'app_language';
 const initialLang = localStorage.getItem(SAVED_LANG_KEY) || 'zh-CN';
 
 const zhCN = {
+  // The developer-market bundles are flat documents keys (`api.title`, …) and
+  // must live at the translation root, not inside a group object.
+  ...developerMarketZhCN,
   nav: navZh,
   common: commonZh,
   discover: discoverZh,
@@ -85,6 +90,9 @@ const zhCN = {
 };
 
 const en = {
+  // The developer-market bundles are flat documents keys (`api.title`, …) and
+  // must live at the translation root, not inside a group object.
+  ...developerMarketEn,
   nav: navEn,
   common: commonEn,
   discover: discoverEn,
@@ -122,7 +130,10 @@ i18n
     lng: initialLang,
     fallbackLng: 'zh-CN',
     interpolation: {
-      escapeValue: false
+      escapeValue: false,
+      // The documents reference copy interpolates {{platformName}}; without a
+      // default the sentences render with a hole.
+      defaultVariables: { platformName: 'SDKWork' }
     }
   });
 

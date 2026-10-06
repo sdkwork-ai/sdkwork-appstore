@@ -2,7 +2,12 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Sliders } from 'lucide-react';
 
-export const ConsoleHeader: React.FC = () => {
+interface ConsoleHeaderProps {
+  /** Tenant resolved from the live session snapshot; hidden when absent. */
+  tenantLabel?: string;
+}
+
+export const ConsoleHeader: React.FC<ConsoleHeaderProps> = ({ tenantLabel }) => {
   const { t } = useTranslation();
 
   return (
@@ -16,12 +21,16 @@ export const ConsoleHeader: React.FC = () => {
           {t('console.header.subtitle')}
         </p>
       </div>
-      <div className="flex items-center gap-2">
-        <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-store-success/10 text-store-success border border-store-success/20">
-          Tenant: SDKWork Global Dev
-        </span>
-      </div>
+      {tenantLabel ? (
+        <div className="flex items-center gap-2">
+          <span
+            title={tenantLabel}
+            className="max-w-[16rem] truncate px-2.5 py-0.5 rounded-full text-xs font-medium bg-store-success/10 text-store-success border border-store-success/20"
+          >
+            {t('console.header.tenantBadge', '租户：{{tenant}}', { tenant: tenantLabel })}
+          </span>
+        </div>
+      ) : null}
     </div>
   );
 };
-
