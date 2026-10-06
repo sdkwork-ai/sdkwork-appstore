@@ -193,15 +193,29 @@
 
   /* Centered phone canvas: on wide viewports the mobile surface stays a
      phone-proportioned column instead of stretching edge to edge. */
+  /* Centered phone canvas: on wide viewports the mobile surface stays a
+     phone-proportioned column instead of stretching edge to edge.
+     Scroll containment (APP_MOBILE_REACT_UI_SPEC §5): the document never
+     scrolls — the canvas is the only scroll container, so the page scrollbar
+     can never overlap the fixed bottom tab bar. The scrollbar stays visually
+     hidden (native-app feel) while scrolling remains functional. */
   .app-canvas-viewport {
-    @apply flex min-h-screen justify-center;
+    @apply flex justify-center overflow-hidden;
+    height: 100vh;
+    height: 100dvh;
     background-color: var(--bg-canvas);
   }
   .app-canvas {
-    @apply w-full min-h-screen;
+    @apply w-full h-full overflow-y-auto;
     max-width: 42rem;
     background-color: var(--bg-primary);
     box-shadow: 0 0 40px rgb(15 23 42 / 0.08);
+    overscroll-behavior: contain;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .app-canvas::-webkit-scrollbar {
+    display: none;
   }
   .tab-bar__row {
     @apply flex h-16 items-stretch justify-around px-1;
