@@ -149,6 +149,7 @@ export function ModerationReviewPage() {
         onClose={() => setDialog(undefined)}
         onCompleted={query.reload}
         open={dialog === 'appeal'}
+        defaultDecisionId={review?.latestDecisionId}
       />
     </div>
   );

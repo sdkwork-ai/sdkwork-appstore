@@ -19,6 +19,9 @@ export default function PublisherOverview() {
   const [registering, setRegistering] = useState(false);
   const [form, setForm] = useState({ displayName: '', legalName: '', supportEmail: '', websiteUrl: '' });
   const [notice, setNotice] = useState<string | null>(null);
+  const [editingProfile, setEditingProfile] = useState(false);
+  const [savingProfile, setSavingProfile] = useState(false);
+  const [profileForm, setProfileForm] = useState({ displayName: '', supportEmail: '', websiteUrl: '' });
 
   useEffect(() => {
     let cancelled = false;
@@ -70,6 +73,28 @@ export default function PublisherOverview() {
     }
   };
 
+  const handleSaveProfile = async () => {
+    if (!profileForm.displayName.trim() || savingProfile) {
+      return;
+    }
+    setSavingProfile(true);
+    try {
+      const updated = await ConsoleService.updatePublisherProfile({
+        displayName: profileForm.displayName.trim(),
+        supportEmail: profileForm.supportEmail.trim() || undefined,
+        websiteUrl: profileForm.websiteUrl.trim() || undefined,
+      });
+      setProfile(updated);
+      setEditingProfile(false);
+      setNotice(t('publisher.profile.updateSuccess'));
+    } catch (error) {
+      console.error('Failed to update publisher profile', error);
+      setNotice(null);
+    } finally {
+      setSavingProfile(false);
+    }
+  };
+
   if (loading) {
     return <LoadingSpinner />;
   }
@@ -81,7 +106,7 @@ export default function PublisherOverview() {
       case 'review':
         return app.status === '审核中';
       case 'draft':
-        return app.status === '已提交上架';
+        return app.status === '草稿';
       case 'offline':
         return app.status === '已下架';
       default:
@@ -203,6 +228,65 @@ export default function PublisherOverview() {
                 {t('publisher.onboarding.pendingVerification')}
               </span>
             )}
+            <button
+              type="button"
+              onClick={() => {
+                setProfileForm({
+                  displayName: profile.displayName,
+                  supportEmail: profile.supportEmail ?? '',
+                  websiteUrl: profile.websiteUrl ?? '',
+                });
+                setEditingProfile((prev) => !prev);
+              }}
+              className="px-3 py-1.5 rounded-store-control bg-store-subtle hover:bg-store-field border border-store-line text-xs font-medium text-store-ink transition-colors cursor-pointer"
+            >
+              {t('publisher.profile.edit')}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {profile && editingProfile && (
+        <div className="rounded-store-card p-6 bg-store-subtle/60 dark:bg-store-surface border border-store-line space-y-4 ">
+          <h2 className="text-sm font-bold text-store-ink ">
+            {t('publisher.profile.editTitle')}
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <input
+              value={profileForm.displayName}
+              onChange={(event) => setProfileForm((prev) => ({ ...prev, displayName: event.target.value }))}
+              placeholder={t('publisher.onboarding.displayName')}
+              className="px-3 rounded-store-control bg-store-field border border-store-line text-sm text-store-ink placeholder:text-store-ink-faint outline-none focus:border-store-brand transition-colors h-9 focus:ring-2 focus:ring-store-brand/25"
+            />
+            <input
+              value={profileForm.supportEmail}
+              onChange={(event) => setProfileForm((prev) => ({ ...prev, supportEmail: event.target.value }))}
+              placeholder={t('publisher.onboarding.supportEmail')}
+              type="email"
+              className="px-3 rounded-store-control bg-store-field border border-store-line text-sm text-store-ink placeholder:text-store-ink-faint outline-none focus:border-store-brand transition-colors h-9 focus:ring-2 focus:ring-store-brand/25"
+            />
+            <input
+              value={profileForm.websiteUrl}
+              onChange={(event) => setProfileForm((prev) => ({ ...prev, websiteUrl: event.target.value }))}
+              placeholder={t('publisher.onboarding.websiteUrl')}
+              type="url"
+              className="px-3 rounded-store-control bg-store-field border border-store-line text-sm text-store-ink placeholder:text-store-ink-faint outline-none focus:border-store-brand transition-colors h-9 focus:ring-2 focus:ring-store-brand/25"
+            />
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleSaveProfile}
+              disabled={savingProfile || !profileForm.displayName.trim()}
+              className="px-5 py-2 bg-store-brand hover:bg-store-brand disabled:opacity-50 text-white rounded-full text-xs font-medium transition-colors cursor-pointer"
+            >
+              {savingProfile ? t('publisher.profile.saving') : t('publisher.profile.save')}
+            </button>
+            <button
+              onClick={() => setEditingProfile(false)}
+              className="px-4 py-2 bg-store-subtle hover:bg-store-field border border-store-line text-store-ink rounded-full text-xs font-medium transition-colors cursor-pointer"
+            >
+              {t('publisher.profile.cancel')}
+            </button>
           </div>
         </div>
       )}

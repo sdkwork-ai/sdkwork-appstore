@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, CheckCircle2, Send } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, FileText, Send } from 'lucide-react';
 import {
     ConsoleService,
     uploadAndAttachReleaseArtifact,
@@ -59,6 +59,11 @@ export default function PublisherAppManage() {
   const [uploadPercent, setUploadPercent] = useState(0);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [releaseNotice, setReleaseNotice] = useState<string | null>(null);
+  // Release notes editing and retirement (releases.notes.update / releases.retire).
+  const [editingNotesReleaseId, setEditingNotesReleaseId] = useState<string | null>(null);
+  const [releaseNotesDraft, setReleaseNotesDraft] = useState('');
+  const [savingReleaseNotes, setSavingReleaseNotes] = useState(false);
+  const [retiringReleaseId, setRetiringReleaseId] = useState<string | null>(null);
 
   // member invite state
   const [inviteForm, setInviteForm] = useState({ userId: '', role: 'EDITOR' });
@@ -166,6 +171,41 @@ export default function PublisherAppManage() {
       console.error('Failed to update rollout', error);
     } finally {
       setApplyingRollout(false);
+    }
+  };
+
+  const handleSaveReleaseNotes = async (releaseId: string) => {
+    if (savingReleaseNotes) {
+      return;
+    }
+    setSavingReleaseNotes(true);
+    try {
+      await ConsoleService.updateReleaseNotes(releaseId, 'zh-CN', releaseNotesDraft);
+      setEditingNotesReleaseId(null);
+      setReleaseNotice(t('publisher.manage.releases.notesSaved'));
+    } catch (error) {
+      console.error('Failed to save release notes', error);
+    } finally {
+      setSavingReleaseNotes(false);
+    }
+  };
+
+  const handleRetireRelease = async (releaseId: string) => {
+    if (retiringReleaseId) {
+      return;
+    }
+    setRetiringReleaseId(releaseId);
+    try {
+      await ConsoleService.retireRelease(releaseId);
+      const refreshed = await ConsoleService.getReleases(id);
+      setReleases(refreshed);
+    } catch (error) {
+      console.error('Failed to retire release', error);
+      setReleaseNotice(
+        error instanceof Error ? error.message : t('publisher.manage.releases.retireFailed'),
+      );
+    } finally {
+      setRetiringReleaseId(null);
     }
   };
 
@@ -519,6 +559,58 @@ export default function PublisherAppManage() {
                       percent: release.targetPercentage ?? rolloutPercent,
                     })}
                   </span>
+                </div>
+                <div className="flex items-center justify-between gap-3 pt-3 border-t border-store-line ">
+                  {editingNotesReleaseId === release.id ? (
+                    <div className="flex-1 space-y-2">
+                      <textarea
+                        value={releaseNotesDraft}
+                        onChange={(event) => setReleaseNotesDraft(event.target.value)}
+                        rows={3}
+                        placeholder={t('publisher.manage.releases.notesPlaceholder')}
+                        className="w-full px-3 py-2 rounded-store-control bg-store-field border border-store-line text-sm text-store-ink placeholder:text-store-ink-faint outline-none focus:border-store-brand transition-colors focus:ring-2 focus:ring-store-brand/25"
+                      />
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => handleSaveReleaseNotes(release.id)}
+                          disabled={savingReleaseNotes}
+                          className="px-3 py-1.5 bg-store-brand hover:bg-store-brand disabled:opacity-50 text-white rounded-store-control text-xs font-medium transition-colors cursor-pointer"
+                        >
+                          {savingReleaseNotes
+                            ? t('publisher.manage.releases.notesSaving')
+                            : t('publisher.manage.releases.notesSave')}
+                        </button>
+                        <button
+                          onClick={() => setEditingNotesReleaseId(null)}
+                          className="px-3 py-1.5 bg-store-subtle hover:bg-store-field border border-store-line text-store-ink rounded-store-control text-xs font-medium transition-colors cursor-pointer"
+                        >
+                          {t('publisher.manage.releases.notesCancel')}
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <button
+                        onClick={() => {
+                          setEditingNotesReleaseId(release.id);
+                          setReleaseNotesDraft('');
+                        }}
+                        className="px-3 py-1.5 bg-store-subtle hover:bg-store-field border border-store-line text-store-ink rounded-store-control text-xs font-medium transition-colors flex items-center gap-1 cursor-pointer"
+                      >
+                        <FileText className="w-3 h-3" />
+                        {t('publisher.manage.releases.editNotes')}
+                      </button>
+                      <button
+                        onClick={() => handleRetireRelease(release.id)}
+                        disabled={retiringReleaseId !== null || release.status === 'RETIRED'}
+                        className="px-3 py-1.5 bg-store-subtle hover:bg-store-field border border-store-danger/40 text-store-danger disabled:opacity-50 rounded-store-control text-xs font-medium transition-colors cursor-pointer"
+                      >
+                        {retiringReleaseId === release.id
+                          ? t('publisher.manage.releases.retiring')
+                          : t('publisher.manage.releases.retire')}
+                      </button>
+                    </>
+                  )}
                 </div>
               </div>
             ))}

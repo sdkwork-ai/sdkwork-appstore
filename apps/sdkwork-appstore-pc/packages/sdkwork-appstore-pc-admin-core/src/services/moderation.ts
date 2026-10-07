@@ -61,6 +61,8 @@ export interface AppstoreAdminModerationReviewDetail {
   priority?: number;
   /** Latest recorded decision, when the backend exposes it on the review. */
   latestDecision?: string;
+  /** Id of the latest decision, pre-fills the appeal dialog on this review. */
+  latestDecisionId?: string;
   latestDecisionReasonCode?: string;
   latestDecisionReasonDetail?: string;
   /** Untyped review payload rendered by the detail inspector. */
@@ -274,6 +276,7 @@ function projectReviewDetail(
       ? {}
       : {
           latestDecision: normalizeToken(readString(decision, 'decisionType', 'decision_type', 'decision')),
+          latestDecisionId: readId(decision, 'decisionId', 'decision_id', 'id'),
           latestDecisionReasonCode: readString(decision, 'reasonCode', 'reason_code'),
           latestDecisionReasonDetail: readString(decision, 'reasonDetail', 'reason_detail'),
         }),

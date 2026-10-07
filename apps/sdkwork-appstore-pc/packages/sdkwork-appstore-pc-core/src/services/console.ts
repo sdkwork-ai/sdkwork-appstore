@@ -95,12 +95,18 @@ export interface IConsoleSDK {
   }): Promise<ManagedApp>;
   getPublisherProfile(): Promise<PublisherProfile | undefined>;
   registerPublisher(data: { displayName: string; legalName?: string; supportEmail?: string; websiteUrl?: string }): Promise<PublisherProfile>;
+  /** Updates the caller's own publisher profile (`publishers.update`). */
+  updatePublisherProfile(data: { displayName?: string; supportEmail?: string; websiteUrl?: string }): Promise<PublisherProfile>;
   submitVerification(data: { verificationType: string; evidenceMediaResourceId?: string }): Promise<boolean>;
   getListingById(id: string): Promise<ManagedAppDetail | undefined>;
   updateListing(id: string, patch: { pricingModel?: string; officialWebsiteUrl?: string; supportUrl?: string; privacyPolicyUrl?: string }): Promise<void>;
   getReleases(listingId: string): Promise<ReleaseItem[]>;
   createRelease(listingId: string, data: { channelCode: string; versionName: string; versionCode: string; buildNumber?: string }): Promise<ReleaseItem>;
   updateReleaseRollout(releaseId: string, targetPercentage: number, strategy?: 'FULL' | 'STAGED' | 'PAUSE'): Promise<void>;
+  /** Replaces the release notes body for one locale (`releases.notes.update`). */
+  updateReleaseNotes(releaseId: string, locale: string, releaseNotes: string): Promise<void>;
+  /** Retires a release so it stops being served (`releases.retire`). */
+  retireRelease(releaseId: string): Promise<void>;
   submitListingForReview(listingId: string, releaseId?: string): Promise<boolean>;
   listMembers(publisherId: string): Promise<PublisherMember[]>;
   inviteMember(publisherId: string, data: { userId: string; role: string }): Promise<boolean>;
@@ -121,6 +127,7 @@ export const ConsoleService: IConsoleSDK = {
   publishApp: (appData) => consolePort.publishApp(appData),
   getPublisherProfile: () => consolePort.getPublisherProfile(),
   registerPublisher: (data) => consolePort.registerPublisher(data),
+  updatePublisherProfile: (data) => consolePort.updatePublisherProfile(data),
   submitVerification: (data) => consolePort.submitVerification(data),
   getListingById: (id) => consolePort.getListingById(id),
   updateListing: (id, patch) => consolePort.updateListing(id, patch),
@@ -128,6 +135,9 @@ export const ConsoleService: IConsoleSDK = {
   createRelease: (listingId, data) => consolePort.createRelease(listingId, data),
   updateReleaseRollout: (releaseId, targetPercentage, strategy) =>
     consolePort.updateReleaseRollout(releaseId, targetPercentage, strategy),
+  updateReleaseNotes: (releaseId, locale, releaseNotes) =>
+    consolePort.updateReleaseNotes(releaseId, locale, releaseNotes),
+  retireRelease: (releaseId) => consolePort.retireRelease(releaseId),
   submitListingForReview: (listingId, releaseId) => consolePort.submitListingForReview(listingId, releaseId),
   listMembers: (publisherId) => consolePort.listMembers(publisherId),
   inviteMember: (publisherId, data) => consolePort.inviteMember(publisherId, data),
@@ -143,12 +153,15 @@ function createUnconfiguredConsolePort(): ConsoleServicePort {
     publishApp: async () => unavailable(),
     getPublisherProfile: async () => unavailable(),
     registerPublisher: async () => unavailable(),
+    updatePublisherProfile: async () => unavailable(),
     submitVerification: async () => unavailable(),
     getListingById: async () => unavailable(),
     updateListing: async () => unavailable(),
     getReleases: async () => unavailable(),
     createRelease: async () => unavailable(),
     updateReleaseRollout: async () => unavailable(),
+    updateReleaseNotes: async () => unavailable(),
+    retireRelease: async () => unavailable(),
     submitListingForReview: async () => unavailable(),
     listMembers: async () => unavailable(),
     inviteMember: async () => unavailable(),

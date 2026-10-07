@@ -1,5 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 import { PublishedApp } from './ManagedAppsList';
 
 interface ManagedAppRowProps {
@@ -17,7 +18,10 @@ export const ManagedAppRow: React.FC<ManagedAppRowProps> = ({ app }) => {
   };
 
   return (
-    <div className="flex items-center justify-between p-3.5 bg-store-surface rounded-store-control border border-store-line/60 dark:border-store-line hover:border-store-line-strong transition-colors ">
+    <Link
+      to={`/publisher/apps/${app.id}`}
+      className="flex items-center justify-between p-3.5 bg-store-surface rounded-store-control border border-store-line/60 dark:border-store-line hover:border-store-line-strong transition-colors card-press"
+    >
       <div>
         <h3 className="font-bold text-xs text-store-ink ">{app.name}</h3>
         <p className="text-[11px] text-store-ink-faint mt-0.5">
@@ -33,6 +37,6 @@ export const ManagedAppRow: React.FC<ManagedAppRowProps> = ({ app }) => {
       >
         {formatStatus(app.status)}
       </span>
-    </div>
+    </Link>
   );
 };

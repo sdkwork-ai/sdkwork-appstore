@@ -100,6 +100,17 @@ export function PublisherListingManagePage() {
   const [submittingReview, setSubmittingReview] = useState(false);
   const [submissionMessage, setSubmissionMessage] = useState<string | null>(null);
 
+  // Listing base info (listings.update) and release rollout/retire controls.
+  const [pricingModel, setPricingModel] = useState('FREE');
+  const [officialWebsiteUrl, setOfficialWebsiteUrl] = useState('');
+  const [supportUrl, setSupportUrl] = useState('');
+  const [privacyPolicyUrl, setPrivacyPolicyUrl] = useState('');
+  const [savingBaseInfo, setSavingBaseInfo] = useState(false);
+  const [baseInfoMessage, setBaseInfoMessage] = useState<string | null>(null);
+  const [rolloutPercent, setRolloutPercent] = useState(100);
+  const [applyingRollout, setApplyingRollout] = useState(false);
+  const [retiringRelease, setRetiringRelease] = useState(false);
+
   const mediaItems = mediaData?.items ?? [];
   const releaseItems = releasesData?.items ?? [];
   const loading = listingLoading || mediaLoading || releasesLoading;
@@ -119,6 +130,13 @@ export function PublisherListingManagePage() {
     if (name) {
       setDisplayName(name);
     }
+    const rowPricing = readString(row, 'pricingModel', 'pricing_model');
+    if (rowPricing) {
+      setPricingModel(rowPricing.toLocaleUpperCase());
+    }
+    setOfficialWebsiteUrl(readString(row, 'officialWebsiteUrl', 'official_website_url'));
+    setSupportUrl(readString(row, 'supportUrl', 'support_url'));
+    setPrivacyPolicyUrl(readString(row, 'privacyPolicyUrl', 'privacy_policy_url'));
     setLocalizationSeeded(true);
   }, [listing, localizationSeeded]);
 
@@ -141,6 +159,63 @@ export function PublisherListingManagePage() {
       setLocalizationMessage(formatApiError(err as Error));
     } finally {
       setSavingLocalization(false);
+    }
+  }
+
+  async function handleSaveBaseInfo() {
+    if (savingBaseInfo) {
+      return;
+    }
+    setSavingBaseInfo(true);
+    setBaseInfoMessage(null);
+    try {
+      await publisherService.updateListing(listingId, {
+        pricingModel: pricingModel.trim() || undefined,
+        officialWebsiteUrl: officialWebsiteUrl.trim() || undefined,
+        supportUrl: supportUrl.trim() || undefined,
+        privacyPolicyUrl: privacyPolicyUrl.trim() || undefined,
+      });
+      setBaseInfoMessage('基础信息已保存。');
+      await refreshListing();
+    } catch (err) {
+      setBaseInfoMessage(formatApiError(err as Error));
+    } finally {
+      setSavingBaseInfo(false);
+    }
+  }
+
+  async function handleApplyRollout() {
+    if (!selectedReleaseId || applyingRollout) {
+      return;
+    }
+    setApplyingRollout(true);
+    try {
+      await publisherService.updateReleaseRollout(selectedReleaseId, {
+        rolloutStrategy: rolloutPercent >= 100 ? 'FULL' : 'STAGED',
+        targetPercentage: rolloutPercent,
+      });
+      setBaseInfoMessage('灰度设置已应用（' + rolloutPercent + '%）。');
+      await refreshReleases();
+    } catch (err) {
+      setBaseInfoMessage(formatApiError(err as Error));
+    } finally {
+      setApplyingRollout(false);
+    }
+  }
+
+  async function handleRetireRelease() {
+    if (!selectedReleaseId || retiringRelease) {
+      return;
+    }
+    setRetiringRelease(true);
+    try {
+      await publisherService.retireRelease(selectedReleaseId);
+      setBaseInfoMessage('版本已退役。');
+      await refreshReleases();
+    } catch (err) {
+      setBaseInfoMessage(formatApiError(err as Error));
+    } finally {
+      setRetiringRelease(false);
     }
   }
 
@@ -304,6 +379,50 @@ export function PublisherListingManagePage() {
         </section>
 
         <section className="card p-4 space-y-3">
+          <h2 className="font-semibold text-[var(--text-primary)]">基础信息</h2>
+          <select
+            value={pricingModel}
+            onChange={(e) => setPricingModel(e.target.value)}
+            aria-label="定价模式"
+            className="w-full px-3 py-2 border border-[var(--border-default)] rounded-xl text-sm bg-[var(--bg-surface)]"
+          >
+            <option value="FREE">免费</option>
+            <option value="FREEMIUM">免费增值</option>
+            <option value="PAID">付费</option>
+          </select>
+          <input
+            value={officialWebsiteUrl}
+            onChange={(e) => setOfficialWebsiteUrl(e.target.value)}
+            placeholder="官网地址"
+            type="url"
+            className="w-full px-3 py-2 border border-[var(--border-default)] rounded-xl text-sm bg-[var(--bg-surface)]"
+          />
+          <input
+            value={supportUrl}
+            onChange={(e) => setSupportUrl(e.target.value)}
+            placeholder="支持页面地址"
+            type="url"
+            className="w-full px-3 py-2 border border-[var(--border-default)] rounded-xl text-sm bg-[var(--bg-surface)]"
+          />
+          <input
+            value={privacyPolicyUrl}
+            onChange={(e) => setPrivacyPolicyUrl(e.target.value)}
+            placeholder="隐私政策地址"
+            type="url"
+            className="w-full px-3 py-2 border border-[var(--border-default)] rounded-xl text-sm bg-[var(--bg-surface)]"
+          />
+          <button
+            type="button"
+            onClick={() => void handleSaveBaseInfo()}
+            disabled={savingBaseInfo}
+            className="w-full py-2.5 bg-emerald-500 text-white rounded-xl text-sm font-medium disabled:opacity-60"
+          >
+            {savingBaseInfo ? '保存中…' : '保存基础信息'}
+          </button>
+          {baseInfoMessage && <p className="text-xs text-[var(--text-tertiary)]">{baseInfoMessage}</p>}
+        </section>
+
+        <section className="card p-4 space-y-3">
           <h2 className="font-semibold text-[var(--text-primary)]">媒体资源</h2>
           <select
             value={mediaRole}
@@ -420,6 +539,41 @@ export function PublisherListingManagePage() {
             />
           </label>
           {artifactMessage && <p className="text-xs text-[var(--text-tertiary)]">{artifactMessage}</p>}
+          {selectedReleaseId && (
+            <div className="space-y-2 border-t border-[var(--border-default)] pt-3">
+              <label htmlFor="release-rollout" className="block text-xs font-medium text-[var(--text-secondary)]">
+                灰度比例：{rolloutPercent}%
+              </label>
+              <input
+                id="release-rollout"
+                type="range"
+                min={0}
+                max={100}
+                step={5}
+                value={rolloutPercent}
+                onChange={(e) => setRolloutPercent(Number(e.target.value))}
+                className="w-full accent-purple-500"
+              />
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => void handleApplyRollout()}
+                  disabled={applyingRollout}
+                  className="flex-1 py-2.5 bg-purple-500 text-white rounded-xl text-sm font-medium disabled:opacity-60"
+                >
+                  {applyingRollout ? '应用中…' : '应用灰度'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => void handleRetireRelease()}
+                  disabled={retiringRelease}
+                  className="flex-1 py-2.5 border border-red-300 text-red-600 rounded-xl text-sm font-medium disabled:opacity-60"
+                >
+                  {retiringRelease ? '退役中…' : '退役版本'}
+                </button>
+              </div>
+            </div>
+          )}
         </section>
 
         <section className="card p-4 space-y-3">

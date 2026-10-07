@@ -177,6 +177,39 @@ export function createConsoleServicePort(client: AppStoreClient): ConsoleService
       };
     },
 
+    async updatePublisherProfile(data: {
+      displayName?: string;
+      supportEmail?: string;
+      websiteUrl?: string;
+    }): Promise<PublisherProfile> {
+      const me = await client.publishers.getMe();
+      const row = me as unknown as Record<string, unknown>;
+      const publisherId = readString(row, 'id');
+      if (!publisherId) {
+        throw new Error('No publisher profile is linked to this account.');
+      }
+      const result = await client.publishers.update(publisherId, {
+        displayName: data.displayName,
+        supportEmail: data.supportEmail,
+        websiteUrl: data.websiteUrl,
+      });
+      const updated = result as unknown as Record<string, unknown>;
+      return {
+        id: readString(updated, 'id') || publisherId,
+        displayName:
+          readString(updated, 'displayName', 'display_name') ||
+          readString(row, 'displayName', 'display_name'),
+        legalName: readString(updated, 'legalName', 'legal_name'),
+        supportEmail: readString(updated, 'supportEmail', 'support_email'),
+        websiteUrl: readString(updated, 'websiteUrl', 'website_url'),
+        verificationStatus: readString(
+          updated,
+          'verificationStatus',
+          'verification_status',
+        ),
+      };
+    },
+
     async submitVerification(data: {
       verificationType: string;
       evidenceMediaResourceId?: string;
@@ -278,6 +311,14 @@ export function createConsoleServicePort(client: AppStoreClient): ConsoleService
         rolloutStrategy: strategy,
         targetPercentage,
       });
+    },
+
+    async updateReleaseNotes(releaseId: string, locale: string, releaseNotes: string): Promise<void> {
+      await client.releases.upsertNotes(releaseId, locale, { releaseNotes });
+    },
+
+    async retireRelease(releaseId: string): Promise<void> {
+      await client.releases.retire(releaseId);
     },
 
     async submitListingForReview(listingId: string, releaseId?: string): Promise<boolean> {

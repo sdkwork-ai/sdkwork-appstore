@@ -50,4 +50,14 @@ export const publisherService = {
     listingId: string,
     data: Parameters<AppStoreClient['listings']['createSubmission']>[1],
   ) => getClient().listings.createSubmission(listingId, data),
+  updateReleaseRollout: (
+    releaseId: string,
+    data: Parameters<AppStoreClient['releases']['updateRollout']>[1],
+  ) => getClient().releases.updateRollout(releaseId, data),
+  upsertReleaseNotes: (
+    releaseId: string,
+    locale: string,
+    data: Parameters<AppStoreClient['releases']['upsertNotes']>[2],
+  ) => getClient().releases.upsertNotes(releaseId, locale, data),
+  retireRelease: (releaseId: string) => getClient().releases.retire(releaseId),
 };
