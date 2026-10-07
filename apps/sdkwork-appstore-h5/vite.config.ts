@@ -194,6 +194,13 @@ export default defineConfig(({ command, mode }) => {
         { find: '@sdkwork/sdk-common/utils', replacement: path.resolve(SDK_COMMON_SOURCE_ROOT, 'utils/index.ts') },
         { find: '@sdkwork/sdk-common', replacement: SDK_COMMON_ENTRY },
       ],
+      // Router dedupe: workspace-linked sibling packages resolve
+      // react-router-dom from their own repository node_modules with a
+      // different physical copy; without dedupe their useLocation()/
+      // useNavigate() read a second router context and crash with "may be
+      // used only in the context of a <Router>" (same defect fixed on the
+      // PC vite config).
+      dedupe: ['react', 'react-dom', 'react-router-dom', 'react-router'],
     },
     optimizeDeps: {
       // The shared IAM H5 auth components pull in the i18n stack through
