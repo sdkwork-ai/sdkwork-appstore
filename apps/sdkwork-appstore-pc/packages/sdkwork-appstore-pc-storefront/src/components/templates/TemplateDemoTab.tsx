@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { RotateCcw, Send, Sparkles, Activity } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { AIHubService } from '@sdkwork/appstore-pc-core';
 import { TemplateItem } from '../../types';
 
 interface TemplateDemoTabProps {
@@ -17,8 +18,9 @@ export const TemplateDemoTab: React.FC<TemplateDemoTabProps> = ({ template }) =>
     },
   ]);
   const [loading, setLoading] = useState(false);
+  const [sendError, setSendError] = useState<string | null>(null);
 
-  const handleSend = (e?: React.FormEvent) => {
+  const handleSend = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     if (!demoInput.trim() || loading) return;
 
@@ -26,17 +28,22 @@ export const TemplateDemoTab: React.FC<TemplateDemoTabProps> = ({ template }) =>
     setMessages((prev) => [...prev, { role: 'user', content: userText }]);
     setDemoInput('');
     setLoading(true);
+    setSendError(null);
 
-    setTimeout(() => {
+    try {
+      // Real model round-trip through the AI Hub completion port (Agents SDK
+      // preview); failures surface as an honest error message.
+      const result = await AIHubService.generateCompletion(userText);
       setMessages((prev) => [
         ...prev,
-        {
-          role: 'assistant',
-          content: `[${template.title} Engine]: Received command "${userText}". Execution completed with ${template.framework} architecture.`,
-        },
+        { role: 'assistant', content: result.response },
       ]);
+    } catch (err) {
+      console.error('Template demo completion failed', err);
+      setSendError(t('templates.detail.demoError'));
+    } finally {
       setLoading(false);
-    }, 600);
+    }
   };
 
   const resetDemo = () => {
@@ -46,6 +53,7 @@ export const TemplateDemoTab: React.FC<TemplateDemoTabProps> = ({ template }) =>
         content: `Reset complete. Active template: ${template.title}`,
       },
     ]);
+    setSendError(null);
   };
 
   return (
@@ -59,7 +67,7 @@ export const TemplateDemoTab: React.FC<TemplateDemoTabProps> = ({ template }) =>
             <span className="w-2.5 h-2.5 rounded-full bg-store-warning inline-block" />
             <span className="w-2.5 h-2.5 rounded-full bg-store-success inline-block" />
             <span className="text-[10px] font-mono text-store-ink-faint ml-2">
-              {template.demoUrl || 'https://sandbox.template.local'}
+              {template.demoUrl || t('templates.detail.demoPreviewLabel')}
             </span>
           </div>
 
@@ -107,6 +115,12 @@ export const TemplateDemoTab: React.FC<TemplateDemoTabProps> = ({ template }) =>
               <span className="w-3 h-3 border-2 border-store-brand/30 border-t-indigo-400 rounded-full animate-spin" />
               <span>{t('aihub.sandbox.generating')}</span>
             </div>
+          )}
+
+          {sendError && (
+            <p role="alert" className="text-xs text-store-danger font-medium">
+              {sendError}
+            </p>
           )}
         </div>
 

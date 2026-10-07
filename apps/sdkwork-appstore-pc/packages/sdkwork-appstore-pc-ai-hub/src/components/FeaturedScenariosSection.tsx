@@ -14,9 +14,11 @@ import {
   Sparkles,
   UserCheck
 } from 'lucide-react';
-import { expertScenarios } from '@sdkwork/appstore-pc-markets';
+import type { ExpertScenario } from '@sdkwork/appstore-pc-core';
 
 interface FeaturedScenariosSectionProps {
+  /** Scenario cards derived from the stored expert catalog (ExpertsService). */
+  scenarios: ExpertScenario[];
   selectedScenario: string | null;
   onSelectScenario: (scenarioTitle: string | null) => void;
   onSelectExpertByName?: (name: string) => void;
@@ -46,7 +48,18 @@ const scenarioTitleKeyMap: Record<string, string> = {
   '工程开发': 'aihub.experts.scenarios.dev',
 };
 
+const scenarioColorCycle = [
+  'from-store-warning/20 to-orange-500/20 text-store-warning border-store-warning/30',
+  'from-store-success/20 to-store-info/20 text-store-success border-store-success/30',
+  'from-store-brand/20 to-store-brand/20 text-store-brand border-store-brand/30',
+  'from-purple-500/20 to-store-brand/20 text-purple-400 border-purple-500/30',
+  'from-store-danger/20 to-store-danger/20 text-store-danger border-store-danger/30',
+  'from-store-info/20 to-store-brand/20 text-store-info border-store-info/30',
+  'from-fuchsia-500/20 to-pink-500/20 text-fuchsia-400 border-fuchsia-500/30',
+];
+
 export const FeaturedScenariosSection: React.FC<FeaturedScenariosSectionProps> = ({
+  scenarios,
   selectedScenario,
   onSelectScenario,
   onSelectExpertByName
@@ -73,8 +86,11 @@ export const FeaturedScenariosSection: React.FC<FeaturedScenariosSectionProps> =
 
       {/* Grid / Horizontal Deck of Scenario Cards */}
       <div className="grid grid-cols-1 @sm:grid-cols-2 @lg:grid-cols-3 @3xl:grid-cols-4 gap-3.5">
-        {expertScenarios.map((scen) => {
+        {scenarios.map((scen, scenIdx) => {
           const IconComp = scenarioIcons[scen.icon] || Sparkles;
+          // Derived scenarios carry no styling; cycle a small presentation
+          // palette so the deck keeps its visual rhythm.
+          const scenColor = scen.color || scenarioColorCycle[scenIdx % scenarioColorCycle.length];
           const isSelected = selectedScenario === scen.title;
           const scenarioTitle = t(scenarioTitleKeyMap[scen.title] ?? '', scen.title);
 
@@ -91,7 +107,7 @@ export const FeaturedScenariosSection: React.FC<FeaturedScenariosSectionProps> =
               {/* Header of Scenario Card */}
               <div className="flex items-center justify-between mb-3 border-b border-store-line/60 pb-2.5">
                 <div className="flex items-center gap-2.5">
-                  <div className={`p-2 rounded-store-control bg-gradient-to-br ${scen.color} border border-slate-700/50 shadow-inner`}>
+                  <div className={`p-2 rounded-store-control bg-gradient-to-br ${scenColor} border border-slate-700/50 shadow-inner`}>
                     <IconComp className="w-4 h-4" />
                   </div>
                   <div>

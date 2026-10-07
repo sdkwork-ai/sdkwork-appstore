@@ -118,6 +118,8 @@ export const aihub = {
       tagsPlaceholder: '例如：高频交易, 回测, Python',
       cancel: '取消',
       create: '确认创建',
+      createFailed: '创建自定义专家失败，请稍后重试。',
+      creating: '创建中…',
       defaultNickname: '自定义专家',
       defaultTag1: '自定义',
       defaultTag2: 'AI助手',

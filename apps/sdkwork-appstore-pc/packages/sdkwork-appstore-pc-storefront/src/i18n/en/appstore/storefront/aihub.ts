@@ -118,6 +118,8 @@ export const aihub = {
       tagsPlaceholder: 'e.g. High-frequency trading, Backtesting, Python',
       cancel: 'Cancel',
       create: 'Create Expert',
+      createFailed: 'Failed to create the custom expert. Please try again later.',
+      creating: 'Creating…',
       defaultNickname: 'Custom Expert',
       defaultTag1: 'Custom',
       defaultTag2: 'AI Assistant',

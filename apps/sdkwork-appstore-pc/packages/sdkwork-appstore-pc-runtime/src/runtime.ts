@@ -20,6 +20,7 @@ import { configureAppstorePcAdminRuntime } from './adminRuntime';
 import { configureAppstorePcAIHub } from './aiHub';
 import { configureAppstorePcAppStore } from './appStore';
 import { configureAppstorePcConsole } from './console';
+import { configureAppstorePcExperts } from './experts';
 import { configureAppstorePcInstall } from './install';
 import { configureAppstorePcMcp } from './mcp';
 import { configureAppstorePcPlugins } from './plugins';
@@ -85,6 +86,7 @@ export function createAppstorePcRuntime(
   configureAppstorePcTemplates(sdkClients.app);
   configureAppstorePcCompany(sdkClients.company);
   configureAppstorePcPlugins(sdkClients.app);
+  configureAppstorePcExperts(sdkClients.app);
   configureAppstorePcConsole(sdkClients.app);
   configureAppstorePcInstall(sdkClients.app);
   configureAppstorePcUserStore(sdkClients);

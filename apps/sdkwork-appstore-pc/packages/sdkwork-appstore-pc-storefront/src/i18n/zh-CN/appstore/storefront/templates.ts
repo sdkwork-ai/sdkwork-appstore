@@ -93,6 +93,8 @@ export const templates = {
     archTitle: '系统架构与运行拓扑',
     envExampleTitle: '环境变量配置示例 (.env.example)',
     resetDemo: '重置测试',
+    demoPreviewLabel: '交互演示（本地预览）',
+    demoError: 'AI 演示暂不可用，请稍后重试。',
     running: '运行中',
     demoInputPlaceholder: '在此测试 {{title}} 的交互功能...',
     sendBtn: '发送',

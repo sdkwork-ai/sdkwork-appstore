@@ -14,6 +14,7 @@ export * from './adminRuntime';
 export * from './aiHub';
 export * from './appStore';
 export * from './console';
+export * from './experts';
 export * from './install';
 export * from './mcp';
 export * from './plugins';

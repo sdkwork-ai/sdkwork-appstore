@@ -1,13 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { AIHubService, AppStoreService, PluginsService, SkillsService } from '@sdkwork/appstore-pc-core';
+import {
+  AIHubService,
+  AppStoreService,
+  ExpertsService,
+  PluginsService,
+  SkillsService,
+} from '@sdkwork/appstore-pc-core';
 import { AppItem, ExpertItem } from '@sdkwork/appstore-pc-core';
 import { LoadingSpinner } from '@sdkwork/appstore-pc-commons';
-// Marketplace add flows and experts content, reused verbatim so the AI Lab's
-// add dropdown opens the exact same modals (and copy) as the marketplace's
-// Plugins/Skills pages, and both pages render one experts dataset.
+// Marketplace add flows, reused so the AI Lab's add dropdown opens the exact
+// same modals (and copy) as the marketplace's Plugins/Skills pages. Expert
+// content itself comes from the ExpertsService port (catalog EXPERT feed),
+// shared with the marketplace's Experts page.
 import {
-  expertItems,
   PublishSkillModal,
   RegisterPluginModal,
 } from '@sdkwork/appstore-pc-markets';
@@ -28,7 +34,8 @@ export default function AIHubPage() {
   const [activeTab, setActiveTab] = useState<AIHubTabType>('experts');
 
   // Experts State
-  const [expertsList, setExpertsList] = useState<ExpertItem[]>(expertItems);
+  const [expertsList, setExpertsList] = useState<ExpertItem[]>([]);
+  const [expertsError, setExpertsError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [showOnlyMine, setShowOnlyMine] = useState(false);
 
@@ -86,7 +93,23 @@ export default function AIHubPage() {
     loadAIHub();
   }, []);
 
-  const handleCreateCustomExpert = (data: {
+  useEffect(() => {
+    async function loadExperts() {
+      try {
+        const experts = await ExpertsService.getExperts();
+        setExpertsList(experts);
+        setExpertsError(null);
+      } catch (err) {
+        console.error('Failed to load experts', err);
+        setExpertsError(
+          err instanceof Error ? err.message : '专家目录加载失败，请稍后重试。',
+        );
+      }
+    }
+    loadExperts();
+  }, []);
+
+  const handleCreateCustomExpert = async (data: {
     name: string;
     nickname: string;
     category: string;
@@ -94,24 +117,25 @@ export default function AIHubPage() {
     systemPrompt: string;
     tags: string[];
   }) => {
-    const newExp: ExpertItem = {
-      id: `custom-exp-${Date.now()}`,
-      name: data.name,
-      nickname: data.nickname,
-      avatarBg: 'bg-purple-600',
-      avatarIcon: 'Bot',
-      scenarioCategory: data.category,
-      filterTag: 'OPC:一人公司',
-      description: data.description,
-      systemPrompt: data.systemPrompt || t('aihub.experts.customModal.defaultSystemPrompt', { name: data.name }),
-      tags: data.tags,
-      popularity: 1000,
-      rating: 5.0,
-      isOfficial: false,
-      badge: t('aihub.experts.customModal.myCreation')
-    };
-
-    setExpertsList(prev => [newExp, ...prev]);
+    try {
+      const created = await ExpertsService.createCustomExpert({
+        name: data.name,
+        nickname: data.nickname,
+        scenarioCategory: data.category,
+        description: data.description,
+        systemPrompt: data.systemPrompt || undefined,
+        tags: data.tags,
+        avatarIcon: 'Bot',
+      });
+      setExpertsList((prev) => [created, ...prev]);
+      setIsCustomModalOpen(false);
+    } catch (error) {
+      // Creation persists through the catalog API and requires the catalog
+      // write scope; surface the backend reason instead of faking success.
+      const message = error instanceof Error ? error.message : '创建自定义专家失败。';
+      setExpertsError(message);
+      throw error instanceof Error ? error : new Error(message);
+    }
   };
 
   // Marketplace-shared submit handlers: identical payloads and service calls
@@ -200,6 +224,12 @@ export default function AIHubPage() {
             onSelectTag={() => {}}
             totalCount={expertsList.length}
           />
+
+          {expertsError && (
+            <p role="alert" className="text-xs text-store-danger">
+              {expertsError}
+            </p>
+          )}
 
           {marketActionError && (
             <p role="alert" className="text-xs text-store-brand ">

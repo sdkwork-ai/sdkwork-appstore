@@ -93,6 +93,8 @@ export const templates = {
     archTitle: 'Architecture & Topology',
     envExampleTitle: 'Environment Variables (.env.example)',
     resetDemo: 'Reset Test',
+    demoPreviewLabel: 'Interactive demo (local preview)',
+    demoError: 'AI demo is unavailable right now. Please try again later.',
     running: 'Running',
     demoInputPlaceholder: 'Test interactive features of {{title}} here...',
     sendBtn: 'Send',

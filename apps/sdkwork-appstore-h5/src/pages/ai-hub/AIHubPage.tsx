@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, Sparkles, Users, MessageSquare, Send } from 'lucide-react';
 import { useAiHubApps, useAiModels, generateAiCompletion, AI_PROMPT_PRESETS } from '@/hooks/aiLab';
-import { AI_EXPERT_CATALOG } from '@/data/expertsCatalog';
+import { useExperts } from '@/hooks/catalog';
 import { getAiPreviewAgentId } from '@/services/aiLabClients';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 
@@ -95,13 +95,8 @@ function ExpertsTab({
   query: string;
   onQueryChange: (value: string) => void;
 }) {
-  const normalized = query.trim().toLocaleLowerCase();
-  const experts = AI_EXPERT_CATALOG.filter(
-    (expert) =>
-      normalized === '' ||
-      expert.name.toLocaleLowerCase().includes(normalized) ||
-      expert.tags.some((tag) => tag.toLocaleLowerCase().includes(normalized)),
-  ).slice(0, 6);
+  const { data, loading, error } = useExperts(query);
+  const experts = (data?.experts ?? []).slice(0, 6);
 
   return (
     <div className="px-4 py-4">
@@ -116,31 +111,41 @@ function ExpertsTab({
           className="w-full bg-transparent text-sm outline-none text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)]"
         />
       </div>
-      <div className="mt-3 space-y-2">
-        {experts.map((expert) => (
-          <Link
-            key={expert.id}
-            to="/experts"
-            className="card card-press flex items-center gap-3 p-3"
-          >
-            <div
-              className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-2xl text-sm font-bold text-white"
-              style={{ background: 'linear-gradient(135deg, var(--accent), #7c3aed)' }}
+      {error ? (
+        <div className="card mt-3 p-6 text-center" role="alert">
+          <p className="text-sm text-[var(--text-secondary)]">专家目录加载失败，请稍后重试</p>
+        </div>
+      ) : loading ? (
+        <div className="flex justify-center py-10">
+          <LoadingSpinner />
+        </div>
+      ) : (
+        <div className="mt-3 space-y-2">
+          {experts.map((expert) => (
+            <Link
+              key={expert.id}
+              to="/experts"
+              className="card card-press flex items-center gap-3 p-3"
             >
-              {expert.name[0]}
-            </div>
-            <div className="min-w-0 flex-1">
-              <h3 className="truncate text-sm font-semibold text-[var(--text-primary)]">
-                {expert.name}
-              </h3>
-              <p className="truncate text-xs text-[var(--text-tertiary)]">{expert.description}</p>
-            </div>
-            <span className="shrink-0 rounded-full bg-violet-500/10 px-2 py-0.5 text-[10px] text-violet-500">
-              {expert.category}
-            </span>
-          </Link>
-        ))}
-      </div>
+              <div
+                className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-2xl text-sm font-bold text-white"
+                style={{ background: 'linear-gradient(135deg, var(--accent), #7c3aed)' }}
+              >
+                {expert.name[0]}
+              </div>
+              <div className="min-w-0 flex-1">
+                <h3 className="truncate text-sm font-semibold text-[var(--text-primary)]">
+                  {expert.name}
+                </h3>
+                <p className="truncate text-xs text-[var(--text-tertiary)]">{expert.description}</p>
+              </div>
+              <span className="shrink-0 rounded-full bg-violet-500/10 px-2 py-0.5 text-[10px] text-violet-500">
+                {expert.category}
+              </span>
+            </Link>
+          ))}
+        </div>
+      )}
       <Link
         to="/experts"
         className="mt-3 block text-center text-xs font-medium text-[var(--accent)]"

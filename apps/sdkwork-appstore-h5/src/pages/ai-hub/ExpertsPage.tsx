@@ -1,32 +1,31 @@
 import { useMemo, useState } from 'react';
 import { Search } from 'lucide-react';
-import {
-  AI_EXPERT_CATALOG,
-  AI_EXPERT_SCENARIOS,
-  AI_EXPERT_TAGS,
-} from '@/data/expertsCatalog';
+import { useExperts } from '@/hooks/catalog';
+import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 
 /**
  * 专家页（/experts，AI Lab 独立页面，布局镜像应用模板页：
  * 头部横幅 + 搜索 + 分类筛选 + 卡片列表 + 空态，
  * `specs/AGENTS_DEPENDENCY_BOUNDARY_SPEC.md` section 4）。
+ * 目录数据来自 App Store 目录 EXPERT 模板行（useExperts）。
  */
 export function ExpertsPage() {
   const [query, setQuery] = useState('');
   const [activeTag, setActiveTag] = useState('全部');
+  const { data, loading, error } = useExperts(query);
+
+  const tags = useMemo(() => {
+    const set = new Set<string>();
+    (data?.experts ?? []).forEach((expert) => set.add(expert.category));
+    return Array.from(set);
+  }, [data]);
 
   const experts = useMemo(() => {
-    const normalized = query.trim().toLocaleLowerCase();
-    return AI_EXPERT_CATALOG.filter((expert) => {
-      const matchesTag = activeTag === '全部' || expert.category === activeTag;
-      const matchesQuery =
-        normalized === '' ||
-        expert.name.toLocaleLowerCase().includes(normalized) ||
-        expert.description.toLocaleLowerCase().includes(normalized) ||
-        expert.tags.some((tag) => tag.toLocaleLowerCase().includes(normalized));
-      return matchesTag && matchesQuery;
-    });
-  }, [query, activeTag]);
+    const list = data?.experts ?? [];
+    return activeTag === '全部'
+      ? list
+      : list.filter((expert) => expert.category === activeTag);
+  }, [data, activeTag]);
 
   return (
     <div className="animate-fade-in">
@@ -47,7 +46,7 @@ export function ExpertsPage() {
       </header>
 
       <div className="flex gap-2 overflow-x-auto px-4 pb-1 pt-4">
-        {['全部', ...AI_EXPERT_TAGS].map((tag) => (
+        {['全部', ...tags].map((tag) => (
           <button
             key={tag}
             type="button"
@@ -64,7 +63,7 @@ export function ExpertsPage() {
       </div>
 
       <div className="flex gap-3 overflow-x-auto px-4 pb-1 pt-3">
-        {AI_EXPERT_SCENARIOS.map((scenario) => (
+        {(data?.scenarios ?? []).map((scenario) => (
           <div
             key={scenario.id}
             className="shrink-0 rounded-2xl border border-[var(--border)] bg-[var(--bg-secondary)] px-3 py-2"
@@ -78,7 +77,15 @@ export function ExpertsPage() {
       </div>
 
       <div className="grid grid-cols-1 gap-3 px-4 py-4 sm:grid-cols-2">
-        {experts.length === 0 ? (
+        {error ? (
+          <div className="card p-8 text-center" role="alert">
+            <p className="text-sm text-[var(--text-secondary)]">专家目录加载失败，请稍后重试</p>
+          </div>
+        ) : loading ? (
+          <div className="flex justify-center py-12">
+            <LoadingSpinner />
+          </div>
+        ) : experts.length === 0 ? (
           <div className="card p-8 text-center">
             <p className="text-sm text-[var(--text-secondary)]">没有匹配的专家，换个关键词试试</p>
           </div>
@@ -117,11 +124,6 @@ export function ExpertsPage() {
                   </span>
                 ))}
               </div>
-              {expert.scenarios.length > 0 && (
-                <p className="mt-2.5 text-[11px] text-[var(--text-tertiary)]">
-                  适用：{expert.scenarios.join(' / ')}
-                </p>
-              )}
             </article>
           ))
         )}

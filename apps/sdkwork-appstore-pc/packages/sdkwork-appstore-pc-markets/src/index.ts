@@ -21,11 +21,10 @@ export * from './components/skills';
 export * from './components/experts';
 export * from './components/mcp';
 
-// Experts marketplace content. Owned here, not in `pc-ai-hub`: the experts
-// marketplace is one of this package's four markets, and the AI Lab page that
-// also renders it already depends on this package, so a single owner keeps the
-// dependency graph acyclic (`APP_PC_ARCHITECTURE_SPEC.md` section 6).
-export { expertItems, expertScenarios } from './data/expertsData';
+// The experts marketplace renders its catalog through the ExpertsService port
+// singleton from `@sdkwork/appstore-pc-core` (bound to the App Store catalog
+// `templateType=EXPERT` feed by `@sdkwork/appstore-pc-runtime`), like the
+// other three markets. No page-level content data lives in this package.
 
 export const pluginsRoute = {
   path: '/plugins',

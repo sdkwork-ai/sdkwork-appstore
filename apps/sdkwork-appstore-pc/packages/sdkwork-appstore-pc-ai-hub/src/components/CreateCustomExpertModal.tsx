@@ -12,7 +12,7 @@ interface CreateCustomExpertModalProps {
     description: string;
     systemPrompt: string;
     tags: string[];
-  }) => void;
+  }) => Promise<void>;
 }
 
 export const CreateCustomExpertModal: React.FC<CreateCustomExpertModalProps> = ({
@@ -28,21 +28,34 @@ export const CreateCustomExpertModal: React.FC<CreateCustomExpertModalProps> = (
   const [customDesc, setCustomDesc] = useState('');
   const [customPrompt, setCustomPrompt] = useState('');
   const [customTags, setCustomTags] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!customName.trim() || !customDesc.trim()) return;
+    if (!customName.trim() || !customDesc.trim() || submitting) return;
 
-    onCreateExpert({
-      name: customName.trim(),
-      nickname: customNickname.trim() || t('aihub.experts.customModal.defaultNickname'),
-      category: customCategory,
-      description: customDesc.trim(),
-      systemPrompt: customPrompt.trim(),
-      tags: customTags ? customTags.split(',').map((tag) => tag.trim()) : [t('aihub.experts.customModal.defaultTag1'), t('aihub.experts.customModal.defaultTag2')],
-    });
+    setSubmitting(true);
+    setSubmitError(null);
+    try {
+      // Persists through the catalog API; the modal stays open with the
+      // backend's error when creation is rejected (e.g. missing scope).
+      await onCreateExpert({
+        name: customName.trim(),
+        nickname: customNickname.trim() || t('aihub.experts.customModal.defaultNickname'),
+        category: customCategory,
+        description: customDesc.trim(),
+        systemPrompt: customPrompt.trim(),
+        tags: customTags ? customTags.split(',').map((tag) => tag.trim()) : [t('aihub.experts.customModal.defaultTag1'), t('aihub.experts.customModal.defaultTag2')],
+      });
+    } catch {
+      setSubmitError(t('aihub.experts.customModal.createFailed'));
+      return;
+    } finally {
+      setSubmitting(false);
+    }
 
     // Reset Form
     setCustomName('');
@@ -161,6 +174,12 @@ export const CreateCustomExpertModal: React.FC<CreateCustomExpertModalProps> = (
             />
           </div>
 
+          {submitError && (
+            <p role="alert" className="text-xs text-store-danger font-medium">
+              {submitError}
+            </p>
+          )}
+
           <div className="pt-2 flex justify-end gap-2">
             <button
               type="button"
@@ -171,9 +190,10 @@ export const CreateCustomExpertModal: React.FC<CreateCustomExpertModalProps> = (
             </button>
             <button
               type="submit"
-              className="px-5 py-2 rounded-store-control bg-store-brand hover:bg-store-brand text-white font-medium shadow-md shadow-store-brand/20 cursor-pointer text-sm"
+              disabled={submitting}
+              className="px-5 py-2 rounded-store-control bg-store-brand hover:bg-store-brand text-white font-medium shadow-md shadow-store-brand/20 cursor-pointer disabled:opacity-50 text-sm"
             >
-              {t('aihub.experts.customModal.create')}
+              {submitting ? t('aihub.experts.customModal.creating') : t('aihub.experts.customModal.create')}
             </button>
           </div>
         </form>

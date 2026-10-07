@@ -246,3 +246,100 @@ export function useTemplate(templateId: string) {
     { refreshKey: templateId },
   );
 }
+
+/** Curated AI expert card rendered by the 专家 surfaces (catalog EXPERT rows). */
+export interface ExpertCatalogCard {
+  id: string;
+  name: string;
+  /** Author/nickname shown as the expert subtitle. */
+  title: string;
+  description: string;
+  /** Filter category (筛选标签) used by the tag filter chips. */
+  category: string;
+  tags: string[];
+  popularity: number;
+  rating: number;
+  badge?: string;
+  isOfficial?: boolean;
+}
+
+export interface ExpertScenarioCard {
+  id: string;
+  title: string;
+  expertCount: number;
+}
+
+function toExpertCard(row: Record<string, unknown>): ExpertCatalogCard {
+  const metadata =
+    row.metadata && typeof row.metadata === 'object' && !Array.isArray(row.metadata)
+      ? (row.metadata as Record<string, unknown>)
+      : {};
+  const tags = Array.isArray(metadata.tags)
+    ? metadata.tags.filter((tag): tag is string => typeof tag === 'string')
+    : [];
+  return {
+    id: String(row.id ?? ''),
+    name: String(row.templateName ?? row.template_code ?? '专家'),
+    title: String(metadata.nickname ?? metadata.authorName ?? '专家'),
+    description: String(row.description ?? ''),
+    category: String(metadata.filterTag ?? row.categoryCode ?? '综合'),
+    tags,
+    popularity: Number(metadata.popularity ?? metadata.usageCount ?? 0),
+    rating: Number(metadata.rating ?? 5),
+    badge: metadata.badge ? String(metadata.badge) : undefined,
+    isOfficial: metadata.isOfficial === true,
+  };
+}
+
+/** Scenario chips derived from the stored catalog: one per scenario category. */
+function deriveExpertScenarios(
+  experts: ExpertCatalogCard[],
+): ExpertScenarioCard[] {
+  const counts = new Map<string, number>();
+  for (const expert of experts) {
+    counts.set(expert.category, (counts.get(expert.category) ?? 0) + 1);
+  }
+  return Array.from(counts.entries())
+    .map(([title, expertCount]) => ({
+      id: `scen-${title}`,
+      title,
+      expertCount,
+    }))
+    .sort((a, b) => b.expertCount - a.expertCount);
+}
+
+function matchesExpertQuery(expert: ExpertCatalogCard, normalized: string): boolean {
+  return (
+    normalized === '' ||
+    expert.name.toLocaleLowerCase().includes(normalized) ||
+    expert.title.toLocaleLowerCase().includes(normalized) ||
+    expert.description.toLocaleLowerCase().includes(normalized) ||
+    expert.tags.some((tag) => tag.toLocaleLowerCase().includes(normalized))
+  );
+}
+
+/**
+ * Curated expert catalog (templateType=EXPERT templates) plus derived
+ * scenario chips. The full set is fetched once and filtered client-side so
+ * the scenario counts stay stable while typing.
+ */
+export function useExperts(query: string) {
+  return useApi(
+    async () => {
+      const page = await getStoreClient().catalog.listTemplates({
+        templateType: 'EXPERT',
+        limit: 100,
+      });
+      const experts = (page.items as unknown as Record<string, unknown>[]).map(
+        toExpertCard,
+      );
+      const scenarios = deriveExpertScenarios(experts);
+      const normalized = query.trim().toLocaleLowerCase();
+      return {
+        scenarios,
+        experts: experts.filter((expert) => matchesExpertQuery(expert, normalized)),
+      };
+    },
+    { refreshKey: `experts:${query}` },
+  );
+}

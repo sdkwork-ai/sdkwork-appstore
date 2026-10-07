@@ -12,17 +12,6 @@ export interface AiAppCard {
   pricingModel: string;
 }
 
-/** AI Lab expert catalog entry (appstore-owned curated presentation content). */
-export interface AiExpertCard {
-  id: string;
-  name: string;
-  title: string;
-  description: string;
-  category: string;
-  tags: string[];
-  scenarios: string[];
-}
-
 function toAiAppCard(row: Record<string, unknown>): AiAppCard {
   return {
     id: String(row.listingSlug ?? row.id ?? ''),
