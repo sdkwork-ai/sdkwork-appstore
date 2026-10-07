@@ -253,6 +253,7 @@ impl MediaRole {
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
+#[serde(rename_all = "camelCase")]
 pub struct Listing {
     pub id: ListingId,
     pub tenant_id: String,
@@ -300,6 +301,7 @@ pub struct Listing {
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
+#[serde(rename_all = "camelCase")]
 pub struct StoreApp {
     pub id: String,
     pub tenant_id: String,
@@ -349,6 +351,7 @@ impl Listing {
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
+#[serde(rename_all = "camelCase")]
 pub struct ListingLocalization {
     pub id: String,
     pub tenant_id: String,
@@ -367,6 +370,7 @@ pub struct ListingLocalization {
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
+#[serde(rename_all = "camelCase")]
 pub struct ListingMedia {
     pub id: String,
     pub tenant_id: String,
@@ -384,6 +388,7 @@ pub struct ListingMedia {
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
+#[serde(rename_all = "camelCase")]
 pub struct ListingCategoryBinding {
     pub id: String,
     pub tenant_id: String,
@@ -395,6 +400,7 @@ pub struct ListingCategoryBinding {
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
+#[serde(rename_all = "camelCase")]
 pub struct ListingSubmission {
     pub id: String,
     pub tenant_id: String,
@@ -414,6 +420,7 @@ pub struct ListingSubmission {
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
+#[serde(rename_all = "camelCase")]
 pub struct RegionalAvailability {
     pub id: String,
     pub tenant_id: String,
@@ -429,6 +436,7 @@ pub struct RegionalAvailability {
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
+#[serde(rename_all = "camelCase")]
 pub struct ListingRating {
     pub id: String,
     pub tenant_id: String,

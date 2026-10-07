@@ -9,10 +9,10 @@ import {
   } from '@sdkwork/appstore-pc-core';
 import type { ArtifactUploadPort } from '@sdkwork/appstore-pc-core';
 import { Tabs } from '@sdkwork/appstore-pc-commons';
-import { ListingMediaItem, ManagedAppDetail, PublisherMember, PublisherProfile, ReleaseHistoryEntry, ReleaseItem } from '../../types';
+import { ComplianceIapItem, CompliancePermissionDisclosure, ComplianceProfileSummary, ListingMediaItem, ManagedAppDetail, PublisherMember, PublisherProfile, ReleaseHistoryEntry, ReleaseItem } from '../../types';
 import { LoadingSpinner } from '../../components/common/LoadingSpinner';
 
-type TabKey = 'overview' | 'releases' | 'members';
+type TabKey = 'overview' | 'releases' | 'compliance' | 'members';
 
 function mapReleaseStatus(status: string): string {
   switch (status.toLocaleUpperCase()) {
@@ -71,6 +71,20 @@ export default function PublisherAppManage() {
   const [showHistory, setShowHistory] = useState(false);
   const [historyEntries, setHistoryEntries] = useState<ReleaseHistoryEntry[]>([]);
   const [historyLoading, setHistoryLoading] = useState(false);
+  // 合规与区域 (compliance.profile/permissions/iapItems + listings.regions).
+  const [regionCn, setRegionCn] = useState(true);
+  const [regionUs, setRegionUs] = useState(true);
+  const [savingRegions, setSavingRegions] = useState(false);
+  const [complianceNotice, setComplianceNotice] = useState<string | null>(null);
+  const [complianceProfile, setComplianceProfile] = useState<ComplianceProfileSummary | null>(null);
+  const [permissionDraft, setPermissionDraft] = useState({ permissionCode: '', usagePurpose: '', isRequired: true });
+  const [savedPermissions, setSavedPermissions] = useState<CompliancePermissionDisclosure[]>([]);
+  const [savingPermissions, setSavingPermissions] = useState(false);
+  const [iapItems, setIapItems] = useState<ComplianceIapItem[] | null>(null);
+  // Minimum OS version editing per release (releases.update).
+  const [editingMinOsReleaseId, setEditingMinOsReleaseId] = useState<string | null>(null);
+  const [minOsDraft, setMinOsDraft] = useState('');
+  const [savingMinOs, setSavingMinOs] = useState(false);
 
   // member invite state
   const [inviteForm, setInviteForm] = useState({ userId: '', role: 'EDITOR' });
@@ -249,6 +263,97 @@ export default function PublisherAppManage() {
     }
   };
 
+  const handleSaveRegions = async () => {
+    if (savingRegions) {
+      return;
+    }
+    setSavingRegions(true);
+    setComplianceNotice(null);
+    try {
+      await ConsoleService.updateListingRegions(id, [
+        { regionCode: 'CN', availabilityStatus: regionCn ? 'available' : 'unavailable' },
+        { regionCode: 'US', availabilityStatus: regionUs ? 'available' : 'unavailable' },
+      ]);
+      setComplianceNotice(t('publisher.manage.compliance.regionsSaved'));
+    } catch (error) {
+      setComplianceNotice(error instanceof Error ? error.message : t('publisher.manage.compliance.saveFailed'));
+    } finally {
+      setSavingRegions(false);
+    }
+  };
+
+  const handleLoadComplianceProfile = async () => {
+    try {
+      const profile = await ConsoleService.getComplianceProfile(id);
+      setComplianceProfile(profile);
+    } catch (error) {
+      setComplianceNotice(error instanceof Error ? error.message : t('publisher.manage.compliance.saveFailed'));
+    }
+  };
+
+  const handleSaveDataSafety = async (encryptionInTransit: boolean, encryptionAtRest: boolean) => {
+    setComplianceNotice(null);
+    try {
+      await ConsoleService.updateComplianceProfile(id, {
+        dataSafety: { encryptionInTransit, encryptionAtRest },
+      });
+      setComplianceNotice(t('publisher.manage.compliance.profileSaved'));
+      await handleLoadComplianceProfile();
+    } catch (error) {
+      setComplianceNotice(error instanceof Error ? error.message : t('publisher.manage.compliance.saveFailed'));
+    }
+  };
+
+  const handleSavePermissions = async () => {
+    if (!permissionDraft.permissionCode.trim() || !permissionDraft.usagePurpose.trim() || savingPermissions) {
+      return;
+    }
+    setSavingPermissions(true);
+    setComplianceNotice(null);
+    try {
+      const saved = await ConsoleService.updateCompliancePermissions(id, [
+        {
+          permissionCode: permissionDraft.permissionCode.trim(),
+          usagePurpose: permissionDraft.usagePurpose.trim(),
+          isRequired: permissionDraft.isRequired,
+        },
+      ]);
+      setSavedPermissions(saved);
+      setPermissionDraft({ permissionCode: '', usagePurpose: '', isRequired: true });
+      setComplianceNotice(t('publisher.manage.compliance.permissionsSaved'));
+    } catch (error) {
+      setComplianceNotice(error instanceof Error ? error.message : t('publisher.manage.compliance.saveFailed'));
+    } finally {
+      setSavingPermissions(false);
+    }
+  };
+
+  const handleLoadIapItems = async () => {
+    try {
+      const items = await ConsoleService.listComplianceIapItems(id);
+      setIapItems(items);
+    } catch (error) {
+      setComplianceNotice(error instanceof Error ? error.message : t('publisher.manage.compliance.saveFailed'));
+    }
+  };
+
+  const handleSaveMinOs = async (releaseId: string) => {
+    if (savingMinOs) {
+      return;
+    }
+    setSavingMinOs(true);
+    try {
+      await ConsoleService.updateReleaseMetadata(releaseId, { minimumOsVersion: minOsDraft.trim() || undefined });
+      setEditingMinOsReleaseId(null);
+      setReleaseNotice(t('publisher.manage.compliance.minOsSaved'));
+    } catch (error) {
+      console.error('Failed to update release metadata', error);
+      setReleaseNotice(error instanceof Error ? error.message : t('publisher.manage.compliance.saveFailed'));
+    } finally {
+      setSavingMinOs(false);
+    }
+  };
+
   const handleArtifactUpload = async (releaseId: string, file: File) => {
     setUploadingReleaseId(releaseId);
     setUploadPercent(0);
@@ -329,6 +434,7 @@ export default function PublisherAppManage() {
   const tabs: { key: TabKey; label: string }[] = [
     { key: 'overview', label: t('publisher.manage.tabs.overview') },
     { key: 'releases', label: t('publisher.manage.tabs.releases') },
+    { key: 'compliance', label: t('publisher.manage.tabs.compliance') },
     { key: 'members', label: t('publisher.manage.tabs.members') },
   ];
 
@@ -677,6 +783,39 @@ export default function PublisherAppManage() {
                         <FileText className="w-3 h-3" />
                         {t('publisher.manage.releases.editNotes')}
                       </button>
+                      {editingMinOsReleaseId === release.id ? (
+                        <div className="flex items-center gap-2">
+                          <input
+                            value={minOsDraft}
+                            onChange={(event) => setMinOsDraft(event.target.value)}
+                            placeholder={t('publisher.manage.compliance.minOsPlaceholder')}
+                            className="w-32 px-2 py-1.5 bg-store-field border border-store-line rounded-store-control text-xs text-store-ink placeholder:text-store-ink-faint outline-none focus:border-store-brand"
+                          />
+                          <button
+                            onClick={() => handleSaveMinOs(release.id)}
+                            disabled={savingMinOs}
+                            className="px-3 py-1.5 bg-store-brand hover:bg-store-brand disabled:opacity-50 text-white rounded-store-control text-xs font-medium transition-colors cursor-pointer"
+                          >
+                            {savingMinOs ? t('publisher.manage.compliance.saving') : t('publisher.manage.compliance.minOsSave')}
+                          </button>
+                          <button
+                            onClick={() => setEditingMinOsReleaseId(null)}
+                            className="px-3 py-1.5 bg-store-subtle hover:bg-store-field border border-store-line text-store-ink rounded-store-control text-xs font-medium transition-colors cursor-pointer"
+                          >
+                            {t('publisher.manage.releases.notesCancel')}
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => {
+                            setEditingMinOsReleaseId(release.id);
+                            setMinOsDraft('');
+                          }}
+                          className="px-3 py-1.5 bg-store-subtle hover:bg-store-field border border-store-line text-store-ink rounded-store-control text-xs font-medium transition-colors cursor-pointer"
+                        >
+                          {t('publisher.manage.compliance.minOsEdit')}
+                        </button>
+                      )}
                       <button
                         onClick={() => handleRetireRelease(release.id)}
                         disabled={retiringReleaseId !== null || release.status === 'RETIRED'}
@@ -746,6 +885,180 @@ export default function PublisherAppManage() {
                   ))}
                 </ul>
               )
+            )}
+          </section>
+        </div>
+      )}
+
+      {tab === 'compliance' && (
+        <div className="space-y-6">
+          {complianceNotice && (
+            <p role="alert" className="text-xs font-bold text-store-brand ">
+              {complianceNotice}
+            </p>
+          )}
+
+          <section className="rounded-store-card p-6 bg-store-subtle/60 dark:bg-store-surface border border-store-line space-y-4">
+            <h3 className="text-sm font-bold tracking-tight text-store-ink ">
+              {t('publisher.manage.compliance.regionsTitle')}
+            </h3>
+            <div className="flex flex-wrap gap-4">
+              <label className="flex items-center gap-2 text-xs font-medium text-store-ink cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={regionCn}
+                  onChange={(event) => setRegionCn(event.target.checked)}
+                  className="accent-store-brand"
+                />
+                {t('publisher.manage.compliance.regionCn')}
+              </label>
+              <label className="flex items-center gap-2 text-xs font-medium text-store-ink cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={regionUs}
+                  onChange={(event) => setRegionUs(event.target.checked)}
+                  className="accent-store-brand"
+                />
+                {t('publisher.manage.compliance.regionUs')}
+              </label>
+            </div>
+            <p className="text-[11px] text-store-ink-faint ">
+              {t('publisher.manage.compliance.regionsHint')}
+            </p>
+            <button
+              onClick={handleSaveRegions}
+              disabled={savingRegions}
+              className="px-5 py-2 bg-store-brand hover:bg-store-brand disabled:opacity-50 text-white rounded-full text-xs font-medium transition-colors cursor-pointer"
+            >
+              {savingRegions ? t('publisher.manage.compliance.saving') : t('publisher.manage.compliance.save')}
+            </button>
+          </section>
+
+          <section className="rounded-store-card p-6 bg-store-subtle/60 dark:bg-store-surface border border-store-line space-y-4">
+            <div className="flex items-center justify-between gap-3">
+              <h3 className="text-sm font-bold tracking-tight text-store-ink ">
+                {t('publisher.manage.compliance.profileTitle')}
+              </h3>
+              <button
+                type="button"
+                onClick={() => void handleLoadComplianceProfile()}
+                className="px-3 py-1.5 bg-store-subtle hover:bg-store-field border border-store-line text-store-ink rounded-store-control text-xs font-medium transition-colors cursor-pointer"
+              >
+                {t('publisher.manage.compliance.profileRefresh')}
+              </button>
+            </div>
+            {complianceProfile ? (
+              <div className="flex flex-wrap items-center gap-2 text-xs text-store-ink-soft">
+                <span className="px-2 py-0.5 rounded-full bg-gray-500/10 ">{complianceProfile.complianceStatus}</span>
+                <span>v{complianceProfile.complianceVersion}</span>
+                {complianceProfile.reviewedBy && (
+                  <span className="text-store-ink-faint">
+                    {t('publisher.manage.compliance.reviewedBy', { reviewer: complianceProfile.reviewedBy })}
+                  </span>
+                )}
+              </div>
+            ) : (
+              <p className="text-[11px] text-store-ink-faint ">
+                {t('publisher.manage.compliance.profileEmpty')}
+              </p>
+            )}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <label className="flex items-center gap-2 text-xs font-medium text-store-ink cursor-pointer">
+                <input
+                  type="checkbox"
+                  defaultChecked
+                  onChange={(event) => void handleSaveDataSafety(event.target.checked, event.target.checked)}
+                  className="accent-store-brand"
+                />
+                {t('publisher.manage.compliance.dataSafetyEncryption')}
+              </label>
+            </div>
+          </section>
+
+          <section className="rounded-store-card p-6 bg-store-subtle/60 dark:bg-store-surface border border-store-line space-y-4">
+            <h3 className="text-sm font-bold tracking-tight text-store-ink ">
+              {t('publisher.manage.compliance.permissionsTitle')}
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <input
+                value={permissionDraft.permissionCode}
+                onChange={(event) => setPermissionDraft((prev) => ({ ...prev, permissionCode: event.target.value }))}
+                placeholder={t('publisher.manage.compliance.permissionCode')}
+                className="px-3 rounded-store-control bg-store-field border border-store-line text-sm text-store-ink placeholder:text-store-ink-faint outline-none focus:border-store-brand transition-colors h-9 focus:ring-2 focus:ring-store-brand/25"
+              />
+              <input
+                value={permissionDraft.usagePurpose}
+                onChange={(event) => setPermissionDraft((prev) => ({ ...prev, usagePurpose: event.target.value }))}
+                placeholder={t('publisher.manage.compliance.permissionPurpose')}
+                className="px-3 rounded-store-control bg-store-field border border-store-line text-sm text-store-ink placeholder:text-store-ink-faint outline-none focus:border-store-brand transition-colors h-9 focus:ring-2 focus:ring-store-brand/25"
+              />
+              <label className="flex items-center gap-2 text-xs font-medium text-store-ink cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={permissionDraft.isRequired}
+                  onChange={(event) => setPermissionDraft((prev) => ({ ...prev, isRequired: event.target.checked }))}
+                  className="accent-store-brand"
+                />
+                {t('publisher.manage.compliance.permissionRequired')}
+              </label>
+            </div>
+            <button
+              onClick={handleSavePermissions}
+              disabled={savingPermissions || !permissionDraft.permissionCode.trim() || !permissionDraft.usagePurpose.trim()}
+              className="px-5 py-2 bg-store-brand hover:bg-store-brand disabled:opacity-50 text-white rounded-full text-xs font-medium transition-colors cursor-pointer"
+            >
+              {savingPermissions ? t('publisher.manage.compliance.saving') : t('publisher.manage.compliance.permissionsSave')}
+            </button>
+            {savedPermissions.length > 0 && (
+              <ul className="space-y-1.5">
+                {savedPermissions.map((permission) => (
+                  <li
+                    key={permission.id || permission.permissionCode}
+                    className="flex items-center gap-2 px-3 py-2 bg-store-subtle/60 dark:bg-store-surface border border-store-line rounded-store-control text-xs "
+                  >
+                    <span className="font-bold text-store-ink ">{permission.permissionCode}</span>
+                    <span className="text-store-ink-soft ">{permission.usagePurpose}</span>
+                    {permission.isRequired && (
+                      <span className="text-store-ink-faint ml-auto ">{t('publisher.manage.compliance.permissionRequired')}</span>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+
+          <section className="rounded-store-card p-6 bg-store-subtle/60 dark:bg-store-surface border border-store-line space-y-4">
+            <div className="flex items-center justify-between gap-3">
+              <h3 className="text-sm font-bold tracking-tight text-store-ink ">
+                {t('publisher.manage.compliance.iapTitle')}
+              </h3>
+              <button
+                type="button"
+                onClick={() => void handleLoadIapItems()}
+                className="px-3 py-1.5 bg-store-subtle hover:bg-store-field border border-store-line text-store-ink rounded-store-control text-xs font-medium transition-colors cursor-pointer"
+              >
+                {t('publisher.manage.compliance.iapRefresh')}
+              </button>
+            </div>
+            {iapItems === null ? (
+              <p className="text-[11px] text-store-ink-faint ">
+                {t('publisher.manage.compliance.iapHint')}
+              </p>
+            ) : iapItems.length === 0 ? (
+              <p className="text-[11px] text-store-ink-faint ">
+                {t('publisher.manage.compliance.iapEmpty')}
+              </p>
+            ) : (
+              <ul className="space-y-1.5">
+                {iapItems.map((item) => (
+                  <li
+                    key={item.id}
+                    className="px-3 py-2 bg-store-subtle/60 dark:bg-store-surface border border-store-line rounded-store-control text-xs text-store-ink "
+                  >
+                    {item.id}
+                  </li>
+                ))}
+              </ul>
             )}
           </section>
         </div>

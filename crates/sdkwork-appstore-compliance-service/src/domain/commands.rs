@@ -86,7 +86,7 @@ impl UpdateComplianceProfileRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(deny_unknown_fields)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct PermissionDisclosureItem {
     pub permission_code: String,
     pub usage_purpose: String,

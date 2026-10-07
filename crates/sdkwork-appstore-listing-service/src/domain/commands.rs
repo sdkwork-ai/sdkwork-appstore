@@ -297,7 +297,7 @@ impl BindListingCategoriesRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(deny_unknown_fields)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct RegionEntry {
     pub region_code: String,
     pub availability_status: String,

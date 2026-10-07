@@ -40,6 +40,29 @@ export interface ManagedAppDetail extends ManagedApp {
   releaseCount?: number;
 }
 
+/** Compliance profile summary (`appstore.compliance.profile.retrieve`). */
+export interface ComplianceProfileSummary {
+  id: string;
+  complianceVersion: number;
+  complianceStatus: string;
+  reviewedBy?: string;
+  reviewedAt?: string;
+}
+
+/** One permission disclosure (`appstore.compliance.permissions.update`). */
+export interface CompliancePermissionDisclosure {
+  id?: string;
+  permissionCode: string;
+  usagePurpose: string;
+  isRequired?: boolean;
+}
+
+/** One compliance IAP item (`appstore.compliance.iapItems.list`). */
+export interface ComplianceIapItem {
+  id: string;
+  listingId: string;
+}
+
 /** One attached media row of a listing (`appstore.listings.media.list`). */
 export interface ListingMediaItem {
   id: string;
@@ -126,12 +149,24 @@ export interface IConsoleSDK {
   listListingReleaseHistory(listingId: string): Promise<ReleaseHistoryEntry[]>;
   /** Removes one listing media attachment (`listings.media.delete`). */
   deleteListingMedia(listingId: string, mediaId: string): Promise<void>;
+  /** Replaces the listing's regional availability (`listings.regions.update`). */
+  updateListingRegions(listingId: string, regions: { regionCode: string; availabilityStatus: string }[]): Promise<void>;
+  /** Retrieves the compliance profile (`compliance.profile.retrieve`). */
+  getComplianceProfile(listingId: string): Promise<ComplianceProfileSummary | null>;
+  /** Updates the compliance profile (`compliance.profile.update`). */
+  updateComplianceProfile(listingId: string, patch: { dataSafety?: Record<string, unknown> }): Promise<void>;
+  /** Replaces permission disclosures (`compliance.permissions.update`). */
+  updateCompliancePermissions(listingId: string, permissions: { permissionCode: string; usagePurpose: string; isRequired: boolean }[]): Promise<CompliancePermissionDisclosure[]>;
+  /** Lists compliance IAP items (`compliance.iapItems.list`). */
+  listComplianceIapItems(listingId: string): Promise<ComplianceIapItem[]>;
   /** Lists a listing's attached media (`listings.media.list`). */
   listListingMedia(listingId: string): Promise<ListingMediaItem[]>;
   createRelease(listingId: string, data: { channelCode: string; versionName: string; versionCode: string; buildNumber?: string }): Promise<ReleaseItem>;
   updateReleaseRollout(releaseId: string, targetPercentage: number, strategy?: 'FULL' | 'STAGED' | 'PAUSE'): Promise<void>;
   /** Replaces the release notes body for one locale (`releases.notes.update`). */
   updateReleaseNotes(releaseId: string, locale: string, releaseNotes: string): Promise<void>;
+  /** Patches release metadata (`releases.update`; e.g. minimum OS version). */
+  updateReleaseMetadata(releaseId: string, patch: { minimumOsVersion?: string }): Promise<void>;
   /** Retires a release so it stops being served (`releases.retire`). */
   retireRelease(releaseId: string): Promise<void>;
   submitListingForReview(listingId: string, releaseId?: string): Promise<boolean>;
@@ -162,11 +197,17 @@ export const ConsoleService: IConsoleSDK = {
   listListingReleaseHistory: (listingId) => consolePort.listListingReleaseHistory(listingId),
   deleteListingMedia: (listingId, mediaId) => consolePort.deleteListingMedia(listingId, mediaId),
   listListingMedia: (listingId) => consolePort.listListingMedia(listingId),
+  updateListingRegions: (listingId, regions) => consolePort.updateListingRegions(listingId, regions),
+  getComplianceProfile: (listingId) => consolePort.getComplianceProfile(listingId),
+  updateComplianceProfile: (listingId, patch) => consolePort.updateComplianceProfile(listingId, patch),
+  updateCompliancePermissions: (listingId, permissions) => consolePort.updateCompliancePermissions(listingId, permissions),
+  listComplianceIapItems: (listingId) => consolePort.listComplianceIapItems(listingId),
   createRelease: (listingId, data) => consolePort.createRelease(listingId, data),
   updateReleaseRollout: (releaseId, targetPercentage, strategy) =>
     consolePort.updateReleaseRollout(releaseId, targetPercentage, strategy),
   updateReleaseNotes: (releaseId, locale, releaseNotes) =>
     consolePort.updateReleaseNotes(releaseId, locale, releaseNotes),
+  updateReleaseMetadata: (releaseId, patch) => consolePort.updateReleaseMetadata(releaseId, patch),
   retireRelease: (releaseId) => consolePort.retireRelease(releaseId),
   submitListingForReview: (listingId, releaseId) => consolePort.submitListingForReview(listingId, releaseId),
   listMembers: (publisherId) => consolePort.listMembers(publisherId),
@@ -191,9 +232,15 @@ function createUnconfiguredConsolePort(): ConsoleServicePort {
     listListingReleaseHistory: async () => unavailable(),
     deleteListingMedia: async () => unavailable(),
     listListingMedia: async () => unavailable(),
+    updateListingRegions: async () => unavailable(),
+    getComplianceProfile: async () => unavailable(),
+    updateComplianceProfile: async () => unavailable(),
+    updateCompliancePermissions: async () => unavailable(),
+    listComplianceIapItems: async () => unavailable(),
     createRelease: async () => unavailable(),
     updateReleaseRollout: async () => unavailable(),
     updateReleaseNotes: async () => unavailable(),
+    updateReleaseMetadata: async () => unavailable(),
     retireRelease: async () => unavailable(),
     submitListingForReview: async () => unavailable(),
     listMembers: async () => unavailable(),

@@ -24,6 +24,13 @@ export const publisherService = {
   getMe: () => getClient().publishers.getMe(),
   listMyListings: () => getClient().publishers.listMyListings(),
   listMembers: (publisherId: string) => getClient().publishers.listMembers(publisherId),
+  inviteMember: (
+    publisherId: string,
+    data: Parameters<AppStoreClient['publishers']['inviteMember']>[1],
+  ) => getClient().publishers.inviteMember(publisherId, data),
+  createPublisher: (
+    data: Parameters<AppStoreClient['publishers']['create']>[0],
+  ) => getClient().publishers.create(data),
   bootstrapApp: (data: Parameters<AppStoreClient['publishers']['bootstrapApp']>[0]) =>
     getClient().publishers.bootstrapApp(data),
   updatePublisher: (

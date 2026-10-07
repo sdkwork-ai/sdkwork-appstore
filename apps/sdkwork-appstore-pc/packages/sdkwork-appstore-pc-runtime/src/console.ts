@@ -10,6 +10,9 @@ import {
   type ListingMediaItem,
   type ReleaseHistoryEntry,
   type ReleaseItem,
+  type ComplianceIapItem,
+  type CompliancePermissionDisclosure,
+  type ComplianceProfileSummary,
 } from '@sdkwork/appstore-pc-core';
 
 export function configureAppstorePcConsole(client: AppStoreClient): void {
@@ -319,6 +322,10 @@ export function createConsoleServicePort(client: AppStoreClient): ConsoleService
       await client.releases.upsertNotes(releaseId, locale, { releaseNotes });
     },
 
+    async updateReleaseMetadata(releaseId: string, patch: { minimumOsVersion?: string }): Promise<void> {
+      await client.releases.update(releaseId, { minimumOsVersion: patch.minimumOsVersion });
+    },
+
     async retireRelease(releaseId: string): Promise<void> {
       await client.releases.retire(releaseId);
     },
@@ -340,6 +347,48 @@ export function createConsoleServicePort(client: AppStoreClient): ConsoleService
 
     async deleteListingMedia(listingId: string, mediaId: string): Promise<void> {
       await client.listings.removeMedia(listingId, mediaId);
+    },
+
+    async updateListingRegions(
+      listingId: string,
+      regions: { regionCode: string; availabilityStatus: string }[],
+    ): Promise<void> {
+      await client.listings.updateRegions(listingId, { regions });
+    },
+
+    async getComplianceProfile(listingId: string): Promise<ComplianceProfileSummary | null> {
+      const profile = await client.compliance.getProfile(listingId);
+      const row = profile as unknown as Record<string, unknown> | undefined;
+      if (!row || !readString(row, 'id')) {
+        return null;
+      }
+      return {
+        id: readString(row, 'id'),
+        complianceVersion: readNumber(row, 'complianceVersion', 'compliance_version') ?? 1,
+        complianceStatus: readString(row, 'complianceStatus', 'compliance_status') || 'unknown',
+        reviewedBy: readString(row, 'reviewedBy', 'reviewed_by') || undefined,
+        reviewedAt: readString(row, 'reviewedAt', 'reviewed_at') || undefined,
+      };
+    },
+
+    async updateComplianceProfile(
+      listingId: string,
+      patch: { dataSafety?: Record<string, unknown> },
+    ): Promise<void> {
+      await client.compliance.updateProfile(listingId, { dataSafety: patch.dataSafety });
+    },
+
+    async updateCompliancePermissions(
+      listingId: string,
+      permissions: { permissionCode: string; usagePurpose: string; isRequired: boolean }[],
+    ): Promise<CompliancePermissionDisclosure[]> {
+      const page = await client.compliance.updatePermissions(listingId, { permissions });
+      return ((page as unknown as { items?: unknown }).items as CompliancePermissionDisclosure[]) ?? [];
+    },
+
+    async listComplianceIapItems(listingId: string): Promise<ComplianceIapItem[]> {
+      const page = await client.compliance.listIapItems(listingId, { limit: 100 });
+      return ((page as unknown as { items?: unknown }).items as ComplianceIapItem[]) ?? [];
     },
 
     async listListingMedia(listingId: string): Promise<ListingMediaItem[]> {

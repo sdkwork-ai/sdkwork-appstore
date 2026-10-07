@@ -1,7 +1,9 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Plus } from 'lucide-react';
 import {
   formatApiError,
+  publisherService,
   usePublisher,
   usePublisherListings,
 } from '@sdkwork/appstore-publisher-console-core';
@@ -20,13 +22,135 @@ function mapReviewLabel(reviewStatus: string, listingStatus: string): string {
   return '草稿';
 }
 
+/** Inline publisher registration (publishers.create) for H5-first publishers. */
+function PublisherRegisterForm({ onRegistered }: { onRegistered: () => void }) {
+  const [displayName, setDisplayName] = useState('');
+  const [supportEmail, setSupportEmail] = useState('');
+  const [websiteUrl, setWebsiteUrl] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
+
+  async function handleSubmit() {
+    if (!displayName.trim() || submitting) {
+      return;
+    }
+    setSubmitting(true);
+    setMessage(null);
+    try {
+      await publisherService.createPublisher({
+        displayName: displayName.trim(),
+        supportEmail: supportEmail.trim() || undefined,
+        websiteUrl: websiteUrl.trim() || undefined,
+        publisherType: 'INDIVIDUAL',
+      });
+      onRegistered();
+    } catch (err) {
+      setMessage(formatApiError(err as Error));
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  return (
+    <section className="card p-4 space-y-3 mb-4">
+      <h2 className="font-semibold text-[var(--text-primary)]">注册发布者</h2>
+      <input
+        value={displayName}
+        onChange={(e) => setDisplayName(e.target.value)}
+        placeholder="发布者名称"
+        aria-label="发布者名称"
+        className="w-full px-3 py-2 border border-[var(--border-default)] rounded-xl text-sm bg-[var(--bg-surface)]"
+      />
+      <input
+        value={supportEmail}
+        onChange={(e) => setSupportEmail(e.target.value)}
+        placeholder="联系邮箱（选填）"
+        type="email"
+        aria-label="联系邮箱"
+        className="w-full px-3 py-2 border border-[var(--border-default)] rounded-xl text-sm bg-[var(--bg-surface)]"
+      />
+      <input
+        value={websiteUrl}
+        onChange={(e) => setWebsiteUrl(e.target.value)}
+        placeholder="官网地址（选填）"
+        type="url"
+        aria-label="官网地址"
+        className="w-full px-3 py-2 border border-[var(--border-default)] rounded-xl text-sm bg-[var(--bg-surface)]"
+      />
+      <button
+        type="button"
+        onClick={() => void handleSubmit()}
+        disabled={submitting || !displayName.trim()}
+        className="w-full py-2.5 bg-emerald-500 text-white rounded-xl text-sm font-medium disabled:opacity-60"
+      >
+        {submitting ? '注册中…' : '注册发布者'}
+      </button>
+      {message && <p className="text-xs text-[var(--text-tertiary)]">{message}</p>}
+    </section>
+  );
+}
+
 export function PublisherConsolePage() {
-  const { data: publisherData, loading: publisherLoading, error: publisherError } = usePublisher();
+  const { data: publisherData, loading: publisherLoading, error: publisherError, execute: refreshPublisher } = usePublisher();
   const { data: listingsData, loading: listingsLoading, error: listingsError } = usePublisherListings();
+  const [membersOpen, setMembersOpen] = useState(false);
+  const [members, setMembers] = useState<{ id: string; label: string }[]>([]);
+  const [membersLoading, setMembersLoading] = useState(false);
+  const [membersError, setMembersError] = useState<string | null>(null);
+  const [inviteUserId, setInviteUserId] = useState('');
+  const [inviting, setInviting] = useState(false);
+  const [inviteMessage, setInviteMessage] = useState<string | null>(null);
 
   const items = listingsData?.items ?? [];
   const loading = publisherLoading || listingsLoading;
   const error = publisherError ?? listingsError;
+
+  const publisherRow = (publisherData ?? {}) as unknown as Record<string, unknown>;
+  const publisherId = readString(publisherRow, 'id');
+  const publisherName = readString(publisherRow, 'displayName', 'display_name') || '开发者';
+
+  async function loadMembers() {
+    if (!publisherId || membersLoading) {
+      return;
+    }
+    setMembersOpen(true);
+    setMembersLoading(true);
+    setMembersError(null);
+    try {
+      const page = await publisherService.listMembers(publisherId);
+      const rows = ((page as unknown as { items?: unknown }).items ?? []) as Record<string, unknown>[];
+      setMembers(
+        rows.map((row, index) => ({
+          id: readString(row, 'id') || String(index),
+          label: `${readString(row, 'displayName', 'display_name') || readString(row, 'userId', 'user_id') || '成员'} · ${
+            readString(row, 'memberRole', 'member_role') || readString(row, 'role') || 'member'
+          }`,
+        })),
+      );
+    } catch (err) {
+      setMembersError(formatApiError(err as Error));
+    } finally {
+      setMembersLoading(false);
+    }
+  }
+
+  async function handleInvite() {
+    if (!publisherId || !inviteUserId.trim() || inviting) {
+      return;
+    }
+    setInviting(true);
+    setInviteMessage(null);
+    try {
+      await publisherService.inviteMember(publisherId, { inviteeUserId: inviteUserId.trim(), memberRole: 'member' });
+      setInviteUserId('');
+      setInviteMessage('邀请已发送。');
+      await loadMembers();
+    } catch (err) {
+      setInviteMessage(formatApiError(err as Error));
+    } finally {
+      setInviting(false);
+    }
+  }
 
   if (loading) {
     return (
@@ -35,9 +159,6 @@ export function PublisherConsolePage() {
       </div>
     );
   }
-
-  const publisherRow = (publisherData ?? {}) as unknown as Record<string, unknown>;
-  const publisherName = readString(publisherRow, 'displayName', 'display_name') || '开发者';
 
   return (
     <div className="animate-fade-in pb-6">
@@ -66,10 +187,50 @@ export function PublisherConsolePage() {
           </div>
         )}
 
-        {!publisherData && (
-          <p className="text-sm text-[var(--text-secondary)] mb-4">
-            请先在 PC 端开发者控制台创建发布者资料，或联系管理员开通权限。
-          </p>
+        {!publisherData && <PublisherRegisterForm onRegistered={() => void refreshPublisher()} />}
+
+        {publisherId && (
+          <section className="card p-4 space-y-3 mb-4">
+            <button
+              type="button"
+              onClick={() => (membersOpen ? setMembersOpen(false) : void loadMembers())}
+              className="text-sm font-semibold text-[var(--text-primary)]"
+            >
+              {membersOpen ? '收起成员' : '成员管理'}
+            </button>
+            {membersOpen && (
+              <div className="space-y-2">
+                {membersLoading && <p className="text-xs text-[var(--text-tertiary)]">加载中…</p>}
+                {membersError && <p className="text-xs text-[var(--text-tertiary)]">{membersError}</p>}
+                {!membersLoading && !membersError && members.length === 0 && (
+                  <p className="text-xs text-[var(--text-tertiary)]">暂无成员。</p>
+                )}
+                {members.map((member) => (
+                  <div key={member.id} className="px-3 py-2 border border-[var(--border-default)] rounded-xl text-xs">
+                    {member.label}
+                  </div>
+                ))}
+                <div className="flex gap-2 pt-1">
+                  <input
+                    value={inviteUserId}
+                    onChange={(e) => setInviteUserId(e.target.value)}
+                    placeholder="被邀请用户 ID"
+                    aria-label="被邀请用户 ID"
+                    className="flex-1 px-3 py-2 border border-[var(--border-default)] rounded-xl text-sm bg-[var(--bg-surface)]"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => void handleInvite()}
+                    disabled={inviting || !inviteUserId.trim()}
+                    className="px-4 py-2 bg-purple-500 text-white rounded-xl text-sm font-medium disabled:opacity-60"
+                  >
+                    {inviting ? '邀请中…' : '邀请'}
+                  </button>
+                </div>
+                {inviteMessage && <p className="text-xs text-[var(--text-tertiary)]">{inviteMessage}</p>}
+              </div>
+            )}
+          </section>
         )}
 
         {items.length === 0 ? (

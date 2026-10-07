@@ -3,11 +3,13 @@ import { createClient as createGeneratedClient, SdkworkAppstoreAppClient } from 
 import type { AuthTokenManager } from '../generated/server-openapi/src/auth/index';
 import type { SdkworkAppConfig } from '../generated/server-openapi/src/types/common';
 import type {
-  AppTemplateCreateRequest, AppTemplateUsageCreateRequest, DownloadGrantCreateRequest,
+  AppTemplateCreateRequest, AppTemplateUsageCreateRequest, CompliancePermissionUpdateRequest,
+  ComplianceProfileUpdateRequest, DownloadGrantCreateRequest,
   FeedbackCreateRequest, LibraryInstallRequest, LibraryUninstallRequest,
   LibraryUpdatesCheckRequest, ListingCategoryBindRequest, ListingCreateRequest,
   ListingLocalizationUpsertRequest, ListingMediaAttachRequest, ListingRatingUpsertRequest,
   ListingSubmissionCreateRequest, ListingUpdateRequest, PublisherAppBootstrapRequest,
+  RegionalAvailabilityUpdateRequest,
   PublisherCreateRequest, PublisherMemberInviteRequest, PublisherUpdateRequest,
   PublisherVerificationSubmitRequest, ReleaseArtifactAttachRequest, ReleaseCreateRequest,
   ReleaseNotesUpsertRequest, ReleaseRolloutUpdateRequest, ReleaseUpdateRequest,
@@ -83,6 +85,7 @@ function createListingsFacade(client: SdkworkAppstoreAppClient) {
     listMedia: (id: string) => api.media.list(id),
     attachMedia: (id: string, body: ListingMediaAttachRequest) => api.media.create(id, body),
     removeMedia: (id: string, mediaId: string) => api.media.delete(id, mediaId),
+    updateRegions: (id: string, body: RegionalAvailabilityUpdateRequest) => api.regions.update(id, body),
     bindCategories: (id: string, body: ListingCategoryBindRequest) => api.categories.update(id, body),
     createSubmission: (id: string, body: ListingSubmissionCreateRequest) =>
       api.submissions.create(id, body, commandOptions()),
@@ -153,9 +156,12 @@ function createDownloadGrantFacade(client: SdkworkAppstoreAppClient) {
 }
 
 function createComplianceFacade(client: SdkworkAppstoreAppClient) {
-  const api = client.compliance.appstore.compliance.iapItems;
+  const api = client.compliance.appstore.compliance;
   return {
-    listIapItems: (id: string, p?: { cursor?: string; limit?: number }) => api.list(id, pageParams(p)),
+    getProfile: (listingId: string) => api.profile.retrieve(listingId),
+    updateProfile: (listingId: string, body: ComplianceProfileUpdateRequest) => api.profile.update(listingId, body),
+    updatePermissions: (listingId: string, body: CompliancePermissionUpdateRequest) => api.permissions.update(listingId, body),
+    listIapItems: (listingId: string, p?: { cursor?: string; limit?: number }) => api.iapItems.list(listingId, pageParams(p)),
   };
 }
 
