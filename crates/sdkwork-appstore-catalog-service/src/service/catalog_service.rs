@@ -335,9 +335,13 @@ async fn resolve_publisher_id<R: CatalogRepositoryPort>(
     context: &AppstoreRequestContext,
 ) -> AppstoreServiceResult<String> {
     let user_id = require_user_id(context)?;
+    // Owner first; invited members reach the same publisher-scoped surfaces
+    // instead of dead-ending on a profile they can never own (one publisher
+    // per organization).
     repository
         .find_publisher_id_by_owner(context, &user_id)
         .await?
+        .or(repository.find_publisher_id_by_member(context, &user_id).await?)
         .ok_or_else(|| {
             AppstoreServiceError::NotFound(
                 "Publisher profile not found for current user".to_string(),

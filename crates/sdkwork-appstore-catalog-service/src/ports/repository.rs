@@ -247,6 +247,15 @@ pub trait CatalogRepositoryPort: Send + Sync {
         owner_user_id: &str,
     ) -> AppstoreServiceResult<Option<String>>;
 
+    /// Finds the publisher id whose member roster contains `user_id`
+    /// (owner aside), so invited members resolve the same publisher-scoped
+    /// surfaces as owners.
+    async fn find_publisher_id_by_member(
+        &self,
+        context: &AppstoreRequestContext,
+        user_id: &str,
+    ) -> AppstoreServiceResult<Option<String>>;
+
     async fn aggregate_publisher_metrics(
         &self,
         context: &AppstoreRequestContext,

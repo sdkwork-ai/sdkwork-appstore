@@ -1553,6 +1553,30 @@ impl CatalogRepositoryPort for SqlxCatalogRepository {
         Ok(row.map(|(id,)| id))
     }
 
+    async fn find_publisher_id_by_member(
+        &self,
+        context: &AppstoreRequestContext,
+        user_id: &str,
+    ) -> Result<Option<String>, AppstoreServiceError> {
+        let row: Option<(String,)> = self
+            .db
+            .query_as::<(String,)>(
+                r#"SELECT p.id FROM appstore_publisher p
+               JOIN appstore_publisher_member m
+                 ON m.publisher_id = p.id AND m.tenant_id = p.tenant_id
+               WHERE p.tenant_id = ? AND p.deleted_at IS NULL AND m.user_id = ?
+                 AND m.member_status = 'active'
+               LIMIT 1"#,
+            )
+            .bind(&context.tenant_id)
+            .bind(user_id)
+            .fetch_optional(&self.db)
+            .await
+            .map_err(|e| AppstoreServiceError::Internal(format!("Database error: {e}")))?;
+
+        Ok(row.map(|(id,)| id))
+    }
+
     async fn aggregate_publisher_metrics(
         &self,
         context: &AppstoreRequestContext,
@@ -1564,11 +1588,11 @@ impl CatalogRepositoryPort for SqlxCatalogRepository {
             r#"
             SELECT
               COUNT(DISTINCT l.id) AS listing_count,
-              COALESCE(SUM(m.impression_count), 0) AS total_impressions,
-              COALESCE(SUM(m.detail_view_count), 0) AS total_detail_views,
-              COALESCE(SUM(m.install_count), 0) AS total_installs,
-              COALESCE(SUM(m.uninstall_count), 0) AS total_uninstalls,
-              COALESCE(SUM(m.update_count), 0) AS total_updates
+              COALESCE(SUM(m.impression_count), 0)::bigint AS total_impressions,
+              COALESCE(SUM(m.detail_view_count), 0)::bigint AS total_detail_views,
+              COALESCE(SUM(m.install_count), 0)::bigint AS total_installs,
+              COALESCE(SUM(m.uninstall_count), 0)::bigint AS total_uninstalls,
+              COALESCE(SUM(m.update_count), 0)::bigint AS total_updates
             FROM appstore_listing l
             LEFT JOIN appstore_listing_metric_snapshot m
               ON m.listing_id = l.id AND m.tenant_id = l.tenant_id
@@ -1634,11 +1658,11 @@ impl CatalogRepositoryPort for SqlxCatalogRepository {
               l.id,
               l.listing_slug,
               ll.display_name,
-              COALESCE(SUM(m.impression_count), 0) AS impression_count,
-              COALESCE(SUM(m.detail_view_count), 0) AS detail_view_count,
-              COALESCE(SUM(m.install_count), 0) AS install_count,
-              COALESCE(SUM(m.uninstall_count), 0) AS uninstall_count,
-              COALESCE(SUM(m.update_count), 0) AS update_count
+              COALESCE(SUM(m.impression_count), 0)::bigint AS impression_count,
+              COALESCE(SUM(m.detail_view_count), 0)::bigint AS detail_view_count,
+              COALESCE(SUM(m.install_count), 0)::bigint AS install_count,
+              COALESCE(SUM(m.uninstall_count), 0)::bigint AS uninstall_count,
+              COALESCE(SUM(m.update_count), 0)::bigint AS update_count
             FROM appstore_listing l
             LEFT JOIN appstore_listing_localization ll
               ON ll.listing_id = l.id AND ll.locale = l.default_locale AND ll.tenant_id = l.tenant_id
