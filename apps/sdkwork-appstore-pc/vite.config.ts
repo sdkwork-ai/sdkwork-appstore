@@ -150,7 +150,12 @@ export default defineConfig(({ mode }) => {
         { find: '@', replacement: path.resolve(CONFIG_DIR) },
         ...createSharedWorkspaceAliases(),
       ],
-      dedupe: ['react', 'react-dom'],
+      // Router dedupe: workspace-linked sibling packages (auth-pc-react and
+      // friends) resolve react-router-dom from their own repository
+      // node_modules with a different physical copy; without dedupe their
+      // useLocation()/useNavigate() read a second router context and crash
+      // with "may be used only in the context of a <Router>".
+      dedupe: ['react', 'react-dom', 'react-router-dom', 'react-router'],
       // Workspace packages are consumed as TypeScript sources; try `.ts` before
       // `.js` so a machine-local tsc residue (`src/*.js` next to `src/*.ts`,
       // gitignored) can never shadow the source plane in builds and tests.

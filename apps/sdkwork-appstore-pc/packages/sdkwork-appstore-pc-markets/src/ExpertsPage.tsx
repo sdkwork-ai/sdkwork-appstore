@@ -19,7 +19,7 @@ export function ExpertsPage() {
     let cancelled = false;
     setLoading(true);
     setLoadError(null);
-    ExpertsService.getExperts(selectedCategory, searchQuery)
+    ExpertsService.getExperts(selectedCategory === ALL_CATEGORY ? '' : selectedCategory, searchQuery)
       .then((data) => {
         if (!cancelled) {
           setExperts(data);

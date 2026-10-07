@@ -22,11 +22,11 @@ export function createExpertsServicePort(client: AppStoreClient): ExpertsService
         limit: expertPageSize,
       });
       const templates = readPageItems<Record<string, unknown>>(response);
-      const normalizedQuery = query.trim().toLocaleLowerCase();
-      const normalizedCategory = category.trim();
-      return templates
-        .map(mapExpertRecord)
-        .filter((expert) => {
+      {
+        const normalizedQuery = query.trim().toLocaleLowerCase();
+        const normalizedCategory = category.trim();
+        const mapped = templates.map(mapExpertRecord);
+        const filtered = mapped.filter((expert) => {
           const matchesCategory =
             !normalizedCategory ||
             normalizedCategory === '全部' ||
@@ -45,6 +45,8 @@ export function createExpertsServicePort(client: AppStoreClient): ExpertsService
             expert.tags.some((tag) => tag.toLocaleLowerCase().includes(normalizedQuery))
           );
         });
+        return filtered;
+      }
     },
 
     async getExpertById(id: string): Promise<ExpertItem | null> {

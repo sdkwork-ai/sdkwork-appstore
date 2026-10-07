@@ -50,6 +50,10 @@ export function createTemplatesServicePort(client: AppStoreClient): TemplatesSer
     async getTemplates(category = '全部', query = '', platform = ''): Promise<TemplateItem[]> {
       const requested = asTemplatePlatform(platform);
       const response = await client.catalog.listTemplates({
+        // The templates marketplace lists application scaffolds only; plugins
+        // (扩展插件) and curated experts (专家) are separate markets with
+        // their own pages, matching the H5 catalog hook behavior.
+        templateType: 'APP',
         limit: templatePageSize,
         q: query.trim() || undefined,
         ...(requested ? { templatePlatform: requested } : {}),
