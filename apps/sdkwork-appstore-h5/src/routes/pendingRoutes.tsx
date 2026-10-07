@@ -63,6 +63,11 @@ const SettingsPage = lazy(() =>
     default: module.SettingsPage,
   })),
 );
+const ConsoleSettingsPage = lazy(() =>
+  import('@sdkwork/appstore-h5-console-settings').then((module) => ({
+    default: module.ConsoleSettingsPage,
+  })),
+);
 
 export const OVERRIDDEN_ROUTE_IDS: readonly string[] = [
   'app.store.apps.index',
@@ -73,7 +78,7 @@ export const OVERRIDDEN_ROUTE_IDS: readonly string[] = [
 const ROUTE_ELEMENT_OVERRIDES: Readonly<Record<string, ReactElement>> = {
   'app.store.apps.index': <AppsBrowsePage />,
   'app.store.games.index': <GamesBrowsePage />,
-  'console.system.settings.index': <SettingsPage />,
+  'console.system.settings.index': <ConsoleSettingsPage />,
 };
 
 /**

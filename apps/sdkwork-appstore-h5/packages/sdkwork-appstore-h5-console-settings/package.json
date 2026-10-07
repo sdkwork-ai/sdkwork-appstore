@@ -16,8 +16,9 @@
     "typecheck": "tsc --noEmit -p tsconfig.json"
   },
   "dependencies": {
-    "@sdkwork/appstore-h5-core": "workspace:*",
     "@sdkwork/appstore-h5-commons": "workspace:*",
+    "@sdkwork/appstore-h5-core": "workspace:*",
+    "lucide-react": "catalog:",
     "react": "catalog:",
     "react-router-dom": "catalog:"
   },

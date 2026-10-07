@@ -4,6 +4,7 @@ import {
   User,
   Bell,
   Package,
+  Settings as SettingsIcon,
   Palette,
   ChevronRight,
   ArrowLeft,
@@ -61,6 +62,7 @@ export function SettingsPage() {
 
   const sections = [
     { label: '开发者中心', icon: Package, path: '/publisher' },
+    { label: '开发者设置', icon: SettingsIcon, path: '/console/settings' },
     { label: '通知', icon: Bell, path: '/notifications' },
     { label: '我的库', icon: Library, path: '/library' },
     { label: '更新', icon: RefreshCw, path: '/updates' },

@@ -25,6 +25,7 @@
     "@sdkwork/appstore-app-sdk": "workspace:*",
     "@sdkwork/appstore-h5-commons": "workspace:*",
     "@sdkwork/appstore-h5-console-publisher": "workspace:*",
+    "@sdkwork/appstore-h5-console-settings": "workspace:*",
     "@sdkwork/appstore-h5-core": "workspace:*",
     "@sdkwork/appstore-h5-shell": "workspace:*",
     "@sdkwork/appstore-library-core": "workspace:*",
