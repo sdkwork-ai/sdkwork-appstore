@@ -15,14 +15,6 @@ export const publisher = {
     success: '注册成功，欢迎加入 SDKWork 开发者计划！',
     verified: '已实名认证',
     pendingVerification: '认证审核中',
-    profile: {
-      edit: '编辑资料',
-      editTitle: '编辑发布者资料',
-      save: '保存',
-      saving: '保存中…',
-      cancel: '取消',
-      updateSuccess: '发布者资料已更新。',
-    },
     verifyCta: '提交实名认证'
   },
   overview: {
@@ -59,7 +51,39 @@ export const publisher = {
     back: '返回开发者中心',
     success: '应用创建成功，请完善资料后提交审核。'
   },
+  verification: {
+    title: '开发者认证',
+    subtitle: '完成认证后可获得官方标识与更多分发能力',
+    typeLabel: '认证类型',
+    typeIdentity: '实名认证',
+    typeBusiness: '企业认证',
+    typeDeveloper: '开发者认证',
+    evidencePlaceholder: '证明材料资源 ID（选填）',
+    submit: '提交认证',
+    submitting: '提交中…',
+    submitted: '认证材料已提交，等待审核。',
+  },
+  profile: {
+    edit: '编辑资料',
+    editTitle: '编辑发布者资料',
+    save: '保存',
+    saving: '保存中…',
+    cancel: '取消',
+    updateSuccess: '发布者资料已更新。',
+  },
   manage: {
+    media: {
+      title: '媒体资源',
+      empty: '暂无关联媒体。可在移动端上传，或通过商店素材流程补充。',
+      delete: '删除',
+      deleting: '删除中…',
+    },
+    history: {
+      show: '查看版本历史',
+      hide: '收起版本历史',
+      loading: '加载中…',
+      empty: '暂无版本历史记录。',
+    },
     back: '返回开发者中心',
     tabs: {
       label: '分区',

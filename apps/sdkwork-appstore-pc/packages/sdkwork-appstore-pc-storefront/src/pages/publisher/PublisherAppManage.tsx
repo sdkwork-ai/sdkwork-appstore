@@ -9,7 +9,7 @@ import {
   } from '@sdkwork/appstore-pc-core';
 import type { ArtifactUploadPort } from '@sdkwork/appstore-pc-core';
 import { Tabs } from '@sdkwork/appstore-pc-commons';
-import { ManagedAppDetail, PublisherMember, PublisherProfile, ReleaseItem } from '../../types';
+import { ListingMediaItem, ManagedAppDetail, PublisherMember, PublisherProfile, ReleaseHistoryEntry, ReleaseItem } from '../../types';
 import { LoadingSpinner } from '../../components/common/LoadingSpinner';
 
 type TabKey = 'overview' | 'releases' | 'members';
@@ -64,6 +64,13 @@ export default function PublisherAppManage() {
   const [releaseNotesDraft, setReleaseNotesDraft] = useState('');
   const [savingReleaseNotes, setSavingReleaseNotes] = useState(false);
   const [retiringReleaseId, setRetiringReleaseId] = useState<string | null>(null);
+  // Listing media management (listings.media.list / listings.media.delete).
+  const [mediaItems, setMediaItems] = useState<ListingMediaItem[]>([]);
+  const [deletingMediaId, setDeletingMediaId] = useState<string | null>(null);
+  // Release lifecycle history (listings.releases.history.list).
+  const [showHistory, setShowHistory] = useState(false);
+  const [historyEntries, setHistoryEntries] = useState<ReleaseHistoryEntry[]>([]);
+  const [historyLoading, setHistoryLoading] = useState(false);
 
   // member invite state
   const [inviteForm, setInviteForm] = useState({ userId: '', role: 'EDITOR' });
@@ -73,14 +80,16 @@ export default function PublisherAppManage() {
     let cancelled = false;
     async function loadData() {
       try {
-        const [detail, releaseList, me] = await Promise.all([
+        const [detail, releaseList, me, mediaList] = await Promise.all([
           ConsoleService.getListingById(id).catch(() => undefined),
           ConsoleService.getReleases(id).catch(() => []),
           ConsoleService.getPublisherProfile().catch(() => undefined),
+          ConsoleService.listListingMedia(id).catch(() => []),
         ]);
         if (cancelled) {
           return;
         }
+        setMediaItems(mediaList);
         if (!detail) {
           setLoadError(true);
         } else {
@@ -206,6 +215,37 @@ export default function PublisherAppManage() {
       );
     } finally {
       setRetiringReleaseId(null);
+    }
+  };
+
+  const handleDeleteMedia = async (mediaId: string) => {
+    if (deletingMediaId) {
+      return;
+    }
+    setDeletingMediaId(mediaId);
+    try {
+      await ConsoleService.deleteListingMedia(id, mediaId);
+      setMediaItems((prev) => prev.filter((item) => item.id !== mediaId));
+    } catch (error) {
+      console.error('Failed to delete media', error);
+    } finally {
+      setDeletingMediaId(null);
+    }
+  };
+
+  const handleToggleHistory = async () => {
+    const next = !showHistory;
+    setShowHistory(next);
+    if (next && historyEntries.length === 0) {
+      setHistoryLoading(true);
+      try {
+        const entries = await ConsoleService.listListingReleaseHistory(id);
+        setHistoryEntries(entries);
+      } catch (error) {
+        console.error('Failed to load release history', error);
+      } finally {
+        setHistoryLoading(false);
+      }
     }
   };
 
@@ -428,6 +468,43 @@ export default function PublisherAppManage() {
               </span>
             )}
           </div>
+
+          <section className="pt-4 border-t border-store-line space-y-3">
+            <h3 className="text-sm font-bold tracking-tight text-store-ink ">
+              {t('publisher.manage.media.title')}
+            </h3>
+            {mediaItems.length === 0 ? (
+              <p className="text-[11px] text-store-ink-faint ">
+                {t('publisher.manage.media.empty')}
+              </p>
+            ) : (
+              <div className="space-y-2">
+                {mediaItems.map((media) => (
+                  <div
+                    key={media.id}
+                    className="flex items-center justify-between px-3 py-2 bg-store-subtle/60 dark:bg-store-surface border border-store-line rounded-store-control "
+                  >
+                    <div className="min-w-0">
+                      <span className="text-xs font-bold text-store-ink ">
+                        {t(`publisher.manage.media.role.${media.mediaRole}`, media.mediaRole)}
+                      </span>
+                      <p className="text-[11px] text-store-ink-faint truncate ">{media.mediaResourceId}</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteMedia(media.id)}
+                      disabled={deletingMediaId !== null}
+                      className="px-3 py-1.5 border border-store-danger/40 text-store-danger hover:bg-store-danger/10 disabled:opacity-50 rounded-store-control text-xs font-medium transition-colors cursor-pointer shrink-0"
+                    >
+                      {deletingMediaId === media.id
+                        ? t('publisher.manage.media.deleting')
+                        : t('publisher.manage.media.delete')}
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </section>
         </div>
       )}
 
@@ -623,6 +700,52 @@ export default function PublisherAppManage() {
                   {t('publisher.manage.error.loadFailed')}
                 </p>
               </div>
+            )}
+          </section>
+
+          <section className="space-y-3">
+            <button
+              type="button"
+              onClick={() => void handleToggleHistory()}
+              className="px-3 py-1.5 bg-store-subtle hover:bg-store-field border border-store-line text-store-ink rounded-store-control text-xs font-medium transition-colors cursor-pointer"
+            >
+              {showHistory
+                ? t('publisher.manage.history.hide')
+                : t('publisher.manage.history.show')}
+            </button>
+            {showHistory && (
+              historyLoading ? (
+                <p className="text-[11px] text-store-ink-faint ">
+                  {t('publisher.manage.history.loading')}
+                </p>
+              ) : historyEntries.length === 0 ? (
+                <p className="text-[11px] text-store-ink-faint ">
+                  {t('publisher.manage.history.empty')}
+                </p>
+              ) : (
+                <ul className="space-y-1.5">
+                  {historyEntries.map((entry) => (
+                    <li
+                      key={entry.id}
+                      className="flex flex-wrap items-center gap-x-2 gap-y-1 px-3 py-2 bg-store-subtle/60 dark:bg-store-surface border border-store-line rounded-store-control text-xs "
+                    >
+                      <span className="font-bold text-store-ink shrink-0 ">
+                        v{entry.versionName}
+                        {entry.versionCode ? ` (${entry.versionCode})` : ''}
+                      </span>
+                      <span className="px-2 py-0.5 rounded-full bg-gray-500/10 text-store-ink-soft shrink-0 ">
+                        {entry.releaseStatus}
+                      </span>
+                      {entry.channelCode && (
+                        <span className="text-store-ink-soft shrink-0 ">{entry.channelCode}</span>
+                      )}
+                      <span className="text-store-ink-faint ml-auto shrink-0 ">
+                        {entry.publishedAt || entry.approvedAt || entry.submittedAt || ''}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              )
             )}
           </section>
         </div>

@@ -19,6 +19,8 @@ export default function PublisherOverview() {
   const [registering, setRegistering] = useState(false);
   const [form, setForm] = useState({ displayName: '', legalName: '', supportEmail: '', websiteUrl: '' });
   const [notice, setNotice] = useState<string | null>(null);
+  const [verificationForm, setVerificationForm] = useState({ verificationType: 'identity', evidenceMediaResourceId: '' });
+  const [submittingVerification, setSubmittingVerification] = useState(false);
   const [editingProfile, setEditingProfile] = useState(false);
   const [savingProfile, setSavingProfile] = useState(false);
   const [profileForm, setProfileForm] = useState({ displayName: '', supportEmail: '', websiteUrl: '' });
@@ -63,8 +65,11 @@ export default function PublisherOverview() {
       });
       setProfile(created);
       setNotice(t('publisher.onboarding.success'));
-      // Best-effort verification submission; failures never block onboarding.
-      await ConsoleService.submitVerification({ verificationType: 'INDIVIDUAL' }).catch(() => false);
+      // Best-effort identity verification submission; failures surface in the
+      // verification panel instead of blocking onboarding.
+      await ConsoleService.submitVerification({ verificationType: 'identity' }).catch((error) => {
+        console.error('Automatic identity verification failed', error);
+      });
     } catch (error) {
       console.error('Failed to register publisher', error);
       setNotice(null);
@@ -92,6 +97,29 @@ export default function PublisherOverview() {
       setNotice(null);
     } finally {
       setSavingProfile(false);
+    }
+  };
+
+  const handleSubmitVerification = async () => {
+    if (submittingVerification) {
+      return;
+    }
+    setSubmittingVerification(true);
+    try {
+      await ConsoleService.submitVerification({
+        verificationType: verificationForm.verificationType,
+        evidenceMediaResourceId: verificationForm.evidenceMediaResourceId.trim() || undefined,
+      });
+      setNotice(t('publisher.verification.submitted'));
+      const refreshed = await ConsoleService.getPublisherProfile().catch(() => undefined);
+      if (refreshed) {
+        setProfile(refreshed);
+      }
+    } catch (error) {
+      console.error('Failed to submit verification', error);
+      setNotice(null);
+    } finally {
+      setSubmittingVerification(false);
     }
   };
 
@@ -288,6 +316,49 @@ export default function PublisherOverview() {
               {t('publisher.profile.cancel')}
             </button>
           </div>
+        </div>
+      )}
+
+      {profile && profile.verificationStatus !== 'VERIFIED' && (
+        <div className="rounded-store-card p-6 bg-store-subtle/60 dark:bg-store-surface border border-store-line space-y-4 ">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-store-control bg-store-warning/10 text-store-warning flex items-center justify-center ">
+              <ShieldAlert className="w-5 h-5" />
+            </div>
+            <div>
+              <h2 className="text-sm font-bold text-store-ink ">
+                {t('publisher.verification.title')}
+              </h2>
+              <p className="text-xs text-store-ink-faint mt-0.5 ">
+                {t('publisher.verification.subtitle')}
+              </p>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <select
+              value={verificationForm.verificationType}
+              onChange={(event) => setVerificationForm((prev) => ({ ...prev, verificationType: event.target.value }))}
+              aria-label={t('publisher.verification.typeLabel')}
+              className="px-3 rounded-store-control bg-store-field border border-store-line text-sm text-store-ink outline-none focus:border-store-brand transition-colors h-9 focus:ring-2 focus:ring-store-brand/25"
+            >
+              <option value="identity">{t('publisher.verification.typeIdentity')}</option>
+              <option value="business">{t('publisher.verification.typeBusiness')}</option>
+              <option value="developer">{t('publisher.verification.typeDeveloper')}</option>
+            </select>
+            <input
+              value={verificationForm.evidenceMediaResourceId}
+              onChange={(event) => setVerificationForm((prev) => ({ ...prev, evidenceMediaResourceId: event.target.value }))}
+              placeholder={t('publisher.verification.evidencePlaceholder')}
+              className="md:col-span-2 px-3 rounded-store-control bg-store-field border border-store-line text-sm text-store-ink placeholder:text-store-ink-faint outline-none focus:border-store-brand transition-colors h-9 focus:ring-2 focus:ring-store-brand/25"
+            />
+          </div>
+          <button
+            onClick={handleSubmitVerification}
+            disabled={submittingVerification}
+            className="px-5 py-2 bg-store-brand hover:bg-store-brand disabled:opacity-50 text-white rounded-full text-xs font-medium transition-colors cursor-pointer"
+          >
+            {submittingVerification ? t('publisher.verification.submitting') : t('publisher.verification.submit')}
+          </button>
         </div>
       )}
 

@@ -40,6 +40,27 @@ export interface ManagedAppDetail extends ManagedApp {
   releaseCount?: number;
 }
 
+/** One attached media row of a listing (`appstore.listings.media.list`). */
+export interface ListingMediaItem {
+  id: string;
+  mediaRole: string;
+  mediaResourceId: string;
+  sortWeight?: number;
+}
+
+/** One release snapshot in a listing's lifecycle (`appstore.listings.releases.history.list`). */
+export interface ReleaseHistoryEntry {
+  id: string;
+  versionName: string;
+  versionCode?: string;
+  channelCode?: string;
+  releaseStatus: string;
+  submittedAt?: string;
+  approvedAt?: string;
+  publishedAt?: string;
+  retiredAt?: string;
+}
+
 export interface PublisherMember {
   id: string;
   userId: string;
@@ -101,6 +122,12 @@ export interface IConsoleSDK {
   getListingById(id: string): Promise<ManagedAppDetail | undefined>;
   updateListing(id: string, patch: { pricingModel?: string; officialWebsiteUrl?: string; supportUrl?: string; privacyPolicyUrl?: string }): Promise<void>;
   getReleases(listingId: string): Promise<ReleaseItem[]>;
+  /** Lists a listing's release lifecycle history (`listings.releases.history.list`). */
+  listListingReleaseHistory(listingId: string): Promise<ReleaseHistoryEntry[]>;
+  /** Removes one listing media attachment (`listings.media.delete`). */
+  deleteListingMedia(listingId: string, mediaId: string): Promise<void>;
+  /** Lists a listing's attached media (`listings.media.list`). */
+  listListingMedia(listingId: string): Promise<ListingMediaItem[]>;
   createRelease(listingId: string, data: { channelCode: string; versionName: string; versionCode: string; buildNumber?: string }): Promise<ReleaseItem>;
   updateReleaseRollout(releaseId: string, targetPercentage: number, strategy?: 'FULL' | 'STAGED' | 'PAUSE'): Promise<void>;
   /** Replaces the release notes body for one locale (`releases.notes.update`). */
@@ -132,6 +159,9 @@ export const ConsoleService: IConsoleSDK = {
   getListingById: (id) => consolePort.getListingById(id),
   updateListing: (id, patch) => consolePort.updateListing(id, patch),
   getReleases: (listingId) => consolePort.getReleases(listingId),
+  listListingReleaseHistory: (listingId) => consolePort.listListingReleaseHistory(listingId),
+  deleteListingMedia: (listingId, mediaId) => consolePort.deleteListingMedia(listingId, mediaId),
+  listListingMedia: (listingId) => consolePort.listListingMedia(listingId),
   createRelease: (listingId, data) => consolePort.createRelease(listingId, data),
   updateReleaseRollout: (releaseId, targetPercentage, strategy) =>
     consolePort.updateReleaseRollout(releaseId, targetPercentage, strategy),
@@ -158,6 +188,9 @@ function createUnconfiguredConsolePort(): ConsoleServicePort {
     getListingById: async () => unavailable(),
     updateListing: async () => unavailable(),
     getReleases: async () => unavailable(),
+    listListingReleaseHistory: async () => unavailable(),
+    deleteListingMedia: async () => unavailable(),
+    listListingMedia: async () => unavailable(),
     createRelease: async () => unavailable(),
     updateReleaseRollout: async () => unavailable(),
     updateReleaseNotes: async () => unavailable(),

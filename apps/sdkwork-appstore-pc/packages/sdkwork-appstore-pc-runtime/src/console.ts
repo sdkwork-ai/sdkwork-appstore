@@ -7,6 +7,8 @@ import {
   type ManagedAppDetail,
   type PublisherMember,
   type PublisherProfile,
+  type ListingMediaItem,
+  type ReleaseHistoryEntry,
   type ReleaseItem,
 } from '@sdkwork/appstore-pc-core';
 
@@ -319,6 +321,36 @@ export function createConsoleServicePort(client: AppStoreClient): ConsoleService
 
     async retireRelease(releaseId: string): Promise<void> {
       await client.releases.retire(releaseId);
+    },
+
+    async listListingReleaseHistory(listingId: string): Promise<ReleaseHistoryEntry[]> {
+      const page = await client.listings.listReleaseHistory(listingId, { limit: 50 });
+      return (page.items as unknown as Record<string, unknown>[]).map((row) => ({
+        id: readString(row, 'id'),
+        versionName: readString(row, 'versionName', 'version_name'),
+        versionCode: readString(row, 'versionCode', 'version_code') || undefined,
+        channelCode: readString(row, 'channelId', 'channel_id', 'channelCode') || undefined,
+        releaseStatus: readString(row, 'releaseStatus', 'release_status') || 'unknown',
+        submittedAt: readString(row, 'submittedAt', 'submitted_at') || undefined,
+        approvedAt: readString(row, 'approvedAt', 'approved_at') || undefined,
+        publishedAt: readString(row, 'publishedAt', 'published_at') || undefined,
+        retiredAt: readString(row, 'retiredAt', 'retired_at') || undefined,
+      }));
+    },
+
+    async deleteListingMedia(listingId: string, mediaId: string): Promise<void> {
+      await client.listings.removeMedia(listingId, mediaId);
+    },
+
+    async listListingMedia(listingId: string): Promise<ListingMediaItem[]> {
+      const page = await client.listings.listMedia(listingId);
+      const rows = (page as unknown as { items?: unknown }).items ?? page;
+      return (rows as unknown as Record<string, unknown>[]).map((row) => ({
+        id: readString(row, 'id'),
+        mediaRole: readString(row, 'mediaRole', 'media_role') || 'UNKNOWN',
+        mediaResourceId: readString(row, 'mediaResourceId', 'media_resource_id'),
+        sortWeight: readNumber(row, 'sortWeight', 'sort_order', 'sortOrder'),
+      }));
     },
 
     async submitListingForReview(listingId: string, releaseId?: string): Promise<boolean> {

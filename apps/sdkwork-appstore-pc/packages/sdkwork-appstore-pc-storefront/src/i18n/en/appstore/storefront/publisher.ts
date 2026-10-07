@@ -15,14 +15,6 @@ export const publisher = {
     success: 'Registered successfully. Welcome to the SDKWork developer program!',
     verified: 'Verified',
     pendingVerification: 'Verification in review',
-    profile: {
-      edit: 'Edit profile',
-      editTitle: 'Edit publisher profile',
-      save: 'Save',
-      saving: 'Saving…',
-      cancel: 'Cancel',
-      updateSuccess: 'Publisher profile updated.',
-    },
     verifyCta: 'Submit verification'
   },
   overview: {
@@ -59,7 +51,39 @@ export const publisher = {
     back: 'Back to console',
     success: 'App created. Complete the details and submit for review.'
   },
+  verification: {
+    title: 'Publisher verification',
+    subtitle: 'Verified publishers earn the official badge and broader distribution',
+    typeLabel: 'Verification type',
+    typeIdentity: 'Identity verification',
+    typeBusiness: 'Business verification',
+    typeDeveloper: 'Developer verification',
+    evidencePlaceholder: 'Evidence resource ID (optional)',
+    submit: 'Submit verification',
+    submitting: 'Submitting…',
+    submitted: 'Verification submitted and pending review.',
+  },
+  profile: {
+    edit: 'Edit profile',
+    editTitle: 'Edit publisher profile',
+    save: 'Save',
+    saving: 'Saving…',
+    cancel: 'Cancel',
+    updateSuccess: 'Publisher profile updated.',
+  },
   manage: {
+    media: {
+      title: 'Media assets',
+      empty: 'No media attached yet. Upload from mobile or via the store asset flow.',
+      delete: 'Delete',
+      deleting: 'Deleting…',
+    },
+    history: {
+      show: 'View release history',
+      hide: 'Hide release history',
+      loading: 'Loading…',
+      empty: 'No release history entries.',
+    },
     back: 'Back to console',
     tabs: {
       label: 'Sections',
