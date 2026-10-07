@@ -3,7 +3,7 @@ export interface AppTemplate {
   templateCode: string;
   templateName: string;
   description?: string;
-  templateType: 'APP' | 'PLUGIN' | 'AGENT';
+  templateType: 'APP' | 'PLUGIN' | 'AGENT' | 'EXPERT';
   templatePlatform?: 'H5' | 'PC' | 'FLUTTER' | 'MINIPROGRAM';
   categoryCode?: string;
   framework?: string;

@@ -55,7 +55,7 @@ export class CatalogAppstoreCatalogTemplatesUsageApi {
 export interface CatalogAppstoreCatalogTemplatesListParams {
   q?: string;
   categoryCode?: string;
-  templateType?: 'APP' | 'PLUGIN' | 'AGENT';
+  templateType?: 'APP' | 'PLUGIN' | 'AGENT' | 'EXPERT';
   templatePlatform?: 'H5' | 'PC' | 'FLUTTER' | 'MINIPROGRAM';
   cursor?: string;
   pageSize?: number;

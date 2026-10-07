@@ -51,7 +51,9 @@ FROM appstore_listing l
 WHERE l.tenant_id = '100001'
   AND l.primary_category_id IS NOT NULL
   AND l.primary_category_id <> ''
-ON CONFLICT (id) DO NOTHING;
+-- Conflict on the natural unique key: rows written by other tooling may carry
+-- a different surrogate id for the same (tenant, listing, category) tuple.
+ON CONFLICT (tenant_id, listing_id, category_id) DO NOTHING;
 
 -- Approved compliance profile for every published listing.
 INSERT INTO appstore_compliance_profile
@@ -74,7 +76,9 @@ SELECT
 FROM appstore_listing l
 WHERE l.tenant_id = '100001'
   AND l.listing_status = 'published'
-ON CONFLICT (id) DO NOTHING;
+-- One compliance profile per (tenant, listing, version); other writers may
+-- have used a different surrogate id for the same tuple.
+ON CONFLICT (tenant_id, listing_id, compliance_version) DO NOTHING;
 
 -- Default regional availability for CN and US storefronts.
 INSERT INTO appstore_regional_availability
@@ -93,7 +97,8 @@ SELECT
 FROM appstore_listing l
 WHERE l.tenant_id = '100001'
   AND l.listing_status = 'published'
-ON CONFLICT (id) DO NOTHING;
+-- One availability row per (tenant, listing, region).
+ON CONFLICT (tenant_id, listing_id, region_code) DO NOTHING;
 
 INSERT INTO appstore_regional_availability
     (id, tenant_id, organization_id, listing_id, region_code, availability_status, effective_at, expires_at, created_at, updated_at)
@@ -111,7 +116,8 @@ SELECT
 FROM appstore_listing l
 WHERE l.tenant_id = '100001'
   AND l.listing_status = 'published'
-ON CONFLICT (id) DO NOTHING;
+-- One availability row per (tenant, listing, region).
+ON CONFLICT (tenant_id, listing_id, region_code) DO NOTHING;
 
 -- Link published releases to the SDKWork PC market channel.
 INSERT INTO appstore_market_release
@@ -146,7 +152,9 @@ JOIN appstore_listing l
  AND l.tenant_id = r.tenant_id
 WHERE r.tenant_id = '100001'
   AND r.release_status = 'published'
-ON CONFLICT (id) DO NOTHING;
+-- One market release per (tenant, release number); other writers may have
+-- used a different surrogate id for the same tuple.
+ON CONFLICT (tenant_id, market_release_no) DO NOTHING;
 
 -- Ensure review threads and media references are populated for storefront listings.
 UPDATE appstore_listing
