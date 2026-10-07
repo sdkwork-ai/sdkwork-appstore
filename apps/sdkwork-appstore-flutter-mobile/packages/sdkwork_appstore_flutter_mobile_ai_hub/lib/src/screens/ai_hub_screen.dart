@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:sdkwork_appstore_flutter_mobile_commons/sdkwork_appstore_flutter_mobile_commons.dart';
 
 import '../copy/ai_hub_messages.dart';
-import '../data/experts_catalog.dart';
 import '../models/ai_hub_models.dart';
 import '../services/ai_hub_service.dart';
 
@@ -143,63 +142,76 @@ class _ExpertsView extends StatefulWidget {
 
 class _ExpertsViewState extends State<_ExpertsView> {
   String _category = '全部';
+  late final Future<List<AiExpertEntry>> _expertsFuture = widget.service.loadExperts();
 
   @override
   Widget build(BuildContext context) {
-    final categories = aiExpertCategories();
-    final filtered = aiExpertCatalog
-        .where((expert) => _category == '全部' || expert.category == _category)
-        .toList();
     return Scaffold(
       appBar: AppBar(title: const Text('专家')),
-      body: ListView(
-        children: <Widget>[
-          SizedBox(
-            height: 48,
-            child: ListView(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              children: <Widget>[
-                for (final category in categories)
-                  Padding(
-                    padding: const EdgeInsets.only(right: 8),
-                    child: ChoiceChip(
-                      label: Text(category),
-                      selected: _category == category,
-                      onSelected: (bool selected) {
-                        if (!selected) {
-                          return;
-                        }
-                        setState(() => _category = category);
-                      },
-                    ),
-                  ),
-              ],
-            ),
-          ),
-          for (final expert in filtered)
-            Card(
-              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-              child: ListTile(
-                leading: CircleAvatar(
-                  child: Text(expert.name.characters.first),
-                ),
-                title: Text(expert.name),
-                subtitle: Text(
-                  expert.description,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                trailing: Chip(
-                  label: Text(
-                    expert.category,
-                    style: const TextStyle(fontSize: 11),
-                  ),
-                  visualDensity: VisualDensity.compact,
+      body: FutureBuilder<List<AiExpertEntry>>(
+        future: _expertsFuture,
+        builder: (BuildContext context, AsyncSnapshot<List<AiExpertEntry>> snapshot) {
+          if (snapshot.connectionState != ConnectionState.done) {
+            return const AppstoreScreenState(
+              kind: AppstoreScreenStateKind.loading,
+              message: AppstoreScreenStateMessages.loading,
+            );
+          }
+          final experts = snapshot.data ?? const <AiExpertEntry>[];
+          final categories = <String>['全部', for (final expert in experts) expert.category];
+          final filtered = experts
+              .where((expert) => _category == '全部' || expert.category == _category)
+              .toList();
+          return ListView(
+            children: <Widget>[
+              SizedBox(
+                height: 48,
+                child: ListView(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  children: <Widget>[
+                    for (final category in categories)
+                      Padding(
+                        padding: const EdgeInsets.only(right: 8),
+                        child: ChoiceChip(
+                          label: Text(category),
+                          selected: _category == category,
+                          onSelected: (bool selected) {
+                            if (!selected) {
+                              return;
+                            }
+                            setState(() => _category = category);
+                          },
+                        ),
+                      ),
+                  ],
                 ),
               ),
-            ),
-        ],
+              for (final expert in filtered)
+                Card(
+                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                  child: ListTile(
+                    leading: CircleAvatar(
+                      child: Text(expert.name.characters.first),
+                    ),
+                    title: Text(expert.name),
+                    subtitle: Text(
+                      expert.description,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    trailing: Chip(
+                      label: Text(
+                        expert.category,
+                        style: const TextStyle(fontSize: 11),
+                      ),
+                      visualDensity: VisualDensity.compact,
+                    ),
+                  ),
+                ),
+            ],
+          );
+        },
       ),
     );
   }

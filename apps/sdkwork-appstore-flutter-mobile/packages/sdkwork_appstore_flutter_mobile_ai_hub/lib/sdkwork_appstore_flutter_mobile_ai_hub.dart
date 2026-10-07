@@ -1,6 +1,5 @@
 library;
 
-export 'src/data/experts_catalog.dart';
 export 'src/models/ai_hub_models.dart';
 export 'src/services/ai_hub_service.dart';
 export 'src/state/ai_hub_state.dart';

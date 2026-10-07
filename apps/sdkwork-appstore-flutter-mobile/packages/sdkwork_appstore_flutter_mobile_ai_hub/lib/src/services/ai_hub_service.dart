@@ -1,17 +1,15 @@
 import 'package:sdkwork_appstore_flutter_mobile_core/sdkwork_appstore_flutter_mobile_core.dart';
 
-import '../data/experts_catalog.dart';
 import '../models/ai_hub_models.dart';
 
 /// AI Hub service (index / experts / plugins / skills / mcp / templates).
 ///
 /// Injected clients only; data flows through the generated Dart target of
 /// `sdkwork-appstore-app-sdk`: catalog AI-category filter for AI apps,
-/// catalog template domain for plugins (templateType PLUGIN) and app
-/// templates (templateType APP). Skills / MCP registries ride the generated
-/// Dart targets of the skills and mcp SDK families, injected alongside. The
-/// curated expert catalog is local presentation content and needs no
-/// transport.
+/// catalog template domain for plugins (templateType PLUGIN), app
+/// templates (templateType APP) and curated experts (templateType EXPERT).
+/// Skills / MCP registries ride the generated Dart targets of the skills and
+/// mcp SDK families, injected alongside.
 class AiHubService {
   const AiHubService({
     required this.clients,
@@ -31,9 +29,31 @@ class AiHubService {
 
   String get capability => 'ai-hub';
 
-  /// Curated experts (appstore-owned presentation content, no transport).
+  /// Curated experts (catalog template domain, templateType EXPERT).
   Future<List<AiExpertEntry>> loadExperts() async {
-    return aiExpertCatalog;
+    clients.ensureTransportBound(capability);
+    final response = await clients.requireAppClient.catalog.appstoreCatalogTemplatesList(
+      null,
+      null,
+      'EXPERT',
+      null,
+      100,
+    );
+    return <AiExpertEntry>[
+      for (final row in AppstoreAppSdkClients.itemsOf(response?.data))
+        AiExpertEntry(
+          id: _text(row['id']),
+          name: _text(row['templateName'], _text(row['template_name'], '专家')),
+          title: _metadata(row)['nickname']?.toString() ?? '专家',
+          description: _text(row['description']),
+          category: _metadata(row)['filterTag']?.toString() ??
+              _text(row['categoryCode'] ?? row['category_code'], '综合'),
+          tags: <String>[
+            for (final tag in (_metadata(row)['tags'] as List<dynamic>? ?? <dynamic>[]))
+              tag.toString(),
+          ],
+        ),
+    ];
   }
 
   /// AI category storefront listings (catalog domain filter).
