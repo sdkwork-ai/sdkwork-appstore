@@ -341,7 +341,9 @@ async fn resolve_publisher_id<R: CatalogRepositoryPort>(
     repository
         .find_publisher_id_by_owner(context, &user_id)
         .await?
-        .or(repository.find_publisher_id_by_member(context, &user_id).await?)
+        .or(repository
+            .find_publisher_id_by_member(context, &user_id)
+            .await?)
         .ok_or_else(|| {
             AppstoreServiceError::NotFound(
                 "Publisher profile not found for current user".to_string(),
