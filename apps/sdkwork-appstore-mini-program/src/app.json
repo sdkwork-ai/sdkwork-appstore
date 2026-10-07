@@ -11,6 +11,8 @@
     "pages/events/index",
     "pages/app-detail/index",
     "pages/templates/index",
+    "pages/plugins/index",
+    "pages/experts/index",
     "pages/login/index",
     "pages/library/index",
     "pages/wishlist/index",

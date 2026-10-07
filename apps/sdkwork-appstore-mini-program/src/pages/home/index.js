@@ -6,6 +6,8 @@ const CAPABILITIES = [
   { key: "games", name: "游戏", desc: "桌游 / 小游戏 / 掌机", path: "/pages/games/index" },
   { key: "charts", name: "排行榜", desc: "免费榜与付费榜", path: "/pages/charts/index" },
   { key: "search", name: "搜索", desc: "应用与游戏搜索", path: "/pages/search/index" },
+  { key: "experts", name: "专家", desc: "AI 专家目录", path: "/pages/experts/index" },
+  { key: "plugins", name: "扩展插件", desc: "扩展能力市场", path: "/pages/plugins/index" },
   { key: "templates", name: "应用模板", desc: "从模板快速启动", path: "/pages/templates/index" },
   { key: "settings", name: "设置", desc: "账户与通用偏好", path: "/pages/settings/index" },
 ];

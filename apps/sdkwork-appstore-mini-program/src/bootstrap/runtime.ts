@@ -633,7 +633,7 @@ function createPageLoaders(getClient: () => AppstoreAppClient) {
 
     /** App templates (catalog template domain, templateType filterable). */
     async templates(
-      templateType: 'APP' | 'PLUGIN',
+      templateType: 'APP' | 'PLUGIN' | 'EXPERT',
     ): Promise<
       Array<{ id: string; name: string; author: string; description: string; stars: number }>
     > {
@@ -650,7 +650,7 @@ function createPageLoaders(getClient: () => AppstoreAppClient) {
         return {
           id: String(row.id ?? ''),
           name: String(row.templateName ?? '模板'),
-          author: String(metadata.authorName ?? 'SDKWork'),
+          author: String(metadata.nickname ?? metadata.authorName ?? 'SDKWork'),
           description: String(row.description ?? ''),
           stars: Number(row.starCount ?? 0) || 0,
         };
