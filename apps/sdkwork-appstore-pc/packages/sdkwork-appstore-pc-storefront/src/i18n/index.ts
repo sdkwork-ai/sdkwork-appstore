@@ -1,4 +1,4 @@
-import i18n from 'i18next';
+import { createInstance } from 'i18next';
 import { initReactI18next } from 'react-i18next';
 
 import { nav as navZh } from './zh-CN/appstore/storefront/nav';
@@ -119,6 +119,14 @@ const en = {
   console: consoleLocalesEn,
   install: installEn,
 };
+
+// A dedicated instance, not the i18next module singleton: the storefront is
+// inlined into several client bundles (App Store host, template library,
+// demand hall), and every copy running the module-level `init()` against the
+// shared singleton would re-run i18next's init and drop the resources the
+// previous copy registered. Each bundle therefore owns its instance, and the
+// embed surfaces hand it to their components through I18nextProvider.
+const i18n = createInstance();
 
 i18n
   .use(initReactI18next)
