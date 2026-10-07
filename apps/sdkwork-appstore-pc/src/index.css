@@ -1,4 +1,7 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+/* No remote font @import: a blocking `@import url(fonts.googleapis…)` stalls
+   the whole sheet (and therefore first paint) wherever the CDN is
+   unreachable, and the font stack below already falls back to system fonts
+   when Inter is not installed locally. */
 @import "tailwindcss";
 @plugin "tailwindcss-animate";
 @source "../packages";

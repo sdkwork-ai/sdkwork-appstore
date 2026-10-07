@@ -30,6 +30,20 @@
  * What remains is surface-scoped and safe to inline anywhere.
  */
 
+/*
+ * Layer-order guard. This sheet reaches the document BEFORE the app's
+ * Tailwind sheet (main.tsx imports App.tsx — which pulls this file in —
+ * before ./index.css), and a bare `@layer utilities { … }` below would make
+ * `utilities` the FIRST layer the document declares. CSS layers order by
+ * first appearance, so the app sheet's `@layer theme, base, components,
+ * utilities;` would then find `utilities` already positioned first and
+ * preflight (base) would outrank every padding/border utility — the whole
+ * console renders with zero padding and zero borders. Declaring the canonical
+ * order here pins it regardless of injection position; in an embedded host
+ * whose own sheet loaded first, this line is a no-op (first declaration wins).
+ */
+@layer theme, base, components, utilities;
+
 @layer utilities {
   .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
   .scrollbar-hide::-webkit-scrollbar { display: none; }
