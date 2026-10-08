@@ -1,4 +1,4 @@
-import { createInstance } from 'i18next';
+import { createInstance, type i18n as I18n } from 'i18next';
 import { initReactI18next } from 'react-i18next';
 
 import { nav as navZh } from './zh-CN/appstore/storefront/nav';
@@ -126,7 +126,7 @@ const en = {
 // shared singleton would re-run i18next's init and drop the resources the
 // previous copy registered. Each bundle therefore owns its instance, and the
 // embed surfaces hand it to their components through I18nextProvider.
-const i18n = createInstance();
+const i18n: I18n = createInstance();
 
 i18n
   .use(initReactI18next)
@@ -155,7 +155,7 @@ export const changeLanguage = (lang: 'zh-CN' | 'en') => {
  * @param locale - BCP 47 tag such as `zh-CN` or `en-US`.
  * @returns the shared i18n instance.
  */
-export function initializeAppstorePcI18n(locale?: string) {
+export function initializeAppstorePcI18n(locale?: string): I18n {
   const raw = locale?.trim() || i18n.language || initialLang
   const lang: 'zh-CN' | 'en' = raw.startsWith('zh') ? 'zh-CN' : 'en'
   if (i18n.language !== lang) {
