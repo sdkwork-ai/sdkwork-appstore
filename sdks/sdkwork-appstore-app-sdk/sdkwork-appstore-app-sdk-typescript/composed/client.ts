@@ -35,37 +35,55 @@ export function isAppStoreApiError(error: unknown): error is AppStoreApiError {
 }
 
 const commandOptions = () => ({ idempotencyKey: uuid() });
+
+/** Option object whose properties lost their `undefined` half. */
+type DefinedParams<T extends object> = { [K in keyof T]?: Exclude<T[K], undefined> };
+
+/**
+ * Drop undefined entries so generated `exactOptionalPropertyTypes` query
+ * params (`cursor?: string`, …) accept partially-filled option objects.
+ */
+function omitUndefined<T extends object>(params: T): DefinedParams<T> {
+  const result: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(params)) {
+    if (value !== undefined) {
+      result[key] = value;
+    }
+  }
+  return result as DefinedParams<T>;
+}
+
 const pageParams = (params?: { cursor?: string; limit?: number }) =>
-  params ? { cursor: params.cursor, pageSize: params.limit } : undefined;
+  params === undefined ? undefined : omitUndefined({ cursor: params.cursor, pageSize: params.limit });
 
 function createCatalogFacade(client: SdkworkAppstoreAppClient) {
   const api = client.catalog.appstore.catalog;
   return {
     getHome: () => api.home.retrieve(),
     listCategories: (p?: { cursor?: string; limit?: number; locale?: string }) =>
-      api.categories.list({ cursor: p?.cursor, pageSize: p?.limit, locale: p?.locale }),
+      api.categories.list(omitUndefined({ cursor: p?.cursor, pageSize: p?.limit, locale: p?.locale })),
     getCategory: (id: string) => api.categories.retrieve(id),
     listCollections: (p?: { cursor?: string; limit?: number }) => api.collections.list(pageParams(p)),
     getCollection: (id: string) => api.collections.retrieve(id),
     listFeatured: () => api.featured.list(),
     getChart: (code: string) => api.charts.retrieve(code),
     searchListings: (p?: { q?: string; categoryId?: string; ids?: string[]; cursor?: string; limit?: number }) =>
-      api.listings.list({ q: p?.q, categoryId: p?.categoryId, ids: p?.ids?.join(','), cursor: p?.cursor, pageSize: p?.limit }),
+      api.listings.list(omitUndefined({ q: p?.q, categoryId: p?.categoryId, ids: p?.ids?.join(','), cursor: p?.cursor, pageSize: p?.limit })),
     listRecommendations: (p?: { locale?: string; platform?: string; cursor?: string; limit?: number }) =>
-      api.recommendations.list({ locale: p?.locale, platform: p?.platform, cursor: p?.cursor, pageSize: p?.limit }),
+      api.recommendations.list(omitUndefined({ locale: p?.locale, platform: p?.platform, cursor: p?.cursor, pageSize: p?.limit })),
     listRecentlyUpdated: (p?: { locale?: string; cursor?: string; limit?: number }) =>
-      api.recentlyUpdated.list({ locale: p?.locale, cursor: p?.cursor, pageSize: p?.limit }),
+      api.recentlyUpdated.list(omitUndefined({ locale: p?.locale, cursor: p?.cursor, pageSize: p?.limit })),
     listEvents: (p?: { status?: string; cursor?: string; limit?: number }) =>
-      api.events.list({ status: p?.status, cursor: p?.cursor, pageSize: p?.limit }),
+      api.events.list(omitUndefined({ status: p?.status, cursor: p?.cursor, pageSize: p?.limit })),
     getEvent: (id: string) => api.events.retrieve(id),
     listSearchSuggestions: (p: { q: string; locale?: string }) => api.search.suggestions.list(p),
     listTrendingSearchTerms: (p?: { locale?: string; limit?: number }) =>
-      api.search.trending.list({ locale: p?.locale, pageSize: p?.limit }),
+      api.search.trending.list(omitUndefined({ locale: p?.locale, pageSize: p?.limit })),
     listSearchHistory: (p?: { cursor?: string; limit?: number }) => api.search.history.list(pageParams(p)),
     upsertSearchHistory: (body: SearchHistoryUpsertRequest) => api.search.history.update(body),
     clearSearchHistory: () => api.search.history.delete(),
     listTemplates: (p?: { q?: string; categoryCode?: string; templateType?: 'APP' | 'PLUGIN' | 'AGENT' | 'EXPERT'; templatePlatform?: 'H5' | 'PC' | 'FLUTTER' | 'MINIPROGRAM'; cursor?: string; limit?: number }) =>
-      api.templates.list({ q: p?.q, categoryCode: p?.categoryCode, templateType: p?.templateType, templatePlatform: p?.templatePlatform, cursor: p?.cursor, pageSize: p?.limit }),
+      api.templates.list(omitUndefined({ q: p?.q, categoryCode: p?.categoryCode, templateType: p?.templateType, templatePlatform: p?.templatePlatform, cursor: p?.cursor, pageSize: p?.limit })),
     getTemplate: (id: string) => api.templates.retrieve(id),
     createTemplate: (body: AppTemplateCreateRequest) => api.templates.create(body, commandOptions()),
     recordTemplateUsage: (id: string, body: AppTemplateUsageCreateRequest) =>
@@ -141,7 +159,7 @@ function createWishlistFacade(client: SdkworkAppstoreAppClient) {
   const api = client.wishlist.appstore.wishlist.items;
   return {
     listItems: (p?: { cursor?: string; limit?: number }) =>
-      api.list({ cursor: p?.cursor, pageSize: p?.limit }),
+      api.list(omitUndefined({ cursor: p?.cursor, pageSize: p?.limit })),
     addItem: (listingId: string) => api.create({ listingId }, commandOptions()),
     removeItem: (listingId: string) => api.delete(listingId),
   };
