@@ -37,6 +37,8 @@
     "db:materialize:contract": "node scripts/sdkwork-command.mjs db:materialize:contract",
     "db:validate": "node scripts/sdkwork-command.mjs db:validate",
     "db:audit-seeds": "node database/seeds/.audit-seeds.mjs",
+    "db:materialize:module-templates": "node tools/materialize_module_template_seed.mjs",
+    "db:materialize:module-templates:check": "node tools/materialize_module_template_seed.mjs --check",
     "db:plan": "node scripts/sdkwork-command.mjs db:plan",
     "db:init": "node scripts/sdkwork-command.mjs db:init",
     "db:migrate": "node scripts/sdkwork-command.mjs db:migrate",

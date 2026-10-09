@@ -61,6 +61,7 @@
         "common/006_storefront_releases.sql",
         "common/007_storefront_catalog.sql",
         "common/008_app_templates.sql",
+        "common/015_module_app_templates.sql",
         "common/009_user_demo_data.sql",
         "common/010_download_capabilities.sql",
         "common/012_storefront_distribution.sql",
