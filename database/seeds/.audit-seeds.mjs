@@ -82,6 +82,25 @@ const badLibraryReleaseRefs = libraryReleaseIds.filter((id) => !releases.include
 const downloadSql = read('common/010_download_capabilities.sql');
 const downloadUserMismatch = downloadSql.includes("'demo-user-100001'");
 
+// Generated workspace application seeds (common/016 + locale 004 partners).
+const workspaceSql = read('common/016_workspace_applications.sql');
+const workspaceListings = listingIdsFrom005(workspaceSql);
+const workspaceZh = listingIdsFromLocalization(read('locales/zh-CN/004_workspace_applications_zh.sql'));
+const workspaceEn = listingIdsFromLocalization(read('locales/en-US/004_workspace_applications_en.sql'));
+const workspaceReleases = [...workspaceSql.matchAll(/\('(rel-[^']+)'/g)].map((m) => m[1]);
+const workspaceZhNotes = releaseNoteIdsFromLocale(read('locales/zh-CN/004_workspace_applications_zh.sql'));
+const workspaceEnNotes = releaseNoteIdsFromLocale(read('locales/en-US/004_workspace_applications_en.sql'));
+const workspaceMissingZh = [...workspaceListings].filter((id) => !workspaceZh.has(id)).sort();
+const workspaceMissingEn = [...workspaceListings].filter((id) => !workspaceEn.has(id)).sort();
+const workspaceMissingZhNotes = workspaceReleases.filter((id) => {
+  const noteId = `note-${id.replace(/^rel-/, '').replace(/-\d+$/, '')}`;
+  return !workspaceZhNotes.has(noteId);
+});
+const workspaceMissingEnNotes = workspaceReleases.filter((id) => {
+  const noteId = `note-${id.replace(/^rel-/, '').replace(/-\d+$/, '')}-en`;
+  return !workspaceEnNotes.has(noteId);
+});
+
 const emptyListingComments = (listingsSql.match(/'4\+',\s*''/g) ?? []).length;
 const emptyCollectionHighlights = (catalogSql.match(/,\s*'\{\}'/g) ?? []).length;
 const emptyCollectionCovers = (catalogSql.match(/cover_media_resource_id, starts_at[\s\S]*?'', CURRENT_TIMESTAMP/g) ?? []).length;
@@ -136,6 +155,12 @@ const report = {
   brokenEnReleaseRows,
   localeChecksumIssues,
   missingStandardLocaleFiles,
+  workspaceApplications: workspaceListings.size,
+  workspaceReleases: workspaceReleases.length,
+  workspaceMissingZhCn: workspaceMissingZh,
+  workspaceMissingEnUs: workspaceMissingEn,
+  workspaceMissingZhReleaseNotes: workspaceMissingZhNotes,
+  workspaceMissingEnReleaseNotes: workspaceMissingEnNotes,
   releases: releases.length,
   releaseNotes: releaseNotes.length,
 };
@@ -158,6 +183,10 @@ const failures = [
   report.completeEnReleaseRows !== report.releases ? 1 : 0,
   Object.keys(report.localeChecksumIssues).length,
   Object.keys(report.missingStandardLocaleFiles).length,
+  report.workspaceMissingZhCn.length,
+  report.workspaceMissingEnUs.length,
+  report.workspaceMissingZhReleaseNotes.length,
+  report.workspaceMissingEnReleaseNotes.length,
 ].reduce((sum, n) => sum + n, 0);
 
 if (failures > 0) {

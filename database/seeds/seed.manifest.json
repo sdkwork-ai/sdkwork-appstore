@@ -21,21 +21,23 @@
     "zh-CN": {
       "version": "1.1.0",
       "required": true,
-      "checksum": "sha256:e37663f666867671777f86e408b5796da3ac22116e057d92e310c03f371786e4",
+      "checksum": "sha256:4abc23a49b734d48f586bf1b8b7876227d75ac710cd5850c26b9199fd8ca7dda",
       "files": [
         "locales/zh-CN/001_storefront_listings_zh.sql",
         "locales/zh-CN/002_storefront_releases_zh.sql",
-        "locales/zh-CN/003_storefront_catalog_zh.sql"
+        "locales/zh-CN/003_storefront_catalog_zh.sql",
+        "locales/zh-CN/004_workspace_applications_zh.sql"
       ]
     },
     "en-US": {
       "version": "1.1.0",
       "required": false,
-      "checksum": "sha256:6e94cfe769d57dd57f31ec343956c8c0714af6921715684e4232033d09fa92bd",
+      "checksum": "sha256:03b4feda627f8a9770225acc56104e4a762baa7e566d0e70f1228ea00f838a2e",
       "files": [
         "locales/en-US/001_storefront_listings_en.sql",
         "locales/en-US/002_storefront_releases_en.sql",
-        "locales/en-US/003_storefront_catalog_en.sql"
+        "locales/en-US/003_storefront_catalog_en.sql",
+        "locales/en-US/004_workspace_applications_en.sql"
       ]
     }
   },
@@ -64,18 +66,21 @@
         "common/012_storefront_distribution.sql",
         "common/013_app_platform_delivery.sql",
         "common/014_expert_catalog.sql",
+        "common/016_workspace_applications.sql",
         "001_bootstrap.sql"
       ],
       "locales": {
         "zh-CN": [
           "locales/zh-CN/001_storefront_listings_zh.sql",
           "locales/zh-CN/002_storefront_releases_zh.sql",
-          "locales/zh-CN/003_storefront_catalog_zh.sql"
+          "locales/zh-CN/003_storefront_catalog_zh.sql",
+          "locales/zh-CN/004_workspace_applications_zh.sql"
         ],
         "en-US": [
           "locales/en-US/001_storefront_listings_en.sql",
           "locales/en-US/002_storefront_releases_en.sql",
-          "locales/en-US/003_storefront_catalog_en.sql"
+          "locales/en-US/003_storefront_catalog_en.sql",
+          "locales/en-US/004_workspace_applications_en.sql"
         ]
       }
     }
