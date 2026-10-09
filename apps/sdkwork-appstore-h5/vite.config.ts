@@ -147,17 +147,25 @@ export default defineConfig(({ command, mode }) => {
         path: '/runtime-env.js',
         resolveServeDocument: () => {
           // Standalone dev is same-origin: the deployment mode alone makes
-          // shared resolvers derive the page's own origin. An SDKWORK_API_BASE_URL
-          // of '/' would reduce to an empty origin for SDK clients that validate
+          // shared resolvers derive the page's own origin. The mode keys MUST
+          // match sdk-common DEPLOYMENT_MODE_ENV_KEYS (SDKWORK_DEPLOY_MODE /
+          // SDKWORK_DEPLOYMENT_PROFILE); SDKWORK_DEPLOYMENT_MODE is legacy
+          // surface only and the resolver never reads it — publishing just
+          // that key falls back to the cloud profile and points clients at
+          // the local cloud-gateway dev port. An SDKWORK_API_BASE_URL of '/'
+          // would reduce to an empty origin for SDK clients that validate
           // their base, so only an explicitly configured absolute URL passes
           // through.
           const deploymentMode = process.env.SDKWORK_DEPLOYMENT_MODE ?? 'standalone';
           const configuredApiBase = process.env.SDKWORK_API_BASE_URL ?? '';
-          return `window.SDKWORK_RUNTIME_ENV = Object.freeze({${JSON.stringify(
-            'SDKWORK_DEPLOYMENT_MODE',
-          )}: ${JSON.stringify(deploymentMode)}, ${JSON.stringify(
-            'SDKWORK_API_BASE_URL',
-          )}: ${JSON.stringify(configuredApiBase)}});`;
+          return `window.SDKWORK_RUNTIME_ENV = Object.freeze({${[
+            ['SDKWORK_DEPLOY_MODE', deploymentMode],
+            ['SDKWORK_DEPLOYMENT_PROFILE', deploymentMode],
+            ['SDKWORK_DEPLOYMENT_MODE', deploymentMode],
+            ['SDKWORK_API_BASE_URL', configuredApiBase],
+          ]
+            .map(([key, value]) => `${JSON.stringify(key)}: ${JSON.stringify(value)}`)
+            .join(', ')}});`;
         },
         transformIndexHtml(html: string) {
           return html.replace(
@@ -222,7 +230,7 @@ export default defineConfig(({ command, mode }) => {
           changeOrigin: true,
         },
         '/store/v3/api': {
-          target: 'http://127.0.0.1:18092',
+          target: 'http://127.0.0.1:18090',
           changeOrigin: true,
         },
       },
