@@ -8,6 +8,7 @@ export interface TabBarItem {
   readonly icon: ComponentType<{
     readonly className?: string;
     readonly strokeWidth?: number;
+    readonly fill?: string;
   }>;
   readonly end?: boolean;
 }
@@ -22,6 +23,11 @@ export interface TabBarProps {
  * Tab ownership sits with the shell so every capability package renders inside
  * the same navigation container
  * (`APP_CLIENT_ARCHITECTURE_ALIGNMENT_SPEC.md` section 4).
+ *
+ * Selection is carried by the icon glyph itself — filled on the selected tab,
+ * outline on the others — because color alone is not a selection signal
+ * (`APP_MOBILE_REACT_UI_SPEC.md` "Bottom tab bar"; stroke-based icon sets fill
+ * the same glyph with `fill="currentColor"`).
  */
 export function TabBar({ items }: TabBarProps) {
   return (
@@ -42,8 +48,16 @@ export function TabBar({ items }: TabBarProps) {
               )
             }
           >
-            <item.icon className="w-6 h-6 flex-shrink-0" strokeWidth={1.75} />
-            <span className="truncate max-w-full px-0.5">{item.label}</span>
+            {({ isActive }) => (
+              <>
+                <item.icon
+                  className="w-6 h-6 flex-shrink-0"
+                  strokeWidth={1.75}
+                  fill={isActive ? 'currentColor' : 'none'}
+                />
+                <span className="truncate max-w-full px-0.5">{item.label}</span>
+              </>
+            )}
           </NavLink>
         ))}
       </div>
