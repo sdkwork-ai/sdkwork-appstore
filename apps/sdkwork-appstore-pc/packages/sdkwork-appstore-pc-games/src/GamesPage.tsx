@@ -19,17 +19,30 @@ export default function GamesPage() {
   useEffect(() => {
     async function loadGames() {
       try {
-        // Bounded cursor-following load: at most 4 pages of 50 listings per
-        // PAGINATION_SPEC (never an unbounded "fetch all").
+        // Listing summaries carry no category, so each section is loaded from
+        // its own catalog category and stamped with the category name the
+        // section filters on.
+        const categories = await AppStoreService.getCategories().catch(() => []);
+        const idByName = new Map(categories.map((category) => [category.name, category.id]));
         const collected: AppItem[] = [];
-        let pageCursor: string | undefined;
-        for (let page = 0; page < 4; page += 1) {
-          const result = await AppStoreService.listAppsPage({ cursor: pageCursor, limit: 50 });
-          collected.push(...result.items);
-          if (!result.nextCursor) {
-            break;
+        const seenIds = new Set<string>();
+        for (const categoryName of ['棋牌游戏', '微信小游戏', '精品手游', '游戏']) {
+          const categoryId = idByName.get(categoryName);
+          if (!categoryId) {
+            continue;
           }
-          pageCursor = result.nextCursor;
+          try {
+            const page = await AppStoreService.listAppsPage({ categoryId, limit: 50 });
+            for (const app of page.items) {
+              if (seenIds.has(app.id)) {
+                continue;
+              }
+              seenIds.add(app.id);
+              collected.push({ ...app, category: categoryName });
+            }
+          } catch (err) {
+            console.error(`Failed to load games for category ${categoryName}`, err);
+          }
         }
         setAllApps(collected);
       } catch (err) {

@@ -177,6 +177,33 @@ export function openDistributionUrl(url: string | undefined): boolean {
   return opened !== null && opened !== undefined;
 }
 
+/**
+ * Start an installer download without leaving the storefront.
+ *
+ * A presigned download URL is only known after an asynchronous grant request,
+ * so the browser click that started it is no longer a live gesture; opening a
+ * window at that point is routinely popup-blocked. A detached anchor with the
+ * `download` attribute is not, and a file response never replaces this page.
+ * @param url - presigned installer URL; only `http(s)` targets are accepted.
+ * @returns true when the download was handed to the browser.
+ */
+export function startInstallerDownload(url: string | undefined): boolean {
+  const target = url?.trim();
+  if (!target || !/^https?:\/\//i.test(target) || typeof document === 'undefined') {
+    return false;
+  }
+  const anchor = document.createElement('a');
+  anchor.href = target;
+  anchor.download = '';
+  anchor.target = '_blank';
+  anchor.rel = 'noopener noreferrer';
+  anchor.style.display = 'none';
+  document.body.appendChild(anchor);
+  anchor.click();
+  anchor.remove();
+  return true;
+}
+
 /** Whether the listing's pricing model gates adoption behind purchase.
  *  FREE/FREEMIUM adopt like free; only explicit PAID pricing is gated. */
 export function paidPricing(pricingModel: string | undefined): boolean {

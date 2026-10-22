@@ -103,6 +103,13 @@ export const common = {
       macos: 'macOS',
       linux: 'Linux'
     },
+    architecture: {
+      x64: 'x64',
+      arm64: 'ARM64',
+      ia32: '32 位',
+      universal: '通用',
+      appleSilicon: 'Apple 芯片'
+    },
     qrAndroid: '安卓扫码安装',
     qrIos: 'iOS 扫码安装',
     qrHarmonyos: '鸿蒙扫码安装',

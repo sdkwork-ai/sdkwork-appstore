@@ -9,6 +9,36 @@ export const appDetail = {
     shareApp: 'Share Application',
     inAppPurchases: 'In-App Purchases'
   },
+  install: {
+    forOs: 'Install for {{os}}',
+    downloadForOs: 'Download for {{os}}',
+    download: 'Download',
+    downloading: 'Downloading...',
+    choosePlatform: 'Choose platform',
+    unavailableFor: 'Not available for {{os}}',
+    chooseHint: 'Pick the build that matches your device.',
+    moreOptions: 'More download options',
+    menuTitle: 'Available builds',
+    thisDevice: 'This device',
+    recommended: 'Recommended',
+    alsoFor: 'Also for {{platforms}}',
+    emulatedHint: 'Runs in compatibility mode on this device',
+    incompatibleHint: 'may not run on this device',
+    incompatibleWarning: 'This build may not run on this device',
+    artifactPending: 'Installer not published yet',
+    archUnknown: 'Any CPU',
+    openInstalled: 'Open',
+    installedHint: 'Installed on this device',
+    buy: 'Buy'
+  },
+  downloads: {
+    title: 'Download installers',
+    subtitle: 'Every published build, by platform and CPU architecture',
+    install: 'Install',
+    acquire: 'Get',
+    download: 'Download',
+    pending: 'Not published yet'
+  },
   notFound: 'App Not Found',
   goBack: 'Go Back',
   stats: {
@@ -60,7 +90,8 @@ export const appDetail = {
     size: 'Size',
     category: 'Category',
     language: 'Language',
-    ageRating: 'Age Rating'
+    ageRating: 'Age Rating',
+    compatibility: 'Compatibility'
   },
   inAppPurchases: {
     title: 'In-App Purchases'

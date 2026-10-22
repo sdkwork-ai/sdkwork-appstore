@@ -164,4 +164,25 @@ describe('install service port platform', () => {
 
     expect(install).toHaveBeenCalledWith({ listingId: 'app-cursor', platform: 'windows' });
   });
+
+  it('forwards the selected CPU architecture without inventing one', async () => {
+    const install = vi.fn(async () => ({}));
+    const client = {
+      library: { install },
+    } as unknown as AppStoreClient;
+
+    const port = createInstallServicePort(client);
+    await port.installApp('app-cursor', 'macos', 'arm64');
+    await port.installApp('app-cursor', 'macos');
+
+    expect(install).toHaveBeenNthCalledWith(1, {
+      listingId: 'app-cursor',
+      platform: 'macos',
+      architecture: 'arm64',
+    });
+    expect(install).toHaveBeenNthCalledWith(2, {
+      listingId: 'app-cursor',
+      platform: 'macos',
+    });
+  });
 });

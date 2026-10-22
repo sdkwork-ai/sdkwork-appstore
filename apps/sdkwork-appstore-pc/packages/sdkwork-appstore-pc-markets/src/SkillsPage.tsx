@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { SkillItem } from '@sdkwork/appstore-pc-core';
@@ -10,18 +10,44 @@ import { SkillsHeaderBanner } from './components/skills/SkillsHeaderBanner';
 import { PublishSkillModal } from './components/skills/PublishSkillModal';
 import { SkillsEmptyState } from './components/skills/SkillsEmptyState';
 import { SkillsService } from '@sdkwork/appstore-pc-core';
+import { ALL_CATEGORY, type CategoryOption } from './components/marketCategories';
 
 export function SkillsPage() {
   const { t } = useTranslation();
-  const [skills, setSkills] = useState<SkillItem[]>([]);
+  // The catalog is loaded once and filtered locally: the category chips are
+  // derived from the full catalog, so selecting one never hides the others and
+  // every chip names a category the catalog actually contains.
+  const [allSkills, setAllSkills] = useState<SkillItem[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [selectedCategory, setSelectedCategory] = useState<string>(ALL_CATEGORY);
   const [selectedSkill, setSelectedSkill] = useState<SkillItem | null>(null);
   const [loading, setLoading] = useState(true);
   const [isPublishOpen, setIsPublishOpen] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
 
-  const categories = [
+  useEffect(() => {
+    let cancelled = false;
+    SkillsService.getSkills()
+      .then((data) => {
+        if (!cancelled) {
+          setAllSkills(data);
+        }
+      })
+      .catch((err) => {
+        console.error('Failed to load skills', err);
+      })
+      .finally(() => {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  // The publish form keeps its own taxonomy; only the catalog filter is derived.
+  const publishCategories = [
     t('skills.categories.all'),
     t('skills.categories.dataScience'),
     t('skills.categories.frontendDesign'),
@@ -30,20 +56,34 @@ export function SkillsPage() {
     t('skills.categories.nlp')
   ];
 
-  const loadSkills = async () => {
-    try {
-      const data = await SkillsService.getSkills(selectedCategory, searchQuery);
-      setSkills(data);
-    } catch (err) {
-      console.error('Failed to load skills', err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const categories = useMemo<CategoryOption[]>(() => {
+    const values = new Set<string>();
+    allSkills.forEach((skill) => {
+      if (skill.category) {
+        values.add(skill.category);
+      }
+    });
+    return [
+      { value: ALL_CATEGORY, label: t('skills.categories.all') },
+      ...[...values]
+        .sort((left, right) => left.localeCompare(right))
+        .map((value) => ({ value, label: value })),
+    ];
+  }, [allSkills, t]);
 
-  useEffect(() => {
-    loadSkills();
-  }, [selectedCategory, searchQuery]);
+  const skills = useMemo(() => {
+    const query = searchQuery.trim().toLocaleLowerCase();
+    return allSkills.filter((skill) => {
+      if (selectedCategory !== ALL_CATEGORY && skill.category !== selectedCategory) {
+        return false;
+      }
+      if (!query) {
+        return true;
+      }
+      return [skill.name, skill.author, skill.description, skill.category, ...skill.triggers]
+        .some((text) => text.toLocaleLowerCase().includes(query));
+    });
+  }, [allSkills, selectedCategory, searchQuery]);
 
   const handleToggleInstall = async (id: string) => {
     setActionError(null);
@@ -53,7 +93,7 @@ export function SkillsPage() {
       setActionError(error instanceof Error ? error.message : 'Skill action failed.');
       return;
     }
-    setSkills((prev) =>
+    setAllSkills((prev) =>
       prev.map((s) => {
         if (s.id === id) {
           const nextState = !s.isInstalled;
@@ -89,7 +129,7 @@ export function SkillsPage() {
     setActionError(null);
     try {
       const created = await SkillsService.publishSkill(skillData);
-      setSkills((prev) => [created, ...prev]);
+      setAllSkills((prev) => [created, ...prev]);
       setIsPublishOpen(false);
     } catch (error) {
       setActionError(error instanceof Error ? error.message : 'Skill publishing failed.');
@@ -156,7 +196,7 @@ export function SkillsPage() {
         isOpen={isPublishOpen}
         onClose={() => setIsPublishOpen(false)}
         onSubmit={handlePublishSubmit}
-        categories={categories}
+        categories={publishCategories}
       />
     </div>
   );

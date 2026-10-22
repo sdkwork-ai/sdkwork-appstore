@@ -1,7 +1,9 @@
 import { motion } from 'motion/react';
 import { useTranslation } from 'react-i18next';
 import { DynamicIcon } from '../DynamicIcon';
-import type { AppItem, ListingArtifact } from '../../types';
+import type { AppItem, DesktopOs, InstallVariant } from '../../types';
+import { formatInstallerSize } from '@sdkwork/appstore-pc-core';
+import { architectureLabelKey } from '../../lib/installVariant';
 import { InstallModalConfirmActions } from './InstallModalConfirmActions';
 import { InstallModalProgress } from './InstallModalProgress';
 import { InstallModalSuccessState } from './InstallModalSuccessState';
@@ -11,38 +13,36 @@ interface InstallModalProps {
   installState: 'confirm' | 'downloading' | 'success';
   progress: number;
   error?: string | null;
-  /** Desktop platform code the install records (windows/macos/linux); shown on confirm. */
-  installPlatform?: string;
-  /** Verified installer artifact matched for the requested platform. */
-  installArtifact?: ListingArtifact;
+  /** Build the install uses, resolved from the host or the builds menu. */
+  variant: InstallVariant | null;
+  /** Host desktop OS, used to label the build as detected for this machine. */
+  hostOs: DesktopOs | null;
   onConfirm: () => void;
   onCancel: () => void;
 }
 
-/** Human-readable artifact size from a byte-count string. */
-function formatArtifactSize(fileSizeBytes: string | undefined): string {
-  const bytes = Number.parseInt(fileSizeBytes ?? '', 10);
-  if (!Number.isFinite(bytes) || bytes <= 0) {
-    return '—';
-  }
-  const mb = bytes / (1024 * 1024);
-  if (mb >= 1024) {
-    return `${(mb / 1024).toFixed(1)} GB`;
-  }
-  return `${mb.toFixed(1)} MB`;
-}
-
+/**
+ * Confirmation dialog for one resolved install build: platform, CPU
+ * architecture, package format, and size, plus the compatibility warning when
+ * the chosen build does not run natively on this machine.
+ */
 export function InstallModal({
   app,
   installState,
   progress,
   error,
-  installPlatform,
-  installArtifact,
+  variant,
+  hostOs,
   onConfirm,
   onCancel,
 }: InstallModalProps) {
   const { t } = useTranslation();
+  const osLabel = variant ? t(`common.distribution.os.${variant.platform}`) : null;
+  const archKey = variant ? architectureLabelKey(variant) : null;
+  const archLabel = archKey ? t(`common.distribution.architecture.${archKey}`) : null;
+  const buildLabel = [osLabel, archLabel].filter((part): part is string => part !== null).join(' · ');
+  const detectedForHost = variant !== null && variant.platform === hostOs;
+
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center px-4">
       <motion.div
@@ -75,22 +75,29 @@ export function InstallModal({
 
           {installState === 'confirm' && (
             <>
-              {installPlatform && (
-                <p className="text-xs font-medium text-store-ink-soft bg-store-subtle border border-store-line-soft rounded-full px-3 py-1 mb-4">
-                  {t('install.modal.platformNote', {
-                    platform: t(`common.distribution.os.${installPlatform}`),
-                  })}
+              {variant && buildLabel && (
+                <p className="text-xs font-medium text-store-ink-soft bg-store-subtle border border-store-line-soft rounded-full px-3 py-1 mb-3">
+                  {detectedForHost
+                    ? t('install.modal.platformNote', { platform: buildLabel })
+                    : t('install.modal.platformNoteGeneric', { platform: buildLabel })}
                 </p>
               )}
-              {installArtifact && (
-                <p className="text-xs text-store-ink-faint mb-4">
+              {variant && variant.packageFormatLabel && (
+                <p className="text-xs text-store-ink-faint mb-2">
                   {t('install.modal.artifactNote', {
-                    format: installArtifact.packageFormat.toUpperCase(),
-                    size: formatArtifactSize(installArtifact.fileSizeBytes),
+                    format: variant.packageFormatLabel,
+                    size: formatInstallerSize(variant.fileSizeBytes),
                   })}
                 </p>
               )}
-              <InstallModalConfirmActions onConfirm={onConfirm} onCancel={onCancel} />
+              {variant && variant.match === 'emulated' && (
+                <p className="text-xs text-store-warning mb-2">
+                  {t('install.modal.compatibilityNote')}
+                </p>
+              )}
+              <div className="pt-2 w-full">
+                <InstallModalConfirmActions onConfirm={onConfirm} onCancel={onCancel} />
+              </div>
             </>
           )}
 
@@ -106,4 +113,3 @@ export function InstallModal({
     </div>
   );
 }
-

@@ -1,34 +1,66 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AppStoreService } from '@sdkwork/appstore-pc-core';
 import { AppItem } from '@sdkwork/appstore-pc-core';
 import { LoadingSpinner } from '@sdkwork/appstore-pc-commons';
 import { AppsHeaderBanner } from './components/AppsHeaderBanner';
-import { AppsCategoryFilter } from './components/AppsCategoryFilter';
+import { AppsCategoryFilter, type AppsCategoryOption } from './components/AppsCategoryFilter';
 import { AppsGrid } from './components/AppsGrid';
+
+const ALL_SUBCATEGORY = 'all';
+
+/** Catalog categories that belong to the games marketplace, not the app list. */
+const GAME_CATEGORIES = new Set(['微信小游戏', '精品手游']);
+
+interface StoreCategory {
+  id: string;
+  name: string;
+  icon: string;
+}
 
 export default function AppsPage() {
   const { t } = useTranslation();
   const [apps, setApps] = useState<AppItem[]>([]);
+  const [categories, setCategories] = useState<StoreCategory[]>([]);
   const [cursor, setCursor] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
-  const [selectedSubCategory, setSelectedSubCategory] = useState<string>('all');
+  const [selectedSubCategory, setSelectedSubCategory] = useState<string>(ALL_SUBCATEGORY);
 
   useEffect(() => {
+    let cancelled = false;
     async function loadApps() {
+      setLoading(true);
       try {
-        const page = await AppStoreService.listAppsPage({ limit: 50 });
+        // Category chips are the storefront's own category list, and the page
+        // is narrowed server-side by the selected category id.
+        const storeCategories = await AppStoreService.getCategories();
+        if (cancelled) {
+          return;
+        }
+        setCategories(storeCategories);
+        const page = await AppStoreService.listAppsPage({
+          limit: 50,
+          ...(selectedSubCategory === ALL_SUBCATEGORY ? {} : { categoryId: selectedSubCategory }),
+        });
+        if (cancelled) {
+          return;
+        }
         setApps(page.items);
         setCursor(page.nextCursor);
       } catch (err) {
         console.error('Failed to load apps page data', err);
       } finally {
-        setLoading(false);
+        if (!cancelled) {
+          setLoading(false);
+        }
       }
     }
     loadApps();
-  }, []);
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedSubCategory]);
 
   async function loadMore() {
     if (!cursor || loadingMore) {
@@ -36,7 +68,11 @@ export default function AppsPage() {
     }
     setLoadingMore(true);
     try {
-      const page = await AppStoreService.listAppsPage({ cursor, limit: 50 });
+      const page = await AppStoreService.listAppsPage({
+        cursor,
+        limit: 50,
+        ...(selectedSubCategory === ALL_SUBCATEGORY ? {} : { categoryId: selectedSubCategory }),
+      });
       setApps((prev) => [...prev, ...page.items]);
       setCursor(page.nextCursor);
     } catch (err) {
@@ -46,20 +82,30 @@ export default function AppsPage() {
     }
   }
 
+  const subCategories = useMemo<AppsCategoryOption[]>(() => {
+    const options: AppsCategoryOption[] = [
+      { value: ALL_SUBCATEGORY, label: t('apps.categories.all') },
+    ];
+    const seenIds = new Set<string>();
+    categories.forEach((category) => {
+      if (!category.id || !category.name || seenIds.has(category.id) || GAME_CATEGORIES.has(category.name)) {
+        return;
+      }
+      seenIds.add(category.id);
+      options.push({ value: category.id, label: category.name });
+    });
+    return options;
+  }, [categories, t]);
+
+  // The games marketplace owns the mini and handheld game categories.
+  const visibleApps = useMemo(
+    () => apps.filter((app) => !GAME_CATEGORIES.has(app.category)),
+    [apps],
+  );
+
   if (loading) {
     return <LoadingSpinner />;
   }
-
-  const subCategories = ['all', 'productivity', 'utilities', 'development', 'design'];
-
-  const filteredApps = apps.filter(app => {
-    if (app.category === '微信小游戏' || app.category === '精品手游') return false;
-    if (selectedSubCategory === 'all') return true;
-    if (selectedSubCategory === 'development' || selectedSubCategory === 'design') {
-      return app.category.includes('开发') || app.category.includes('设计');
-    }
-    return app.category.includes(selectedSubCategory);
-  });
 
   const featuredApp = apps[0];
 
@@ -77,8 +123,8 @@ export default function AppsPage() {
 
       {/* Sub-component: Applications Grid */}
       <AppsGrid
-        apps={filteredApps}
-        title={t('apps.stats.filteredApps', { count: filteredApps.length })}
+        apps={visibleApps}
+        title={t('apps.stats.filteredApps', { count: visibleApps.length })}
       />
 
       {cursor ? (

@@ -1,5 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { ALL_CATEGORY } from '../marketCategories';
 
 interface ExpertsCategoryFilterProps {
   categories: string[];
@@ -40,5 +41,3 @@ export const ExpertsCategoryFilter: React.FC<ExpertsCategoryFilterProps> = ({
   );
 };
 
-/** Sentinel category value matching every expert roster entry. */
-export const ALL_CATEGORY = '__all__';

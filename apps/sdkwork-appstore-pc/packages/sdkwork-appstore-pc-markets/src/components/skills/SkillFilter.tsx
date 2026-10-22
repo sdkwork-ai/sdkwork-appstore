@@ -1,13 +1,14 @@
 import React from 'react';
 import { Search } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import type { CategoryOption } from '../marketCategories';
 
 interface SkillFilterProps {
   searchQuery: string;
   onSearchChange: (query: string) => void;
   selectedCategory: string;
   onSelectCategory: (category: string) => void;
-  categories: string[];
+  categories: CategoryOption[];
 }
 
 export const SkillFilter: React.FC<SkillFilterProps> = ({
@@ -33,21 +34,20 @@ export const SkillFilter: React.FC<SkillFilterProps> = ({
       </div>
 
       <div className="flex items-center gap-2 overflow-x-auto pb-1 min-w-0 custom-scrollbar">
-        {categories.map((cat) => (
+        {categories.map((category) => (
           <button
-            key={cat}
-            onClick={() => onSelectCategory(cat)}
+            key={category.value}
+            onClick={() => onSelectCategory(category.value)}
             className={`px-3 py-1.5 rounded-store-control text-xs font-medium whitespace-nowrap transition-all shrink-0 cursor-pointer ${
-              selectedCategory === cat
+              selectedCategory === category.value
                 ? 'bg-purple-600 text-white shadow-sm'
                 : 'bg-store-surface text-store-ink-soft border border-store-line hover:bg-store-subtle '
             }`}
           >
-            {cat}
+            {category.label}
           </button>
         ))}
       </div>
     </div>
   );
 };
-

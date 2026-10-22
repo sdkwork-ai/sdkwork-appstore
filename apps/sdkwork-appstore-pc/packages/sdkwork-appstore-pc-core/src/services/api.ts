@@ -14,6 +14,8 @@ export interface AppItemPageParams {
   cursor?: string;
   /** Page size; clamped server-side to the canonical maximum. */
   limit?: number;
+  /** Catalog category id to restrict the window to; omitted lists every category. */
+  categoryId?: string;
 }
 
 /**

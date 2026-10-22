@@ -10,6 +10,7 @@ import { AppDescription } from '../components/app-detail/AppDescription';
 import { AppWhatsNew } from '../components/app-detail/AppWhatsNew';
 import { AppReviews } from '../components/app-detail/AppReviews';
 import { AppInfo } from '../components/app-detail/AppInfo';
+import { AppDownloads } from '../components/app-detail/AppDownloads';
 import { AppInAppPurchases } from '../components/app-detail/AppInAppPurchases';
 import { AppPrivacy } from '../components/app-detail/AppPrivacy';
 import { AppMoreByDeveloper } from '../components/app-detail/AppMoreByDeveloper';
@@ -116,6 +117,9 @@ export default function AppDetail() {
           ratingBreakdown={app.ratingBreakdown}
           reviews={reviews}
         />
+
+        {/* Every published build: other platforms and CPU architectures. */}
+        <AppDownloads app={app} />
 
         {/* Information Table */}
         <AppInfo app={app} />

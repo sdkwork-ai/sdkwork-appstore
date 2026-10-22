@@ -6,6 +6,7 @@ import {
   openDistributionUrl,
   primaryDistributionAction,
   resolveDistributionActions,
+  startInstallerDownload,
 } from './distribution.ts';
 
 const WINDOWS_UA =
@@ -162,5 +163,70 @@ describe('openDistributionUrl', () => {
     expect(openDistributionUrl('   ')).toBe(false);
     expect(openDistributionUrl('https://store.example/app')).toBe(false);
     expect(open).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('startInstallerDownload', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  function stubAnchor(): {
+    anchor: {
+      href: string;
+      download: string;
+      target: string;
+      rel: string;
+      style: Record<string, string>;
+      click: ReturnType<typeof vi.fn>;
+      remove: ReturnType<typeof vi.fn>;
+    };
+    appendChild: ReturnType<typeof vi.fn>;
+  } {
+    const anchor = {
+      href: '',
+      download: '',
+      target: '',
+      rel: '',
+      style: {} as Record<string, string>,
+      click: vi.fn(),
+      remove: vi.fn(),
+    };
+    const appendChild = vi.fn();
+    vi.stubGlobal('document', {
+      createElement: vi.fn(() => anchor),
+      body: { appendChild },
+    });
+    return { anchor, appendChild };
+  }
+
+  it('hands a presigned installer URL to the browser as a file download', () => {
+    const { anchor, appendChild } = stubAnchor();
+
+    expect(startInstallerDownload(' https://dl.example/x.msi ')).toBe(true);
+
+    expect(anchor.href).toBe('https://dl.example/x.msi');
+    expect(anchor.download).toBe('');
+    expect(anchor.target).toBe('_blank');
+    expect(anchor.rel).toBe('noopener noreferrer');
+    expect(anchor.style.display).toBe('none');
+    expect(appendChild).toHaveBeenCalledWith(anchor);
+    expect(anchor.click).toHaveBeenCalledTimes(1);
+    expect(anchor.remove).toHaveBeenCalledTimes(1);
+  });
+
+  it('refuses empty and non-http targets', () => {
+    const { anchor } = stubAnchor();
+
+    expect(startInstallerDownload(undefined)).toBe(false);
+    expect(startInstallerDownload('   ')).toBe(false);
+    expect(startInstallerDownload('javascript:alert(1)')).toBe(false);
+    expect(startInstallerDownload('file:///tmp/x.msi')).toBe(false);
+    expect(anchor.click).not.toHaveBeenCalled();
+  });
+
+  it('is a no-op outside a browser document', () => {
+    vi.stubGlobal('document', undefined);
+    expect(startInstallerDownload('https://dl.example/x.msi')).toBe(false);
   });
 });

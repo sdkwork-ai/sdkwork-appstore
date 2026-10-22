@@ -19,8 +19,19 @@ export function createInstallServicePort(client: AppStoreClient): InstallService
         .filter(Boolean);
     },
 
-    async installApp(appId: string, platform?: string): Promise<boolean> {
-      await client.library.install({ listingId: appId, platform: platform?.trim() || 'windows' });
+    async installApp(
+      appId: string,
+      platform?: string,
+      architecture?: string,
+    ): Promise<boolean> {
+      const normalizedArchitecture = architecture?.trim();
+      await client.library.install({
+        listingId: appId,
+        platform: platform?.trim() || 'windows',
+        // The wire field is optional: listing-level installs (no resolved
+        // release artifact) must not claim an architecture they never saw.
+        ...(normalizedArchitecture ? { architecture: normalizedArchitecture } : {}),
+      });
       return true;
     },
 

@@ -6,7 +6,7 @@ import { CardGrid } from '../components/common';
 import { TemplateCard } from '../components/templates/TemplateCard';
 import { PublishTemplateModal } from '../components/templates/PublishTemplateModal';
 import { TemplatesHeaderBanner } from '../components/templates/TemplatesHeaderBanner';
-import { TemplatesCategoryFilter } from '../components/templates/TemplatesCategoryFilter';
+import { TemplatesCategoryFilter, type TemplateCategoryOption } from '../components/templates/TemplatesCategoryFilter';
 import { TemplatesPlatformFilter } from '../components/templates/TemplatesPlatformFilter';
 import { TemplatesSearchBar } from '../components/templates/TemplatesSearchBar';
 import { TemplatesEmptyState } from '../components/templates/TemplatesEmptyState';
@@ -17,18 +17,20 @@ export function TemplatesPage() {
   const { t } = useTranslation();
   const [templates, setTemplates] = useState<TemplateItem[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState(t('templates.categories.all'));
+  const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedPlatform, setSelectedPlatform] = useState('');
   const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  const categories = [
-    t('templates.categories.all'),
-    t('templates.categories.saasFullstack'),
-    t('templates.categories.knowledgeBase'),
-    t('templates.categories.agentCollab'),
-    t('templates.categories.devTools'),
-    t('templates.categories.eCommerce')
+  // Category values are the catalog's own strings; labels come from the locale
+  // dictionary. Keeping them apart lets the filter work in every locale.
+  const categories: TemplateCategoryOption[] = [
+    { value: '', label: t('templates.categories.all') },
+    { value: 'SaaS 全栈', label: t('templates.categories.saasFullstack') },
+    { value: '知识库系统', label: t('templates.categories.knowledgeBase') },
+    { value: 'Agent 协同', label: t('templates.categories.agentCollab') },
+    { value: '开发者工具', label: t('templates.categories.devTools') },
+    { value: '电商应用', label: t('templates.categories.eCommerce') }
   ];
 
   const loadTemplates = async () => {

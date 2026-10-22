@@ -9,6 +9,36 @@ export const appDetail = {
     shareApp: '分享应用',
     inAppPurchases: '内购/订阅扩展'
   },
+  install: {
+    forOs: '安装 {{os}} 版',
+    downloadForOs: '下载 {{os}} 版',
+    download: '下载',
+    downloading: '下载中...',
+    choosePlatform: '选择平台',
+    unavailableFor: '暂不支持 {{os}}',
+    chooseHint: '请选择与当前设备匹配的安装包。',
+    moreOptions: '更多下载选项',
+    menuTitle: '可选安装包',
+    thisDevice: '当前设备',
+    recommended: '推荐',
+    alsoFor: '另支持 {{platforms}}',
+    emulatedHint: '该安装包在当前设备上以兼容模式运行',
+    incompatibleHint: '可能无法在当前设备运行',
+    incompatibleWarning: '该安装包可能无法在当前设备运行',
+    artifactPending: '安装包尚未发布',
+    archUnknown: '通用',
+    openInstalled: '打开',
+    installedHint: '已安装到当前设备',
+    buy: '购买'
+  },
+  downloads: {
+    title: '安装包下载',
+    subtitle: '按系统与 CPU 架构选择已发布的安装包',
+    install: '安装',
+    acquire: '获取',
+    download: '下载',
+    pending: '暂未发布'
+  },
   notFound: '未找到该应用',
   goBack: '返回上页',
   stats: {
@@ -60,7 +90,8 @@ export const appDetail = {
     size: '大小',
     category: '分类',
     language: '语言',
-    ageRating: '年龄分级'
+    ageRating: '年龄分级',
+    compatibility: '兼容性'
   },
   inAppPurchases: {
     title: 'App 内购买'

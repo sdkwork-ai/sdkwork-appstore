@@ -22,8 +22,11 @@ export interface IInstallSDK {
    * @param appId - the listing id.
    * @param platform - raw platform code (windows/macos/linux/android/...);
    *   defaults to the PC storefront context when omitted.
+   * @param architecture - the CPU architecture of the downloaded build
+   *   (x64/arm64/ia32/universal); omitted for listing-level installs that
+   *   resolve no specific artifact.
    */
-  installApp(appId: string, platform?: string): Promise<boolean>;
+  installApp(appId: string, platform?: string, architecture?: string): Promise<boolean>;
   /**
    * Issue and consume a download grant for one artifact, returning the
    * delivery projection (presigned URL when drive integration is enabled).
@@ -44,7 +47,8 @@ export function configureInstallServicePort(port: InstallServicePort): void {
 
 export const InstallService: IInstallSDK = {
   getInstalledAppIds: () => installPort.getInstalledAppIds(),
-  installApp: (appId, platform) => installPort.installApp(appId, platform),
+  installApp: (appId, platform, architecture) =>
+    installPort.installApp(appId, platform, architecture),
   resolveInstallerDownload: (artifactId) => installPort.resolveInstallerDownload(artifactId),
   uninstallApp: (appId) => installPort.uninstallApp(appId),
   getStorageStats: () => installPort.getStorageStats(),

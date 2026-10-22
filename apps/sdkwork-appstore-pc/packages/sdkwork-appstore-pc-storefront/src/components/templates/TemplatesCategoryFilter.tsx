@@ -1,8 +1,13 @@
 import React from 'react';
-import { useTranslation } from 'react-i18next';
+
+/** One template category chip: the catalog category value and its display label. */
+export interface TemplateCategoryOption {
+  value: string;
+  label: string;
+}
 
 interface TemplatesCategoryFilterProps {
-  categories: string[];
+  categories: TemplateCategoryOption[];
   selectedCategory: string;
   onSelectCategory: (category: string) => void;
 }
@@ -12,43 +17,21 @@ export const TemplatesCategoryFilter: React.FC<TemplatesCategoryFilterProps> = (
   selectedCategory,
   onSelectCategory,
 }) => {
-  const { t } = useTranslation();
-
-  const getCategoryLabel = (cat: string) => {
-    switch (cat) {
-      case '全部':
-        return t('common.actions.all');
-      case 'SaaS 全栈':
-        return t('templates.categories.saasFullstack');
-      case '知识库系统':
-        return t('templates.categories.knowledgeBase');
-      case 'Agent 协同':
-        return t('templates.categories.agentCollab');
-      case '开发者工具':
-        return t('templates.categories.devTools');
-      case '电商应用':
-        return t('templates.categories.ecommerce');
-      default:
-        return cat;
-    }
-  };
-
   return (
     <div className="flex items-center gap-2 overflow-x-auto pb-1 custom-scrollbar">
-      {categories.map((cat) => (
+      {categories.map((category) => (
         <button
-          key={cat}
-          onClick={() => onSelectCategory(cat)}
+          key={category.value}
+          onClick={() => onSelectCategory(category.value)}
           className={`px-3.5 py-1.5 rounded-store-control text-xs font-medium whitespace-nowrap transition-all cursor-pointer ${
-            selectedCategory === cat
+            selectedCategory === category.value
               ? 'bg-store-brand text-white shadow-sm'
               : 'bg-store-surface text-store-ink-soft border border-store-line hover:bg-store-subtle '
           }`}
         >
-          {getCategoryLabel(cat)}
+          {category.label}
         </button>
       ))}
     </div>
   );
 };
-

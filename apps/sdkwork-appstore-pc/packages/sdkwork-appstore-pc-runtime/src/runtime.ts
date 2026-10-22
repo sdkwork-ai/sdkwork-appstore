@@ -104,6 +104,7 @@ export function createAppstorePcRuntime(
     // The documents reference surfaces ride the shared gateway origin.
     baseUrl: normalizeGeneratedSdkBaseUrl(config.appApiBaseUrl, '/app/v3/api'),
     tokenManager,
+    locale: config.locale,
   });
   configureAppstorePcAdminRuntime(config, tokenManager);
 

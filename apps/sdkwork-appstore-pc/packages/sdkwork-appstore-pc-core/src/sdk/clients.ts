@@ -155,10 +155,13 @@ export function createAppstorePcSdkClients(
 export function createAppstorePcDocumentsAppClient(
   config: Pick<AppstorePcSdkBaseUrls, 'appApiBaseUrl'>,
   tokenManager: AuthTokenManager,
+  locale = 'en-US',
 ): SdkworkDocumentsAppClient {
   return createDocumentsAppClient({
     baseUrl: normalizeGeneratedSdkBaseUrl(config.appApiBaseUrl, '/app/v3/api'),
     tokenManager,
+    // Developer-catalog labels are localized server-side from this header.
+    headers: { 'Accept-Language': locale },
   });
 }
 

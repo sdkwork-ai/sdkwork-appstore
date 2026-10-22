@@ -1,7 +1,6 @@
 import { useTranslation } from 'react-i18next'
-import { Download, Globe, Puzzle, QrCode } from 'lucide-react'
+import { Globe, Puzzle, QrCode } from 'lucide-react'
 import {
-  detectDesktopOs,
   resolveDistributionActions,
   type AppItem,
   type DistributionAction,
@@ -11,8 +10,6 @@ interface DistributionActionsProps {
   app: AppItem
   /** Handle a web/H5 open action (new independent window). */
   onOpen: (action: DistributionAction) => void
-  /** Handle a desktop install action for one OS code. */
-  onInstall: (app: AppItem, platform: string) => void
   /** Handle a scan-to-continue action (mobile, mini program, extension). */
   onQr: (app: AppItem, action: DistributionAction) => void
   className?: string
@@ -27,30 +24,35 @@ const GROUP_QR_KEY: Partial<Record<DistributionAction['group'], string>> = {
 }
 
 /**
- * One action per supported distribution of a listing: direct open for web
- * surfaces, an OS-tagged download button per desktop installer, and scan
- * entries for mobile, mini program, and browser-extension distributions.
- * Used on the listing detail header; catalog cards carry only the primary
- * action (see AppRow).
+ * The distribution channels that are not desktop installers: direct open for
+ * web surfaces and scan entries for mobile, mini program, and browser-extension
+ * distributions.
+ *
+ * Desktop builds do not appear here. On a listing detail page they belong to
+ * the install call to action, which resolves the host OS and CPU architecture
+ * and lists every build in its own menu; rendering one button per OS here as
+ * well would offer the same choice twice with different rules.
  */
-export function DistributionActions({ app, onOpen, onInstall, onQr, className }: DistributionActionsProps) {
+export function DistributionActions({ app, onOpen, onQr, className }: DistributionActionsProps) {
   const { t } = useTranslation()
-  const detectedOs = detectDesktopOs()
-  const actions = resolveDistributionActions(app, detectedOs)
+  const actions = resolveDistributionActions(app, null).filter(
+    (action) => action.kind !== 'install',
+  )
   if (actions.length === 0) {
     return null
   }
 
   const buttonClass =
-    'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors cursor-pointer '
+    'inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors cursor-pointer '
 
   return (
     <div className={`flex flex-wrap items-center gap-2 ${className ?? ''}`}>
       {actions.map((action) => {
         if (action.kind === 'open') {
-          const label = action.group === 'h5Web'
-            ? t('common.distribution.openH5Web')
-            : t('common.distribution.openPcWeb')
+          const label =
+            action.group === 'h5Web'
+              ? t('common.distribution.openH5Web')
+              : t('common.distribution.openPcWeb')
           return (
             <button
               key={action.group}
@@ -63,24 +65,6 @@ export function DistributionActions({ app, onOpen, onInstall, onQr, className }:
               {label}
             </button>
           )
-        }
-        if (action.kind === 'install') {
-          return action.platformCodes.map((code) => {
-            const primary = code === detectedOs
-            return (
-              <button
-                key={`${action.group}:${code}`}
-                type="button"
-                onClick={() => onInstall(app, code)}
-                className={`${buttonClass} bg-store-brand/10 text-store-brand border-store-brand/20 hover:bg-store-brand/20 ${
-                  primary ? 'ring-1 ring-store-brand/60' : ''
-                }`}
-              >
-                <Download className="w-3.5 h-3.5" />
-                {t(`common.distribution.download.${code}`)}
-              </button>
-            )
-          })
         }
         return (
           <button

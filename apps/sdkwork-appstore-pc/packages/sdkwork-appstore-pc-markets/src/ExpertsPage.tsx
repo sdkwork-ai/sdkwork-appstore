@@ -3,13 +3,18 @@ import { ExpertsService } from '@sdkwork/appstore-pc-core';
 import type { ExpertItem } from '@sdkwork/appstore-pc-core';
 import { CardGrid } from '@sdkwork/appstore-pc-commons';
 import { ExpertCard } from './components/experts/ExpertCard';
-import { ALL_CATEGORY, ExpertsCategoryFilter } from './components/experts/ExpertsCategoryFilter';
+import { ExpertsCategoryFilter } from './components/experts/ExpertsCategoryFilter';
+import { ALL_CATEGORY } from './components/marketCategories';
 import { ExpertsEmptyState } from './components/experts/ExpertsEmptyState';
 import { ExpertsHeaderBanner } from './components/experts/ExpertsHeaderBanner';
 import { ExpertsSearchBar } from './components/experts/ExpertsSearchBar';
 
 export function ExpertsPage() {
-  const [experts, setExperts] = useState<ExpertItem[]>([]);
+  // The catalog is loaded once; the category filters and the search box are
+  // applied locally. Deriving the category list from the filtered result would
+  // hide every category except the selected one after the first click, so the
+  // roster and the categories stay the full catalog.
+  const [allExperts, setAllExperts] = useState<ExpertItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -17,12 +22,11 @@ export function ExpertsPage() {
 
   useEffect(() => {
     let cancelled = false;
-    setLoading(true);
-    setLoadError(null);
-    ExpertsService.getExperts(selectedCategory === ALL_CATEGORY ? '' : selectedCategory, searchQuery)
+    ExpertsService.getExperts()
       .then((data) => {
         if (!cancelled) {
-          setExperts(data);
+          setAllExperts(data);
+          setLoadError(null);
         }
       })
       .catch((err: unknown) => {
@@ -41,17 +45,35 @@ export function ExpertsPage() {
     return () => {
       cancelled = true;
     };
-  }, [selectedCategory, searchQuery]);
+  }, []);
 
   const categories = useMemo(() => {
     const tags = new Set<string>();
-    experts.forEach((expert) => {
+    allExperts.forEach((expert) => {
       if (expert.filterTag) {
         tags.add(expert.filterTag);
       }
     });
     return [ALL_CATEGORY, ...Array.from(tags)];
-  }, [experts]);
+  }, [allExperts]);
+
+  const experts = useMemo(() => {
+    const normalizedQuery = searchQuery.trim().toLocaleLowerCase();
+    return allExperts.filter((expert) => {
+      if (selectedCategory !== ALL_CATEGORY && expert.filterTag !== selectedCategory) {
+        return false;
+      }
+      if (!normalizedQuery) {
+        return true;
+      }
+      return (
+        expert.name.toLocaleLowerCase().includes(normalizedQuery) ||
+        expert.nickname.toLocaleLowerCase().includes(normalizedQuery) ||
+        expert.description.toLocaleLowerCase().includes(normalizedQuery) ||
+        expert.tags.some((tag) => tag.toLocaleLowerCase().includes(normalizedQuery))
+      );
+    });
+  }, [allExperts, selectedCategory, searchQuery]);
 
   return (
     <div className="p-6 md:p-8 w-full max-w-full space-y-6 animate-fade-in @container">

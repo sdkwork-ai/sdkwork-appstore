@@ -58,11 +58,16 @@ export function createAppStoreServicePort(
     }
     const response = await client.catalog.listCategories({ limit: 200, locale: 'zh-CN' });
     const items = readPageItems<Record<string, unknown>>(response);
-    categoryCache = items.map((item) => ({
-      id: readString(item, 'id'),
-      code: readString(item, 'categoryCode', 'category_code'),
-      displayName: readLocalizedName(item) || readString(item, 'displayName', 'display_name'),
-    }));
+    categoryCache = items.map((item) => {
+      // The catalog wraps each row as `{ category: { … }, localizations: […] }`;
+      // the identity fields live on the nested record.
+      const record = readCategoryRecord(item);
+      return {
+        id: readString(record, 'id'),
+        code: readString(record, 'categoryCode', 'category_code'),
+        displayName: readLocalizedName(item) || readString(record, 'displayName', 'display_name'),
+      };
+    });
     return categoryCache;
   }
 
@@ -168,13 +173,14 @@ export function createAppStoreServicePort(
       }
       const category = await client.catalog.getCategory(id).catch(() => undefined);
       const row = category as unknown as Record<string, unknown> | undefined;
-      if (!row || !readString(row, 'id')) {
+      const record = readCategoryRecord(row ?? {});
+      if (!row || !readString(record, 'id')) {
         return undefined;
       }
-      const code = readString(row, 'categoryCode', 'category_code');
+      const code = readString(record, 'categoryCode', 'category_code');
       return {
-        id: readString(row, 'id'),
-        name: readLocalizedName(row) || readString(row, 'displayName', 'display_name') || id,
+        id: readString(record, 'id'),
+        name: readLocalizedName(row) || readString(record, 'displayName', 'display_name') || id,
         description: readLocalizedDescription(row) || readString(row, 'description'),
         icon: (categoryVisuals[code] ?? fallbackVisual).icon,
       };
@@ -284,10 +290,12 @@ export function createAppStoreServicePort(
     async listAppsPage(params?: {
       cursor?: string;
       limit?: number;
+      categoryId?: string;
     }): Promise<{ items: AppItem[]; nextCursor: string | null }> {
       const response = await client.catalog.searchListings({
         cursor: params?.cursor || undefined,
         limit: Math.min(Math.max(params?.limit ?? storefrontPageSize, 1), catalogPageMax),
+        ...(params?.categoryId ? { categoryId: params.categoryId } : {}),
       });
       return {
         items: readPageItems<Record<string, unknown>>(response).map((item) =>
@@ -738,6 +746,14 @@ function formatDate(value: string | undefined): string {
     return value;
   }
   return date.toISOString().slice(0, 10);
+}
+
+/** Unwrap the catalog's `{ category, localizations }` category row. */
+function readCategoryRecord(item: Record<string, unknown>): Record<string, unknown> {
+  const nested = item.category;
+  return nested !== null && typeof nested === 'object' && !Array.isArray(nested)
+    ? (nested as Record<string, unknown>)
+    : item;
 }
 
 function readLocalizedName(item: Record<string, unknown>): string {

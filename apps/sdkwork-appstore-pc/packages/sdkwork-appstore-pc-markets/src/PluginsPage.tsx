@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { PluginItem } from '@sdkwork/appstore-pc-core';
 import { CardGrid } from '@sdkwork/appstore-pc-commons';
@@ -8,40 +8,69 @@ import { PluginDetailModal } from './components/plugins/PluginDetailModal';
 import { PluginsHeaderBanner } from './components/plugins/PluginsHeaderBanner';
 import { PluginsEmptyState } from './components/plugins/PluginsEmptyState';
 import { PluginsService } from '@sdkwork/appstore-pc-core';
+import { ALL_CATEGORY, type CategoryOption } from './components/marketCategories';
 
 export function PluginsPage() {
   const { t } = useTranslation();
-  const [plugins, setPlugins] = useState<PluginItem[]>([]);
+  // The catalog is loaded once and filtered locally: the category chips are
+  // derived from the full catalog, so selecting one never hides the others and
+  // every chip names a category the catalog actually contains.
+  const [allPlugins, setAllPlugins] = useState<PluginItem[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [selectedCategory, setSelectedCategory] = useState<string>(ALL_CATEGORY);
   const [selectedPlugin, setSelectedPlugin] = useState<PluginItem | null>(null);
   const [loading, setLoading] = useState(true);
   const [actionError, setActionError] = useState<string | null>(null);
 
-  const categories = [
-    t('plugins.categories.all'),
-    t('plugins.categories.codeDev'),
-    t('plugins.categories.dataRetrieval'),
-    t('plugins.categories.docProcessing'),
-    t('plugins.categories.databaseApps'),
-    t('plugins.categories.imageProcessing'),
-    t('plugins.categories.business')
-  ];
-
-  const loadPlugins = async () => {
-    try {
-      const data = await PluginsService.getPlugins(selectedCategory, searchQuery);
-      setPlugins(data);
-    } catch (err) {
-      console.error('Failed to load plugins', err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    loadPlugins();
-  }, [selectedCategory, searchQuery]);
+    let cancelled = false;
+    PluginsService.getPlugins()
+      .then((data) => {
+        if (!cancelled) {
+          setAllPlugins(data);
+        }
+      })
+      .catch((err) => {
+        console.error('Failed to load plugins', err);
+      })
+      .finally(() => {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const categories = useMemo<CategoryOption[]>(() => {
+    const values = new Set<string>();
+    allPlugins.forEach((plugin) => {
+      if (plugin.category) {
+        values.add(plugin.category);
+      }
+    });
+    return [
+      { value: ALL_CATEGORY, label: t('plugins.categories.all') },
+      ...[...values]
+        .sort((left, right) => left.localeCompare(right))
+        .map((value) => ({ value, label: value })),
+    ];
+  }, [allPlugins, t]);
+
+  const plugins = useMemo(() => {
+    const query = searchQuery.trim().toLocaleLowerCase();
+    return allPlugins.filter((plugin) => {
+      if (selectedCategory !== ALL_CATEGORY && plugin.category !== selectedCategory) {
+        return false;
+      }
+      if (!query) {
+        return true;
+      }
+      return [plugin.name, plugin.developer, plugin.description, plugin.category, ...plugin.capabilities]
+        .some((text) => text.toLocaleLowerCase().includes(query));
+    });
+  }, [allPlugins, selectedCategory, searchQuery]);
 
   const handleToggleEnable = async (id: string) => {
     setActionError(null);
@@ -51,7 +80,7 @@ export function PluginsPage() {
       setActionError(error instanceof Error ? error.message : 'Plugin action failed.');
       return;
     }
-    setPlugins((prev) =>
+    setAllPlugins((prev) =>
       prev.map((p) => (p.id === id ? { ...p, enabled: !p.enabled } : p))
     );
     if (selectedPlugin && selectedPlugin.id === id) {
@@ -112,4 +141,3 @@ export function PluginsPage() {
 }
 
 export default PluginsPage;
-

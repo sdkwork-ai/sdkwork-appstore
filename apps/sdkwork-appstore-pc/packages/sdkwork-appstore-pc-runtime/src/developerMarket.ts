@@ -14,12 +14,14 @@ import type { AuthTokenManager } from '@sdkwork/sdk-common';
 export function configureAppstorePcDeveloperMarketSurface(config: {
   baseUrl: string;
   tokenManager: AuthTokenManager;
+  locale: string;
 }): void {
   configureAppstorePcDeveloperMarket({
     baseUrl: config.baseUrl,
     documentsAppClient: createAppstorePcDocumentsAppClient(
       { appApiBaseUrl: config.baseUrl },
       config.tokenManager,
+      config.locale,
     ),
   });
 }

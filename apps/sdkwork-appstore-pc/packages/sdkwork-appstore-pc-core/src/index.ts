@@ -1,6 +1,7 @@
 export * from './composition';
 export * from './config';
 export * from './distribution';
+export * from './installTarget';
 export * from './platforms';
 export * from './runtime';
 export * from './sdk';

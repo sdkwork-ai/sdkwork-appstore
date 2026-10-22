@@ -103,6 +103,13 @@ export const common = {
       macos: 'macOS',
       linux: 'Linux'
     },
+    architecture: {
+      x64: 'x64',
+      arm64: 'ARM64',
+      ia32: '32-bit',
+      universal: 'Universal',
+      appleSilicon: 'Apple Silicon'
+    },
     qrAndroid: 'Scan with Android',
     qrIos: 'Scan with iOS',
     qrHarmonyos: 'Scan with HarmonyOS',
