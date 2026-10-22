@@ -113,17 +113,17 @@ export function DesktopSidebar() {
           isTabActive={isTabActive}
         />
 
-        {/* Sub-component: Library Navigation Section */}
-        <SidebarNavGroup
-          title={t('nav.menu.library')}
-          items={libraryTabs}
-          isTabActive={isTabActive}
-        />
-
         {/* Sub-component: AI Ecosystem Section */}
         <SidebarNavGroup
           title={t('nav.menu.aiHub')}
           items={aiTabs}
+          isTabActive={isTabActive}
+        />
+
+        {/* Sub-component: Library Navigation Section */}
+        <SidebarNavGroup
+          title={t('nav.menu.library')}
+          items={libraryTabs}
           isTabActive={isTabActive}
         />
 
