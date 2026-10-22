@@ -1,13 +1,13 @@
 import { lazy } from 'react';
 import { DeveloperMarketSurface } from './DeveloperMarketSurface';
 
-const SdkReferenceSurface = lazy(() =>
-  import('@sdkwork/documents-pc-sdk-reference').then((module) => ({
-    default: module.SdkReference,
+const SdkMarketSurface = lazy(() =>
+  import('@sdkwork/documents-pc-api-reference').then((module) => ({
+    default: module.SdkMarketPage,
   })),
 );
 
-/** The SDK market: generated SDK documentation, language packages, and archive downloads. */
+/** The SDK market: multi-language SDK families generated from every API surface. */
 export function SdkMarketPage() {
-  return <DeveloperMarketSurface Surface={SdkReferenceSurface} />;
+  return <DeveloperMarketSurface Surface={SdkMarketSurface} />;
 }

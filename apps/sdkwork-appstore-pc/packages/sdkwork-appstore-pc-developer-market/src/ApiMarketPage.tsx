@@ -1,13 +1,13 @@
 import { lazy } from 'react';
 import { DeveloperMarketSurface } from './DeveloperMarketSurface';
 
-const ApiReferenceSurface = lazy(() =>
+const ApiMarketSurface = lazy(() =>
   import('@sdkwork/documents-pc-api-reference').then((module) => ({
-    default: module.ApiReference,
+    default: module.ApiMarketPage,
   })),
 );
 
-/** The API market: the SDKWork gateway's API reference browser and playground. */
+/** The API market: every API surface published across the SDKWork workspace. */
 export function ApiMarketPage() {
-  return <DeveloperMarketSurface Surface={ApiReferenceSurface} />;
+  return <DeveloperMarketSurface Surface={ApiMarketSurface} />;
 }

@@ -6,7 +6,9 @@
  * `DocumentsReferenceRuntime` registered by the embedding host. This module is
  * that registration for the App Store: `configureAppstorePcDeveloperMarket`
  * mints the documents app SDK client over the shared gateway with the App
- * Store's single TokenManager, and the API-market pages read it back.
+ * Store's single TokenManager. The developer catalog itself lives in the
+ * documents database and is read through that same client, so the API-market
+ * and SDK-market pages never fetch static gateway JSON.
  *
  * The module graph stays free of React: the runtime package wires it from
  * `createAppstorePcRuntime` (the same lane as `configureAppstorePcPaidCheckout`)
@@ -28,6 +30,11 @@ export interface AppstorePcDeveloperMarketConfig {
    * feature package never constructs generated SDK transports itself.
    */
   documentsAppClient: DocumentsAppSdkClient;
+  /**
+   * Active gateway origin. The API playground sends requests to this origin
+   * with the documented surface prefix instead of the embedding page origin.
+   */
+  baseUrl: string;
 }
 
 // Bundlers that cannot keep `import.meta` semantics collapse the expression to
@@ -183,7 +190,9 @@ const DOCUMENTS_OPEN_SDK_METADATA = developerMarketSdkMetadata({
  * SDK system metadata behind the SDK-reference page. Hand-mirrored from the
  * documents app's `src/bootstrap/sdkSystemConfig.ts` ("Re-sync by hand"): the
  * table names the SDKWork SDK family the shared gateway serves, and the system
- * ids must line up with the gateway's `/openapi/schema-tabs.json` entries.
+ * ids must line up with the App Store's developer-market catalog
+ * (`database/seeds/common/017_developer_market.sql`, generated from the gateway
+ * contract artifacts by `database/seeds/.generate-developer-market.mjs`).
  */
 const DEVELOPER_MARKET_SDK_SYSTEM_CONFIG: Record<string, DocumentsGeneratedSdkMetadata> = {
   'llm-open-api': LLM_OPEN_API_METADATA,
@@ -233,6 +242,39 @@ export function configureAppstorePcDeveloperMarket(config: AppstorePcDeveloperMa
     // documents reference runtime consumes its `documents.sdkReference`
     // surface, so no reshaping adapter sits in between.
     getDocumentsAppSdkClient: () => config.documentsAppClient,
+    developerMarket: {
+      async listSystems() {
+        const response = await config.documentsAppClient.developerCatalog.apisList({
+          pageSize: 100,
+        });
+        return response.items.map((surface) => ({
+          systemCode: surface.id,
+          systemName: surface.title,
+          description: surface.description,
+          availability: surface.deprecated ? 'planned' : 'available',
+          sortWeight: surface.operationCount,
+          schemaKey: surface.id,
+          aliases: [surface.apiAuthority],
+        }));
+      },
+      async loadSchema(surfaceId) {
+        const schema = await config.documentsAppClient.developerCatalog.apiSchemaRetrieve(
+          surfaceId,
+        );
+        return schema.spec;
+      },
+      resolveRequestBaseUrl(_systemCode, apiPrefix) {
+        const prefix = apiPrefix.trim();
+        if (!prefix || /^https?:\/\//u.test(prefix)) {
+          return prefix;
+        }
+        const base = config.baseUrl.replace(/\/+$/u, '');
+        if (!base) {
+          return prefix;
+        }
+        return `${base}${prefix.startsWith('/') ? prefix : `/${prefix}`}`;
+      },
+    },
     playgroundUserAgent: 'SDKWork-AppStore-DeveloperMarket/1.0.0',
   };
 }

@@ -188,12 +188,13 @@ export default defineConfig(({ mode }) => {
           target: gatewayOrigin,
           changeOrigin: true,
         },
+        // Standalone-development fallback for surfaces that run without the App
+        // Store developer-market catalog runtime; embedded surfaces read the
+        // roster and OpenAPI documents from the database through the app SDK.
         '/openapi.json': {
           target: gatewayOrigin,
           changeOrigin: true,
         },
-        // The developer-market API reference reads its system roster from the
-        // gateway's schema-tabs document before falling back to /openapi.json.
         '/openapi/schema-tabs.json': {
           target: gatewayOrigin,
           changeOrigin: true,
