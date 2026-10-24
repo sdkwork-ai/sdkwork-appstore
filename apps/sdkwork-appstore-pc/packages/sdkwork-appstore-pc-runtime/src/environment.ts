@@ -9,6 +9,8 @@ export interface AppstorePcRuntimeConfig {
   agentsAppApiBaseUrl: string;
   commentsAppApiBaseUrl: string;
   companyAppApiBaseUrl: string;
+  /** Company backend API origin; the operator console governs demand categories there. */
+  companyBackendApiBaseUrl: string;
   aiPreviewAgentId?: string;
   appApiBaseUrl: string;
   appDisplayName: string;
@@ -51,6 +53,7 @@ export interface AppstorePcRuntimeConfigOverrides {
   agentsAppApiBaseUrl?: string
   commentsAppApiBaseUrl?: string
   companyAppApiBaseUrl?: string
+  companyBackendApiBaseUrl?: string
   appApiBaseUrl?: string
   backendApiBaseUrl?: string
   iamAppApiBaseUrl?: string
@@ -99,6 +102,10 @@ export function resolveAppstorePcRuntimeConfig(
       overrides.commentsAppApiBaseUrl ?? readEnv('VITE_SDKWORK_COMMENTS_APP_API_BASE_URL') ?? platformApiGatewayUrl,
     companyAppApiBaseUrl:
       overrides.companyAppApiBaseUrl ?? readEnv('VITE_SDKWORK_COMPANY_APP_API_BASE_URL') ?? platformApiGatewayUrl,
+    companyBackendApiBaseUrl:
+      overrides.companyBackendApiBaseUrl
+      ?? readEnv('VITE_SDKWORK_COMPANY_BACKEND_API_BASE_URL')
+      ?? platformApiGatewayUrl,
     appApiBaseUrl: overrides.appApiBaseUrl ?? applicationPublicUrl,
     appDisplayName: overrides.appDisplayName ?? manifest.app.displayName,
     appKey: overrides.appKey ?? manifest.app.key,

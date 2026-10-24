@@ -37,7 +37,12 @@ export const demands = {
     titlePlaceholder: 'e.g. Corporate website and mini-program development',
     demandTypeLabel: 'Demand Type',
     categoryLabel: 'Category',
-    categoryPlaceholder: 'e.g. IT equipment / Web application',
+    categoryPlaceholder: 'Select a leaf category',
+    appFormLabel: 'Application Form',
+    appFormHint: 'Which application form to deliver, per the SDKWork application architecture standards.',
+    appFormRequired: 'A development demand must select an application form',
+    appFormUnset: 'Not selected',
+    categoryRequired: 'Select a leaf demand category',
     budgetLabel: 'Budget',
     budgetPlaceholder: 'e.g. Negotiable / 1M-2M',
     budgetMinPlaceholder: 'Budget min (CNY)',
@@ -47,6 +52,25 @@ export const demands = {
     descriptionPlaceholder: 'Describe the background, scope and delivery requirements...',
     submit: 'Publish Demand',
     submitting: 'Publishing...'
+  },
+  category: {
+    loading: 'Loading categories...',
+    error: 'Failed to load categories, please retry',
+    empty: 'No categories available',
+    clear: 'Clear selection',
+    breadcrumb: 'Category path'
+  },
+  appForms: {
+    pc: 'PC application',
+    h5: 'H5 mobile app',
+    'static-web': 'Static website',
+    miniprogram: 'Mini program',
+    flutter: 'Flutter app',
+    uniapp: 'uni-app',
+    'android-native': 'Android native',
+    'ios-native': 'iOS native',
+    'harmony-native': 'HarmonyOS native',
+    unity: 'Unity interactive app'
   },
   claim: {
     action: 'Claim Order',
@@ -60,6 +84,9 @@ export const demands = {
   detail: {
     loading: 'Loading demand details...',
     bidDeadline: 'Bid deadline',
+    category: 'Category',
+    appForm: 'Application Form',
+    startProject: 'Create Project and Start',
     bidsSection: 'Bids received ({{count}})'
   },
   bidStatus: {

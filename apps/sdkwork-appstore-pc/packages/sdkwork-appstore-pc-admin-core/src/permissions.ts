@@ -37,6 +37,12 @@ export const APPSTORE_ADMIN_PERMISSIONS = {
   marketReleasesRead: 'appstore.market_releases.read',
   /** `appstore.market_releases.sync` — trigger external market release sync. */
   marketReleasesSync: 'appstore.market_releases.sync',
+  /**
+   * `company.demand_categories.manage` — demand hall category tree governance.
+   * Demand data is owned by the `sdkwork-company` backend API, so this code is
+   * enforced there rather than by `sdkwork-appstore-backend-api`.
+   */
+  demandsManage: 'company.demand_categories.manage',
 } as const;
 
 /** Union of every backend-admin permission code owned by this application. */
@@ -70,4 +76,5 @@ export const APPSTORE_ADMIN_SURFACE_ENTRY_PERMISSIONS: readonly AppstoreAdminPer
   APPSTORE_ADMIN_PERMISSIONS.marketChannelsWrite,
   APPSTORE_ADMIN_PERMISSIONS.marketReleasesRead,
   APPSTORE_ADMIN_PERMISSIONS.marketReleasesSync,
+  APPSTORE_ADMIN_PERMISSIONS.demandsManage,
 ];

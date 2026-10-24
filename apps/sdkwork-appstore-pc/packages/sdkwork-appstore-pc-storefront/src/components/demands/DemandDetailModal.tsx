@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { X } from 'lucide-react';
+import { FolderPlus, Layers, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { DemandClaimInput, DemandHallBid, DemandHallItem } from '@sdkwork/appstore-pc-core';
 import { CompanyDemandsService } from '../../services/api';
@@ -9,6 +9,12 @@ interface DemandDetailModalProps {
   onClose: () => void;
   /** 抢单提交；由页面接服务层。 */
   onClaim: (demandId: string, input: DemandClaimInput) => Promise<void>;
+  /**
+   * Host-provided "create project and start" action. The embedding host (for
+   * example the BirdCoder demand hall) supplies it to initialize a project from
+   * this demand; the standalone storefront omits it and renders no button.
+   */
+  onStartProject?: (demand: DemandHallItem) => void;
 }
 
 const BID_STATUS_KEYS: Record<string, string> = {
@@ -23,6 +29,7 @@ export const DemandDetailModal: React.FC<DemandDetailModalProps> = ({
   demandId,
   onClose,
   onClaim,
+  onStartProject,
 }) => {
   const { t } = useTranslation();
   const [demand, setDemand] = useState<DemandHallItem | null>(null);
@@ -115,6 +122,20 @@ export const DemandDetailModal: React.FC<DemandDetailModalProps> = ({
               </span>
             </div>
             <h3 className="mt-2 text-lg font-bold pr-8">{demand.title}</h3>
+            <div className="mt-2 flex flex-wrap items-center gap-2 text-[11px] text-store-ink-faint">
+              <span className="flex items-center gap-1">
+                <Layers className="w-3.5 h-3.5" />
+                {demand.category}
+              </span>
+              {demand.appForm ? (
+                <span
+                  className="rounded-full bg-store-brand/10 border border-store-brand/20 px-2.5 py-0.5 text-xs font-medium text-store-brand"
+                  data-demand-app-form={demand.appForm}
+                >
+                  {t(`demands.appForms.${demand.appForm}`, demand.appForm)}
+                </span>
+              ) : null}
+            </div>
             <p className="mt-1 text-xs text-store-ink-faint">
               {demand.companyName || t('demands.card.personalPublisher')}
               {demand.bidDeadline
@@ -124,6 +145,18 @@ export const DemandDetailModal: React.FC<DemandDetailModalProps> = ({
             <p className="mt-3 text-sm text-store-ink-soft leading-relaxed whitespace-pre-wrap">
               {demand.description || t('demands.card.noDescription')}
             </p>
+
+            {onStartProject ? (
+              <button
+                type="button"
+                className="mt-4 w-full py-2.5 rounded-store-control border border-store-brand/40 bg-store-brand/5 text-store-brand text-sm font-bold hover:bg-store-brand/10 transition-colors cursor-pointer flex items-center justify-center gap-2"
+                onClick={() => onStartProject(demand)}
+                data-demand-start-project
+              >
+                <FolderPlus className="w-4 h-4" />
+                {t('demands.detail.startProject')}
+              </button>
+            ) : null}
 
             {canClaim && !claimOpen ? (
               <button

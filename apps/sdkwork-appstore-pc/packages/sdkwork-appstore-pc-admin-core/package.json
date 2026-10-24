@@ -18,6 +18,7 @@
   },
   "dependencies": {
     "@sdkwork/appstore-backend-sdk": "workspace:*",
+    "@sdkwork/company-backend-sdk": "workspace:*",
     "@sdkwork/iam-contracts": "workspace:*",
     "@sdkwork/sdk-common": "workspace:*",
     "@sdkwork/utils": "workspace:*"

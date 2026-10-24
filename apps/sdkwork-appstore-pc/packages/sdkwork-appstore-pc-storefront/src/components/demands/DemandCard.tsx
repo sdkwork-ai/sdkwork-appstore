@@ -40,6 +40,14 @@ export const DemandCard: React.FC<DemandCardProps> = ({ demand, onSelect, onClai
         <h3 className="mt-2 text-sm font-bold text-store-ink group-hover:text-store-brand transition-colors line-clamp-1">
           {demand.title}
         </h3>
+        {demand.appForm ? (
+          <span
+            className="mt-1 inline-block rounded-full bg-store-brand/10 border border-store-brand/20 px-2.5 py-0.5 text-xs font-medium text-store-brand"
+            data-demand-app-form={demand.appForm}
+          >
+            {t(`demands.appForms.${demand.appForm}`, demand.appForm)}
+          </span>
+        ) : null}
         <p className="text-xs text-store-ink-soft mt-2 line-clamp-2 leading-relaxed">
           {demand.description || t('demands.card.noDescription')}
         </p>

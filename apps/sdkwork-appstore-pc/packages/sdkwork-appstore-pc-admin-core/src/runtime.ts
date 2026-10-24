@@ -1,4 +1,5 @@
 import type { SdkworkAppstoreBackendClient } from '@sdkwork/appstore-backend-sdk';
+import type { SdkworkBackendClient as SdkworkCompanyBackendClient } from '@sdkwork/company-backend-sdk';
 
 import {
   configureAppstoreAdminServicePorts,
@@ -10,17 +11,21 @@ import {
  * Bind the App Store backend-admin runtime.
  *
  * Bootstrap code inside the host product owns credential resolution and calls
- * `createAppstorePcAdminBackendClient` from this package (`./sdk`) to build the
- * generated backend client; this entrypoint turns that client into the service
- * ports every `pc-admin-*` capability package consumes.
+ * `createAppstorePcAdminBackendClient` / `createAppstorePcAdminCompanyBackendClient`
+ * from this package (`./sdk`) to build the generated clients; this entrypoint
+ * turns them into the service ports every `pc-admin-*` capability package
+ * consumes. Demand data is owned by the company domain, so that domain's client
+ * is required for the demand capability module.
  *
- * @param backendClient - generated backend client bound to a TokenManager.
+ * @param backendClient - App Store backend client bound to a TokenManager.
+ * @param companyBackendClient - company backend client bound to the same TokenManager.
  * @returns the bound ports, so a host may also hold them directly.
  */
 export function configureAppstorePcAdminRuntime(
   backendClient: SdkworkAppstoreBackendClient,
+  companyBackendClient: SdkworkCompanyBackendClient,
 ): AppstoreAdminServicePorts {
-  const ports = createAppstoreAdminServicePorts(backendClient);
+  const ports = createAppstoreAdminServicePorts(backendClient, companyBackendClient);
   configureAppstoreAdminServicePorts(ports);
   return ports;
 }

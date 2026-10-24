@@ -12,6 +12,7 @@ import {
   i18n,
   ThemeProvider,
 } from '@sdkwork/appstore-pc-storefront';
+import type { DemandHallItem } from '@sdkwork/appstore-pc-core';
 import {
   createAppstorePcRuntime,
   resolveAppstorePcRuntimeConfig,
@@ -71,6 +72,12 @@ export interface AppstoreMarketsSurfaceProps {
   /** Host color-scheme bridge: the surface follows the host theme instead of owning one. */
   resolveHostColorScheme?: () => 'light' | 'dark'
   subscribeHostColorScheme?: (listener: (scheme: 'light' | 'dark') => void) => () => void
+  /**
+   * Host action for the demands page: create and initialize a project from a
+   * selected demand. The embedding host supplies it (BirdCoder's demand hall
+   * does); without it the demand detail renders no start-project affordance.
+   */
+  onStartProject?: (demand: DemandHallItem) => void
 }
 
 function resolveMarketsConfig(props: AppstoreMarketsSurfaceProps): AppstorePcRuntimeConfig {
@@ -208,7 +215,13 @@ export function AppstoreMarketsSurface(props: AppstoreMarketsSurfaceProps) {
             just like the full AppstorePcHost embed: hosts without a React
             Router context must still be able to mount one page. */}
         <MemoryRouter initialEntries={['/']}>
-          <MarketPage />
+          {props.page === 'demands' ? (
+            <DemandsPage
+              {...(props.onStartProject === undefined ? {} : { onStartProject: props.onStartProject })}
+            />
+          ) : (
+            <MarketPage />
+          )}
         </MemoryRouter>
       </ThemeProvider>
     </I18nextProvider>

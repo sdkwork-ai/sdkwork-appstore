@@ -37,7 +37,12 @@ export const demands = {
     titlePlaceholder: '例如：企业官网与小程序开发',
     demandTypeLabel: '需求类型',
     categoryLabel: '需求分类',
-    categoryPlaceholder: '例如：IT设备 / Web 应用',
+    categoryPlaceholder: '请选择末级分类',
+    appFormLabel: '应用形态',
+    appFormHint: '交付什么形式的应用，按 SDKWork 应用架构规范实现。',
+    appFormRequired: '发布软件开发需求必须选择应用形态',
+    appFormUnset: '未选择',
+    categoryRequired: '请选择末级需求分类',
     budgetLabel: '预算',
     budgetPlaceholder: '例如：面议 / 100万-200万',
     budgetMinPlaceholder: '预算下限（元）',
@@ -47,6 +52,25 @@ export const demands = {
     descriptionPlaceholder: '请描述需求背景、范围、交付要求...',
     submit: '发布需求',
     submitting: '发布中...'
+  },
+  category: {
+    loading: '分类加载中...',
+    error: '分类加载失败，请重试',
+    empty: '暂无可选分类',
+    clear: '清除选择',
+    breadcrumb: '分类路径'
+  },
+  appForms: {
+    pc: 'PC 应用',
+    h5: 'H5 移动应用',
+    'static-web': '静态网站',
+    miniprogram: '小程序',
+    flutter: 'Flutter 应用',
+    uniapp: 'uni-app 应用',
+    'android-native': 'Android 原生',
+    'ios-native': 'iOS 原生',
+    'harmony-native': 'HarmonyOS 原生',
+    unity: 'Unity 互动应用'
   },
   claim: {
     action: '我要抢单',
@@ -60,6 +84,9 @@ export const demands = {
   detail: {
     loading: '需求详情加载中...',
     bidDeadline: '截标',
+    category: '分类',
+    appForm: '应用形态',
+    startProject: '创建项目并开工',
     bidsSection: '收到的投标（{{count}}）'
   },
   bidStatus: {

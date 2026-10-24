@@ -25,4 +25,7 @@ export * from './composition';
 export * from './runtime';
 export * from './i18n';
 
-export { createAppstorePcAdminBackendClient } from './sdk';
+export {
+  createAppstorePcAdminBackendClient,
+  createAppstorePcAdminCompanyBackendClient,
+} from './sdk';

@@ -12,6 +12,12 @@ export interface DemandHallItem {
   title: string;
   /** 企业中心分类（自由文本），如 "IT设备"。 */
   category: string;
+  /** Leaf demand category id selected through the cascading category menu. */
+  categoryId?: string;
+  /** Slash-delimited category tree path, for example `/software/web/admin-system`. */
+  categoryPath?: string;
+  /** Application form being commissioned, per the SDKWork application standards. */
+  appForm?: DemandAppForm;
   /** 需求大类：软件开发 / 求购 / 设计 / 其他。 */
   demandType: string;
   /** 展示预算文本；结构化区间见 budgetMin/budgetMax。 */
@@ -26,6 +32,44 @@ export interface DemandHallItem {
   publisherUserId: string;
   companyName: string;
   publishedAt: string;
+}
+
+/**
+ * Demand application forms, one code per SDKWork application architecture
+ * standard, in publish-form order. The code is the wire value; the label and
+ * the spec each code implements live in the client dictionaries.
+ */
+export const DEMAND_APP_FORMS = [
+  'pc',
+  'h5',
+  'static-web',
+  'miniprogram',
+  'flutter',
+  'uniapp',
+  'android-native',
+  'ios-native',
+  'harmony-native',
+  'unity',
+] as const;
+
+/** One {@link DEMAND_APP_FORMS} code. */
+export type DemandAppForm = (typeof DEMAND_APP_FORMS)[number];
+
+/** One node of the demand category tree served for the cascading menu. */
+export interface DemandCategory {
+  id: string;
+  parentId?: string;
+  categoryCode: string;
+  displayName: string;
+  displayNameEn?: string;
+  description?: string;
+  /** Application form this category usually commissions, offered as the default. */
+  appForm?: DemandAppForm;
+  level: number;
+  path: string;
+  sortOrder: number;
+  status: 'active' | 'disabled';
+  children: DemandCategory[];
 }
 
 export interface DemandHallBid {
@@ -46,7 +90,10 @@ export type DemandHallType = 'development' | 'purchase' | 'design' | 'other';
 
 export interface DemandPublishInput {
   title: string;
-  category: string;
+  /** Leaf category id from the cascading category menu; required by the service. */
+  categoryId: string;
+  /** Application form being commissioned; required for a development demand. */
+  appForm?: DemandAppForm;
   demandType?: DemandHallType;
   budget?: string;
   budgetMin?: string;
@@ -70,6 +117,8 @@ export interface ICompanyDemandsSDK {
   listDemands(query?: { q?: string; demandType?: string }): Promise<DemandHallItem[]>;
   getDemand(demandId: string): Promise<DemandHallItem>;
   publishDemand(input: DemandPublishInput): Promise<DemandHallItem>;
+  /** Read the demand category tree that drives the cascading publish menu. */
+  listDemandCategories(): Promise<DemandCategory[]>;
   /** 抢单：以当前登录身份对该需求提交一份接单投标。 */
   claimDemand(demandId: string, input: DemandClaimInput): Promise<DemandHallBid>;
   /** 需求方视角：查看收到的投标（仅发布人可见）。 */
@@ -91,6 +140,7 @@ export const CompanyDemandsService: ICompanyDemandsSDK = {
   listDemands: (query) => companyDemandsPort.listDemands(query),
   getDemand: (demandId) => companyDemandsPort.getDemand(demandId),
   publishDemand: (input) => companyDemandsPort.publishDemand(input),
+  listDemandCategories: () => companyDemandsPort.listDemandCategories(),
   claimDemand: (demandId, input) => companyDemandsPort.claimDemand(demandId, input),
   listDemandBids: (demandId) => companyDemandsPort.listDemandBids(demandId),
   listMyBids: () => companyDemandsPort.listMyBids(),
@@ -104,6 +154,7 @@ function createUnconfiguredCompanyDemandsPort(): CompanyDemandsServicePort {
     listDemands: async () => unavailable(),
     getDemand: async () => unavailable(),
     publishDemand: async () => unavailable(),
+    listDemandCategories: async () => unavailable(),
     claimDemand: async () => unavailable(),
     listDemandBids: async () => unavailable(),
     listMyBids: async () => unavailable(),

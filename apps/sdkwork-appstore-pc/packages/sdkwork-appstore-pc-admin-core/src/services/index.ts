@@ -6,4 +6,5 @@ export * from './listings';
 export * from './catalog';
 export * from './publishers';
 export * from './market';
+export * from './demands';
 export * from './registry';

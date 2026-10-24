@@ -8,6 +8,7 @@ import {
 import { AppstoreAdminShellProvider } from '@sdkwork/appstore-pc-admin-shell';
 import { appstoreAdminCatalogI18nBundle, appstoreAdminCatalogModule } from '@sdkwork/appstore-pc-admin-catalog';
 import { appstoreAdminDashboardI18nBundle, appstoreAdminDashboardModule } from '@sdkwork/appstore-pc-admin-dashboard';
+import { appstoreAdminDemandsI18nBundle, appstoreAdminDemandsModule } from '@sdkwork/appstore-pc-admin-demands';
 import { appstoreAdminListingsI18nBundle, appstoreAdminListingsModule } from '@sdkwork/appstore-pc-admin-listings';
 import { appstoreAdminMarketI18nBundle, appstoreAdminMarketModule } from '@sdkwork/appstore-pc-admin-market';
 import { appstoreAdminModerationI18nBundle, appstoreAdminModerationModule } from '@sdkwork/appstore-pc-admin-moderation';
@@ -33,6 +34,7 @@ export const APPSTORE_ADMIN_MODULES = [
   appstoreAdminModerationModule,
   appstoreAdminListingsModule,
   appstoreAdminCatalogModule,
+  appstoreAdminDemandsModule,
   appstoreAdminPublishersModule,
   appstoreAdminMarketModule,
 ] as const;
@@ -58,6 +60,7 @@ export function ensureAppstoreAdminLocalesRegistered(): void {
     appstoreAdminModerationI18nBundle,
     appstoreAdminListingsI18nBundle,
     appstoreAdminCatalogI18nBundle,
+    appstoreAdminDemandsI18nBundle,
     appstoreAdminPublishersI18nBundle,
     appstoreAdminMarketI18nBundle,
   ]);

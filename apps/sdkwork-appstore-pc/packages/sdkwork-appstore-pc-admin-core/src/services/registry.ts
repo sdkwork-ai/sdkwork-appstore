@@ -1,4 +1,5 @@
 import type { SdkworkAppstoreBackendClient } from '@sdkwork/appstore-backend-sdk';
+import type { SdkworkBackendClient as SdkworkCompanyBackendClient } from '@sdkwork/company-backend-sdk';
 
 import { AppstoreAdminRuntimeUnconfiguredError } from './errors';
 import {
@@ -22,6 +23,7 @@ import {
   type AppstoreAdminPublishersPort,
 } from './publishers';
 import { createAppstoreAdminMarketPort, type AppstoreAdminMarketPort } from './market';
+import { createAppstoreAdminDemandsPort, type AppstoreAdminDemandsPort } from './demands';
 
 /**
  * Every backend-admin service port the App Store operator console consumes.
@@ -44,14 +46,20 @@ export interface AppstoreAdminServicePorts {
   publishers: AppstoreAdminPublishersPort;
   /** `marketChannels.*` + `marketReleases.*` — external distribution. */
   market: AppstoreAdminMarketPort;
+  /** `company.demandCategories.*` — demand hall category tree governance. */
+  demands: AppstoreAdminDemandsPort;
 }
 
 /**
  * Build every admin service port from one generated backend client.
  * @param client - client produced by `createAppstorePcAdminBackendClient`.
+ * @param companyClient - company-domain client produced by
+ *   `createAppstorePcAdminCompanyBackendClient`; demand data is owned by the
+ *   `sdkwork-company` domain, so its port needs that domain's client.
  */
 export function createAppstoreAdminServicePorts(
   client: SdkworkAppstoreBackendClient,
+  companyClient: SdkworkCompanyBackendClient,
 ): AppstoreAdminServicePorts {
   return {
     dashboard: createAppstoreAdminDashboardPort(client),
@@ -60,6 +68,7 @@ export function createAppstoreAdminServicePorts(
     catalog: createAppstoreAdminCatalogPort(client),
     publishers: createAppstoreAdminPublishersPort(client),
     market: createAppstoreAdminMarketPort(client),
+    demands: createAppstoreAdminDemandsPort(companyClient.company.demandCategories),
   };
 }
 
@@ -118,5 +127,8 @@ export const AppstoreAdminService: AppstoreAdminServicePorts = {
   },
   get market(): AppstoreAdminMarketPort {
     return getAppstoreAdminServicePorts().market;
+  },
+  get demands(): AppstoreAdminDemandsPort {
+    return getAppstoreAdminServicePorts().demands;
   },
 };

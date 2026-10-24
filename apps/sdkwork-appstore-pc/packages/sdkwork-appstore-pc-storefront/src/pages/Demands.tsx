@@ -18,7 +18,15 @@ import { DemandDetailModal } from '../components/demands/DemandDetailModal';
  * Demand data is owned by the company domain and consumed through the
  * pc-core demand hall service port.
  */
-export function DemandsPage() {
+export interface DemandsPageProps {
+  /**
+   * Host-provided "create project and start" action. Embedding hosts such as
+   * the BirdCoder demand hall supply it; the standalone storefront omits it.
+   */
+  onStartProject?: (demand: DemandHallItem) => void;
+}
+
+export function DemandsPage({ onStartProject }: DemandsPageProps = {}) {
   const { t } = useTranslation();
   const [demands, setDemands] = useState<DemandHallItem[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -98,6 +106,7 @@ export function DemandsPage() {
         demandId={detailDemandId}
         onClose={() => setDetailDemandId(null)}
         onClaim={handleClaim}
+        {...(onStartProject === undefined ? {} : { onStartProject })}
       />
     </div>
   );

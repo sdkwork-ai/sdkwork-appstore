@@ -9,6 +9,7 @@ const fixtureConfig: AppstorePcRuntimeConfig = {
   agentsAppApiBaseUrl: 'https://agents.example.test',
   commentsAppApiBaseUrl: 'https://comments.example.test',
   companyAppApiBaseUrl: 'https://company.example.test',
+  companyBackendApiBaseUrl: 'https://company-backend.example.test',
   appApiBaseUrl: 'https://app.example.test',
   appDisplayName: 'App Store fixture',
   appKey: 'sdkwork-appstore-pc',
