@@ -10,7 +10,7 @@ The canonical standards index is `../../../sdkwork-specs/README.md`; `../../../s
 
 ## Application Identity
 
-Read `sdkwork.app.config.json` for application identity, release, media, and packaging metadata. Runtime and deployment values belong in `etc/sdkwork.deployment.config.json` and the typed runtime configuration adapter.
+Read `agent.app.config.json` for application identity, release, media, and packaging metadata. Runtime and deployment values belong in `etc/sdkwork.deployment.config.json` and the typed runtime configuration adapter.
 
 ## Local Dictionary Structure
 

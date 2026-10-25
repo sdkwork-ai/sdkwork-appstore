@@ -20,7 +20,7 @@ export interface AppstoreH5UploadDeclarationEntry {
   readonly uploadProfileCode: string;
 }
 
-/** This application's canonical appId, from `sdkwork.app.config.json` `backend.appId`. */
+/** This application's canonical appId, from `agent.app.config.json` `backend.appId`. */
 export const APPSTORE_H5_APP_ID = 'sdkwork-appstore-h5' as const;
 
 /** The call-origin label for store listings media. */

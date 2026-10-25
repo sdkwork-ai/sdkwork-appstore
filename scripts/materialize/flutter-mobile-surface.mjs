@@ -66,7 +66,7 @@ export function materializeFlutterMobile(appsDir) {
 
   write('AGENTS.md', agentsMd(SUFFIX));
   write('README.md', readmeMd(SUFFIX));
-  writeJson('sdkwork.app.config.json', appManifest(SUFFIX));
+  writeJson('agent.app.config.json', appManifest(SUFFIX));
   writeJson('specs/component.spec.json', rootComponentSpec(SUFFIX));
   writeJson('etc/sdkwork.deployment.config.json', deploymentConfig(SUFFIX));
   write('etc/README.md', etcReadme(SUFFIX));

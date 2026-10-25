@@ -51,7 +51,7 @@ export const platformProfiles = {
     packageSegment: 'flutter_mobile',
     componentType: 'flutter-mobile-app-root',
     languages: ['dart'],
-    manifests: ['pubspec.yaml', 'sdkwork.app.config.json'],
+    manifests: ['pubspec.yaml', 'agent.app.config.json'],
     packageManager: 'flutter',
     etcFormat: 'dart-define-json',
     etcOutputPattern: '../env/sdkwork.{deploymentProfile}.{environment}.json',
@@ -82,7 +82,7 @@ export const platformProfiles = {
     packageSegment: 'mp',
     componentType: 'mini-program-app-root',
     languages: ['typescript'],
-    manifests: ['package.json', 'sdkwork.app.config.json', 'project.config.json'],
+    manifests: ['package.json', 'agent.app.config.json', 'project.config.json'],
     packageManager: 'pnpm',
     etcFormat: 'mini-program-json',
     etcOutputPattern:
@@ -114,7 +114,7 @@ export const platformProfiles = {
     packageSegment: 'harmony-mobile',
     componentType: 'harmony-mobile-app-root',
     languages: ['arkts'],
-    manifests: ['oh-package.json5', 'sdkwork.app.config.json'],
+    manifests: ['oh-package.json5', 'agent.app.config.json'],
     packageManager: 'ohpm',
     etcFormat: 'har-json',
     etcOutputPattern:
@@ -132,13 +132,13 @@ export const platformProfiles = {
 export const appRootName = (suffix) => `sdkwork-${applicationCode}-${suffix}`;
 export const applicationKey = (suffix) => `${applicationCode}-${suffix}`;
 
-/** Application declaration (`sdkwork.app.config.json`) for one client root. */
+/** Application declaration (`agent.app.config.json`) for one client root. */
 export function appManifest(suffix) {
   const profile = platformProfiles[suffix];
   const root = `apps/${appRootName(suffix)}`;
   return {
     schemaVersion: 3,
-    kind: 'sdkwork.app',
+    kind: 'agent.app',
     app: {
       key: applicationKey(suffix),
       name: profile.displayName,
@@ -388,7 +388,7 @@ of the ${profileIds.length} supported profiles
 - Commit non-secret templates and environment descriptors only.
 - Never commit access tokens, refresh tokens, signing material, or app secrets.
 - Concrete environment, runtime, base URL, and deployment values belong here,
-  not in \`sdkwork.app.config.json\`.
+  not in \`agent.app.config.json\`.
 `;
 }
 
@@ -495,7 +495,7 @@ The canonical standards index is \`${SPECS}/README.md\`, and \`${SPECS}/AGENTS_S
 
 ## Application Identity
 
-Read \`sdkwork.app.config.json\` only for application identity, SDK/API inventory, release metadata, packaging, or app-owned capabilities. Runtime values belong to source configuration under \`etc/\` and \`${profile.configRoot}/\`, not to the application declaration.
+Read \`agent.app.config.json\` only for application identity, SDK/API inventory, release metadata, packaging, or app-owned capabilities. Runtime values belong to source configuration under \`etc/\` and \`${profile.configRoot}/\`, not to the application declaration.
 
 - Application code: \`${applicationCode}\`
 - Application key: \`${applicationKey(suffix)}\`
@@ -661,7 +661,7 @@ export function permissionComposition() {
       },
     ],
     bootstrapAccessTokenScope: {
-      inheritFrom: 'sdkwork.app.config.json#backend.accessTokenPermissionScope',
+      inheritFrom: 'agent.app.config.json#backend.accessTokenPermissionScope',
       supplement: [],
       overrideReplace: false,
     },

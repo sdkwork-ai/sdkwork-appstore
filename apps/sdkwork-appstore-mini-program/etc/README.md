@@ -25,4 +25,4 @@ of the 10 supported profiles
 - Commit non-secret templates and environment descriptors only.
 - Never commit access tokens, refresh tokens, signing material, or app secrets.
 - Concrete environment, runtime, base URL, and deployment values belong here,
-  not in `sdkwork.app.config.json`.
+  not in `agent.app.config.json`.

@@ -14,7 +14,7 @@ The canonical standards entrypoint is `../sdkwork-specs/README.md`; agent behavi
 - Runtime family: Rust/Axum services with PC and H5 TypeScript applications
 - API authorities: `sdkwork-appstore-app-api`, `sdkwork-appstore-backend-api`, `sdkwork-appstore-open-api`
 - SDK families: `sdkwork-appstore-app-sdk`, `sdkwork-appstore-backend-sdk`, `sdkwork-appstore-sdk`
-- Application declarations: `apps/*/sdkwork.app.config.json`
+- Application declarations: `apps/*/agent.app.config.json`
 - Source configuration: `apps/*/etc/sdkwork.deployment.config.json`
 
 Application declarations own identity and release metadata. Concrete environment, runtime, base URL, and deployment values belong under each deployable root's `etc/` directory.
@@ -42,7 +42,7 @@ Application declarations own identity and release metadata. Concrete environment
 Use dynamic progressive loading and inspect implementation files only after resolving the task-specific dictionary and standards.
 
 1. Read the nearest `AGENTS.md`.
-2. Read `sdkwork.app.config.json` and `etc/` only when identity, runtime, release, or deployment is in scope.
+2. Read `agent.app.config.json` and `etc/` only when identity, runtime, release, or deployment is in scope.
 3. Read the nearest module `specs/`, then repository `specs/`, when their contracts are touched.
 4. Read `specs/AGENTS_DEPENDENCY_BOUNDARY_SPEC.md` when the `sdkwork-agents` dependency, `@sdkwork/agents-app-sdk` consumption, or the AI Lab 专家/独立页面 composition is touched.
 5. Read relevant `.sdkwork/` metadata only when a local extension is in scope.

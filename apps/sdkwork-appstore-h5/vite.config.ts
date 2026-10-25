@@ -31,7 +31,7 @@ const CONFIG_DIR = fileURLToPath(new URL('.', import.meta.url));
 const WORKSPACE_ROOT = path.resolve(CONFIG_DIR, '../../..');
 const REPO_ROOT = path.resolve(CONFIG_DIR, '../..');
 /** Surface manifest that owns the credential-entry bootstrap identity. */
-const APP_MANIFEST_PATH = 'apps/sdkwork-appstore-h5/sdkwork.app.config.json';
+const APP_MANIFEST_PATH = 'apps/sdkwork-appstore-h5/agent.app.config.json';
 const SDK_COMMON_SOURCE_ROOT = path.resolve(
   WORKSPACE_ROOT,
   'sdkwork-sdk-commons/sdkwork-sdk-common-typescript/src',

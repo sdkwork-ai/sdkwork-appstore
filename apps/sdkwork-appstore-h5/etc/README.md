@@ -50,4 +50,4 @@ node ../../../../sdkwork-specs/tools/check-browser-build-scripts.mjs --root .
   environment (`ENVIRONMENT_SPEC.md` section 5.1.0.1); standalone profiles stay same-origin
   with root-relative `/` SDK base URLs.
 - Concrete environment, runtime, base URL, and deployment values belong here,
-  not in `sdkwork.app.config.json`.
+  not in `agent.app.config.json`.

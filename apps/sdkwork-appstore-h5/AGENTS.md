@@ -12,14 +12,14 @@ Use `../../../sdkwork-specs/README.md` and `../../../sdkwork-specs/AGENTS_SPEC.m
 
 - Application id: `sdkwork-appstore-h5`
 - Surface: phone-first H5 browser application
-- Declaration: `sdkwork.app.config.json`
+- Declaration: `agent.app.config.json`
 - Source configuration: `etc/sdkwork.deployment.config.json`
 - Application SDK: `@sdkwork/appstore-app-sdk`
 - Federated commerce SDK: `@sdkwork/cloudrouter-app-sdk/domains`
 
 ## Local Dictionary Structure
 
-- `sdkwork.app.config.json`: application and release identity.
+- `agent.app.config.json`: application and release identity.
 - `etc/`: concrete environment, base URL, runtime, and deployment configuration.
 - `specs/`: component contracts.
 - `packages/`: H5 application packages.

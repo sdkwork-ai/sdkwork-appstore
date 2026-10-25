@@ -145,7 +145,7 @@ function scanModuleApps() {
       const appRoot = path.join(appsRoot, `${moduleName}-${form.suffix}`);
       if (!fs.existsSync(appRoot)) continue;
 
-      const config = readJson(path.join(appRoot, 'sdkwork.app.config.json'));
+      const config = readJson(path.join(appRoot, 'agent.app.config.json'));
       const packageJson = readJson(path.join(appRoot, 'package.json'));
 
       const appKey = config?.app?.key ?? packageJson?.name ?? `${moduleName}-${form.suffix}`;

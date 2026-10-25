@@ -16,7 +16,7 @@
     "generated": false,
     "manifests": [
       "oh-package.json5",
-      "sdkwork.app.config.json"
+      "agent.app.config.json"
     ]
   },
   "canonicalSpecs": [

@@ -1,4 +1,4 @@
-import manifest from '../../../sdkwork.app.config.json';
+import manifest from '../../../agent.app.config.json';
 import {resolveBaseUrlWithAlignProtocol} from '@sdkwork/sdk-common';
 
 export type AppstorePcEnvironment = 'development' | 'test' | 'staging' | 'production';

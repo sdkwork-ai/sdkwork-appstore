@@ -1,30 +1,30 @@
 {
   "schemaVersion": 3,
-  "kind": "sdkwork.app",
+  "kind": "agent.app",
   "app": {
-    "key": "appstore-harmony-mobile",
-    "name": "SDKWork App Store HarmonyOS Mobile",
-    "displayName": "SDKWork App Store HarmonyOS Mobile",
-    "description": "SDKWork App Store native HarmonyOS mobile client for discovering, installing, and operating marketplace applications.",
+    "key": "appstore-mini-program",
+    "name": "SDKWork App Store Mini Program",
+    "displayName": "SDKWork App Store Mini Program",
+    "description": "SDKWork App Store WeChat mini program client for discovering, installing, and operating marketplace applications.",
     "vendor": "SDKWork",
-    "officialWebsiteUrl": "https://sdkwork.com/apps/appstore-harmony-mobile",
+    "officialWebsiteUrl": "https://sdkwork.com/apps/appstore-mini-program",
     "supportUrl": "https://sdkwork.com/support",
     "privacyPolicyUrl": "https://sdkwork.com/privacy",
     "termsOfServiceUrl": "https://sdkwork.com/terms",
-    "appType": "APP_HARMONY",
-    "versionSource": "oh-package.json5",
+    "appType": "APP_UNIAPP",
+    "versionSource": "package.json",
     "identifiers": {
-      "packageName": "com.sdkwork.appstore.mobile",
-      "bundleId": "com.sdkwork.appstore.mobile",
+      "packageName": null,
+      "bundleId": null,
       "desktopAppId": null,
-      "containerImage": "registry.sdkwork.com/apps/appstore-harmony-mobile"
+      "containerImage": "registry.sdkwork.com/apps/appstore-mini-program"
     }
   },
   "backend": {
     "profileKey": "backend-root-admin",
     "ownerMode": "tenant",
     "grantMode": "current",
-    "platform": "APP_HARMONY",
+    "platform": "MP_WEIXIN",
     "appId": "sdkwork-appstore",
     "organizationId": "0",
     "tenantId": "100001",
@@ -33,16 +33,15 @@
     ]
   },
   "runtime": {
-    "family": "mobile",
-    "framework": "arkts",
+    "family": "mini-program",
+    "framework": "mp-weixin",
     "runtimes": [
-      "APP_HARMONY",
-      "APP"
+      "MP_WEIXIN"
     ],
     "deliveryModes": [
-      "DIRECT_DOWNLOAD"
+      "WEB_URL"
     ],
-    "defaultPlatform": "APP_HARMONY",
+    "defaultPlatform": "MP_WEIXIN",
     "defaultArchitecture": "universal",
     "supportedDeploymentProfiles": [
       "standalone",
@@ -53,7 +52,7 @@
   "media": {
     "icons": {
       "primary": {
-        "id": "appstore-harmony-mobile-primary-icon",
+        "id": "appstore-mini-program-primary-icon",
         "type": "ICON",
         "purpose": "PRIMARY",
         "platform": "APP",
@@ -83,16 +82,14 @@
     "status": "DRAFT",
     "installSkill": false,
     "platforms": [
-      "APP_HARMONY",
-      "APP"
+      "MP_WEIXIN"
     ],
     "installPlatforms": [
-      "APP_HARMONY",
-      "APP"
+      "MP_WEIXIN"
     ],
     "config": {
-      "workspaceRoot": "apps/sdkwork-appstore-harmony-mobile",
-      "framework": "arkts",
+      "workspaceRoot": "apps/sdkwork-appstore-mini-program",
+      "framework": "mp-weixin",
       "managedBy": "sdkwork-appstore-client-scaffold"
     }
   },
@@ -100,9 +97,9 @@
     "installConfig": {
       "packages": [],
       "metadata": {
-        "workspaceRoot": "apps/sdkwork-appstore-harmony-mobile",
-        "framework": "arkts",
-        "packageManager": "ohpm"
+        "workspaceRoot": "apps/sdkwork-appstore-mini-program",
+        "framework": "mp-weixin",
+        "packageManager": "pnpm"
       }
     }
   },
@@ -130,7 +127,7 @@
     "build": {
       "targets": []
     },
-    "sourceRoot": "apps/sdkwork-appstore-harmony-mobile"
+    "sourceRoot": "apps/sdkwork-appstore-mini-program"
   },
   "metadata": {
     "domain": "appstore",

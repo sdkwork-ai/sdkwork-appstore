@@ -16,7 +16,7 @@ Canonical SDKWORK specs path from this application root:
 
 ## Application Identity
 
-This root is `sdkwork-appstore-common`: a shared, non-runnable package root for SDKWork App Store. Runnable app identity lives in `../sdkwork-appstore-pc/sdkwork.app.config.json` and `../sdkwork-appstore-h5/sdkwork.app.config.json`.
+This root is `sdkwork-appstore-common`: a shared, non-runnable package root for SDKWork App Store. Runnable app identity lives in `../sdkwork-appstore-pc/agent.app.config.json` and `../sdkwork-appstore-h5/agent.app.config.json`.
 
 ## Local Dictionary Structure
 

@@ -28,7 +28,7 @@ const BACKEND_API_PREFIX = '/backend/v3/api';
 const CONFIG_DIR = fileURLToPath(new URL('.', import.meta.url));
 const REPO_ROOT = path.resolve(CONFIG_DIR, '../..');
 const WORKSPACE_ROOT = path.resolve(REPO_ROOT, '..');
-const APP_MANIFEST_PATH = 'apps/sdkwork-appstore-pc/sdkwork.app.config.json';
+const APP_MANIFEST_PATH = 'apps/sdkwork-appstore-pc/agent.app.config.json';
 const SDK_COMMON_SOURCE_ROOT = path.resolve(
   WORKSPACE_ROOT,
   'sdkwork-sdk-commons/sdkwork-sdk-common-typescript/src',

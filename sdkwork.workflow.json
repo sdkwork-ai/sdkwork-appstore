@@ -6,7 +6,7 @@
     "name": "SDKWork App Store",
     "repository": "sdkwork-ai/sdkwork-appstore",
     "sourcePath": ".",
-    "configPath": "sdkwork.app.config.json"
+    "configPath": "agent.app.config.json"
   },
   "release": {
     "artifactPrefix": "sdkwork-appstore",
@@ -232,7 +232,7 @@
         "database/**",
         "etc/topology/*.production.env",
         "deployments/**",
-        "sdkwork.app.config.json"
+        "agent.app.config.json"
       ],
       "artifactPath": "dist/release-packages/sdkwork-appstore-linux-x64-standalone-server-tar-gz-0.1.0.tar.gz"
     },

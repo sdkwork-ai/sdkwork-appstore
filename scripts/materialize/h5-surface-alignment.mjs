@@ -265,10 +265,10 @@ export function appstoreRoutePath(routeId: string): string {
  * H5 application-root `specs/component.spec.json`.
  *
  * Mirrors the PC root spec shape; identity and release metadata come from the
- * root's own `sdkwork.app.config.json`, which owns them.
+ * root's own `agent.app.config.json`, which owns them.
  */
 function h5RootComponentSpec(appRoot) {
-  const manifestPath = path.join(appRoot, 'sdkwork.app.config.json');
+  const manifestPath = path.join(appRoot, 'agent.app.config.json');
   const manifest = fs.existsSync(manifestPath)
     ? JSON.parse(fs.readFileSync(manifestPath, 'utf8'))
     : { app: {} };
@@ -290,7 +290,7 @@ function h5RootComponentSpec(appRoot) {
       status: manifest.publish?.status ?? 'DRAFT',
       manifests: [
         'package.json',
-        'sdkwork.app.config.json',
+        'agent.app.config.json',
         'specs/component.spec.json',
       ],
     },
