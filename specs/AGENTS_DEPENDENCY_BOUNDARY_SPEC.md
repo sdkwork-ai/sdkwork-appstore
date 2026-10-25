@@ -31,7 +31,7 @@ consistent:
 - Local development: the root `pnpm-workspace.yaml` declares
   `../sdkwork-agents/sdks/sdkwork-agents-app-sdk/sdkwork-agents-app-sdk-typescript`
   exactly once; workspace members consume it with `workspace:*`.
-- CI / release packaging: `sdkwork.workflow.json` declares a matching
+- CI / release packaging: `agent.workflow.json` declares a matching
   `sdkwork-agents` `dependencies[]` entry so CI checks out the sibling into the
   same `../sdkwork-agents` layout.
 - Never use `file:`, `link:`, or git-URL specifiers for `@sdkwork/agents-app-sdk`;

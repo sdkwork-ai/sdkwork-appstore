@@ -134,6 +134,6 @@
     "capability": "store",
     "standardOwner": "sdkwork-appstore",
     "deploymentConfig": "etc/sdkwork.deployment.config.json",
-    "releaseAuthority": "../../sdkwork.workflow.json"
+    "releaseAuthority": "../../agent.workflow.json"
   }
 }

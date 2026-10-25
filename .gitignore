@@ -139,3 +139,15 @@ __pycache__/
 # Local SQL scratch dump (never committed).
 # Added by repo-commit sweep; targeted rules only.
 /cols.txt
+
+# ---- auto-audited: local artifacts that must never be committed ----
+*.key
+*.pem
+*.p12
+*.pfx
+*.keystore
+tmp/
+temp/
+*.tmp
+*.temp
+.next/

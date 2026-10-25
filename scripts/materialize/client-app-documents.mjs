@@ -239,7 +239,7 @@ export function appManifest(suffix) {
       capability: 'store',
       standardOwner: appId,
       deploymentConfig: 'etc/sdkwork.deployment.config.json',
-      releaseAuthority: '../../sdkwork.workflow.json',
+      releaseAuthority: '../../agent.workflow.json',
     },
   };
 }
