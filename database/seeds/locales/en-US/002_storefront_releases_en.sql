@@ -153,7 +153,37 @@ VALUES
     ('note-app-vlc-3021-en', '100001', '0', 'rel-app-vlc-3021', 'en-US', '• Updated decoders and HDR support
 • Improved subtitle sync precision', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
     ('note-app-netease-music-315-en', '100001', '0', 'rel-app-netease-music-315', 'en-US', '• Upgraded AI recommendations
-• Expanded VIP perks', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+• Expanded VIP perks', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('note-app-eval-model-arena-120-en', '100001', '0', 'rel-app-eval-model-arena-120', 'en-US', '• Added per-spec ratings and reviews
+• Covers 8 mainstream model specs', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('note-app-eval-agent-arena-110-en', '100001', '0', 'rel-app-eval-agent-arena-110', 'en-US', '• Added per-spec ratings and reviews
+• Covers BirdCoder, Codex CLI, Claude Code and 3 more agent specs', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('note-app-eval-math-arena-100-en', '100001', '0', 'rel-app-eval-math-arena-100', 'en-US', '• Launched the competition-math benchmark
+• Accuracy comparison across 6 model specs', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('note-app-eval-longctx-arena-100-en', '100001', '0', 'rel-app-eval-longctx-arena-100', 'en-US', '• Launched needle-in-a-haystack and long-doc QA benchmarks
+• Covers 5 long-context model specs', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('note-app-eval-multimodal-arena-100-en', '100001', '0', 'rel-app-eval-multimodal-arena-100', 'en-US', '• Launched image, chart and document understanding benchmarks
+• Covers 5 multimodal model specs', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('note-app-eval-tools-arena-100-en', '100001', '0', 'rel-app-eval-tools-arena-100', 'en-US', '• Launched the function-calling and planning benchmark
+• Tool-calling reliability comparison across 6 model specs', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('note-app-edu-k12-virtual-lab-100-en', '100001', '0', 'rel-app-edu-k12-virtual-lab-100', 'en-US', '• Launched the curriculum-aligned K12 experiment benchmark
+• Covers primary to senior-high physics, chemistry and biology labs with per-spec ratings', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('note-app-edu-university-physics-lab-100-en', '100001', '0', 'rel-app-edu-university-physics-lab-100', 'en-US', '• Launched the university physics lab benchmark
+• Covers error analysis, data processing and design-experiment coaching', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('note-app-edu-professional-skills-100-en', '100001', '0', 'rel-app-edu-professional-skills-100', 'en-US', '• Launched the vocational and certification training benchmark
+• Covers engineering, IT and foreign-language training tasks', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('note-app-tour-attraction-guide-100-en', '100001', '0', 'rel-app-tour-attraction-guide-100', 'en-US', '• Launched the four-region 5A attraction benchmark
+• Covers narration accuracy, cultural knowledge and info freshness', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('note-app-tour-itinerary-planner-100-en', '100001', '0', 'rel-app-tour-itinerary-planner-100', 'en-US', '• Launched the multi-day itinerary constraint benchmark
+• Covers city-walk and attraction itinerary planning', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('note-app-tour-multilingual-guide-100-en', '100001', '0', 'rel-app-tour-multilingual-guide-100', 'en-US', '• Launched the minor-language narration benchmark
+• Covers museums, heritage sites and cultural terminology translation', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('note-app-health-medical-qa-100-en', '100001', '0', 'rel-app-health-medical-qa-100', 'en-US', '• Launched the safety-first medical QA benchmark
+• Covers clinical QA and medical education; AI output never replaces a licensed physician', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('note-app-health-emr-quality-100-en', '100001', '0', 'rel-app-health-emr-quality-100', 'en-US', '• Launched the de-identified chart-quality benchmark
+• Covers defect detection and structured-field extraction', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('note-app-health-health-education-100-en', '100001', '0', 'rel-app-health-health-education-100', 'en-US', '• Launched the readability benchmark for education material
+• Covers public-health messaging and health-management communication', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
 ON CONFLICT (id) DO UPDATE SET
     release_notes = EXCLUDED.release_notes,
     updated_at = EXCLUDED.updated_at;

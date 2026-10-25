@@ -1,5 +1,5 @@
 -- zh-CN localizations for workspace module applications (generated).
--- Source: sibling repositories’ `apps/*/sdkwork.app.config.json`; partner file of
+-- Source: sibling repositories’ `apps/*/agent.app.config.json`; partner file of
 -- common/016_workspace_applications.sql. Do not hand-edit.
 
 INSERT INTO appstore_listing_localization

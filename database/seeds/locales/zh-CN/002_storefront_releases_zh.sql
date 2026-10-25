@@ -153,7 +153,37 @@ VALUES
     ('note-app-vlc-3021', '100001', '0', 'rel-app-vlc-3021', 'zh-CN', '• 更新解码器与 HDR 支持
 • 字幕同步精度提升', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
     ('note-app-netease-music-315', '100001', '0', 'rel-app-netease-music-315', 'zh-CN', '• AI 个性化推荐升级
-• 黑胶 VIP 权益扩展', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+• 黑胶 VIP 权益扩展', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('note-app-eval-model-arena-120', '100001', '0', 'rel-app-eval-model-arena-120', 'zh-CN', '• 新增模型规格级评分与评论
+• 覆盖 8 个主流模型规格', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('note-app-eval-agent-arena-110', '100001', '0', 'rel-app-eval-agent-arena-110', 'zh-CN', '• 新增 Agent 规格级评分与评论
+• 覆盖 BirdCoder、Codex、Claude Code 等 6 个规格', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('note-app-eval-math-arena-100', '100001', '0', 'rel-app-eval-math-arena-100', 'zh-CN', '• 首发竞赛级数学题组基准
+• 覆盖 6 个模型规格的解题准确率对比', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('note-app-eval-longctx-arena-100', '100001', '0', 'rel-app-eval-longctx-arena-100', 'zh-CN', '• 首发大海捞针与长文档问答基准
+• 覆盖 5 个长上下文模型规格', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('note-app-eval-multimodal-arena-100', '100001', '0', 'rel-app-eval-multimodal-arena-100', 'zh-CN', '• 首发图像、图表与文档理解基准
+• 覆盖 5 个多模态模型规格', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('note-app-eval-tools-arena-100', '100001', '0', 'rel-app-eval-tools-arena-100', 'zh-CN', '• 首发函数调用与任务规划基准
+• 覆盖 6 个模型规格的工具调用可靠性对比', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('note-app-edu-k12-virtual-lab-100', '100001', '0', 'rel-app-edu-k12-virtual-lab-100', 'zh-CN', '• 首发课标对齐的 K12 实验任务基准
+• 覆盖小学至高中理化生实验，每个规格独立评分与评论', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('note-app-edu-university-physics-lab-100', '100001', '0', 'rel-app-edu-university-physics-lab-100', 'zh-CN', '• 首发大学物理实验任务基准
+• 覆盖误差分析、数据处理与设计性实验方案', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('note-app-edu-professional-skills-100', '100001', '0', 'rel-app-edu-professional-skills-100', 'zh-CN', '• 首发职业培训与行业认证实训基准
+• 覆盖工程、信息科技与外语实训任务', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('note-app-tour-attraction-guide-100', '100001', '0', 'rel-app-tour-attraction-guide-100', 'zh-CN', '• 首发四地 5A 景区讲解基准
+• 覆盖讲解准确性、文化知识覆盖与实用信息时效', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('note-app-tour-itinerary-planner-100', '100001', '0', 'rel-app-tour-itinerary-planner-100', 'zh-CN', '• 首发多日行程约束组合基准
+• 覆盖城市漫游与景点行程规划能力对比', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('note-app-tour-multilingual-guide-100', '100001', '0', 'rel-app-tour-multilingual-guide-100', 'zh-CN', '• 首发小语种讲解覆盖基准
+• 覆盖博物馆、遗址与多语言术语翻译', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('note-app-health-medical-qa-100', '100001', '0', 'rel-app-health-medical-qa-100', 'zh-CN', '• 首发安全性单列的医学问答基准
+• 覆盖临床问答与医学教育考核，AI 输出不替代执业医师诊断', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('note-app-health-emr-quality-100', '100001', '0', 'rel-app-health-emr-quality-100', 'zh-CN', '• 首发脱敏病历质控基准
+• 覆盖病历缺陷识别与结构化字段抽取', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('note-app-health-health-education-100', '100001', '0', 'rel-app-health-health-education-100', 'zh-CN', '• 首发宣教材料可读性基准
+• 覆盖公共卫生宣教与健康管理表达', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
 ON CONFLICT (id) DO UPDATE SET
     release_notes = EXCLUDED.release_notes,
     updated_at = EXCLUDED.updated_at;
