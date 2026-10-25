@@ -14,6 +14,68 @@ export { HandheldGameCard } from './components/HandheldGameCard'
 export { MiniGamesCarousel } from './components/MiniGamesCarousel'
 export { MiniGameCard } from './components/MiniGameCard'
 export { formatPrice } from './formatPrice'
+export {
+  AI_MODEL_EVAL_CATEGORY_NAMES,
+  resolveAppSpecs,
+  rankEvalSpecs,
+  summarizeSpecReviews,
+} from './aiEvaluation'
+export type {
+  CuratedEvalSpec,
+  EvalBenchmark,
+  EvalDimensionScore,
+  EvalSampleUnit,
+} from './aiEvaluation'
+export {
+  EDU_EXPERIMENT_CATEGORY_NAMES,
+  EDU_STAGES,
+  EDU_STAGE_GROUPS,
+  EDU_SUBJECTS,
+  resolveEduExperimentProfile,
+} from './eduExperiment'
+export type {
+  CuratedEduListing,
+  EduCoverageCell,
+  EduExperimentProfile,
+  EduStageGroupId,
+  EduStageId,
+  EduSubjectId,
+} from './eduExperiment'
+export {
+  CULTURE_TOURISM_CATEGORY_NAMES,
+  TOURISM_REGIONS,
+  TOURISM_SCENARIOS,
+  TOURISM_THEMES,
+  resolveTourismProfile,
+} from './tourism'
+export type {
+  CuratedTourismListing,
+  TourAttraction,
+  TourismProfile,
+  TourRegionId,
+  TourScenarioId,
+  TourThemeId,
+} from './tourism'
+export {
+  HEALTHCARE_CATEGORY_NAMES,
+  HEALTHCARE_SCENARIOS,
+  HEALTHCARE_SAFETY_DIM_ID,
+  healthcareSafetyScore,
+  resolveHealthcareProfile,
+} from './healthcare'
+export type {
+  CuratedHealthcareListing,
+  HealthcareProfile,
+  HealthcareScenarioId,
+  HealthcareScenarioScore,
+} from './healthcare'
+export type {
+  VerticalBenchmark,
+  VerticalDimensionScore,
+  VerticalEvalSpec,
+  VerticalEvaluationKind,
+  VerticalListingInput,
+} from './verticalEvaluation'
 export { AppstoreInstallContext, useInstall } from './install'
 export type { AppstoreInstallApi } from './install'
 

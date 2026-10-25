@@ -1,10 +1,14 @@
 export const nav = {
-  brand: 'SDKWork 应用商店',
+  brand: '应用商店',
   subtitle: 'PC 桌面客户端',
   menu: {
     discover: '探索发现',
     apps: '软件应用',
     games: '游戏大厅',
+    aiEval: 'AI模型测评',
+    eduExperiment: '教育实验应用',
+    tourism: '文旅应用',
+    healthcare: '医疗卫生应用',
     aiHub: 'AI 实验室',
     experts: '专家',
     plugins: '扩展插件',

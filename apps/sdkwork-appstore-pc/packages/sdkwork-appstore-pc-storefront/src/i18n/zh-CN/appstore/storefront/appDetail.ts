@@ -58,6 +58,35 @@ export const appDetail = {
     title: '新功能',
     version: '版本 {{version}}'
   },
+  specEval: {
+    title: 'AI 模型测评',
+    subtitle: '《{{name}}》为多规格测评应用：覆盖 {{model}} 个模型与 {{agent}} 个 Agent 候选，每个规格独立评分与评论。',
+    kind: {
+      all: '全部规格',
+      model: '模型',
+      agent: 'Agent'
+    },
+    benchmarkLabel: '官方基准分',
+    sampleSize: '样本 {{count}} {{unit}}',
+    sampleUnit: {
+      votes: '票',
+      tasks: '任务',
+      questions: '题'
+    },
+    rankSuffix: '名',
+    userRatingLabel: '用户评分 · {{count}} 条',
+    communityLabel: '社区实测',
+    communityDesc: '已有 {{count}} 位用户为 {{name}} 打分，你的实测可以帮更多人选择。',
+    communityHint: '基准分来自官方题组，用户评分来自真实使用反馈',
+    reviewsTitle: '{{name}} 的规格评价',
+    writeReview: '评价此规格',
+    formTitle: '为 {{name}} 打分并写评价',
+    commentPlaceholder: '描述 {{name}} 在该测评中的表现、优点与不足...',
+    defaultTitle: '{{name}} 规格评价',
+    submitBtn: '发布规格评价',
+    loading: '正在加载各规格评分...',
+    noReviews: '{{name}} 暂无评价，快来给出第一个评分吧！'
+  },
   reviews: {
     title: '评分与玩家评价',
     writeReview: '撰写玩家评价',

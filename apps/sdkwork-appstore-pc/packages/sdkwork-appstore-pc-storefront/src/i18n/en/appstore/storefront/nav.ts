@@ -1,10 +1,14 @@
 export const nav = {
-  brand: 'SDKWork AppStore',
+  brand: 'App Store',
   subtitle: 'PC Desktop Client',
   menu: {
     discover: 'Discover',
     apps: 'Apps',
     games: 'Games',
+    aiEval: 'AI Model Evaluation',
+    eduExperiment: 'Education Experiment Apps',
+    tourism: 'Culture & Tourism Apps',
+    healthcare: 'Healthcare Apps',
     aiHub: 'AI Hub',
     experts: 'Experts',
     plugins: 'Plugins',

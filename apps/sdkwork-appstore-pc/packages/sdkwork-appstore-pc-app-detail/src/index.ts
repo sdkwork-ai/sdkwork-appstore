@@ -5,6 +5,7 @@ export {
   AppDescription,
   AppWhatsNew,
   AppReviews,
+  AppSpecEvaluation,
   ReviewForm,
   RatingBreakdown,
   ReviewCard,

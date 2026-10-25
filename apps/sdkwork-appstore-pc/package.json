@@ -49,6 +49,7 @@
     "@sdkwork/appstore-pc-admin-moderation": "workspace:*",
     "@sdkwork/appstore-pc-admin-publishers": "workspace:*",
     "@sdkwork/appstore-pc-admin-shell": "workspace:*",
+    "@sdkwork/appstore-pc-ai-eval": "workspace:*",
     "@sdkwork/appstore-pc-ai-hub": "workspace:*",
     "@sdkwork/appstore-pc-app-detail": "workspace:*",
     "@sdkwork/appstore-pc-apps": "workspace:*",

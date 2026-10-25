@@ -6,6 +6,10 @@ import { common as commonZh } from './zh-CN/appstore/storefront/common';
 import { discover as discoverZh } from './zh-CN/appstore/storefront/discover';
 import { apps as appsZh } from './zh-CN/appstore/storefront/apps';
 import { games as gamesZh } from './zh-CN/appstore/storefront/games';
+import { aiEval as aiEvalZh } from './zh-CN/appstore/storefront/aiEval';
+import { eduExperiment as eduExperimentZh } from './zh-CN/appstore/storefront/eduExperiment';
+import { tourism as tourismZh } from './zh-CN/appstore/storefront/tourism';
+import { healthcare as healthcareZh } from './zh-CN/appstore/storefront/healthcare';
 import { aihub as aihubZh } from './zh-CN/appstore/storefront/aihub';
 import { pluginsZhCN as pluginsZh } from '@sdkwork/appstore-pc-markets/i18n';
 import { expertsZhCN as expertsZh } from '@sdkwork/appstore-pc-markets/i18n';
@@ -33,6 +37,10 @@ import { common as commonEn } from './en/appstore/storefront/common';
 import { discover as discoverEn } from './en/appstore/storefront/discover';
 import { apps as appsEn } from './en/appstore/storefront/apps';
 import { games as gamesEn } from './en/appstore/storefront/games';
+import { aiEval as aiEvalEn } from './en/appstore/storefront/aiEval';
+import { eduExperiment as eduExperimentEn } from './en/appstore/storefront/eduExperiment';
+import { tourism as tourismEn } from './en/appstore/storefront/tourism';
+import { healthcare as healthcareEn } from './en/appstore/storefront/healthcare';
 import { aihub as aihubEn } from './en/appstore/storefront/aihub';
 import { pluginsEn as pluginsEn } from '@sdkwork/appstore-pc-markets/i18n';
 import { expertsEn as expertsEn } from '@sdkwork/appstore-pc-markets/i18n';
@@ -67,6 +75,10 @@ const zhCN = {
   discover: discoverZh,
   apps: appsZh,
   games: gamesZh,
+  aiEval: aiEvalZh,
+  eduExperiment: eduExperimentZh,
+  tourism: tourismZh,
+  healthcare: healthcareZh,
   aihub: aihubZh,
   experts: expertsZh,
   plugins: pluginsZh,
@@ -98,6 +110,10 @@ const en = {
   discover: discoverEn,
   apps: appsEn,
   games: gamesEn,
+  aiEval: aiEvalEn,
+  eduExperiment: eduExperimentEn,
+  tourism: tourismEn,
+  healthcare: healthcareEn,
   aihub: aihubEn,
   experts: expertsEn,
   plugins: pluginsEn,

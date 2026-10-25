@@ -4,13 +4,24 @@ import {
   type AppStoreServicePort,
 } from '@sdkwork/appstore-pc-core';
 
-import type { AppItem, EditorialCollection, EventItem, Review } from '../types';
+import type { AppItem, EditorialCollection, EventItem, Review, SpecReviewSubmitInput } from '../types';
 
 /** Bounded storefront page for catalog grid views (PAGINATION_SPEC §3: max 200,
  * keep interactive surfaces small). */
 const storefrontPageSize = 50;
 const catalogPageMax = 200;
 const reviewPageSize = 20;
+
+/**
+ * Comments owner kind of a per-spec evaluation thread. Each spec of a
+ * multi-spec AI evaluation app owns one thread keyed by
+ * `{listingId}:{specId}`, so ratings and comments never mix across specs.
+ */
+const specThreadOwnerKind = 'appstore-listing-spec';
+
+function specThreadOwnerId(appId: string, specId: string): string {
+  return `${appId}:${specId}`;
+}
 
 interface CategoryRef {
   id: string;
@@ -25,6 +36,7 @@ const categoryVisuals: Record<string, { icon: string; color: string }> = {
   'ai-creative': { icon: 'Palette', color: 'bg-fuchsia-600' },
   'ai-productivity': { icon: 'Briefcase', color: 'bg-store-info' },
   'ai-games': { icon: 'Gamepad2', color: 'bg-store-danger' },
+  'ai-model-eval': { icon: 'FlaskConical', color: 'bg-violet-600' },
   'board-games': { icon: 'Dices', color: 'bg-store-warning' },
   'mini-games': { icon: 'Smartphone', color: 'bg-store-info' },
   'mobile-games': { icon: 'Gamepad', color: 'bg-store-brand' },
@@ -154,6 +166,30 @@ export function createAppStoreServicePort(
       version: version || '1.0.0',
       date: formatDate(readString(item, 'releasedAt', 'released_at')),
       notes: notes || '',
+    };
+  }
+
+  /** Idempotently resolve the comments thread of one evaluation spec. */
+  async function ensureSpecThread(appId: string, specId: string): Promise<string> {
+    const thread = await comments.comments.threads.ensure({
+      ownerKind: specThreadOwnerKind,
+      ownerId: specThreadOwnerId(appId, specId),
+    });
+    return readString(thread as unknown as Record<string, unknown>, 'id');
+  }
+
+  function mapSpecComment(comment: Record<string, unknown>, appId: string, specId: string): Review {
+    const authorId = readString(comment, 'authorId', 'author_id');
+    return {
+      id: readString(comment, 'id'),
+      appId,
+      specId,
+      user: readString(comment, 'authorName', 'author_name') || authorId || '匿名用户',
+      rating: readNumber(comment, 'rating') ?? 0,
+      title: '好评推荐',
+      comment: readString(comment, 'body', 'content'),
+      date: formatDate(readString(comment, 'createdAt', 'created_at')),
+      likes: readNumber(comment, 'likeCount', 'like_count') ?? 0,
     };
   }
 
@@ -394,6 +430,10 @@ export function createAppStoreServicePort(
     },
 
     async getAppById(id: string): Promise<AppItem | undefined> {
+      // The category stamp on the summary comes from the category cache, so a
+      // deep link straight onto a detail page must load it first (cached after
+      // the first call).
+      await getCategories().catch(() => []);
       // The catalog projection carries the distribution fields (platforms,
       // accessUrl); the single-listing aggregate does not expose them yet.
       const response = await client.catalog
@@ -537,6 +577,47 @@ export function createAppStoreServicePort(
     async likeReview(reviewId: string): Promise<boolean> {
       await comments.engagement.likes.update('comment', reviewId);
       return true;
+    },
+
+    async getSpecReviews(appId: string, specId: string): Promise<Review[]> {
+      const threadId = await ensureSpecThread(appId, specId);
+      const response = await comments.comments.comments.list(threadId, {
+        page: 1,
+        pageSize: reviewPageSize,
+      });
+      return readPageItems<Record<string, unknown>>(response as unknown)
+        .filter((comment) => readString(comment, 'status') !== 'deleted')
+        .map((comment) => mapSpecComment(comment, appId, specId));
+    },
+
+    async submitSpecReview(reviewData: SpecReviewSubmitInput): Promise<Review> {
+      const threadId = await ensureSpecThread(reviewData.appId, reviewData.specId);
+      const response = await comments.comments.comments.create(threadId, {
+        body: reviewData.comment,
+        rating: reviewData.rating,
+        metadata: { appId: reviewData.appId, specId: reviewData.specId },
+      });
+      // The returned comment carries the created rating; project it back so
+      // the UI can prepend the row without a refetch. The unwrap keeps the
+      // `CommentResponse` envelope (`{ comment, requestId }`), so read the
+      // nested row and fall back to the envelope itself.
+      const envelope = (response ?? {}) as unknown as Record<string, unknown>;
+      const comment = (
+        envelope.comment && typeof envelope.comment === 'object'
+          ? envelope.comment
+          : envelope
+      ) as Record<string, unknown>;
+      return {
+        id: readString(comment, 'id'),
+        appId: reviewData.appId,
+        specId: reviewData.specId,
+        user: reviewData.user || '匿名用户',
+        rating: reviewData.rating,
+        title: reviewData.title || '好评推荐',
+        comment: reviewData.comment,
+        date: '刚刚',
+        likes: 0,
+      };
     },
 
     async getMoreByDeveloper(_developer: string, excludeAppId: string): Promise<AppItem[]> {

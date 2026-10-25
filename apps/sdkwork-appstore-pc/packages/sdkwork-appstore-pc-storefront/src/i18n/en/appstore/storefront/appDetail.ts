@@ -58,6 +58,35 @@ export const appDetail = {
     title: "What's New",
     version: 'Version {{version}}'
   },
+  specEval: {
+    title: 'AI Model Evaluation',
+    subtitle: '{{name}} is a multi-spec evaluation app: {{model}} model and {{agent}} agent candidates, each rated and reviewed separately.',
+    kind: {
+      all: 'All Specs',
+      model: 'Model',
+      agent: 'Agent'
+    },
+    benchmarkLabel: 'Official benchmark',
+    sampleSize: '{{count}} {{unit}} sample',
+    sampleUnit: {
+      votes: 'votes',
+      tasks: 'tasks',
+      questions: 'questions'
+    },
+    rankSuffix: '',
+    userRatingLabel: 'User rating · {{count}} reviews',
+    communityLabel: 'Community field notes',
+    communityDesc: '{{count}} users have rated {{name}}. Your hands-on score helps others choose.',
+    communityHint: 'Benchmark scores come from official suites; user ratings come from real usage',
+    reviewsTitle: 'Reviews of {{name}}',
+    writeReview: 'Rate this spec',
+    formTitle: 'Rate & review {{name}}',
+    commentPlaceholder: "Describe how {{name}} performed in this evaluation, its strengths and weaknesses...",
+    defaultTitle: '{{name}} spec review',
+    submitBtn: 'Publish Spec Review',
+    loading: 'Loading spec ratings...',
+    noReviews: 'No reviews for {{name}} yet. Be the first to rate it!'
+  },
   reviews: {
     title: 'Ratings & Reviews',
     writeReview: 'Write a Review',

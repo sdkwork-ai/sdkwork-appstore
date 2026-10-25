@@ -59,6 +59,35 @@ export interface Review {
   comment: string;
   date: string;
   likes?: number;
+  /** Evaluation spec the review targets; absent for listing-level reviews. */
+  specId?: string;
+}
+
+/** Kind of an AI-evaluation spec: the evaluated candidate family. */
+export type AppSpecKind = 'model' | 'agent';
+
+/**
+ * One evaluation candidate of a multi-spec AI evaluation app (a model or an
+ * agent such as BirdCoder, Codex, Claude Code). Ratings and comment threads
+ * are scoped per spec.
+ */
+export interface AppSpec {
+  /** Stable spec id; unique within its app and the comments-thread owner key. */
+  id: string;
+  kind: AppSpecKind;
+  /** Display name of the evaluated candidate (e.g. `DeepSeek-V3.2`, `BirdCoder`). */
+  name: string;
+  /** Vendor or team behind the candidate. */
+  publisher?: string;
+  /** One-line evaluation focus of this candidate. */
+  summary?: string;
+}
+
+/** Aggregate star rating of one spec, folded from its spec-scoped reviews. */
+export interface SpecRatingSummary {
+  /** Mean of submitted spec ratings, 0 when no reviews exist yet. */
+  rating: number;
+  reviewsCount: number;
 }
 
 export interface EditorialCollection {

@@ -9,6 +9,7 @@ import { AppScreenshots } from '../components/app-detail/AppScreenshots';
 import { AppDescription } from '../components/app-detail/AppDescription';
 import { AppWhatsNew } from '../components/app-detail/AppWhatsNew';
 import { AppReviews } from '../components/app-detail/AppReviews';
+import { AppVerticalEvaluation } from '../components/app-detail/AppVerticalEvaluation';
 import { AppInfo } from '../components/app-detail/AppInfo';
 import { AppDownloads } from '../components/app-detail/AppDownloads';
 import { AppInAppPurchases } from '../components/app-detail/AppInAppPurchases';
@@ -76,6 +77,8 @@ export default function AppDetail() {
     fetchAppDetails();
   }, [id]);
 
+  // Vertical evaluation modules (教育实验应用 / 文旅应用 / 医疗卫生应用) and the
+  // legacy AI 模型测评 panel resolve storefront-side from the listing category.
   if (loading) {
     return <LoadingSpinner />;
   }
@@ -84,7 +87,7 @@ export default function AppDetail() {
     return (
       <div className="p-8 text-center flex flex-col items-center justify-center h-full flex-1">
         <h2 className="text-2xl font-bold mb-4 text-store-ink ">{t('appDetail.notFound')}</h2>
-        <button 
+        <button
           onClick={() => navigate(-1)}
           className="text-store-brand font-medium hover:underline cursor-pointer "
         >
@@ -108,6 +111,9 @@ export default function AppDetail() {
 
         {/* What's New */}
         <AppWhatsNew whatsNew={app.whatsNew} />
+
+        {/* Multi-spec evaluation panel (AI 模型测评 + vertical modules) */}
+        <AppVerticalEvaluation app={app} />
 
         {/* Ratings & Reviews */}
         <AppReviews

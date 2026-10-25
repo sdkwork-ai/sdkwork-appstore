@@ -6,6 +6,10 @@ import {
   AppDetailPage,
   AppstoreAuthShell,
   AppsPage,
+  AiEvalPage,
+  EduExperimentPage,
+  TourismPage,
+  HealthcarePage,
   AIHubPage,
   ApiMarketPage,
   AuthGate,
@@ -116,6 +120,10 @@ export function AppstorePcRoutes({
             <Route index element={<DiscoverPage />} />
             <Route path="apps" element={<AppsPage />} />
             <Route path="games" element={<GamesPage />} />
+            <Route path="ai-eval" element={<AiEvalPage />} />
+            <Route path="edu-experiment" element={<EduExperimentPage />} />
+            <Route path="tourism" element={<TourismPage />} />
+            <Route path="healthcare" element={<HealthcarePage />} />
             <Route path="ai-hub" element={<AIHubPage />} />
             <Route path="experts" element={<ExpertsPage />} />
             <Route path="plugins" element={<PluginsPage />} />

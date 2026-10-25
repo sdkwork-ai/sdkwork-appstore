@@ -18,6 +18,7 @@ Authority: [REQ-2026-appstore-foundation.md](../requirements/REQ-2026-appstore-f
 - PC 应用 PRD：[apps/sdkwork-appstore-pc/docs/product/prd/PRD.md](../../../apps/sdkwork-appstore-pc/docs/product/prd/PRD.md)
 - H5 应用 PRD：[apps/sdkwork-appstore-h5/docs/product/prd/PRD.md](../../../apps/sdkwork-appstore-h5/docs/product/prd/PRD.md)
 - UI/UX 设计规范：[UI_DESIGN_SPEC.md](../design/UI_DESIGN_SPEC.md)
+- 垂直行业测评模块 PRD：[PRD-vertical-evaluation-modules.md](PRD-vertical-evaluation-modules.md)
 - 实现跟踪：[crates/IMPLEMENTATION_TODO.md](../../../crates/IMPLEMENTATION_TODO.md)
 
 ---
@@ -226,6 +227,12 @@ SDKWork App Store 是 SDKWork 生态的应用市场：让用户在一个入口�
 | 优惠标记 | 应用卡标记「限时免费」「打折」 |
 | 任务系统 | 预留：下载任务、签到任务（结算由 Order/Payment 域） |
 | 兑换码 | 预留：兑换码发放应用权益 |
+
+#### 4.2.7 垂直行业测评模块（Vertical Evaluation Modules）
+
+左侧导航「AI模型测评」下方提供三个独立行业模块入口：教育实验应用（`/edu-experiment`，学段×学科分类）、文旅应用（`/tourism`，旅游景点等场景）、医疗卫生应用（`/healthcare`，场景分类 + 安全维度 + 非诊断免责声明）。每个模块独立包、路由、分类种子与文案，复用多规格测评范式。
+
+产品设计与分类体系见 [PRD-vertical-evaluation-modules.md](PRD-vertical-evaluation-modules.md)。
 
 ### 4.3 模块二：应用详情（Listing Detail）
 

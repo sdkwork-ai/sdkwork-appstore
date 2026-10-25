@@ -1,6 +1,19 @@
 import type { AppItem, Review, EditorialCollection, CategoryDetail, EventItem } from '../types';
 
 /**
+ * Input of {@link IAppStoreSDK.submitSpecReview}: one scored comment on an
+ * evaluation spec of a multi-spec AI evaluation app.
+ */
+export interface SpecReviewSubmitInput {
+  appId: string;
+  specId: string;
+  user: string;
+  rating: number;
+  title: string;
+  comment: string;
+}
+
+/**
  * Cursor-paged catalog window (PAGINATION_SPEC §4: keyset cursor, bounded
  * page). `nextCursor` is `null` when the server has no further rows.
  */
@@ -47,6 +60,13 @@ export interface IAppStoreSDK {
   getReviewsByAppId(id: string): Promise<Review[]>;
   submitReview(reviewData: { appId: string; user: string; rating: number; title: string; comment: string }): Promise<Review>;
   likeReview(reviewId: string): Promise<boolean>;
+  /**
+   * Reviews of one evaluation spec of a multi-spec AI evaluation app. Each
+   * spec owns a dedicated comments thread, ensured on first access.
+   */
+  getSpecReviews(appId: string, specId: string): Promise<Review[]>;
+  /** Post one rating plus comment onto an evaluation spec's thread. */
+  submitSpecReview(reviewData: SpecReviewSubmitInput): Promise<Review>;
   getMoreByDeveloper(developer: string, excludeAppId: string): Promise<AppItem[]>;
   getSimilarApps(appId: string): Promise<AppItem[]>;
   getBoardGameRecommendations(appId: string): Promise<AppItem[]>;
@@ -96,6 +116,8 @@ export const AppStoreService: IAppStoreSDK = {
   getReviewsByAppId: (id) => appStorePort.getReviewsByAppId(id),
   submitReview: (reviewData) => appStorePort.submitReview(reviewData),
   likeReview: (reviewId) => appStorePort.likeReview(reviewId),
+  getSpecReviews: (appId, specId) => appStorePort.getSpecReviews(appId, specId),
+  submitSpecReview: (reviewData) => appStorePort.submitSpecReview(reviewData),
   getMoreByDeveloper: (developer, excludeAppId) =>
     appStorePort.getMoreByDeveloper(developer, excludeAppId),
   getSimilarApps: (appId) => appStorePort.getSimilarApps(appId),
@@ -136,6 +158,8 @@ function createUnconfiguredAppStorePort(): AppStoreServicePort {
     getReviewsByAppId: async () => unavailable(),
     submitReview: async () => unavailable(),
     likeReview: async () => unavailable(),
+    getSpecReviews: async () => unavailable(),
+    submitSpecReview: async () => unavailable(),
     getMoreByDeveloper: async () => unavailable(),
     getSimilarApps: async () => unavailable(),
     getBoardGameRecommendations: async () => unavailable(),

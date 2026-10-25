@@ -2,7 +2,7 @@
 
 Active alignment tracker for `sdkwork-appstore` against `sdkwork-specs`.
 
-Last updated: 2026-08-08
+Last updated: 2026-10-25
 
 ## Framework Integration
 
@@ -99,6 +99,21 @@ All catalog, listing, library, publisher, moderation, compliance, analytics, and
 | PC browser | `pnpm dev` (pc app root) | zh-CN shell; IAM profile; publisher console package |
 | H5 mobile web | `pnpm dev` (h5 app root) | 5-tab nav; zh-CN library/report/settings |
 
+## Vertical Evaluation Modules (2026-10-25 PC storefront 阶段一)
+
+「AI模型测评」下方的三个独立行业模块（[REQ-2026-0002](../docs/product/requirements/REQ-2026-0002-education-experiment-apps.md) / [REQ-2026-0003](../docs/product/requirements/REQ-2026-0003-culture-tourism-apps.md) / [REQ-2026-0004](../docs/product/requirements/REQ-2026-0004-healthcare-apps.md)，产品权威 [PRD-vertical-evaluation-modules.md](../docs/product/prd/PRD-vertical-evaluation-modules.md)）：
+
+| Component | Status | Notes |
+| --- | --- | --- |
+| Module packages | Implemented | `@sdkwork/appstore-pc-edu-experiment` / `@sdkwork/appstore-pc-tourism` / `@sdkwork/appstore-pc-healthcare`（页面 + 卡片 + 路由常量） |
+| Sidebar + routes | Implemented | `DesktopSidebar` 主分组 AI模型测评 下方三项；embed 注册 `/edu-experiment`、`/tourism`、`/healthcare` |
+| Vertical taxonomy data | Implemented | `sdkwork-appstore-pc-commons` `verticalEvaluation.ts` + `eduExperiment.ts` / `tourism.ts` / `healthcare.ts`（storefront 侧策展，i18n 维度键） |
+| Detail vertical panels | Implemented | `AppVerticalEvaluation` 分发器：覆盖矩阵 / 景点覆盖（含数据更新时间）/ 场景覆盖（安全性单列）+ 医疗非诊断免责声明；ai-eval 面板回退保持不变 |
+| Catalog seeds | Implemented | `database/seeds/common/015_vertical_evaluation.sql`（3 分类 zh/en + 9 apps/listings + 媒体）+ zh/en 本地化与 releases/notes；`db:audit-seeds` 全绿（84 listings、93 releases 全对齐），并回填 6 个 AI测评 listing 缺失的 en 本地化与 en 发布说明 |
+| i18n | Implemented | storefront `eduExperiment` / `tourism` / `healthcare` 命名空间（zh + en）+ nav 键 |
+| H5 / mobile surfaces | Pending | 阶段二 |
+| Healthcare review-report reason | Deferred | 依赖评论级举报入口（见 REQ-2026-0004 Capability Requirements） |
+
 ## Verification
 
 ```bash
@@ -112,4 +127,4 @@ node ../sdkwork-specs/tools/check-api-operation-patterns.mjs --workspace .
 node ../sdkwork-specs/tools/check-app-sdk-consumer-imports.mjs --workspace .
 ```
 
-Last verified: 2026-08-08 — workspace tests green; pagination/envelope/operation-pattern checks pass.
+Last verified: 2026-10-25 — `pnpm check` / `pnpm verify` / `pnpm typecheck` green; PC vitest 153 tests green; `db:audit-seeds` green（84 listings，93 releases 与 zh/en notes 全对齐）。

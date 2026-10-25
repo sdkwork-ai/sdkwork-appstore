@@ -24,14 +24,18 @@
     "react-i18next": ">=14.0.0 <18"
   },
   "dependencies": {
+    "@sdkwork/appstore-pc-ai-eval": "workspace:*",
     "@sdkwork/appstore-pc-ai-hub": "workspace:*",
     "@sdkwork/appstore-pc-apps": "workspace:*",
     "@sdkwork/appstore-pc-commons": "workspace:*",
     "@sdkwork/appstore-pc-core": "workspace:*",
     "@sdkwork/appstore-pc-developer-market": "workspace:*",
+    "@sdkwork/appstore-pc-edu-experiment": "workspace:*",
     "@sdkwork/appstore-pc-games": "workspace:*",
+    "@sdkwork/appstore-pc-healthcare": "workspace:*",
     "@sdkwork/appstore-pc-markets": "workspace:*",
     "@sdkwork/appstore-pc-runtime": "workspace:*",
+    "@sdkwork/appstore-pc-tourism": "workspace:*",
     "@sdkwork/auth-pc-react": "workspace:*",
     "@sdkwork/utils": "workspace:*",
     "clsx": "^2.1.1",
