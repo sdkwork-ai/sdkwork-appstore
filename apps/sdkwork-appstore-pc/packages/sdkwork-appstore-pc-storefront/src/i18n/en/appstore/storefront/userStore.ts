@@ -65,13 +65,13 @@ export const userStore = {
   },
   public: {
     title: "'s Appstore",
-    poweredBy: 'Powered by SDKWork Appstore',
+    poweredBy: 'Powered by the App Store',
     categoryAll: 'All',
     empty: 'This user has not shared any apps yet',
     invalid: 'This share link does not exist or is no longer valid',
     expired: 'This share link has expired',
     revoked: 'This share has been revoked',
-    backHome: 'Browse SDKWork Appstore',
+    backHome: 'Browse the App Store',
     appCount: '{{count}} apps',
   },
   error: {

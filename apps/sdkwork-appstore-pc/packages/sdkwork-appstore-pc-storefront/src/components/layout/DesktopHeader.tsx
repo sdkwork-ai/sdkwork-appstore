@@ -61,7 +61,7 @@ export function DesktopHeader({ pendingUpdatesCount: initialCount = 0, showActio
       <div className="hidden xl:flex items-center gap-3 shrink-0">
         <span className="text-xs font-semibold tracking-wide text-store-ink-faint flex items-center gap-1.5 ">
           <span className="w-2 h-2 rounded-full bg-store-brand animate-pulse"></span>
-          Sdkwork Store
+          App Store
         </span>
       </div>
 

@@ -65,13 +65,13 @@ export const userStore = {
   },
   public: {
     title: '的个人 Appstore',
-    poweredBy: '由 SDKWork Appstore 提供服务',
+    poweredBy: '由应用商店提供服务',
     categoryAll: '全部',
     empty: '该用户还没有公开分享任何应用',
     invalid: '分享链接不存在或已失效',
     expired: '分享链接已过期',
     revoked: '分享已被撤销',
-    backHome: '浏览 SDKWork Appstore',
+    backHome: '浏览应用商店',
     appCount: '{{count}} 个应用',
   },
   error: {
