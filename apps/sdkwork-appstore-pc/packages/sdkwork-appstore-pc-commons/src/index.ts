@@ -16,15 +16,22 @@ export { MiniGameCard } from './components/MiniGameCard'
 export { formatPrice } from './formatPrice'
 export {
   AI_MODEL_EVAL_CATEGORY_NAMES,
+  EVAL_SECTIONS,
+  evalDomainsForSection,
   resolveAppSpecs,
   rankEvalSpecs,
+  resolveEvalAppDomain,
+  resolveEvalSectionId,
   summarizeSpecReviews,
 } from './aiEvaluation'
 export type {
   CuratedEvalSpec,
   EvalBenchmark,
   EvalDimensionScore,
+  EvalDomainId,
   EvalSampleUnit,
+  EvalSectionDescriptor,
+  EvalSectionId,
 } from './aiEvaluation'
 export {
   EDU_EXPERIMENT_CATEGORY_NAMES,

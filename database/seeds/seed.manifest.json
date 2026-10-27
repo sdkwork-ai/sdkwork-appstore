@@ -21,23 +21,25 @@
     "zh-CN": {
       "version": "1.1.0",
       "required": true,
-      "checksum": "sha256:6b60ac68168ba6b977edc6980a28f73c3f963eff952e969778cbed9f27c0e608",
+      "checksum": "sha256:d3b4e0e693fdae57d11767a6cbe8821832f9e66346fb33b3305e3a5aa7c973da",
       "files": [
         "locales/zh-CN/001_storefront_listings_zh.sql",
         "locales/zh-CN/002_storefront_releases_zh.sql",
         "locales/zh-CN/003_storefront_catalog_zh.sql",
-        "locales/zh-CN/004_workspace_applications_zh.sql"
+        "locales/zh-CN/004_workspace_applications_zh.sql",
+        "locales/zh-CN/005_ai_model_benchmark_apps_zh.sql"
       ]
     },
     "en-US": {
       "version": "1.1.0",
       "required": false,
-      "checksum": "sha256:52c54ca898d8a3c5a6fa9e0907abe135388dd87b97df242b1174bb22fa259709",
+      "checksum": "sha256:63d658c6b07914ce8da7f6406bccd418e777e192df5dad34cfe8c73c69eba397",
       "files": [
         "locales/en-US/001_storefront_listings_en.sql",
         "locales/en-US/002_storefront_releases_en.sql",
         "locales/en-US/003_storefront_catalog_en.sql",
-        "locales/en-US/004_workspace_applications_en.sql"
+        "locales/en-US/004_workspace_applications_en.sql",
+        "locales/en-US/005_ai_model_benchmark_apps_en.sql"
       ]
     }
   },
@@ -68,6 +70,7 @@
         "common/013_app_platform_delivery.sql",
         "common/014_expert_catalog.sql",
         "common/016_workspace_applications.sql",
+        "common/017_ai_model_benchmark_apps.sql",
         "001_bootstrap.sql"
       ],
       "locales": {
@@ -75,13 +78,15 @@
           "locales/zh-CN/001_storefront_listings_zh.sql",
           "locales/zh-CN/002_storefront_releases_zh.sql",
           "locales/zh-CN/003_storefront_catalog_zh.sql",
-          "locales/zh-CN/004_workspace_applications_zh.sql"
+          "locales/zh-CN/004_workspace_applications_zh.sql",
+          "locales/zh-CN/005_ai_model_benchmark_apps_zh.sql"
         ],
         "en-US": [
           "locales/en-US/001_storefront_listings_en.sql",
           "locales/en-US/002_storefront_releases_en.sql",
           "locales/en-US/003_storefront_catalog_en.sql",
-          "locales/en-US/004_workspace_applications_en.sql"
+          "locales/en-US/004_workspace_applications_en.sql",
+          "locales/en-US/005_ai_model_benchmark_apps_en.sql"
         ]
       }
     }

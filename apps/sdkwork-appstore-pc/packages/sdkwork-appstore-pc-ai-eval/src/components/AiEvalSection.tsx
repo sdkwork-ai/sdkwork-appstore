@@ -3,7 +3,13 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Bot, Cpu, Star, Zap } from 'lucide-react';
 import { AppItem } from '@sdkwork/appstore-pc-core';
-import { CuratedEvalSpec, rankEvalSpecs, resolveAppSpecs } from '@sdkwork/appstore-pc-commons';
+import {
+  CuratedEvalSpec,
+  EVAL_SECTIONS,
+  rankEvalSpecs,
+  resolveAppSpecs,
+  resolveEvalSectionId,
+} from '@sdkwork/appstore-pc-commons';
 
 /** Card layout cap: chips beyond the first four collapse into a "+n" row. */
 const visibleSpecChips = 4;
@@ -116,7 +122,7 @@ export const AiEvalSection: React.FC<AiEvalSectionProps> = ({ apps }) => {
   }
 
   return (
-    <section className="space-y-4">
+    <div className="space-y-6">
       <div className="flex items-center gap-2">
         <div className="p-2 bg-violet-600 text-white rounded-store-control shadow-sm">
           <Cpu className="w-5 h-5" />
@@ -131,11 +137,29 @@ export const AiEvalSection: React.FC<AiEvalSectionProps> = ({ apps }) => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-        {apps.map((app) => (
-          <AiEvalCard key={app.id} app={app} />
-        ))}
-      </div>
-    </section>
+      {EVAL_SECTIONS.map((section) => {
+        const sectionApps = apps.filter((app) => resolveEvalSectionId(app) === section.id);
+        if (sectionApps.length === 0) {
+          return null;
+        }
+        return (
+          <section key={section.id} className="space-y-3">
+            <div className="border-l-2 border-violet-500/50 pl-3">
+              <h3 className="text-sm font-bold text-store-ink">
+                {t(section.titleKey, { count: sectionApps.length })}
+              </h3>
+              <p className="text-[11px] text-store-ink-faint">
+                {t(section.descKey)}
+              </p>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {sectionApps.map((app) => (
+                <AiEvalCard key={app.id} app={app} />
+              ))}
+            </div>
+          </section>
+        );
+      })}
+    </div>
   );
 };
