@@ -71,7 +71,7 @@ function resolveGatewayOrigin(env: NodeJS.ProcessEnv): string {
   return parsed.origin;
 }
 
-export default defineConfig(({ mode }) => {
+export default defineConfig(({ command, mode }) => {
   const env = loadEnv(mode, CONFIG_DIR, '');
   // ENVIRONMENT_SPEC.md §5.1.0.2 (Build-Serve Profile Coherence): the lifecycle
   // environment vocabulary — including `demo` — comes from the shared resolver,
@@ -85,6 +85,7 @@ export default defineConfig(({ mode }) => {
     deploymentMode: deploymentProfile === 'cloud' ? 'saas' : 'local',
     env: { ...process.env, ...env },
     manifestPath: APP_MANIFEST_PATH,
+    persist: command === 'serve',
     repoRoot: REPO_ROOT,
     runtimeTarget: 'browser',
   });
