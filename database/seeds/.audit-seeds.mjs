@@ -2,7 +2,12 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const root = path.dirname(new URL(import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1'));
-const read = (p) => fs.readFileSync(path.join(root, p), 'utf8');
+const read = (p) =>
+  fs
+    .readFileSync(path.join(root, p), 'utf8')
+    // Locale-set checksums describe the committed (LF) content; a Windows
+    // working tree is CRLF because of core.autocrlf.
+    .replaceAll('\r\n', '\n');
 
 function listingIdsFrom005(sql) {
   const section = sql.split('INSERT INTO appstore_listing')[1] ?? '';
