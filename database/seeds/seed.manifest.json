@@ -21,7 +21,7 @@
     "zh-CN": {
       "version": "1.1.0",
       "required": true,
-      "checksum": "sha256:d3b4e0e693fdae57d11767a6cbe8821832f9e66346fb33b3305e3a5aa7c973da",
+      "checksum": "sha256:e7ce816a7e790ff6a1499ca4ccb83fd5851946190314fdee1a5f84028a6fdbb7",
       "files": [
         "locales/zh-CN/001_storefront_listings_zh.sql",
         "locales/zh-CN/002_storefront_releases_zh.sql",
@@ -33,7 +33,7 @@
     "en-US": {
       "version": "1.1.0",
       "required": false,
-      "checksum": "sha256:63d658c6b07914ce8da7f6406bccd418e777e192df5dad34cfe8c73c69eba397",
+      "checksum": "sha256:267b3d25cf9da418d373c16cb2fa464eafaae2efca0348eede74d967e2702196",
       "files": [
         "locales/en-US/001_storefront_listings_en.sql",
         "locales/en-US/002_storefront_releases_en.sql",

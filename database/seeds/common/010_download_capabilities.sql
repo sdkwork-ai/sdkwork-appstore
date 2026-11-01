@@ -220,7 +220,10 @@ JOIN appstore_listing l
  AND l.tenant_id = r.tenant_id
 WHERE a.tenant_id = '100001'
   AND a.artifact_status = 'verified'
-  AND l.listing_status = 'published'
+  -- `active` is the canonical storefront status (ListingStatus::Active); the
+  -- legacy `published` spelling is accepted so databases seeded before the
+  -- 005/017 normalization still receive download grants.
+  AND l.listing_status IN ('active', 'published')
 -- Untargeted conflict guard: seeded grant_no values are deterministic, so a
 -- re-apply collides on (tenant_id, grant_no) before the id conflict triggers.
 ON CONFLICT DO NOTHING;
