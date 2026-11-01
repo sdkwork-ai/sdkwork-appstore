@@ -40,7 +40,8 @@ Cargo.lock
 **/target/
 !.env.example
 !.env.*.example
-!.env.postgres.example
+config/host/postgres.env
+!config/host/postgres.env.example
 dist/
 **/dist/
 coverage/

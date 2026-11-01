@@ -85,7 +85,7 @@ fn resolve_app_root() -> PathBuf {
 }
 
 fn load_workspace_postgres_env(app_root: &PathBuf) {
-    let postgres_env = app_root.join(".env.postgres");
+    let postgres_env = app_root.join("config/host/postgres.env");
     if postgres_env.is_file() {
         dotenvy::from_filename(&postgres_env)
             .map_err(|error| {
