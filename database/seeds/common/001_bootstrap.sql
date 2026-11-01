@@ -55,7 +55,7 @@ WHERE l.tenant_id = '100001'
 -- a different surrogate id for the same (tenant, listing, category) tuple.
 ON CONFLICT (tenant_id, listing_id, category_id) DO NOTHING;
 
--- Approved compliance profile for every published listing.
+-- Approved compliance profile for every active (storefront-visible) listing.
 INSERT INTO appstore_compliance_profile
     (id, tenant_id, organization_id, listing_id, compliance_version, privacy_nutrition_json, content_rating_questionnaire_json, data_safety_json, target_audience_json, compliance_status, reviewed_by, reviewed_at, created_at, updated_at)
 SELECT
@@ -65,7 +65,7 @@ SELECT
     l.id,
     1,
     '{"dataCollected": ["usage", "diagnostics"], "dataLinkedToUser": false}',
-    '{"ageRating": "' || l.age_rating_code || '"}',
+    '{"ageRating": "' || COALESCE(NULLIF(l.age_rating_code, ''), '4+') || '"}',
     '{"encryptionInTransit": true, "encryptionAtRest": true}',
     '{"audience": "general"}',
     'approved',
@@ -75,7 +75,7 @@ SELECT
     CURRENT_TIMESTAMP
 FROM appstore_listing l
 WHERE l.tenant_id = '100001'
-  AND l.listing_status = 'published'
+  AND l.listing_status IN ('active', 'published')
 -- One compliance profile per (tenant, listing, version); other writers may
 -- have used a different surrogate id for the same tuple.
 ON CONFLICT (tenant_id, listing_id, compliance_version) DO NOTHING;
@@ -96,7 +96,7 @@ SELECT
     CURRENT_TIMESTAMP
 FROM appstore_listing l
 WHERE l.tenant_id = '100001'
-  AND l.listing_status = 'published'
+  AND l.listing_status IN ('active', 'published')
 -- One availability row per (tenant, listing, region).
 ON CONFLICT (tenant_id, listing_id, region_code) DO NOTHING;
 
@@ -115,7 +115,7 @@ SELECT
     CURRENT_TIMESTAMP
 FROM appstore_listing l
 WHERE l.tenant_id = '100001'
-  AND l.listing_status = 'published'
+  AND l.listing_status IN ('active', 'published')
 -- One availability row per (tenant, listing, region).
 ON CONFLICT (tenant_id, listing_id, region_code) DO NOTHING;
 
