@@ -2,7 +2,6 @@ export * from './DownloadQueueCard';
 export * from './LibraryAppCard';
 export * from './LibraryAppsGrid';
 export * from './LibraryEmptyState';
-export * from './ReleaseBanner';
 export * from './ReleaseNoteLogItem';
 export * from './ReleaseNotesSection';
 export * from './StorageStatsBanner';

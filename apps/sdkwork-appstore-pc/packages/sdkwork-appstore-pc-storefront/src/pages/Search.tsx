@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next';
 import { AppStoreService } from '../services/api';
 import { AppItem } from '../types';
 import {
-  SearchHeader,
   SearchInput,
   SearchFilters,
   PlatformFilterBar,
@@ -149,8 +148,6 @@ export default function Search() {
 
   return (
     <div className="p-6 md:p-8 w-full max-w-full transition-colors duration-200 select-none">
-      <SearchHeader />
-
       <SearchInput
         value={query}
         onChange={setQuery}

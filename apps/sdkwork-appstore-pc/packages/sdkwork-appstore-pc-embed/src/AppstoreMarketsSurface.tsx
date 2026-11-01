@@ -78,6 +78,21 @@ export interface AppstoreMarketsSurfaceProps {
    * does); without it the demand detail renders no start-project affordance.
    */
   onStartProject?: (demand: DemandHallItem) => void
+  /**
+   * Controlled catalog text filter forwarded to the market page. Embedding
+   * hosts that own a search field (BirdCoder's Markets page header) pass
+   * their live query; the page then renders no local search input — the
+   * host's field is the one search. Omitted, the demands page renders its
+   * own search-and-publish row and the other pages filter by the empty
+   * string.
+   */
+  searchQuery?: string
+  /**
+   * CSS selector of the host-provided container that receives the templates
+   * page's publish button (a portal target in the host's toolbar row). When
+   * set, the button portals there instead of riding the platform-filter row.
+   */
+  templatesPublishSlotSelector?: string
 }
 
 function resolveMarketsConfig(props: AppstoreMarketsSurfaceProps): AppstorePcRuntimeConfig {
@@ -210,17 +225,27 @@ export function AppstoreMarketsSurface(props: AppstoreMarketsSurfaceProps) {
         resolveHostColorScheme={props.resolveHostColorScheme}
         subscribeHostColorScheme={props.subscribeHostColorScheme}
       >
-        {/* Market pages render router-aware widgets (ExpertsSearchBar,
-            ExpertCard call useNavigate), so the surface owns a MemoryRouter
+        {/* Market pages render router-aware widgets (ExpertCard and the
+            experts cards navigate), so the surface owns a MemoryRouter
             just like the full AppstorePcHost embed: hosts without a React
             Router context must still be able to mount one page. */}
         <MemoryRouter initialEntries={['/']}>
           {props.page === 'demands' ? (
             <DemandsPage
               {...(props.onStartProject === undefined ? {} : { onStartProject: props.onStartProject })}
+              {...(props.searchQuery === undefined ? {} : { searchQuery: props.searchQuery })}
+            />
+          ) : props.page === 'templates' ? (
+            <TemplatesPage
+              {...(props.searchQuery === undefined ? {} : { searchQuery: props.searchQuery })}
+              {...(props.templatesPublishSlotSelector === undefined
+                ? {}
+                : { publishSlotSelector: props.templatesPublishSlotSelector })}
             />
           ) : (
-            <MarketPage />
+            <MarketPage
+              {...(props.searchQuery === undefined ? {} : { searchQuery: props.searchQuery })}
+            />
           )}
         </MemoryRouter>
       </ThemeProvider>

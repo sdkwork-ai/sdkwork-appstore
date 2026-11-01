@@ -5,16 +5,24 @@ import { McpServerItem } from '@sdkwork/appstore-pc-core';
 import { CardGrid } from '@sdkwork/appstore-pc-commons';
 import { McpCard } from './components/mcp/McpCard';
 import { McpConfigModal } from './components/mcp/McpConfigModal';
-import { McpHeaderBanner } from './components/mcp/McpHeaderBanner';
-import { McpSearchBar } from './components/mcp/McpSearchBar';
 import { AddMcpServerModal } from './components/mcp/AddMcpServerModal';
 import { McpEmptyState } from './components/mcp/McpEmptyState';
 import { McpService } from '@sdkwork/appstore-pc-core';
 
-export function McpPage() {
+/** Props for the MCP catalog page. */
+export interface McpPageProps {
+  /**
+   * Controlled catalog text filter. The surrounding chrome owns the search
+   * field (the store header's global search, or an embedding host's toolbar)
+   * and passes its query here; the page renders no search input of its own.
+   * Unset filters by the empty string, i.e. the full catalog.
+   */
+  searchQuery?: string;
+}
+
+export function McpPage({ searchQuery }: McpPageProps = {}) {
   const { t } = useTranslation();
   const [servers, setServers] = useState<McpServerItem[]>([]);
-  const [searchQuery, setSearchQuery] = useState('');
   const [selectedServer, setSelectedServer] = useState<McpServerItem | null>(null);
   const [loading, setLoading] = useState(true);
   const [isAddOpen, setIsAddOpen] = useState(false);
@@ -22,7 +30,7 @@ export function McpPage() {
 
   const loadServers = async () => {
     try {
-      const data = await McpService.getMcpServers(searchQuery);
+      const data = await McpService.getMcpServers(searchQuery ?? '');
       setServers(data);
     } catch (err) {
       console.error('Failed to load MCP servers', err);
@@ -89,17 +97,9 @@ export function McpPage() {
 
   return (
     <div className="p-6 md:p-8 w-full max-w-full space-y-6 animate-fade-in @container">
-      {/* Header Banner Subcomponent */}
-      <McpHeaderBanner />
-
-      {/* Search and Action Header */}
-      <div className="flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
-        <div className="flex-1">
-          <McpSearchBar
-            searchQuery={searchQuery}
-            onSearchChange={setSearchQuery}
-          />
-        </div>
+      {/* Deploy action row — the page's one affordance rides the top; text
+          search belongs to the surrounding chrome. */}
+      <div className="flex md:justify-end">
         <button
           onClick={() => setIsAddOpen(true)}
           className="px-4 py-2 bg-store-info hover:bg-store-info-hover text-white rounded-store-control text-xs font-medium transition-all shadow-sm shrink-0 flex items-center justify-center gap-1.5 cursor-pointer"

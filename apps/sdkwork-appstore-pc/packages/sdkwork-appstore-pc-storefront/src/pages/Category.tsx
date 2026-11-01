@@ -62,11 +62,13 @@ export default function Category() {
 
   return (
     <div className="p-6 md:p-8 w-full max-w-full transition-colors duration-200 select-none space-y-6">
-      <div className={`rounded-store-card p-8 text-white ${category.icon ? 'bg-gradient-to-br from-store-brand via-store-brand to-purple-700' : 'bg-gradient-to-br from-store-brand via-store-brand to-purple-700'}`}>
-        <h1 className="text-2xl font-bold tracking-tight">
+      {/* Compact entity heading: the former gradient hero card is gone; the
+          category name and description stay as plain text. */}
+      <div>
+        <h1 className="text-xl font-bold tracking-tight text-store-ink">
           {t('category.header.title', { name: category.name })}
         </h1>
-        <p className="text-sm text-blue-100 mt-2 max-w-xl">
+        <p className="text-xs text-store-ink-faint mt-1 max-w-xl">
           {t('category.header.subtitle', { name: category.name })}
         </p>
       </div>

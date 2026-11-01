@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { BrainCircuit } from 'lucide-react';
+import {} from 'lucide-react';
 import { AppStoreService, AppItem } from '@sdkwork/appstore-pc-core';
 import {
   AI_MODEL_EVAL_CATEGORY_NAMES,
@@ -98,24 +98,6 @@ export default function AiEvalPage() {
 
   return (
     <div className="p-5 md:p-6 space-y-5 w-full max-w-full select-none transition-colors duration-200">
-      {/* Sub-component: Module hero banner */}
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 p-6 bg-gradient-to-br from-store-subtle to-store-subtle border border-store-line rounded-store-card text-store-ink shadow-lg relative overflow-hidden">
-        <div className="z-10 max-w-xl">
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-violet-500/10 border border-violet-500/20 text-violet-500 text-xs font-medium mb-3">
-            <BrainCircuit className="w-3.5 h-3.5" />
-            <span>{t('aiEval.header.badge')}</span>
-          </div>
-          <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight">
-            {t('aiEval.header.title')}
-          </h1>
-          <p className="text-xs md:text-sm text-store-ink-soft mt-2 leading-relaxed">
-            {t('aiEval.header.subtitle')}
-          </p>
-        </div>
-        <div className="z-10 p-4 rounded-store-card bg-violet-600/10 border border-violet-500/20 text-violet-500">
-          <BrainCircuit className="w-10 h-10" />
-        </div>
-      </div>
 
       {/* Sub-component: Two-level filter — section row + dependent domain row */}
       <div className="space-y-2">

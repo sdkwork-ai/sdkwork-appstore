@@ -14,4 +14,3 @@ export * from './SkillPromptPreview';
 export * from './SkillSandboxTab';
 export * from './SkillTriggersList';
 export * from './SkillsEmptyState';
-export * from './SkillsHeaderBanner';

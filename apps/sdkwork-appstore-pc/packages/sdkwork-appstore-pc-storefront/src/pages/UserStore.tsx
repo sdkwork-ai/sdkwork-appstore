@@ -98,33 +98,25 @@ export default function UserStore() {
 
   return (
     <div className="p-6 md:p-8 w-full max-w-full transition-colors duration-200 select-none space-y-6">
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <h1 className="text-xl font-bold tracking-tight text-store-ink ">
-            {t('userStore.header.title')}
-          </h1>
-          <p className="text-xs text-store-ink-faint mt-1 ">
-            {t('userStore.header.subtitle')}
-          </p>
-        </div>
-        <div className="flex items-center gap-2 shrink-0">
-          <button
-            type="button"
-            onClick={() => void load()}
-            aria-label={t('userStore.actions.refresh')}
-            className="p-2.5 rounded-full text-store-ink-faint hover:text-store-ink-soft hover:bg-store-subtle transition-colors cursor-pointer text-xs font-medium"
-          >
-            <RefreshCw className="w-4 h-4" />
-          </button>
-          <button
-            type="button"
-            onClick={() => setCreateOpen(true)}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-store-brand hover:bg-store-brand text-white text-sm font-medium transition-colors cursor-pointer"
-          >
-            <FolderPlus className="w-4 h-4" />
-            {t('userStore.actions.createCategory')}
-          </button>
-        </div>
+      {/* Toolbar row: the title block is gone (the sidebar names the page),
+          so the refresh and create actions lead. */}
+      <div className="flex items-center justify-end gap-2">
+        <button
+          type="button"
+          onClick={() => void load()}
+          aria-label={t('userStore.actions.refresh')}
+          className="p-2.5 rounded-full text-store-ink-faint hover:text-store-ink-soft hover:bg-store-subtle transition-colors cursor-pointer text-xs font-medium"
+        >
+          <RefreshCw className="w-4 h-4" />
+        </button>
+        <button
+          type="button"
+          onClick={() => setCreateOpen(true)}
+          className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-store-brand hover:bg-store-brand text-white text-sm font-medium transition-colors cursor-pointer"
+        >
+          <FolderPlus className="w-4 h-4" />
+          {t('userStore.actions.createCategory')}
+        </button>
       </div>
 
       {error && (

@@ -125,12 +125,15 @@ export function AppstorePcRoutes({
             <Route path="tourism" element={<TourismPage />} />
             <Route path="healthcare" element={<HealthcarePage />} />
             <Route path="ai-hub" element={<AIHubPage />} />
-            <Route path="experts" element={<ExpertsPage />} />
-            <Route path="plugins" element={<PluginsPage />} />
-            <Route path="skills" element={<SkillsPage />} />
-            <Route path="mcp" element={<McpPage />} />
-            <Route path="templates" element={<TemplatesPage />} />
-            <Route path="demands" element={<DemandsPage />} />
+            {/* AI Lab pages: the layout header owns the global search, so the
+                pages render under a controlled empty query — no per-page
+                search input duplicates the header field. */}
+            <Route path="experts" element={<ExpertsPage searchQuery="" />} />
+            <Route path="plugins" element={<PluginsPage searchQuery="" />} />
+            <Route path="skills" element={<SkillsPage searchQuery="" />} />
+            <Route path="mcp" element={<McpPage searchQuery="" />} />
+            <Route path="templates" element={<TemplatesPage searchQuery="" />} />
+            <Route path="demands" element={<DemandsPage searchQuery="" />} />
             <Route path="template/:id" element={<TemplateDetailPage />} />
             <Route path="templates/:id" element={<TemplateDetailPage />} />
             <Route path="api-market" element={<ApiMarketPage />} />

@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 import { AppStoreService } from '@sdkwork/appstore-pc-core';
 import { AppItem } from '@sdkwork/appstore-pc-core';
 import { LoadingSpinner } from '@sdkwork/appstore-pc-commons';
-import { AppsHeaderBanner } from './components/AppsHeaderBanner';
 import { AppsCategoryFilter, type AppsCategoryOption } from './components/AppsCategoryFilter';
 import { AppsGrid } from './components/AppsGrid';
 
@@ -107,13 +106,8 @@ export default function AppsPage() {
     return <LoadingSpinner />;
   }
 
-  const featuredApp = apps[0];
-
   return (
     <div className="p-5 md:p-6 space-y-6 w-full max-w-full select-none transition-colors duration-200">
-      {/* Sub-component: Header Banner */}
-      <AppsHeaderBanner featuredApp={featuredApp} />
-
       {/* Sub-component: Sub-Category Filter Badges */}
       <AppsCategoryFilter
         categories={subCategories}

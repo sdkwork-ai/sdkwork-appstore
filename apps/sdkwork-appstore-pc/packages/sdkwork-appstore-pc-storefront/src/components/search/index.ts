@@ -1,4 +1,3 @@
-export * from './SearchHeader';
 export * from './SearchEmptyState';
 export * from './SearchFilters';
 export * from './PlatformFilterBar';

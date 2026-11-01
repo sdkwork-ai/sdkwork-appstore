@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { HeartPulse, ShieldAlert } from 'lucide-react';
+import {ShieldAlert} from 'lucide-react';
 import { AppStoreService, AppItem } from '@sdkwork/appstore-pc-core';
 import {
   HEALTHCARE_CATEGORY_NAMES,
@@ -86,24 +86,6 @@ export default function HealthcarePage() {
 
   return (
     <div className="p-5 md:p-6 space-y-5 w-full max-w-full select-none transition-colors duration-200">
-      {/* Sub-component: Module hero banner */}
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 p-6 bg-gradient-to-br from-store-subtle to-store-subtle border border-store-line rounded-store-card text-store-ink shadow-lg relative overflow-hidden">
-        <div className="z-10 max-w-xl">
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-rose-500/10 border border-rose-500/20 text-rose-600 text-xs font-medium mb-3">
-            <HeartPulse className="w-3.5 h-3.5" />
-            <span>{t('healthcare.header.badge')}</span>
-          </div>
-          <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight">
-            {t('healthcare.header.title')}
-          </h1>
-          <p className="text-xs md:text-sm text-store-ink-soft mt-2 leading-relaxed">
-            {t('healthcare.header.subtitle')}
-          </p>
-        </div>
-        <div className="z-10 p-4 rounded-store-card bg-rose-600/10 border border-rose-500/20 text-rose-600">
-          <HeartPulse className="w-10 h-10" />
-        </div>
-      </div>
 
       {/* Sub-component: Non-diagnosis compliance notice (fixed, not dismissible) */}
       <div className="flex items-start gap-2 p-3 rounded-store-card bg-amber-400/10 border border-amber-400/30 text-amber-700 dark:text-amber-400">

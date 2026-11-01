@@ -1,5 +1,5 @@
 export { default as GamesPage } from './GamesPage';
-export { GamesHeaderBanner } from './components/GamesHeaderBanner';
+export { GamesCategoryTabs, type GameTabType } from './components/GamesCategoryTabs';
 export { BoardGamesHallSection } from './components/BoardGamesHallSection';
 export { PcGamesSection } from './components/PcGamesSection';
 

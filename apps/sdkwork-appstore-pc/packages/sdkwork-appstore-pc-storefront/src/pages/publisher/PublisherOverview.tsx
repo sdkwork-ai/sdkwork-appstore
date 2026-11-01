@@ -144,15 +144,9 @@ export default function PublisherOverview() {
 
   return (
     <div className="p-6 md:p-8 w-full max-w-full transition-colors duration-200 select-none space-y-6">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div>
-          <h1 className="text-xl font-bold tracking-tight text-store-ink ">
-            {t('publisher.header.title')}
-          </h1>
-          <p className="text-xs text-store-ink-faint mt-1 ">
-            {t('publisher.header.subtitle')}
-          </p>
-        </div>
+      {/* Toolbar row: the title block is gone (the console sidebar names the
+          page), so the create-app action leads. */}
+      <div className="flex items-center justify-end gap-2">
         {profile && (
           <Link
             to="/publisher/apps/new"

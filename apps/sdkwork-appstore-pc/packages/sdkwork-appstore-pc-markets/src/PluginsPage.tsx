@@ -5,18 +5,27 @@ import { CardGrid } from '@sdkwork/appstore-pc-commons';
 import { PluginCard } from './components/plugins/PluginCard';
 import { PluginFilter } from './components/plugins/PluginFilter';
 import { PluginDetailModal } from './components/plugins/PluginDetailModal';
-import { PluginsHeaderBanner } from './components/plugins/PluginsHeaderBanner';
 import { PluginsEmptyState } from './components/plugins/PluginsEmptyState';
 import { PluginsService } from '@sdkwork/appstore-pc-core';
 import { ALL_CATEGORY, type CategoryOption } from './components/marketCategories';
 
-export function PluginsPage() {
+/** Props for the plugins catalog page. */
+export interface PluginsPageProps {
+  /**
+   * Controlled catalog text filter. The surrounding chrome owns the search
+   * field (the store header's global search, or an embedding host's toolbar)
+   * and passes its query here; the page renders no search input of its own.
+   * Unset filters by the empty string, i.e. the full catalog.
+   */
+  searchQuery?: string;
+}
+
+export function PluginsPage({ searchQuery }: PluginsPageProps = {}) {
   const { t } = useTranslation();
   // The catalog is loaded once and filtered locally: the category chips are
   // derived from the full catalog, so selecting one never hides the others and
   // every chip names a category the catalog actually contains.
   const [allPlugins, setAllPlugins] = useState<PluginItem[]>([]);
-  const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>(ALL_CATEGORY);
   const [selectedPlugin, setSelectedPlugin] = useState<PluginItem | null>(null);
   const [loading, setLoading] = useState(true);
@@ -59,7 +68,7 @@ export function PluginsPage() {
   }, [allPlugins, t]);
 
   const plugins = useMemo(() => {
-    const query = searchQuery.trim().toLocaleLowerCase();
+    const query = (searchQuery ?? '').trim().toLocaleLowerCase();
     return allPlugins.filter((plugin) => {
       if (selectedCategory !== ALL_CATEGORY && plugin.category !== selectedCategory) {
         return false;
@@ -90,15 +99,10 @@ export function PluginsPage() {
 
   return (
     <div className="p-6 md:p-8 w-full max-w-full space-y-6 animate-fade-in @container">
-      {/* Header Banner Subcomponent */}
-      <PluginsHeaderBanner />
-
-      {/* Filter & Register Bar */}
+      {/* Category Filter */}
       <div className="flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between min-w-0 w-full">
         <div className="flex-1 min-w-0">
           <PluginFilter
-            searchQuery={searchQuery}
-            onSearchChange={setSearchQuery}
             selectedCategory={selectedCategory}
             onSelectCategory={setSelectedCategory}
             categories={categories}

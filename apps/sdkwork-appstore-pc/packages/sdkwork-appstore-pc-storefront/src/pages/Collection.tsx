@@ -68,15 +68,17 @@ export default function Collection() {
 
   return (
     <div className="p-6 md:p-8 w-full max-w-full transition-colors duration-200 select-none space-y-6">
-      <div className="rounded-store-card p-8 text-white bg-gradient-to-br from-store-brand via-purple-600 to-fuchsia-600">
+      {/* Compact entity heading: the former gradient hero card is gone; the
+          collection eyebrow, title, and description stay as plain text. */}
+      <div>
         <p className="text-xs font-bold text-store-brand uppercase tracking-wider">
           {t('collection.header.subtitle')}
         </p>
-        <h1 className="text-2xl font-bold tracking-tight mt-2">
+        <h1 className="text-xl font-bold tracking-tight text-store-ink mt-1">
           {t('collection.header.title', { title: collection.title })}
         </h1>
         {collection.subtitle && (
-          <p className="text-sm text-store-brand mt-2 max-w-xl">{collection.subtitle}</p>
+          <p className="text-xs text-store-ink-faint mt-1 max-w-xl">{collection.subtitle}</p>
         )}
       </div>
 

@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { AppStoreService } from '@sdkwork/appstore-pc-core';
 import { AppItem } from '@sdkwork/appstore-pc-core';
 import { LoadingSpinner } from '@sdkwork/appstore-pc-commons';
-import { GamesHeaderBanner, GameTabType } from './components/GamesHeaderBanner';
+import { GamesCategoryTabs, type GameTabType } from './components/GamesCategoryTabs';
 import { BoardGamesHallSection } from './components/BoardGamesHallSection';
 import { PcGamesSection } from './components/PcGamesSection';
 import { MiniGamesSection } from './components/MiniGamesSection';
@@ -85,8 +85,8 @@ export default function GamesPage() {
 
   return (
     <div className="p-5 md:p-6 space-y-7 w-full max-w-full select-none transition-colors duration-200">
-      {/* Sub-component: Games Hero Header & Action Tabs */}
-      <GamesHeaderBanner
+      {/* Sub-component: Games Category Tabs */}
+      <GamesCategoryTabs
         activeTab={activeTab}
         onTabChange={setActiveTab}
       />

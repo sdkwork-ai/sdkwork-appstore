@@ -68,21 +68,23 @@ export default function Event() {
 
   return (
     <div className="p-6 md:p-8 w-full max-w-full transition-colors duration-200 select-none space-y-6">
-      <div className="rounded-store-card p-8 text-white bg-gradient-to-r from-violet-600 via-fuchsia-600 to-store-danger">
-        <p className="text-xs font-bold text-fuchsia-200 uppercase tracking-wider">
+      {/* Compact entity heading: the former gradient hero card is gone; the
+          event title, description, and schedule metadata stay as plain text. */}
+      <div>
+        <p className="text-xs font-bold text-store-brand uppercase tracking-wider">
           {t('events.header.subtitle')}
         </p>
-        <h1 className="text-2xl font-bold tracking-tight mt-2">
+        <h1 className="text-xl font-bold tracking-tight text-store-ink mt-1">
           {t('events.header.title', { title: event.title })}
         </h1>
         {event.subtitle && (
-          <p className="text-sm text-fuchsia-100 mt-2 max-w-xl">{event.subtitle}</p>
+          <p className="text-xs text-store-ink-faint mt-1 max-w-xl">{event.subtitle}</p>
         )}
-        <div className="flex items-center gap-4 mt-4 text-xs font-semibold text-fuchsia-100">
+        <div className="flex items-center gap-4 mt-3 text-xs font-semibold text-store-ink-faint">
           {event.startsAt && <span>{t('events.meta.startsAt', { date: event.startsAt })}</span>}
           {event.endsAt && <span>{t('events.meta.endsAt', { date: event.endsAt })}</span>}
           {event.status && (
-            <span className="px-2 py-0.5 rounded-full bg-store-surface/20">
+            <span className="px-2 py-0.5 rounded-full bg-store-subtle text-store-ink-soft">
               {event.status === 'active' ? t('events.meta.active') : t('events.meta.endsSoon')}
             </span>
           )}

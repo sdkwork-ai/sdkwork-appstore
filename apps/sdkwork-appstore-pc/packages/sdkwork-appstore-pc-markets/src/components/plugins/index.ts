@@ -12,6 +12,5 @@ export * from './PluginOverviewTab';
 export * from './PluginSandboxTab';
 export * from './PluginSchemaTab';
 export * from './PluginsEmptyState';
-export * from './PluginsHeaderBanner';
 export * from './RegisterPluginFormFields';
 export * from './RegisterPluginModal';

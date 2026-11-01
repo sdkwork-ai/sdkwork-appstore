@@ -6,18 +6,26 @@ import { ExpertCard } from './components/experts/ExpertCard';
 import { ExpertsCategoryFilter } from './components/experts/ExpertsCategoryFilter';
 import { ALL_CATEGORY } from './components/marketCategories';
 import { ExpertsEmptyState } from './components/experts/ExpertsEmptyState';
-import { ExpertsHeaderBanner } from './components/experts/ExpertsHeaderBanner';
-import { ExpertsSearchBar } from './components/experts/ExpertsSearchBar';
 
-export function ExpertsPage() {
-  // The catalog is loaded once; the category filters and the search box are
-  // applied locally. Deriving the category list from the filtered result would
-  // hide every category except the selected one after the first click, so the
-  // roster and the categories stay the full catalog.
+/** Props for the experts catalog page. */
+export interface ExpertsPageProps {
+  /**
+   * Controlled catalog text filter. The surrounding chrome owns the search
+   * field (the store header's global search, or an embedding host's toolbar)
+   * and passes its query here; the page renders no search input of its own.
+   * Unset filters by the empty string, i.e. the full catalog.
+   */
+  searchQuery?: string;
+}
+
+export function ExpertsPage({ searchQuery }: ExpertsPageProps = {}) {
+  // The catalog is loaded once; the category filters and the controlled query
+  // are applied locally. Deriving the category list from the filtered result
+  // would hide every category except the selected one after the first click,
+  // so the roster and the categories stay the full catalog.
   const [allExperts, setAllExperts] = useState<ExpertItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>(ALL_CATEGORY);
 
   useEffect(() => {
@@ -58,7 +66,7 @@ export function ExpertsPage() {
   }, [allExperts]);
 
   const experts = useMemo(() => {
-    const normalizedQuery = searchQuery.trim().toLocaleLowerCase();
+    const normalizedQuery = (searchQuery ?? '').trim().toLocaleLowerCase();
     return allExperts.filter((expert) => {
       if (selectedCategory !== ALL_CATEGORY && expert.filterTag !== selectedCategory) {
         return false;
@@ -77,15 +85,6 @@ export function ExpertsPage() {
 
   return (
     <div className="p-6 md:p-8 w-full max-w-full space-y-6 animate-fade-in @container">
-      {/* Header Banner Subcomponent */}
-      <ExpertsHeaderBanner />
-
-      {/* Search and Lab Entry Bar Subcomponent */}
-      <ExpertsSearchBar
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
-      />
-
       {/* Categories Horizontal Filter Subcomponent */}
       <ExpertsCategoryFilter
         categories={categories}

@@ -5,7 +5,6 @@ import { ChevronRight, Clock, Compass, Sparkles, Tags } from 'lucide-react';
 import { AppStoreService } from '../services/api';
 import { AppItem, CategoryDetail, EditorialCollection, EventItem } from '../types';
 import { Button, EmptyState, LoadingSpinner } from '../components/common';
-import { DiscoverHeader } from '../components/discover/DiscoverHeader';
 import { EssentialAppsGrid } from '../components/discover/EssentialAppsGrid';
 import { FeaturedTodayCard } from '../components/discover/FeaturedTodayCard';
 import { CollectionGridSection } from '../components/discover/CollectionGridSection';
@@ -83,8 +82,6 @@ export default function Discover() {
   return (
     <div className="p-5 md:p-6 space-y-7 w-full max-w-full transition-colors duration-200 select-none">
       {/* Subcomponent: Page Title Header */}
-      <DiscoverHeader />
-
       {/* An empty store still owes the reader a complete surface —
           `UI_DESIGN_SPEC.md` §4.10: an illustration, a title and a call to
           action. This renders only when no section below can, so it never

@@ -1,6 +1,5 @@
 export {
   DiscoverPage,
-  DiscoverHeader,
   AppSection,
   EssentialAppsGrid,
   FeaturedTodayCard,

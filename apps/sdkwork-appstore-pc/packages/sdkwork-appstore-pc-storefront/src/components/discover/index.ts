@@ -1,6 +1,5 @@
 export * from './AppSection';
 export * from './CollectionGridSection';
-export * from './DiscoverHeader';
 export * from './EssentialAppsGrid';
 export * from './FeaturedTodayCard';
 export * from './HandheldGameCard';

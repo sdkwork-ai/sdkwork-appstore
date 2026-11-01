@@ -17,7 +17,6 @@ import {
   PublishSkillModal,
   RegisterPluginModal,
 } from '@sdkwork/appstore-pc-markets';
-import { AIHubHeaderBanner } from './components/AIHubHeaderBanner';
 import { AIExpertsHeader } from './components/AIExpertsHeader';
 import { AISandboxAssistant } from './components/AISandboxAssistant';
 import { AIAppsGrid } from './components/AIAppsGrid';
@@ -197,9 +196,6 @@ export default function AIHubPage() {
 
   return (
     <div className="p-5 md:p-6 space-y-7 w-full max-w-full select-none transition-colors duration-200 @container">
-      {/* Sub-component: AI Hub Header Banner */}
-      <AIHubHeaderBanner />
-
       {/* Main Sub-Navigation Bar / Tabs Subcomponent */}
       <AIHubTabNav
         activeTab={activeTab}

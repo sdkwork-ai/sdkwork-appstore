@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { GraduationCap } from 'lucide-react';
+import {} from 'lucide-react';
 import { AppStoreService, AppItem } from '@sdkwork/appstore-pc-core';
 import {
   EDU_EXPERIMENT_CATEGORY_NAMES,
@@ -105,24 +105,6 @@ export default function EduExperimentPage() {
 
   return (
     <div className="p-5 md:p-6 space-y-5 w-full max-w-full select-none transition-colors duration-200">
-      {/* Sub-component: Module hero banner */}
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 p-6 bg-gradient-to-br from-store-subtle to-store-subtle border border-store-line rounded-store-card text-store-ink shadow-lg relative overflow-hidden">
-        <div className="z-10 max-w-xl">
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 text-xs font-medium mb-3">
-            <GraduationCap className="w-3.5 h-3.5" />
-            <span>{t('eduExperiment.header.badge')}</span>
-          </div>
-          <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight">
-            {t('eduExperiment.header.title')}
-          </h1>
-          <p className="text-xs md:text-sm text-store-ink-soft mt-2 leading-relaxed">
-            {t('eduExperiment.header.subtitle')}
-          </p>
-        </div>
-        <div className="z-10 p-4 rounded-store-card bg-emerald-600/10 border border-emerald-500/20 text-emerald-600">
-          <GraduationCap className="w-10 h-10" />
-        </div>
-      </div>
 
       {/* Sub-component: Stage group filter, with the K12 sub-stage row on demand */}
       <div className="space-y-2">

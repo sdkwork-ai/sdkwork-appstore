@@ -2,12 +2,33 @@ import React from 'react';
 import { Megaphone, PlusCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
+/**
+ * The 发布需求 action. Extracted so the controlled layout can ride it on the
+ * category-filter row while the search-bar layout reuses the same classes
+ * and copy.
+ */
+export const DemandsPublishButton: React.FC<{ onClick: () => void }> = ({ onClick }) => {
+  const { t } = useTranslation();
+
+  return (
+    <button
+      onClick={onClick}
+      className="flex items-center justify-center gap-2 px-4 py-2 rounded-store-control bg-store-brand hover:bg-store-brand text-white text-xs font-medium shadow-md transition-all cursor-pointer shrink-0"
+    >
+      <PlusCircle className="w-4 h-4" />
+      <span>{t('demands.publishBtn')}</span>
+    </button>
+  );
+};
+
 interface DemandsSearchBarProps {
   searchQuery: string;
   onSearchChange: (query: string) => void;
   onPublishClick: () => void;
 }
 
+/** The search-and-publish row a composition renders when no surrounding
+    chrome owns text search (single-page embeds without their own field). */
 export const DemandsSearchBar: React.FC<DemandsSearchBarProps> = ({
   searchQuery,
   onSearchChange,
@@ -29,13 +50,7 @@ export const DemandsSearchBar: React.FC<DemandsSearchBarProps> = ({
       </div>
 
       <div className="flex items-center gap-2">
-        <button
-          onClick={onPublishClick}
-          className="flex items-center justify-center gap-2 px-4 py-2 rounded-store-control bg-store-brand hover:bg-store-brand text-white text-xs font-medium shadow-md transition-all cursor-pointer shrink-0"
-        >
-          <PlusCircle className="w-4 h-4" />
-          <span>{t('demands.publishBtn')}</span>
-        </button>
+        <DemandsPublishButton onClick={onPublishClick} />
       </div>
     </div>
   );

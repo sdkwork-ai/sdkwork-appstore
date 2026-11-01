@@ -25,5 +25,4 @@ export * from './TemplateScreenshotsTab';
 export * from './TemplateTechStackTab';
 export * from './TemplatesCategoryFilter';
 export * from './TemplatesEmptyState';
-export * from './TemplatesHeaderBanner';
-export * from './TemplatesSearchBar';
+export * from './TemplatesPublishButton';
