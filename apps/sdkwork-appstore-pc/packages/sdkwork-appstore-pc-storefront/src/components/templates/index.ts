@@ -15,7 +15,6 @@ export * from './TemplateDetailActionButtons';
 export * from './TemplateDetailMetricsBar';
 export { TemplateDetailNav } from './TemplateDetailNav';
 export * from './TemplateDetailNavTabs';
-export * from './TemplateDetailRecommendations';
 export * from './TemplateModalFooter';
 export * from './TemplateModalHeader';
 export * from './TemplateOverviewTab';

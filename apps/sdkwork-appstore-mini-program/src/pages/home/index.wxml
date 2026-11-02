@@ -25,7 +25,7 @@
     </view>
   </view>
 
-  <!-- 新建下拉菜单：新建应用 / 新建官网 / 新建宣传应用 -->
+  <!-- 新建下拉菜单：新建应用 / 新建官网 / 创建游戏 / 创建节日祝福 / 新建宣传应用 -->
   <view wx:if="{{createMenuOpen}}" class="create-mask" bindtap="onCreateMenuClose"></view>
   <view wx:if="{{createMenuOpen}}" class="create-menu card" aria-label="新建">
     <view

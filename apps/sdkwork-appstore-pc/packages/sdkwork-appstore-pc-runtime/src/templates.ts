@@ -1,6 +1,7 @@
 import type { AppStoreClient } from '@sdkwork/appstore-pc-core';
 import {
   configureTemplatesServicePort,
+  type TemplateSuggestionSections,
   type TemplatesServicePort,
 } from '@sdkwork/appstore-pc-core';
 
@@ -79,6 +80,12 @@ export function createTemplatesServicePort(client: AppStoreClient): TemplatesSer
       return mapTemplateRecord(template as unknown as Record<string, unknown>);
     },
 
+    async listTemplateSuggestions(id: string): Promise<TemplateSuggestionSections> {
+      // The endpoint returns one item carrying all three ranked rails, so the
+      // detail page's right column needs a single request.
+      return mapTemplateSuggestionRails(await client.catalog.listTemplateSuggestions(id));
+    },
+
     async publishTemplate(templateData: Partial<TemplateItem>): Promise<TemplateItem> {
       const template = await client.catalog.createTemplate({
         templateName: templateData.title || '未命名模板',
@@ -136,6 +143,31 @@ export function createTemplatesServicePort(client: AppStoreClient): TemplatesSer
       return `npx create-sdkwork-app my-app --template ${code || id}`;
     },
   };
+}
+
+/**
+ * Map one suggestions payload onto the detail page's three discovery rails.
+ * Entries that are not objects are dropped, so a malformed rail degrades to an
+ * empty column instead of taking the page down.
+ * @param rails - the service payload's three rail arrays.
+ * @returns the mapped rails.
+ */
+export function mapTemplateSuggestionRails(rails: {
+  latest?: readonly unknown[];
+  related?: readonly unknown[];
+  recommended?: readonly unknown[];
+}): TemplateSuggestionSections {
+  const mapRail = (entries: readonly unknown[] | undefined): TemplateItem[] =>
+    (entries ?? []).filter(isRecord).map(mapTemplateRecord);
+  return {
+    latest: mapRail(rails.latest),
+    related: mapRail(rails.related),
+    recommended: mapRail(rails.recommended),
+  };
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
 function mapTemplateRecord(record: Record<string, unknown>): TemplateItem {

@@ -12,12 +12,15 @@ interface AppstoreCreateTarget {
 const CREATE_TARGETS: AppstoreCreateTarget[] = [
   { type: 'app', title: '新建应用', description: '发布一个全新的应用' },
   { type: 'website', title: '新建官网', description: '搭建并发布官方网站' },
+  { type: 'game', title: '创建游戏', description: '创建一个可在应用商店运行的游戏' },
+  { type: 'festival', title: '创建节日祝福', description: '制作节日祝福海报或互动贺卡' },
   { type: 'promo', title: '新建宣传应用', description: '创建宣传页应用' },
 ];
 
 /** Creation hub: the accent plus button opens a dropdown with the store's
- *  creation entries (new app / new website / new promo app). Menu selection is
- *  reported through `onSelect` with the preset type. */
+ *  creation entries (new app / new website / new game / festival greeting /
+ *  new promo app). Menu selection is reported through `onSelect` with the
+ *  preset type. */
 @Component
 export struct AppstoreCreateMenu {
   onSelect: (type: string) => void = () => {};

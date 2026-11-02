@@ -21,7 +21,7 @@ void main() {
     await tester.pumpAndSettle();
   }
 
-  testWidgets('creation hub plus menu opens with the three presets', (
+  testWidgets('creation hub plus menu opens with every preset', (
     WidgetTester tester,
   ) async {
     await pumpDiscoverScreen(tester);
@@ -33,9 +33,13 @@ void main() {
 
     expect(find.text('新建应用'), findsOneWidget);
     expect(find.text('新建官网'), findsOneWidget);
+    expect(find.text('创建游戏'), findsOneWidget);
+    expect(find.text('创建节日祝福'), findsOneWidget);
     expect(find.text('新建宣传应用'), findsOneWidget);
     expect(find.text('发布一个全新的应用'), findsOneWidget);
     expect(find.text('搭建并发布官方网站'), findsOneWidget);
+    expect(find.text('创建一个可在应用商店运行的游戏'), findsOneWidget);
+    expect(find.text('制作节日祝福海报或互动贺卡'), findsOneWidget);
     expect(find.text('创建宣传页应用'), findsOneWidget);
   });
 }

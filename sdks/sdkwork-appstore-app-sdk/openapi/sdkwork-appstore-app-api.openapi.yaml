@@ -462,13 +462,24 @@ paths:
           - EXPERT
       - name: template_platform
         in: query
+        description: 'Client application architecture code the template scaffolds
+          (see APP_CLIENT_ARCHITECTURE_ALIGNMENT_SPEC section 2): PC, PAD, H5, STATIC_WEB,
+          FLUTTER (Flutter mobile), MINIPROGRAM, ANDROID, IOS, HARMONY, UNIAPP, or
+          UNITY.'
         schema:
           type: string
           enum:
-          - H5
           - PC
+          - PAD
+          - H5
+          - STATIC_WEB
           - FLUTTER
           - MINIPROGRAM
+          - ANDROID
+          - IOS
+          - HARMONY
+          - UNIAPP
+          - UNITY
       - $ref: '#/components/parameters/Cursor'
       - $ref: '#/components/parameters/PageSize'
       responses:
@@ -554,6 +565,41 @@ paths:
               schema:
                 $ref: '#/components/schemas/AppTemplateUsageResponse'
       x-sdkwork-idempotent: true
+  /app/v3/api/appstore/catalog/templates/{templateId}/suggestions:
+    get:
+      tags:
+      - catalog
+      summary: List the discovery rails of a template detail page
+      description: 'Returns the detail page''s three ranked rails in one payload:
+        the newest templates (latest), the nearest catalogue neighbours (related),
+        and the most used remaining candidates (recommended). A template appears in
+        at most one rail, and the template being read never appears in any of them.'
+      operationId: appstore.catalog.templates.suggestions.retrieve
+      security:
+      - AuthToken: []
+        AccessToken: []
+      parameters:
+      - name: templateId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: page_size
+        in: query
+        description: Maximum entries per rail; the service clamps the value to its
+          own bound.
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 12
+          default: 6
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppTemplateSuggestionsResponse'
   /app/v3/api/appstore/catalog/feedback:
     post:
       tags:
@@ -3747,12 +3793,21 @@ components:
           - AGENT
           - EXPERT
         templatePlatform:
+          description: Client application architecture code the template scaffolds,
+            per APP_CLIENT_ARCHITECTURE_ALIGNMENT_SPEC section 2.
           type: string
           enum:
-          - H5
           - PC
+          - PAD
+          - H5
+          - STATIC_WEB
           - FLUTTER
           - MINIPROGRAM
+          - ANDROID
+          - IOS
+          - HARMONY
+          - UNIAPP
+          - UNITY
         categoryCode:
           type: string
         framework:
@@ -3804,12 +3859,21 @@ components:
           - AGENT
           - EXPERT
         templatePlatform:
+          description: Client application architecture code the template scaffolds,
+            per APP_CLIENT_ARCHITECTURE_ALIGNMENT_SPEC section 2.
           type: string
           enum:
-          - H5
           - PC
+          - PAD
+          - H5
+          - STATIC_WEB
           - FLUTTER
           - MINIPROGRAM
+          - ANDROID
+          - IOS
+          - HARMONY
+          - UNIAPP
+          - UNITY
         categoryCode:
           type: string
         framework:
@@ -3914,6 +3978,44 @@ components:
             properties:
               item:
                 $ref: '#/components/schemas/AppTemplateUsageResult'
+    AppTemplateSuggestions:
+      type: object
+      additionalProperties: false
+      required:
+      - latest
+      - related
+      - recommended
+      properties:
+        latest:
+          type: array
+          description: Newest published templates in the same market.
+          items:
+            $ref: '#/components/schemas/AppTemplate'
+        related:
+          type: array
+          description: Templates sharing the current template's category or type,
+            most used first.
+          items:
+            $ref: '#/components/schemas/AppTemplate'
+        recommended:
+          type: array
+          description: Most used remaining templates for the current template's platform.
+          items:
+            $ref: '#/components/schemas/AppTemplate'
+    AppTemplateSuggestionsResponse:
+      allOf:
+      - $ref: '#/components/schemas/SdkWorkApiResponse'
+      - type: object
+        required:
+        - data
+        properties:
+          data:
+            type: object
+            required:
+            - item
+            properties:
+              item:
+                $ref: '#/components/schemas/AppTemplateSuggestions'
     ListingRating:
       type: object
       additionalProperties: false

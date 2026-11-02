@@ -556,6 +556,22 @@ pub struct AppTemplate {
     pub updated_at: DateTime<Utc>,
 }
 
+/// The three discovery rails shown beside a template detail page.
+///
+/// The service ranks the rails and guarantees a template appears in at most one
+/// of them, so the detail page can render all three columns from one payload
+/// without re-filtering: `latest` is the newest first, `related` is the nearest
+/// by catalog taxonomy, and `recommended` is the most used of the remaining
+/// candidates.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+#[serde(rename_all = "camelCase")]
+pub struct TemplateSuggestions {
+    pub latest: Vec<AppTemplate>,
+    pub related: Vec<AppTemplate>,
+    pub recommended: Vec<AppTemplate>,
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 #[serde(rename_all = "camelCase")]

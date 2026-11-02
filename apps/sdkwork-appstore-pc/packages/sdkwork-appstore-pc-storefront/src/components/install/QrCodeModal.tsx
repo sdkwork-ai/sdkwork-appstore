@@ -17,15 +17,17 @@ const GROUP_ACTION_KEY: Partial<Record<AppPlatformGroupKey, string>> = {
   android: 'qrAndroid',
   ios: 'qrIos',
   harmonyos: 'qrHarmonyos',
+  h5Web: 'qrH5',
   miniprogram: 'qrMiniprogram',
   browserExtension: 'qrBrowserExtension',
 };
 
 /**
- * Scan-to-continue dialog for mobile, HarmonyOS, mini-program, and browser
- * extension distributions: encodes the distribution URL (accessUrl, or this
- * storefront's own listing anchor as fallback) into a QR code. The scanned
- * platform group labels the dialog when the scan was triggered per-platform.
+ * Scan-to-continue dialog for H5, mobile, HarmonyOS, mini-program, and browser
+ * extension distributions: encodes the distribution URL (the per-platform scan
+ * link when the app publishes one, else accessUrl, else this storefront's own
+ * listing anchor) into a QR code. The scanned platform group labels the dialog
+ * when the scan was triggered per-platform.
  */
 export function QrCodeModal({ qr, onClose }: QrCodeModalProps) {
   const { t } = useTranslation();

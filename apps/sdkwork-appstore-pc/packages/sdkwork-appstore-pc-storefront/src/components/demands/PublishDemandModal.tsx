@@ -19,10 +19,29 @@ interface PublishDemandModalProps {
 
 const DEMAND_TYPE_OPTIONS: readonly DemandHallType[] = [
   'development',
-  'purchase',
+  'video',
+  'image',
+  'music',
+  'voice',
   'design',
+  'purchase',
   'other',
 ];
+
+/**
+ * Category root each service family publishes under. The cascader only offers
+ * the matching tree, so a video demand cannot be filed under a software leaf.
+ */
+const DEMAND_TYPE_CATEGORY_ROOT: Record<DemandHallType, string> = {
+  development: 'software',
+  purchase: 'purchase',
+  design: 'design',
+  other: 'other',
+  video: 'video',
+  image: 'image',
+  music: 'music',
+  voice: 'voice',
+};
 
 interface CategoryTreeState {
   status: 'loading' | 'ready' | 'error';
@@ -37,7 +56,7 @@ export const PublishDemandModal: React.FC<PublishDemandModalProps> = ({
   const { t } = useTranslation();
   const [title, setTitle] = useState('');
   const [categoryId, setCategoryId] = useState<string | undefined>(undefined);
-  const [appForm, setAppForm] = useState<DemandAppForm | undefined>(undefined);
+  const [appForms, setAppForms] = useState<DemandAppForm[]>([]);
   const [demandType, setDemandType] = useState<DemandHallType>('development');
   const [budget, setBudget] = useState('');
   const [budgetMin, setBudgetMin] = useState('');
@@ -70,14 +89,25 @@ export const PublishDemandModal: React.FC<PublishDemandModalProps> = ({
   const requiresAppForm = demandType === 'development';
   const canSubmit = Boolean(
     title.trim() && categoryId !== undefined && description.trim()
-    && (!requiresAppForm || appForm !== undefined) && !submitting,
+    && (!requiresAppForm || appForms.length > 0) && !submitting,
+  );
+  const categoryRoots = categories.nodes.filter(
+    (node) => node.categoryCode === DEMAND_TYPE_CATEGORY_ROOT[demandType],
   );
 
   const handleSelectCategory = (node: DemandCategory | undefined): void => {
     setCategoryId(node?.id);
     if (node?.appForm !== undefined) {
-      setAppForm(node.appForm);
+      setAppForms((current) => current.includes(node.appForm as DemandAppForm)
+        ? current
+        : [...current, node.appForm as DemandAppForm]);
     }
+  };
+
+  const handleDemandTypeChange = (next: DemandHallType): void => {
+    setDemandType(next);
+    setCategoryId(undefined);
+    setAppForms([]);
   };
 
   const handleSubmit = async (event: React.FormEvent) => {
@@ -89,7 +119,7 @@ export const PublishDemandModal: React.FC<PublishDemandModalProps> = ({
       await onPublish({
         title: title.trim(),
         categoryId,
-        ...(appForm === undefined ? {} : { appForm }),
+        ...(appForms.length === 0 ? {} : { appForms }),
         demandType,
         budget: budget.trim() || undefined,
         budgetMin: budgetMin.trim() || undefined,
@@ -99,7 +129,7 @@ export const PublishDemandModal: React.FC<PublishDemandModalProps> = ({
       });
       setTitle('');
       setCategoryId(undefined);
-      setAppForm(undefined);
+      setAppForms([]);
       setBudget('');
       setBudgetMin('');
       setBudgetMax('');
@@ -144,7 +174,7 @@ export const PublishDemandModal: React.FC<PublishDemandModalProps> = ({
               <select
                 className={inputClass}
                 value={demandType}
-                onChange={(event) => setDemandType(event.target.value as DemandHallType)}
+                onChange={(event) => handleDemandTypeChange(event.target.value as DemandHallType)}
               >
                 {DEMAND_TYPE_OPTIONS.map((value) => (
                   <option key={value} value={value}>
@@ -156,7 +186,7 @@ export const PublishDemandModal: React.FC<PublishDemandModalProps> = ({
             <div className="flex flex-col gap-1.5">
               <span className="text-xs font-medium">{t('demands.publish.categoryLabel')}</span>
               <DemandsCategoryCascader
-                nodes={categories.nodes}
+                nodes={categoryRoots}
                 value={categoryId}
                 disabled={submitting}
                 onSelect={handleSelectCategory}
@@ -174,19 +204,21 @@ export const PublishDemandModal: React.FC<PublishDemandModalProps> = ({
                     {t('common.actions.retry')}
                   </button>
                 </span>
-              ) : categories.nodes.length === 0 ? (
+              ) : categoryRoots.length === 0 ? (
                 <span className="text-[11px] text-store-ink-faint">{t('demands.category.empty')}</span>
               ) : null}
             </div>
           </div>
-          <div className="flex flex-col gap-2">
-            <span className="text-xs font-medium">
-              {t('demands.publish.appFormLabel')}
-              {requiresAppForm ? <span className="ml-1 text-red-500">*</span> : null}
-            </span>
-            <DemandsAppFormPicker value={appForm} disabled={submitting} onChange={setAppForm} />
-            <span className="text-[11px] text-store-ink-faint">{t('demands.publish.appFormHint')}</span>
-          </div>
+          {requiresAppForm ? (
+            <div className="flex flex-col gap-2">
+              <span className="text-xs font-medium">
+                {t('demands.publish.appFormLabel')}
+                <span className="ml-1 text-red-500">*</span>
+              </span>
+              <DemandsAppFormPicker value={appForms} disabled={submitting} onChange={setAppForms} />
+              <span className="text-[11px] text-store-ink-faint">{t('demands.publish.appFormHint')}</span>
+            </div>
+          ) : null}
           <label className="flex flex-col gap-1.5">
             <span className="text-xs font-medium">{t('demands.publish.budgetLabel')}</span>
             <input
@@ -230,7 +262,7 @@ export const PublishDemandModal: React.FC<PublishDemandModalProps> = ({
               placeholder={t('demands.publish.descriptionPlaceholder')}
             />
           </label>
-          {requiresAppForm && appForm === undefined ? (
+          {requiresAppForm && appForms.length === 0 ? (
             <p className="text-[11px] text-store-ink-faint">{t('demands.publish.appFormRequired')}</p>
           ) : null}
           {error ? (

@@ -19,7 +19,7 @@ const targets = [
       generationInputSpec: 'openapi/sdkwork-appstore-app-api.sdkgen.yaml',
       standardProfile: 'sdkwork-v3',
       apiPrefix: '/app/v3/api',
-      ownerOnlyOperationCount: 82,
+      ownerOnlyOperationCount: 83,
     },
   },
   {

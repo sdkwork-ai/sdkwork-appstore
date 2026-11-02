@@ -11,6 +11,8 @@ export interface ListingArtifact {
   architecture: string;
   packageFormat: string;
   fileSizeBytes?: string;
+  /** Published SHA-256 (hex) of the installer, when the release carries one. */
+  checksumSha256?: string;
 }
 
 export interface AppItem {
@@ -172,10 +174,28 @@ export interface McpServerItem {
 }
 
 /**
- * Template target-platform codes, in the library filter-row order. The set is
- * open: the catalog may carry other codes, which the UI renders verbatim.
+ * Template target-platform codes, in the library filter-row order. Each code is
+ * one SDKWork client application architecture (`APP_CLIENT_ARCHITECTURE_ALIGNMENT_SPEC.md`
+ * §2), so a template is classified by the app form it scaffolds: PC browser or
+ * desktop, tablet, phone-first H5, static web, Flutter mobile, mini program,
+ * native Android/iOS/HarmonyOS mobile, uni-app cross-platform, or Unity.
+ *
+ * `H5`, `PC`, `FLUTTER`, and `MINIPROGRAM` are the original four codes and stay
+ * valid; the catalog may still carry other codes, which the UI renders verbatim.
  */
-export const TEMPLATE_PLATFORMS = ['H5', 'PC', 'FLUTTER', 'MINIPROGRAM'] as const;
+export const TEMPLATE_PLATFORMS = [
+  'PC',
+  'PAD',
+  'H5',
+  'STATIC_WEB',
+  'FLUTTER',
+  'MINIPROGRAM',
+  'ANDROID',
+  'IOS',
+  'HARMONY',
+  'UNIAPP',
+  'UNITY',
+] as const;
 
 /** One {@link TEMPLATE_PLATFORMS} code. */
 export type TemplatePlatform = (typeof TEMPLATE_PLATFORMS)[number];

@@ -24,10 +24,17 @@ export const templates = {
   },
   platforms: {
     all: 'All Platforms',
-    h5: 'H5',
-    pc: 'PC',
-    flutter: 'Flutter',
-    miniprogram: 'Mini Program'
+    pc: 'PC App',
+    pad: 'Tablet App',
+    h5: 'H5 App',
+    staticWeb: 'Static Website',
+    flutter: 'Flutter Mobile App',
+    miniprogram: 'Mini Program',
+    android: 'Android App',
+    ios: 'iOS App',
+    harmony: 'HarmonyOS App',
+    uniapp: 'uni-app Cross-platform',
+    unity: 'Unity App'
   },
   form: {
     selectApp: 'Select Target Application to Package',
@@ -72,6 +79,21 @@ export const templates = {
     officialRec: 'Official Choice'
   },
   detail: {
+    backToLibrary: 'Template Library',
+    notFoundTitle: 'Template not found or unpublished',
+    notFoundHint: 'This template may have been removed. Return to the library and pick another one.',
+    scanAction: 'Scan to Try',
+    scanTitle: 'Scan to open on your phone',
+    scanHint: 'Scan with your phone camera or WeChat to open this template\'s mobile experience.',
+    scanSourceDemo: 'The author\'s live demo address',
+    scanSourceApp: 'The mobile entry of the app this template builds',
+    sections: {
+      latest: 'Latest Templates',
+      related: 'Related Templates',
+      recommended: 'Recommended Templates',
+      loading: 'Loading...',
+      empty: 'No templates yet'
+    },
     clonedSuccess: 'Cloned to Workspace Successfully',
     forking: 'Forking / Creating branch...',
     forkBtn: 'Fork / Use Template',

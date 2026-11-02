@@ -46,6 +46,7 @@ packages:
   - "../sdkwork-agents/sdks/sdkwork-agents-app-sdk/sdkwork-agents-app-sdk-typescript"
   - "../sdkwork-company/sdks/sdkwork-company-app-sdk/sdkwork-company-app-sdk-typescript"
   - "../sdkwork-company/sdks/sdkwork-company-backend-sdk/sdkwork-company-backend-sdk-typescript"
+  - "../sdkwork-order/sdks/sdkwork-order-app-sdk/sdkwork-order-app-sdk-typescript"
   - "../sdkwork-skills/sdks/sdkwork-skills-app-sdk/sdkwork-skills-app-sdk-typescript"
   - "../sdkwork-mcp/sdks/sdkwork-mcp-app-sdk/sdkwork-mcp-app-sdk-typescript"
   - "../sdkwork-documents/apps/sdkwork-documents-pc/packages/sdkwork-documents-pc-commons"

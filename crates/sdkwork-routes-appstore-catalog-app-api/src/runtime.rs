@@ -5,7 +5,8 @@ use crate::handlers::{
     catalog_listings_search, catalog_recently_updated_list, catalog_recommendations_list,
     catalog_search_history_clear, catalog_search_history_list, catalog_search_history_upsert,
     catalog_search_suggestions_list, catalog_search_trending_list, catalog_template_create,
-    catalog_template_retrieve, catalog_template_usage_create, catalog_templates_list,
+    catalog_template_retrieve, catalog_template_suggestions_retrieve, catalog_template_usage_create,
+    catalog_templates_list,
 };
 use axum::extract::{Extension, Json, Path, Query, State};
 use axum::http::StatusCode;
@@ -103,6 +104,11 @@ struct CatalogTemplatesListQuery {
     template_type: Option<String>,
     template_platform: Option<String>,
     cursor: Option<String>,
+    page_size: Option<i32>,
+}
+
+#[derive(Debug, serde::Deserialize)]
+struct CatalogTemplateSuggestionsQuery {
     page_size: Option<i32>,
 }
 
@@ -222,6 +228,10 @@ pub fn routes() -> Router<AppState> {
         .route(
             "/app/v3/api/appstore/catalog/templates/{templateId}/usage",
             post(catalog_template_usage_create_handler),
+        )
+        .route(
+            "/app/v3/api/appstore/catalog/templates/{templateId}/suggestions",
+            get(catalog_template_suggestions_retrieve_handler),
         )
         .route(
             "/app/v3/api/appstore/catalog/feedback",
@@ -664,6 +674,29 @@ async fn catalog_template_retrieve_handler(
                 ),
             ),
         },
+        Err(error) => map_catalog_error(context.as_ref(), error),
+    }
+}
+
+async fn catalog_template_suggestions_retrieve_handler(
+    State(state): State<AppState>,
+    Path(template_id): Path<String>,
+    context: Option<Extension<WebRequestContext>>,
+    Query(query): Query<CatalogTemplateSuggestionsQuery>,
+) -> Response {
+    let ctx = match to_catalog_context(context.as_ref()) {
+        Ok(ctx) => ctx,
+        Err(resp) => return resp,
+    };
+    match catalog_template_suggestions_retrieve(
+        &state.catalog_service,
+        &ctx,
+        template_id,
+        query.page_size,
+    )
+    .await
+    {
+        Ok(result) => ok_item(context.as_ref(), result.suggestions),
         Err(error) => map_catalog_error(context.as_ref(), error),
     }
 }

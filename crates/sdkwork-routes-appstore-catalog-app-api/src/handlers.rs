@@ -6,7 +6,8 @@ use sdkwork_appstore_catalog_service::domain::results::{
     FeedbackCreateResult, HomeRetrieveResult, ListingsSearchResult, RecentlyUpdatedListResult,
     RecommendationsListResult, SearchHistoryClearResult, SearchHistoryListResult,
     SearchHistoryUpsertResult, SearchSuggestionsListResult, SearchTrendingListResult,
-    TemplateCreateResult, TemplateRetrieveResult, TemplateUsageCreateResult, TemplatesListResult,
+    TemplateCreateResult, TemplateRetrieveResult, TemplateSuggestionsRetrieveResult,
+    TemplateUsageCreateResult, TemplatesListResult,
 };
 use sdkwork_appstore_catalog_service::error::AppstoreServiceError;
 use sdkwork_appstore_catalog_service::CatalogOperations;
@@ -123,6 +124,11 @@ pub const ROUTE_HANDLER_PLANS: &[RouteHandlerPlan] = &[
         operation_id: "appstore.catalog.templates.usage.create",
         handler_name: "catalog_template_usage_create",
         service_method: "create_template_usage",
+    },
+    RouteHandlerPlan {
+        operation_id: "appstore.catalog.templates.suggestions.retrieve",
+        handler_name: "catalog_template_suggestions_retrieve",
+        service_method: "template_suggestions_retrieve",
     },
     RouteHandlerPlan {
         operation_id: "appstore.catalog.feedback.create",
@@ -343,6 +349,16 @@ pub async fn catalog_template_retrieve<S: CatalogOperations>(
 ) -> Result<TemplateRetrieveResult, AppstoreServiceError> {
     let cmd = mapper::request::map_template_retrieve(template_id);
     service.template_retrieve(context, cmd).await
+}
+
+pub async fn catalog_template_suggestions_retrieve<S: CatalogOperations>(
+    service: &S,
+    context: &AppstoreRequestContext,
+    template_id: String,
+    limit: Option<i32>,
+) -> Result<TemplateSuggestionsRetrieveResult, AppstoreServiceError> {
+    let cmd = mapper::request::map_template_suggestions_retrieve(template_id, limit);
+    service.template_suggestions_retrieve(context, cmd).await
 }
 
 pub async fn catalog_template_create<S: CatalogOperations>(

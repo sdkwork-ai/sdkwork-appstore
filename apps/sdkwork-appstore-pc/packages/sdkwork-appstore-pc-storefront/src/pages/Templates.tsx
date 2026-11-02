@@ -90,7 +90,9 @@ export function TemplatesPage({ searchQuery, publishSlotSelector }: TemplatesPag
   };
 
   const handleSelectTemplate = (template: TemplateItem) => {
-    navigate(`/template/${template.id}`);
+    // Selecting a template is a page navigation: the embed mounts the detail
+    // route, and the standalone storefront owns the same path.
+    navigate(`/templates/${template.id}`);
   };
 
   return (

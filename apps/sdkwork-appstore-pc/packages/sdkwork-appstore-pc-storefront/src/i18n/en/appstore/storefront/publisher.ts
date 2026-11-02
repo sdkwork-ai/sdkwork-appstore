@@ -32,6 +32,10 @@ export const publisher = {
     appDesc: 'Publish a brand-new app',
     website: 'New Website',
     websiteDesc: 'Build and publish an official site',
+    game: 'New Game',
+    gameDesc: 'Create a game that runs in the store',
+    festival: 'New Festival Greeting',
+    festivalDesc: 'Create a festival greeting poster or card',
     promo: 'New Promo App',
     promoDesc: 'Create a promotional page app'
   },

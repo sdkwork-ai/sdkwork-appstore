@@ -1,14 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { TEMPLATE_PLATFORMS, type TemplatePlatform } from '@sdkwork/appstore-pc-core';
-
-/** Filter-row label key per platform code (templates.platforms.*). */
-const PLATFORM_LABEL_KEYS: Record<TemplatePlatform, 'h5' | 'pc' | 'flutter' | 'miniprogram'> = {
-  H5: 'h5',
-  PC: 'pc',
-  FLUTTER: 'flutter',
-  MINIPROGRAM: 'miniprogram',
-};
+import { TEMPLATE_PLATFORMS, resolveTemplateAppType } from '@sdkwork/appstore-pc-core';
 
 interface TemplatesPlatformFilterProps {
   /** Selected platform code; '' shows every template. */
@@ -17,10 +9,11 @@ interface TemplatesPlatformFilterProps {
 }
 
 /**
- * Template target-platform pill row (All / H5 / PC / Flutter / mini program).
- * Sits beside the category filter; the selection is sent to the catalog as a
- * server-side `template_platform` filter. Unknown codes stored on templates
- * render verbatim and filter exactly by their code.
+ * Template application-type pill row (All / PC / H5 / mini program / …), one
+ * pill per SDKWork client architecture. Sits beside the category filter; the
+ * selection is sent to the catalog as a server-side `template_platform` filter.
+ * Unknown codes stored on templates render verbatim and filter exactly by their
+ * code.
  */
 export const TemplatesPlatformFilter: React.FC<TemplatesPlatformFilterProps> = ({
   selected,
@@ -29,8 +22,8 @@ export const TemplatesPlatformFilter: React.FC<TemplatesPlatformFilterProps> = (
   const { t } = useTranslation();
 
   const getPlatformLabel = (platform: string) => {
-    const key = PLATFORM_LABEL_KEYS[platform as TemplatePlatform];
-    return key ? t(`templates.platforms.${key}`) : platform;
+    const appType = resolveTemplateAppType(platform);
+    return appType ? t(`templates.platforms.${appType.labelKey}`) : platform;
   };
 
   return (

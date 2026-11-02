@@ -113,6 +113,7 @@ export const common = {
     qrAndroid: 'Scan with Android',
     qrIos: 'Scan with iOS',
     qrHarmonyos: 'Scan with HarmonyOS',
+    qrH5: 'Scan to preview on phone',
     qrMiniprogram: 'Open Mini Program',
     qrBrowserExtension: 'Browser Extension',
     qrGeneric: 'Scan to Continue',

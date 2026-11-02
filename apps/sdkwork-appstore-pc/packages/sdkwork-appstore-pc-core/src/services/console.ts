@@ -132,7 +132,7 @@ export interface IConsoleSDK {
     /** Initial release version; persisted as a draft release when present. */
     version?: string;
     description?: string;
-    /** Store application type preset (`APP` | `WEBSITE` | `PROMO`); defaults to APP. */
+    /** Canonical app type (`APP_REACT` | `APP_HTML` | `VIDEO` | ...); defaults to APP_REACT. */
     appType?: string;
     /** Storefront pricing model (`FREE` | `FREEMIUM` | `PAID`); defaults to FREE. */
     pricingModel?: string;

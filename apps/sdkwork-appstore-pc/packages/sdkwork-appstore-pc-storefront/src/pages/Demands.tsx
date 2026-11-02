@@ -1,14 +1,17 @@
 import { useState, useEffect, useCallback } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import type { DemandClaimInput, DemandHallItem, DemandPublishInput } from '@sdkwork/appstore-pc-core';
+import { AlertCircle, ClipboardList } from 'lucide-react';
+import type { DemandHallItem, DemandPublishInput } from '@sdkwork/appstore-pc-core';
 import { CardGrid } from '../components/common';
 import { CompanyDemandsService } from '../services/api';
 import { DemandsPublishButton, DemandsSearchBar } from '../components/demands/DemandsSearchBar';
 import { DemandsCategoryFilter } from '../components/demands/DemandsCategoryFilter';
 import { DemandCard } from '../components/demands/DemandCard';
+import { DemandClaimDialog } from '../components/demands/DemandClaimDialog';
+import { DemandClaimNotice } from '../components/demands/DemandClaimNotice';
 import { DemandsEmptyState } from '../components/demands/DemandsEmptyState';
 import { PublishDemandModal } from '../components/demands/PublishDemandModal';
-import { DemandDetailModal } from '../components/demands/DemandDetailModal';
 
 /**
  * 需求大厅 (demand hall) — the AI Lab demand publishing and claiming page.
@@ -16,6 +19,10 @@ import { DemandDetailModal } from '../components/demands/DemandDetailModal';
  * empty state) per the AI Lab composition standard. Demand data is owned by
  * the company domain and consumed through the pc-core demand hall service
  * port.
+ *
+ * Selecting a card navigates to its detail page (a shareable, back-navigable
+ * read surface), while its 抢单 button opens the quick-claim dialog in place —
+ * bidding never costs the reader their list position or filters.
  */
 export interface DemandsPageProps {
   /**
@@ -27,15 +34,11 @@ export interface DemandsPageProps {
    * embeds without another search field).
    */
   searchQuery?: string;
-  /**
-   * Host-provided "create project and start" action. Embedding hosts such as
-   * the BirdCoder demand hall supply it; the standalone storefront omits it.
-   */
-  onStartProject?: (demand: DemandHallItem) => void;
 }
 
-export function DemandsPage({ searchQuery, onStartProject }: DemandsPageProps = {}) {
+export function DemandsPage({ searchQuery }: DemandsPageProps = {}) {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   // Controlled when the surrounding chrome owns the search field; otherwise
   // the page renders its own search input and owns the query.
   const [localQuery, setLocalQuery] = useState('');
@@ -44,7 +47,9 @@ export function DemandsPage({ searchQuery, onStartProject }: DemandsPageProps = 
   const [demands, setDemands] = useState<DemandHallItem[]>([]);
   const [selectedType, setSelectedType] = useState('all');
   const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
-  const [detailDemandId, setDetailDemandId] = useState<string | null>(null);
+  const [claimTarget, setClaimTarget] = useState<DemandHallItem | null>(null);
+  const [claimFeedback, setClaimFeedback] = useState<string | null>(null);
+  const [loadFailed, setLoadFailed] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const loadDemands = useCallback(async () => {
@@ -54,8 +59,10 @@ export function DemandsPage({ searchQuery, onStartProject }: DemandsPageProps = 
         demandType: selectedType === 'all' ? undefined : selectedType,
       });
       setDemands(data);
+      setLoadFailed(false);
     } catch (err) {
       console.error('Failed to load demands', err);
+      setLoadFailed(true);
     } finally {
       setLoading(false);
     }
@@ -65,13 +72,29 @@ export function DemandsPage({ searchQuery, onStartProject }: DemandsPageProps = 
     void loadDemands();
   }, [loadDemands]);
 
+  // The success notice clears itself so a completed claim does not leave a
+  // stale banner above a freshly filtered list.
+  useEffect(() => {
+    if (!claimFeedback) return;
+    const timer = window.setTimeout(() => setClaimFeedback(null), 6000);
+    return () => window.clearTimeout(timer);
+  }, [claimFeedback]);
+
   const handlePublish = async (input: DemandPublishInput) => {
     const published = await CompanyDemandsService.publishDemand(input);
     setDemands((prev) => [published, ...prev]);
   };
 
-  const handleClaim = async (demandId: string, input: DemandClaimInput) => {
-    await CompanyDemandsService.claimDemand(demandId, input);
+  const openDemand = (demand: DemandHallItem) => {
+    navigate(`/demands/${encodeURIComponent(demand.id)}`);
+  };
+
+  /** Reflect the new bid immediately, then reconcile with the server list. */
+  const handleClaimSubmitted = async (claimed: DemandHallItem) => {
+    setClaimFeedback(t('demands.claim.success'));
+    setDemands((prev) => prev.map((demand) => (
+      demand.id === claimed.id ? { ...demand, bidCount: demand.bidCount + 1 } : demand
+    )));
     await loadDemands();
   };
 
@@ -93,10 +116,44 @@ export function DemandsPage({ searchQuery, onStartProject }: DemandsPageProps = 
         <div className="flex-1 min-w-0">
           <DemandsCategoryFilter selectedType={selectedType} onSelectType={setSelectedType} />
         </div>
-        {isControlledSearch && (
-          <DemandsPublishButton onClick={() => setIsPublishModalOpen(true)} />
-        )}
+        <div className="flex items-center gap-2 shrink-0">
+          <Link
+            to="/demands/my-claims"
+            className="inline-flex items-center gap-1.5 rounded-store-control border border-store-line bg-store-surface px-4 py-2 text-xs font-medium text-store-ink-soft hover:border-store-brand/50 hover:text-store-brand transition-colors"
+            data-my-claims-entry
+          >
+            <ClipboardList className="w-4 h-4" />
+            {t('demands.myClaims.entry')}
+          </Link>
+          {isControlledSearch && (
+            <DemandsPublishButton onClick={() => setIsPublishModalOpen(true)} />
+          )}
+        </div>
       </div>
+
+      {claimFeedback ? (
+        <DemandClaimNotice message={claimFeedback} onDismiss={() => setClaimFeedback(null)} />
+      ) : null}
+
+      {loadFailed ? (
+        <div
+          className="flex flex-col sm:flex-row sm:items-center gap-2 rounded-store-card border border-red-500/30 bg-red-500/5 px-4 py-3 text-xs text-red-500"
+          role="alert"
+        >
+          <AlertCircle className="w-4 h-4 shrink-0" />
+          <span className="min-w-0 flex-1">{t('demands.loadFailed')}</span>
+          <button
+            type="button"
+            onClick={() => {
+              setLoading(true);
+              void loadDemands();
+            }}
+            className="shrink-0 rounded-store-control border border-red-500/30 px-3 py-1.5 font-medium hover:bg-red-500/10 transition-colors cursor-pointer"
+          >
+            {t('common.actions.retry')}
+          </button>
+        </div>
+      ) : null}
 
       {/* Demand Grid — mirrors the 应用模板 card grid */}
       {loading ? (
@@ -107,26 +164,25 @@ export function DemandsPage({ searchQuery, onStartProject }: DemandsPageProps = 
             <DemandCard
               key={demand.id}
               demand={demand}
-              onSelect={(item) => setDetailDemandId(item.id)}
-              onClaim={(item) => setDetailDemandId(item.id)}
+              onSelect={openDemand}
+              onClaim={setClaimTarget}
             />
           ))}
         </CardGrid>
       )}
 
-      {demands.length === 0 && !loading && <DemandsEmptyState />}
+      {demands.length === 0 && !loading && !loadFailed && <DemandsEmptyState />}
 
-      {/* Modals */}
+      <DemandClaimDialog
+        demand={claimTarget}
+        onClose={() => setClaimTarget(null)}
+        onSubmitted={handleClaimSubmitted}
+      />
+
       <PublishDemandModal
         isOpen={isPublishModalOpen}
         onClose={() => setIsPublishModalOpen(false)}
         onPublish={handlePublish}
-      />
-      <DemandDetailModal
-        demandId={detailDemandId}
-        onClose={() => setDetailDemandId(null)}
-        onClaim={handleClaim}
-        {...(onStartProject === undefined ? {} : { onStartProject })}
       />
     </div>
   );

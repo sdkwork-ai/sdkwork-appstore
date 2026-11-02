@@ -1,30 +1,39 @@
 import { motion } from 'motion/react';
 import { useTranslation } from 'react-i18next';
+import { RotateCcw } from 'lucide-react';
 import { DynamicIcon } from '../DynamicIcon';
-import type { AppItem, DesktopOs, InstallVariant } from '../../types';
+import type { AppItem, DesktopOs, DownloadTask, InstallVariant } from '../../types';
 import { formatInstallerSize } from '@sdkwork/appstore-pc-core';
 import { architectureLabelKey } from '../../lib/installVariant';
 import { InstallModalConfirmActions } from './InstallModalConfirmActions';
 import { InstallModalProgress } from './InstallModalProgress';
 import { InstallModalSuccessState } from './InstallModalSuccessState';
 
+/** Body state of the install dialog. */
+export type InstallModalState = 'confirm' | 'downloading' | 'paused' | 'success' | 'failed';
+
 interface InstallModalProps {
   app: AppItem;
-  installState: 'confirm' | 'downloading' | 'success';
+  installState: InstallModalState;
   progress: number;
   error?: string | null;
   /** Build the install uses, resolved from the host or the builds menu. */
   variant: InstallVariant | null;
   /** Host desktop OS, used to label the build as detected for this machine. */
   hostOs: DesktopOs | null;
+  /** Active download-center task, when the install started downloading. */
+  task?: DownloadTask | null;
   onConfirm: () => void;
+  onPause?: () => void;
+  onResume?: () => void;
+  onRetry?: () => void;
   onCancel: () => void;
 }
 
 /**
  * Confirmation dialog for one resolved install build: platform, CPU
- * architecture, package format, and size, plus the compatibility warning when
- * the chosen build does not run natively on this machine.
+ * architecture, package format, and size, plus live download progress with
+ * pause/resume/stop controls and a failed state with retry.
  */
 export function InstallModal({
   app,
@@ -33,7 +42,11 @@ export function InstallModal({
   error,
   variant,
   hostOs,
+  task,
   onConfirm,
+  onPause,
+  onResume,
+  onRetry,
   onCancel,
 }: InstallModalProps) {
   const { t } = useTranslation();
@@ -50,7 +63,9 @@ export function InstallModal({
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         className="absolute inset-0 bg-store-overlay backdrop-blur-sm"
-        onClick={onCancel}
+        onClick={
+          installState === 'downloading' || installState === 'paused' ? undefined : onCancel
+        }
       />
       <motion.div
         initial={{ scale: 0.95, opacity: 0, y: 20 }}
@@ -101,12 +116,39 @@ export function InstallModal({
             </>
           )}
 
-          {installState === 'downloading' && (
-            <InstallModalProgress progress={progress} />
+          {(installState === 'downloading' || installState === 'paused') && (
+            <InstallModalProgress
+              progress={progress}
+              receivedBytes={task?.receivedBytes}
+              totalBytes={task?.totalBytes ?? null}
+              bytesPerSecond={task?.bytesPerSecond}
+              status={installState === 'paused' ? 'paused' : 'downloading'}
+              onPause={onPause}
+              onResume={onResume}
+              onCancel={onCancel}
+            />
+          )}
+
+          {installState === 'failed' && (
+            <div className="w-full pt-2 flex gap-3">
+              <button
+                onClick={onCancel}
+                className="flex-1 py-3 bg-store-raised hover:bg-store-raised text-store-ink font-medium rounded-store-control transition-colors cursor-pointer text-sm"
+              >
+                {t('common.actions.cancel')}
+              </button>
+              <button
+                onClick={onRetry}
+                className="flex-1 py-3 bg-store-brand hover:bg-store-brand text-white font-medium rounded-store-control transition-colors shadow-md shadow-blue-200 dark:shadow-none cursor-pointer text-sm flex items-center justify-center gap-1.5"
+              >
+                <RotateCcw className="w-3.5 h-3.5" />
+                {t('common.actions.retry')}
+              </button>
+            </div>
           )}
 
           {installState === 'success' && (
-            <InstallModalSuccessState />
+            <InstallModalSuccessState savedPath={task?.savedPath ?? null} />
           )}
         </div>
       </motion.div>

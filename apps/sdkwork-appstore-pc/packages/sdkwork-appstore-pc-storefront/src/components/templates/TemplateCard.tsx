@@ -16,8 +16,14 @@ export const TemplateCard: React.FC<TemplateCardProps> = ({ template, onSelect }
 
   const handleGoToTemplateDetail = (e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
-    navigate(`/template/${template.id}`);
-    if (onSelect) onSelect(template);
+    // The routed detail page is the owner of the click: the catalog page passes
+    // its navigation callback, and a card rendered without one still resolves
+    // to the same route.
+    if (onSelect) {
+      onSelect(template);
+    } else {
+      navigate(`/templates/${template.id}`);
+    }
   };
 
   const handleGoToAppDetail = (e?: React.MouseEvent) => {
@@ -28,8 +34,20 @@ export const TemplateCard: React.FC<TemplateCardProps> = ({ template, onSelect }
 
   return (
     <div
+      role="link"
+      tabIndex={0}
+      aria-label={template.title}
       onClick={handleGoToTemplateDetail}
-      className="group bg-store-surface border border-store-line/80 dark:border-store-line hover:border-store-brand/50 p-4 rounded-store-card cursor-pointer transition-all duration-200 hover:shadow-xl flex flex-col justify-between "
+      onKeyDown={(event) => {
+        // Only the card itself owns Enter/Space: a nested control (the app
+        // detail button) must keep its own keyboard activation.
+        if (event.target !== event.currentTarget) return;
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          handleGoToTemplateDetail();
+        }
+      }}
+      className="group bg-store-surface border border-store-line/80 dark:border-store-line hover:border-store-brand/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-store-brand/40 p-4 rounded-store-card cursor-pointer transition-all duration-200 hover:shadow-xl flex flex-col justify-between"
     >
       <div>
         {/* Subcomponent: Card Header */}

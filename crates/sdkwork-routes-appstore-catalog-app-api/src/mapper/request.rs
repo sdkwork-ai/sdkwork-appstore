@@ -5,7 +5,7 @@ use sdkwork_appstore_catalog_service::domain::commands::{
     RecentlyUpdatedListRequest, RecommendationsListRequest, SearchHistoryClearRequest,
     SearchHistoryListRequest, SearchHistoryUpsertRequest, SearchSuggestionsListRequest,
     SearchTrendingListRequest, TemplateCreateRequest, TemplateRetrieveRequest,
-    TemplateUsageCreateRequest, TemplatesListRequest,
+    TemplateSuggestionsRetrieveRequest, TemplateUsageCreateRequest, TemplatesListRequest,
 };
 
 pub fn map_home_retrieve(locale: Option<String>, platform: Option<String>) -> HomeRetrieveRequest {
@@ -296,6 +296,17 @@ pub fn map_templates_list(
 
 pub fn map_template_retrieve(template_id: String) -> TemplateRetrieveRequest {
     TemplateRetrieveRequest::new(template_id)
+}
+
+pub fn map_template_suggestions_retrieve(
+    template_id: String,
+    limit: Option<i32>,
+) -> TemplateSuggestionsRetrieveRequest {
+    let mut req = TemplateSuggestionsRetrieveRequest::new(template_id);
+    if let Some(v) = limit {
+        req = req.with_limit(v);
+    }
+    req
 }
 
 pub fn map_template_create(

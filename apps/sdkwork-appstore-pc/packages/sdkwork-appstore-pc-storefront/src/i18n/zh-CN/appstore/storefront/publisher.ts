@@ -32,6 +32,10 @@ export const publisher = {
     appDesc: '发布一个全新的应用',
     website: '新建官网',
     websiteDesc: '搭建并发布官方网站',
+    game: '创建游戏',
+    gameDesc: '创建一个可在应用商店运行的游戏',
+    festival: '创建节日祝福',
+    festivalDesc: '制作节日祝福海报或互动贺卡',
     promo: '新建宣传应用',
     promoDesc: '创建宣传页应用'
   },

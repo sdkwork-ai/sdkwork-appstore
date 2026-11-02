@@ -9,12 +9,14 @@ import {
 
 import { DiscoverViewModel } from '../presentation/viewModels/DiscoverViewModel';
 
-/** Store application type presets (`?create=`) mirroring the cross-client
- *  creation hub (app / website / promo app). */
+/** Creation-hub presets (`?create=`) resolved to canonical app.appType values
+ *  (APP_ASSETS_SPEC.md section 5.3); a preset is never the stored type. */
 const APP_TYPE_BY_PARAM: Record<string, string> = {
-  app: 'APP',
-  website: 'WEBSITE',
-  promo: 'PROMO',
+  app: 'APP_REACT',
+  website: 'APP_HTML',
+  game: 'APP_HTML',
+  festival: 'POSTER',
+  promo: 'VIDEO',
 };
 
 const WEEKDAY_LABELS: string[] = ['日', '一', '二', '三', '四', '五', '六'];
@@ -50,7 +52,7 @@ struct DiscoverPage {
   handleCreateSelect(type: string): void {
     const params: CreateRouteParams = {
       create: type,
-      appType: APP_TYPE_BY_PARAM[type] ?? 'APP',
+      appType: APP_TYPE_BY_PARAM[type] ?? 'APP_REACT',
     };
     router.pushUrl({
       url: 'pages/PublisherPage',

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Sparkles } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { TEMPLATE_PLATFORMS } from '@sdkwork/appstore-pc-core';
+import { TEMPLATE_PLATFORMS, resolveTemplateAppType } from '@sdkwork/appstore-pc-core';
 
 interface PublishTemplateFormFieldsProps {
   appSource: string;
@@ -103,7 +103,7 @@ export const PublishTemplateFormFields: React.FC<PublishTemplateFormFieldsProps>
         >
           {TEMPLATE_PLATFORMS.map((code) => (
             <option key={code} value={code}>
-              {t(`templates.platforms.${code.toLowerCase()}`)}
+              {t(`templates.platforms.${resolveTemplateAppType(code)?.labelKey ?? 'all'}`)}
             </option>
           ))}
         </select>

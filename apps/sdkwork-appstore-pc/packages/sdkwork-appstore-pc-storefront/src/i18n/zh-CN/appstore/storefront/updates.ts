@@ -50,13 +50,24 @@ export const updates = {
     browseMarket: '浏览软件大厅'
   },
   queue: {
-    title: '正在进行中的下载任务',
+    title: '下载任务队列',
     empty: '当前没有正在下载或更新的任务',
     pauseAll: '暂停全部',
     resumeAll: '全部继续',
     clearCompleted: '清除已完成记录',
+    remove: '移除记录',
+    saved: '已保存到本地',
+    saveNow: '保存安装包',
     downloading: '下载中',
-    completed: '已完成'
+    completed: '已完成',
+    status: {
+      queued: '排队等待',
+      downloading: '下载中',
+      paused: '已暂停',
+      completed: '已下载',
+      failed: '下载失败',
+      cancelled: '已终止'
+    }
   },
   pendingList: {
     title: '待更新软件列表 ({{count}})',

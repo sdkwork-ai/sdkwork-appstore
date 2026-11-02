@@ -8,6 +8,29 @@ use crate::domain::models::{
 };
 use crate::error::AppstoreServiceResult;
 
+/// Ranking applied to a template discovery feed.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum TemplateFeedOrder {
+    /// Newest first: publication time, then creation time, then id.
+    Latest,
+    /// Most used first: stars, then forks, then publication time.
+    Popular,
+}
+
+/// One template discovery feed lookup: the filters a detail page's rails need
+/// plus the exclusion set that keeps a template out of more than one rail.
+#[derive(Debug, Clone, Copy)]
+pub struct TemplateFeedQuery<'a> {
+    pub template_type: Option<&'a str>,
+    pub template_platform: Option<&'a str>,
+    pub category_code: Option<&'a str>,
+    /// Templates already shown elsewhere on the page; always excluded.
+    pub exclude_ids: &'a [String],
+    pub order: TemplateFeedOrder,
+    pub limit: i32,
+    pub user_id: Option<&'a str>,
+}
+
 #[async_trait::async_trait]
 pub trait CatalogRepositoryPort: Send + Sync {
     async fn find_categories(
@@ -313,6 +336,15 @@ pub trait CatalogRepositoryPort: Send + Sync {
         template_id: &str,
         user_id: Option<&str>,
     ) -> AppstoreServiceResult<Option<crate::domain::models::AppTemplate>>;
+
+    /// Ranked, explicitly filtered template feed backing the detail page's
+    /// discovery rails. Ordering and exclusion happen in the store so a rail
+    /// never depends on which slice of the catalog happened to be read.
+    async fn find_template_feed(
+        &self,
+        context: &AppstoreRequestContext,
+        query: TemplateFeedQuery<'_>,
+    ) -> AppstoreServiceResult<Vec<crate::domain::models::AppTemplate>>;
 
     async fn insert_template(
         &self,

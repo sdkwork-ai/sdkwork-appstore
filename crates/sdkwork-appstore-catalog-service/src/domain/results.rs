@@ -6,7 +6,7 @@ use super::models::{
     AppTemplate, CatalogChartSnapshot, CatalogCollection, CatalogCollectionItem,
     CatalogCollectionLocalization, CatalogFeaturedSlot, Category, CategoryLocalization,
     CategoryWithLocalizations, CollectionWithItems, Feedback, ListingMetricSnapshot,
-    ListingSummary, SearchHistoryEntry, SearchSuggestion, TrendingTerm,
+    ListingSummary, SearchHistoryEntry, SearchSuggestion, TemplateSuggestions, TrendingTerm,
 };
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -701,6 +701,22 @@ impl TemplateRetrieveResult {
         Self {
             operation_id,
             template: None,
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct TemplateSuggestionsRetrieveResult {
+    pub operation_id: &'static str,
+    pub suggestions: TemplateSuggestions,
+}
+
+impl TemplateSuggestionsRetrieveResult {
+    pub fn new(operation_id: &'static str, suggestions: TemplateSuggestions) -> Self {
+        Self {
+            operation_id,
+            suggestions,
         }
     }
 }

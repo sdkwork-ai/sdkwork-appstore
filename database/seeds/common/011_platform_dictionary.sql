@@ -17,6 +17,10 @@ VALUES
   ('plat_linux', '0', 'linux', 'desktop', 'linux', '["appimage", "deb", "rpm", "tar_gz"]', 'none', 0, 'active', 70),
   -- Web / browser
   ('plat_web', '0', 'web', 'web', 'w3c', '["webmanifest"]', 'start_url', 0, 'active', 80),
+  -- Mobile web surface delivered to a phone browser and reached by scanning a
+  -- QR code. It is a distinct storefront platform (APP_MANIFEST_SPEC.md
+  -- section 5 keeps `H5` separate from `WEB`) even though both are web builds.
+  ('plat_h5', '0', 'h5', 'web', 'w3c', '["webmanifest"]', 'start_url', 0, 'active', 85),
   ('plat_ext_chrome', '0', 'browser-extension-chrome', 'browser-extension', 'google', '["crx", "zip"]', 'extension_id', 1, 'active', 90),
   ('plat_ext_edge', '0', 'browser-extension-edge', 'browser-extension', 'microsoft', '["crx", "zip"]', 'extension_id', 1, 'active', 100),
   ('plat_ext_firefox', '0', 'browser-extension-firefox', 'browser-extension', 'mozilla', '["xpi"]', 'extension_id', 1, 'active', 110),

@@ -9,17 +9,23 @@ import {
 } from '@sdkwork/appstore-publisher-console-core';
 import { LoadingSpinner } from '@sdkwork/appstore-h5-commons';
 
-/** Storefront create-menu presets (`?type=`) mapped to store application types. */
+/**
+ * Storefront create-menu presets (`?type=`) resolved to canonical `app.appType`
+ * values (`APP_ASSETS_SPEC.md` section 5.3). A preset never becomes the stored
+ * application type; it resolves to the PlusProjectType of the client root.
+ */
 const APP_TYPE_BY_PARAM: Record<string, string> = {
-  app: 'APP',
-  website: 'WEBSITE',
-  promo: 'PROMO',
+  app: 'APP_REACT',
+  website: 'APP_HTML',
+  game: 'APP_HTML',
+  festival: 'POSTER',
+  promo: 'VIDEO',
 };
 
 export function PublisherNewAppPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const appType = APP_TYPE_BY_PARAM[searchParams.get('type') ?? ''] ?? 'APP';
+  const appType = APP_TYPE_BY_PARAM[searchParams.get('type') ?? ''] ?? 'APP_REACT';
   const { data: publisherData, loading: publisherLoading } = usePublisher();
   const [appKey, setAppKey] = useState('');
   const [displayName, setDisplayName] = useState('');

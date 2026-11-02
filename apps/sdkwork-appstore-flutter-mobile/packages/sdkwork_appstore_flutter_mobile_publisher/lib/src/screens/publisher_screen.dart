@@ -28,7 +28,8 @@ class PublisherScreen extends StatelessWidget {
 
   final String? listingId;
 
-  /// Store application type preset for the create flow (APP | WEBSITE | PROMO).
+  /// Canonical app type of the create flow
+  /// (APP_REACT | APP_HTML | POSTER | VIDEO).
   final String appType;
 
   @override
@@ -108,11 +109,12 @@ class _OverviewView extends StatelessWidget {
 }
 
 class _CreateAppView extends StatelessWidget {
-  const _CreateAppView({required this.service, this.appType = 'APP'});
+  const _CreateAppView({required this.service, this.appType = 'APP_REACT'});
 
   final PublisherService service;
 
-  /// Store application type preset (APP | WEBSITE | PROMO).
+  /// Canonical app type of the create flow
+  /// (APP_REACT | APP_HTML | POSTER | VIDEO).
   final String appType;
 
   @override

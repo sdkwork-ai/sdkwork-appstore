@@ -4,18 +4,25 @@ import { useTranslation } from 'react-i18next';
 import { ArrowLeft } from 'lucide-react';
 import { AppStoreService, ConsoleService } from '../../services/api';
 
-/** Navbar create-menu presets (`?type=`) mapped to store application types. */
+/**
+ * Navbar create-menu presets (`?type=`) resolved to canonical `app.appType`
+ * values (`APP_ASSETS_SPEC.md` section 5.3): a preset is a navigation shortcut,
+ * never an application type, so each one maps to the PlusProjectType of the
+ * client root it scaffolds. The server stores this value verbatim.
+ */
 const APP_TYPE_BY_PARAM: Record<string, string> = {
-  app: 'APP',
-  website: 'WEBSITE',
-  promo: 'PROMO',
+  app: 'APP_REACT',
+  website: 'APP_HTML',
+  game: 'APP_HTML',
+  festival: 'POSTER',
+  promo: 'VIDEO',
 };
 
 export default function PublisherCreateApp() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const appType = APP_TYPE_BY_PARAM[searchParams.get('type') ?? ''] ?? 'APP';
+  const appType = APP_TYPE_BY_PARAM[searchParams.get('type') ?? ''] ?? 'APP_REACT';
   const [categories, setCategories] = useState<{ id: string; name: string; icon: string }[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);

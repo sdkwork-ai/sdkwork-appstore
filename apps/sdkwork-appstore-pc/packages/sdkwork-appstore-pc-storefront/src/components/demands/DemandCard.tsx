@@ -2,10 +2,13 @@ import React from 'react';
 import { Building2, Users } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { DemandHallItem } from '@sdkwork/appstore-pc-core';
+import { formatDemandBudget } from './demandFormat';
 
 interface DemandCardProps {
   demand: DemandHallItem;
+  /** Open the demand's routed detail page. */
   onSelect: (demand: DemandHallItem) => void;
+  /** Open the detail page with the claim form expanded. */
   onClaim: (demand: DemandHallItem) => void;
 }
 
@@ -18,35 +21,59 @@ const STATUS_LABEL_KEYS: Record<string, string> = {
 
 export const DemandCard: React.FC<DemandCardProps> = ({ demand, onSelect, onClaim }) => {
   const { t } = useTranslation();
-  const claimable = demand.status === 'published';
+  const deadlinePassed = demand.bidDeadline !== undefined
+    && new Date(demand.bidDeadline).getTime() < Date.now();
+  const claimable = demand.status === 'published' && !deadlinePassed;
+  const appForms = demand.appForms !== undefined && demand.appForms.length > 0
+    ? demand.appForms
+    : demand.appForm === undefined
+      ? []
+      : [demand.appForm];
 
   return (
+    // The card is a link in everything but markup: it hands the demand to the
+    // router, while the claim button stays outside the activation target so
+    // one click never both navigates and submits.
     <div
+      role="link"
+      tabIndex={0}
       onClick={() => onSelect(demand)}
-      className="group bg-store-surface border border-store-line/80 dark:border-store-line hover:border-store-brand/50 p-4 rounded-store-card cursor-pointer transition-all duration-200 hover:shadow-xl flex flex-col justify-between"
+      onKeyDown={(event) => {
+        // Only the card itself activates the link; Enter/Space on the claim
+        // button must stay the button's action.
+        if (event.target !== event.currentTarget) return;
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          onSelect(demand);
+        }
+      }}
+      aria-label={demand.title}
+      className="group bg-store-surface border border-store-line/80 dark:border-store-line hover:border-store-brand/50 p-4 rounded-store-card cursor-pointer transition-all duration-200 hover:shadow-xl flex flex-col justify-between focus:outline-none focus-visible:ring-2 focus-visible:ring-store-brand/40"
+      data-demand-card={demand.id}
     >
       <div>
         <div className="flex items-center justify-between gap-2">
           <span className="px-2 py-0.5 rounded-full bg-store-brand/10 border border-store-brand/20 text-store-brand text-[11px] font-medium">
             {t(`demands.types.${demand.demandType}`, demand.category)}
           </span>
-          <span className="text-sm font-bold text-store-brand">
-            {demand.budgetMin || demand.budgetMax
-              ? `¥${demand.budgetMin ?? '?'} - ${demand.budgetMax ?? '?'}`
-              : demand.budget}
-          </span>
+          <span className="text-sm font-bold text-store-brand">{formatDemandBudget(demand)}</span>
         </div>
 
-        <h3 className="mt-2 text-sm font-bold text-store-ink group-hover:text-store-brand transition-colors line-clamp-1">
+        <h3 className="mt-2 text-sm font-bold text-store-ink group-hover:text-store-brand transition-colors line-clamp-2 leading-snug">
           {demand.title}
         </h3>
-        {demand.appForm ? (
-          <span
-            className="mt-1 inline-block rounded-full bg-store-brand/10 border border-store-brand/20 px-2.5 py-0.5 text-xs font-medium text-store-brand"
-            data-demand-app-form={demand.appForm}
-          >
-            {t(`demands.appForms.${demand.appForm}`, demand.appForm)}
-          </span>
+        {appForms.length > 0 ? (
+          <div className="mt-1 flex flex-wrap gap-1" data-demand-app-forms>
+            {appForms.map((form) => (
+              <span
+                key={form}
+                className="inline-block rounded-full bg-store-brand/10 border border-store-brand/20 px-2.5 py-0.5 text-xs font-medium text-store-brand"
+                data-demand-app-form={form}
+              >
+                {t(`demands.appForms.${form}`, form)}
+              </span>
+            ))}
+          </div>
         ) : null}
         <p className="text-xs text-store-ink-soft mt-2 line-clamp-2 leading-relaxed">
           {demand.description || t('demands.card.noDescription')}

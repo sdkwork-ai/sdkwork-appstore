@@ -17,8 +17,8 @@ use crate::domain::commands::{
     MetricsRetrieveRequest, PublicFeaturedListRequest, RecentlyUpdatedListRequest,
     RecommendationsListRequest, SearchHistoryClearRequest, SearchHistoryListRequest,
     SearchHistoryUpsertRequest, SearchSuggestionsListRequest, SearchTrendingListRequest,
-    TemplateCreateRequest, TemplateRetrieveRequest, TemplateUsageCreateRequest,
-    TemplatesListRequest,
+    TemplateCreateRequest, TemplateRetrieveRequest, TemplateSuggestionsRetrieveRequest,
+    TemplateUsageCreateRequest, TemplatesListRequest,
 };
 use crate::domain::models::{
     AppTemplate, AppTemplateUsage, AppTemplateUsageKind, AudienceScope, CatalogChartSnapshot,
@@ -26,6 +26,7 @@ use crate::domain::models::{
     Category, CategoryId, CategoryLocalization, CategoryStatus, CategoryWithLocalizations,
     CollectionId, CollectionStatus, CollectionType, CollectionWithItems, FeaturedSlotId,
     FeaturedSlotStatus, Feedback, ListingSummary, PlatformScope, SearchHistoryEntry,
+    TemplateSuggestions,
 };
 use crate::domain::results::{
     AnalyticsOperatorDashboardResult, AnalyticsOperatorSearchResult,
@@ -38,10 +39,13 @@ use crate::domain::results::{
     MetricsRetrieveResult, PublicFeaturedListResult, RecentlyUpdatedListResult,
     RecommendationsListResult, SearchHistoryClearResult, SearchHistoryListResult,
     SearchHistoryUpsertResult, SearchSuggestionsListResult, SearchTrendingListResult,
-    TemplateCreateResult, TemplateRetrieveResult, TemplateUsageCreateResult, TemplatesListResult,
+    TemplateCreateResult, TemplateRetrieveResult, TemplateSuggestionsRetrieveResult,
+    TemplateUsageCreateResult, TemplatesListResult,
 };
 use crate::error::{AppstoreServiceError, AppstoreServiceResult};
-use crate::ports::repository::CatalogRepositoryPort;
+use crate::ports::repository::{
+    CatalogRepositoryPort, TemplateFeedOrder, TemplateFeedQuery,
+};
 use crate::ports::search_federation::CatalogSearchFederationPort;
 use std::sync::Arc;
 
@@ -238,6 +242,13 @@ pub trait CatalogOperations {
         context: &AppstoreRequestContext,
         request: TemplateRetrieveRequest,
     ) -> AppstoreServiceResult<TemplateRetrieveResult>;
+
+    /// Ranked discovery rails for one template detail page.
+    async fn template_suggestions_retrieve(
+        &self,
+        context: &AppstoreRequestContext,
+        request: TemplateSuggestionsRetrieveRequest,
+    ) -> AppstoreServiceResult<TemplateSuggestionsRetrieveResult>;
 
     async fn template_create(
         &self,
@@ -2023,6 +2034,137 @@ where
         }
     }
 
+    async fn template_suggestions_retrieve(
+        &self,
+        context: &AppstoreRequestContext,
+        request: TemplateSuggestionsRetrieveRequest,
+    ) -> AppstoreServiceResult<TemplateSuggestionsRetrieveResult> {
+        let template = self
+            .repository
+            .find_template_by_id(context, &request.template_id, context.user_id.as_deref())
+            .await?
+            .ok_or_else(|| {
+                AppstoreServiceError::NotFound(format!(
+                    "App template {} not found",
+                    request.template_id
+                ))
+            })?;
+
+        let limit = request
+            .limit
+            .unwrap_or(TEMPLATE_SUGGESTION_RAIL_LIMIT)
+            .clamp(1, TEMPLATE_SUGGESTION_RAIL_LIMIT_MAX);
+        let user_id = context.user_id.as_deref();
+        let template_type = template.template_type.as_str();
+        let template_platform = non_empty(template.template_platform.as_deref());
+        let category_code = non_empty(template.category_code.as_deref());
+
+        // Every rail excludes the template being read and everything an earlier
+        // rail already placed, so one template never appears twice on the page.
+        let mut shown = vec![template.id.clone()];
+
+        // 相关模板: the nearest catalogue neighbours, most used first. A
+        // template without a category falls back to its own type.
+        let mut related = self
+            .repository
+            .find_template_feed(
+                context,
+                TemplateFeedQuery {
+                    template_type: Some(template_type),
+                    template_platform: None,
+                    category_code,
+                    exclude_ids: &shown,
+                    order: TemplateFeedOrder::Popular,
+                    limit,
+                    user_id,
+                },
+            )
+            .await?;
+        if related.is_empty() && category_code.is_some() {
+            related = self
+                .repository
+                .find_template_feed(
+                    context,
+                    TemplateFeedQuery {
+                        template_type: Some(template_type),
+                        template_platform: None,
+                        category_code: None,
+                        exclude_ids: &shown,
+                        order: TemplateFeedOrder::Popular,
+                        limit,
+                        user_id,
+                    },
+                )
+                .await?;
+        }
+        shown.extend(related.iter().map(|entry| entry.id.clone()));
+
+        // 最新模板: newest publications in the same market.
+        let latest = self
+            .repository
+            .find_template_feed(
+                context,
+                TemplateFeedQuery {
+                    template_type: Some(template_type),
+                    template_platform: None,
+                    category_code: None,
+                    exclude_ids: &shown,
+                    order: TemplateFeedOrder::Latest,
+                    limit,
+                    user_id,
+                },
+            )
+            .await?;
+        shown.extend(latest.iter().map(|entry| entry.id.clone()));
+
+        // 推荐模板: the most used templates for the same platform, widening to
+        // the whole market when that platform has nothing left to recommend.
+        let mut recommended = Vec::new();
+        if template_platform.is_some() {
+            recommended = self
+                .repository
+                .find_template_feed(
+                    context,
+                    TemplateFeedQuery {
+                        template_type: Some(template_type),
+                        template_platform,
+                        category_code: None,
+                        exclude_ids: &shown,
+                        order: TemplateFeedOrder::Popular,
+                        limit,
+                        user_id,
+                    },
+                )
+                .await?;
+        }
+        if recommended.is_empty() {
+            recommended = self
+                .repository
+                .find_template_feed(
+                    context,
+                    TemplateFeedQuery {
+                        template_type: Some(template_type),
+                        template_platform: None,
+                        category_code: None,
+                        exclude_ids: &shown,
+                        order: TemplateFeedOrder::Popular,
+                        limit,
+                        user_id,
+                    },
+                )
+                .await?;
+        }
+
+        Ok(TemplateSuggestionsRetrieveResult::new(
+            "appstore.catalog.templates.suggestions.retrieve",
+            TemplateSuggestions {
+                latest,
+                related,
+                recommended,
+            },
+        ))
+    }
+
     async fn template_create(
         &self,
         context: &AppstoreRequestContext,
@@ -2225,6 +2367,15 @@ where
             feedback,
         ))
     }
+}
+
+/// Default and maximum entries per detail-page discovery rail.
+const TEMPLATE_SUGGESTION_RAIL_LIMIT: i32 = 6;
+const TEMPLATE_SUGGESTION_RAIL_LIMIT_MAX: i32 = 12;
+
+/// Read an optional catalogue code, treating blank strings as absent.
+fn non_empty(value: Option<&str>) -> Option<&str> {
+    value.map(str::trim).filter(|value| !value.is_empty())
 }
 
 fn slugify_template_name(name: &str) -> String {

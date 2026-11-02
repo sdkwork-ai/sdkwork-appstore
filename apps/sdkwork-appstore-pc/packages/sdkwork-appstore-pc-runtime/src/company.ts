@@ -7,6 +7,7 @@ import type {
   DemandHallBid,
   DemandHallItem,
   DemandPublishInput,
+  DemandSuggestionSections,
 } from '@sdkwork/appstore-pc-core';
 import { configureCompanyDemandsServicePort, DEMAND_APP_FORMS } from '@sdkwork/appstore-pc-core';
 
@@ -15,12 +16,38 @@ const demandPageSize = 200;
 type DemandRecord = Record<string, unknown>;
 type BidRecord = Record<string, unknown>;
 
+/** Read one discovery rail from the suggestions payload. */
+function readDemandList(record: DemandRecord, key: string): DemandHallItem[] {
+  const value = record[key];
+  return Array.isArray(value) ? value.filter(isRecord).map(mapDemandRecord) : [];
+}
+
+/** Narrow one wire application-form code to the shipped taxonomy. */
+function readAppFormCode(value: unknown): DemandAppForm | undefined {
+  const text = typeof value === 'string' ? value.trim() : '';
+  return (DEMAND_APP_FORMS as readonly string[]).includes(text)
+    ? (text as DemandAppForm)
+    : undefined;
+}
+
 /** Narrow a wire application-form code to the shipped taxonomy. */
 function readAppForm(record: DemandRecord | undefined): DemandAppForm | undefined {
-  const value = readString(record, 'appForm');
-  return (DEMAND_APP_FORMS as readonly string[]).includes(value)
-    ? (value as DemandAppForm)
-    : undefined;
+  return readAppFormCode(record?.['appForm']);
+}
+
+/** Read the canonical `appForms` set, falling back to the legacy `appForm`. */
+function readAppForms(record: DemandRecord | undefined): DemandAppForm[] {
+  const raw = record?.['appForms'];
+  const forms: DemandAppForm[] = [];
+  if (Array.isArray(raw)) {
+    for (const value of raw) {
+      const form = readAppFormCode(value);
+      if (form !== undefined && !forms.includes(form)) forms.push(form);
+    }
+  }
+  const legacy = readAppForm(record);
+  if (legacy !== undefined && !forms.includes(legacy)) forms.unshift(legacy);
+  return forms;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -81,6 +108,7 @@ function readPageItems(value: unknown): DemandRecord[] {
 
 function mapDemandRecord(record: DemandRecord): DemandHallItem {
   const appForm = readAppForm(record);
+  const appForms = readAppForms(record);
   return {
     id: readString(record, 'id'),
     title: readString(record, 'title'),
@@ -88,6 +116,7 @@ function mapDemandRecord(record: DemandRecord): DemandHallItem {
     categoryId: readOptionalString(record, 'categoryId'),
     categoryPath: readOptionalString(record, 'categoryPath'),
     ...(appForm === undefined ? {} : { appForm }),
+    ...(appForms.length === 0 ? {} : { appForms }),
     demandType: readString(record, 'demandType') || 'other',
     budget: readString(record, 'budget') || '面议',
     budgetMin: readOptionalString(record, 'budgetMin'),
@@ -97,6 +126,7 @@ function mapDemandRecord(record: DemandRecord): DemandHallItem {
     description: readString(record, 'description'),
     status: readString(record, 'status'),
     bidCount: readCount(record, 'bidCount'),
+    viewCount: readCount(record, 'viewCount'),
     publisherUserId: readString(record, 'publisherUserId'),
     companyName: readString(record, 'companyName'),
     publishedAt: readString(record, 'publishedAt', 'createdAt'),
@@ -199,12 +229,27 @@ export function createCompanyDemandsServicePort(
       return mapDemandRecord(unwrapItem(await demands.retrieve(demandId)));
     },
 
+    async listDemandSuggestions(demandId): Promise<DemandSuggestionSections> {
+      // The endpoint returns one item carrying all three ranked rails, so the
+      // detail page's right column needs a single request.
+      const payload = unwrapItem(await demands.suggestions.retrieve(demandId));
+      return {
+        latest: readDemandList(payload, 'latest'),
+        related: readDemandList(payload, 'related'),
+        recommended: readDemandList(payload, 'recommended'),
+      };
+    },
+
     async publishDemand(input: DemandPublishInput): Promise<DemandHallItem> {
       const created = unwrapItem(
         await demands.create({
           title: input.title,
           categoryId: input.categoryId,
-          ...(input.appForm === undefined ? {} : { appForm: input.appForm }),
+          ...(input.appForms !== undefined && input.appForms.length > 0
+            ? { appForms: input.appForms }
+            : input.appForm === undefined
+              ? {}
+              : { appForms: [input.appForm] }),
           demandType: input.demandType,
           budget: input.budget,
           budgetMin: input.budgetMin,
@@ -242,6 +287,27 @@ export function createCompanyDemandsServicePort(
     async listMyBids(): Promise<DemandHallBid[]> {
       const response = await bids.list({ page: 1, pageSize: demandPageSize });
       return readPageItems(response).map(mapBidRecord);
+    },
+
+    async acceptDemandBid(demandId: string, bidId: string): Promise<void> {
+      await demands.bids.accept(demandId, bidId);
+    },
+
+    async rejectDemandBid(demandId: string, bidId: string, note?: string): Promise<void> {
+      await demands.bids.reject(demandId, bidId, note === undefined ? {} : { note });
+    },
+
+    async completeDemand(demandId: string): Promise<void> {
+      await demands.complete(demandId);
+    },
+
+    async withdrawMyBidForDemand(demandId: string): Promise<void> {
+      const response = await bids.list({ page: 1, pageSize: demandPageSize });
+      const open = readPageItems(response)
+        .map(mapBidRecord)
+        .find((bid) => bid.demandId === demandId
+          && (bid.status === 'submitted' || bid.status === 'shortlisted'));
+      if (open !== undefined) await bids.delete(open.id);
     },
   };
 }

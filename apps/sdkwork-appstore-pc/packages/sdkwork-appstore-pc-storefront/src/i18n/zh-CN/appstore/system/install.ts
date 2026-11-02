@@ -9,10 +9,16 @@ export const install = {
     autoStart: '开机自动启动',
     confirmInstall: '开始安装',
     installing: '正在向本地磁盘写入并配置安装包...',
-    completed: '应用安装成功！',
+    completed: '安装包已下载完成！',
     launchNow: '立即运行应用',
     runningNotice: '应用【{{name}}】正在本地桌面沙盒环境运行中...',
     installFailed: '安装失败，请稍后重试',
+    paused: '下载已暂停',
+    pause: '暂停下载',
+    resume: '继续下载',
+    stop: '终止下载',
+    savedTo: '安装包已保存至 {{path}}',
+    runInstallerHint: '安装包已保存到本地，请运行安装程序完成安装',
     platformNote: '已识别当前系统，将安装 {{platform}}',
     platformNoteGeneric: '将安装 {{platform}}',
     compatibilityNote: '该安装包在当前设备上以兼容模式运行',
@@ -25,6 +31,12 @@ export const install = {
     started: '已开始下载 {{platform}}',
     pending: '该安装包尚未发布',
     unavailable: '下载链接暂不可用，请稍后重试',
-    failed: '下载失败，请稍后重试'
+    failed: '下载失败，请稍后重试',
+    queued: '已将 {{platform}} 安装包加入下载队列',
+    completed: '{{name}} 已下载到本地',
+    installedNotice: '【{{name}}】安装包已下载完成',
+    saveUnavailable: '当前环境无法保存安装包，请检查下载目录',
+    saveCancelled: '已取消保存安装包，请重试',
+    saveFailed: '安装包保存失败，请重试'
   }
 };

@@ -53,13 +53,43 @@ describe('desktopInstallCodes', () => {
 describe('resolveDistributionActions', () => {
   it('resolves web groups as open actions carrying the access URL', () => {
     const actions = resolveDistributionActions(
-      { id: 'a', platforms: ['web', 'h5'], accessUrl: 'https://store.example/app' },
+      { id: 'a', platforms: ['web'], accessUrl: 'https://store.example/app' },
       'windows',
     );
     expect(actions).toEqual([
       { group: 'pcWeb', kind: 'open', platformCodes: [], url: 'https://store.example/app' },
-      { group: 'h5Web', kind: 'open', platformCodes: [], url: 'https://store.example/app' },
     ]);
+  });
+
+  it('adds a scan preview to the H5 group so a phone-first surface is reachable', () => {
+    const actions = resolveDistributionActions(
+      { id: 'a', platforms: ['h5'], accessUrl: 'https://h5.example/app' },
+      'windows',
+    );
+    expect(actions).toEqual([
+      { group: 'h5Web', kind: 'open', platformCodes: [], url: 'https://h5.example/app' },
+      { group: 'h5Web', kind: 'qr', platformCodes: [], url: 'https://h5.example/app' },
+    ]);
+  });
+
+  it('prefers the published h5 scan link over the access URL', () => {
+    const actions = resolveDistributionActions(
+      {
+        id: 'a',
+        platforms: ['h5'],
+        accessUrl: 'https://h5.example/app',
+        platformLinks: { h5: 'https://h5.example/scan' },
+      },
+      null,
+    );
+    expect(actions.find((action) => action.kind === 'qr')?.url).toBe('https://h5.example/scan');
+  });
+
+  it('keeps an open action without a URL for H5 listings that publish none', () => {
+    const actions = resolveDistributionActions({ id: 'app-7', platforms: ['h5'] }, null);
+    expect(actions[0]).toMatchObject({ group: 'h5Web', kind: 'open' });
+    expect(actions[0].url).toBeUndefined();
+    expect(actions[1].url).toContain('/app/app-7');
   });
 
   it('resolves the desktop group as an install action ordered for the detected OS', () => {

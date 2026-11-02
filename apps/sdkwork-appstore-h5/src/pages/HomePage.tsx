@@ -6,9 +6,11 @@ import {
   ChevronRight,
   Clock,
   FolderHeart,
+  Gamepad2,
   Globe,
   LayoutGrid,
   Megaphone,
+  PartyPopper,
   Plus,
   Search,
   Sparkles,
@@ -380,6 +382,8 @@ function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
 const CREATE_TARGETS = [
   { type: 'app', label: '新建应用', desc: '发布一个全新的应用', icon: AppWindow },
   { type: 'website', label: '新建官网', desc: '搭建并发布官方网站', icon: Globe },
+  { type: 'game', label: '创建游戏', desc: '创建一个可在应用商店运行的游戏', icon: Gamepad2 },
+  { type: 'festival', label: '创建节日祝福', desc: '制作节日祝福海报或互动贺卡', icon: PartyPopper },
   { type: 'promo', label: '新建宣传应用', desc: '创建宣传页应用', icon: Megaphone },
 ] as const;
 

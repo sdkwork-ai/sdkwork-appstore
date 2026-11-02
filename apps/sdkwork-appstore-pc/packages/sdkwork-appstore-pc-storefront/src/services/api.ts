@@ -6,6 +6,7 @@ export {
   McpService,
   TemplatesService,
   CompanyDemandsService,
+  DemandClaimsService,
   ConsoleService,
   InstallService,
   UserStoreService,

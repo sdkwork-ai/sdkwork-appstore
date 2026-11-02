@@ -2,6 +2,7 @@ import { createContext, useContext } from 'react'
 import type {
   AppItem,
   AppPlatformGroupKey,
+  DownloadTask,
   HostPlatform,
   InstallSelection,
   InstallVariant,
@@ -33,7 +34,26 @@ export interface AppstoreInstallApi {
   downloadProgress: (appId: string) => number
   installedAppIds: Set<string>
   activeDownloadApp: AppItem | null
-  downloadState: 'confirm' | 'downloading' | 'success' | null
+  downloadState: 'confirm' | 'downloading' | 'paused' | 'success' | 'failed' | null
+  /**
+   * Every download-center task, newest last. The Updates page renders the
+   * queue from this list; cards read the per-app projections above.
+   */
+  downloads: readonly DownloadTask[]
+  /** Pause one task; partial bytes stay persisted for a later resume. */
+  pauseDownload: (taskId: string) => void
+  /** Resume one paused task from its persisted byte offset. */
+  resumeDownload: (taskId: string) => void
+  /** Cancel one task and discard its partial bytes. */
+  cancelDownload: (taskId: string) => void
+  /** Retry a failed or cancelled task. */
+  retryDownload: (taskId: string) => void
+  /** Delete one task record and its downloaded bytes. */
+  removeDownload: (taskId: string) => void
+  /** Remove completed and cancelled queue records. */
+  clearCompletedDownloads: () => void
+  /** Re-save one completed installer to local storage. */
+  saveDownload: (taskId: string) => Promise<boolean>
   /**
    * Host desktop OS and CPU architecture detected for this browser, refined by
    * the User-Agent Client Hints when available. Consumers choose the build and

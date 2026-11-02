@@ -27,6 +27,7 @@ import { configureAppstorePcPlugins } from './plugins';
 import { configureAppstorePcSkills } from './skills';
 import { configureAppstorePcTemplates } from './templates';
 import { configureAppstorePcCompany } from './company';
+import { configureAppstorePcDemandClaims } from './demandClaims';
 import { configureAppstorePcUserStore } from './userStore';
 import { configureAppstorePcPaidCheckout } from './paidCheckout';
 import { configureAppstorePcArtifactUpload } from './artifactUpload';
@@ -85,6 +86,7 @@ export function createAppstorePcRuntime(
   configureAppstorePcAppStore(sdkClients.app, sdkClients.comments);
   configureAppstorePcTemplates(sdkClients.app);
   configureAppstorePcCompany(sdkClients.company);
+  configureAppstorePcDemandClaims(sdkClients.order);
   configureAppstorePcPlugins(sdkClients.app);
   configureAppstorePcExperts(sdkClients.app);
   configureAppstorePcConsole(sdkClients.app);

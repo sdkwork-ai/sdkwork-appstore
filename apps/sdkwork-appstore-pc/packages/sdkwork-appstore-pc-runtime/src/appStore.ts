@@ -469,6 +469,8 @@ export function createAppStoreServicePort(
               architecture: readString(artifact, 'architecture'),
               packageFormat: readString(artifact, 'packageFormat', 'package_format'),
               fileSizeBytes: readString(artifact, 'fileSizeBytes', 'file_size_bytes') || undefined,
+              checksumSha256:
+                readString(artifact, 'checksumSha256', 'checksum_sha256') || undefined,
             }));
           }
         }

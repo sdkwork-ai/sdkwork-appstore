@@ -230,12 +230,15 @@ class AppstoreMobileRuntime {
           PublisherScreen(
             service: publisherService,
             screen: 'app-create',
-            // Store application type preset from the creation hub
-            // (`?type=app|website|promo`); defaults to APP.
+            // Creation-hub preset (`?type=app|website|game|festival|promo`)
+            // resolved to a canonical PlusProjectType
+            // (APP_ASSETS_SPEC.md section 5.3).
             appType: switch (match.params['type']) {
-              'website' => 'WEBSITE',
-              'promo' => 'PROMO',
-              _ => 'APP',
+              'website' => 'APP_HTML',
+              'game' => 'APP_HTML',
+              'festival' => 'POSTER',
+              'promo' => 'VIDEO',
+              _ => 'APP_REACT',
             },
           ),
       'console.store.publisher.app-manage': (

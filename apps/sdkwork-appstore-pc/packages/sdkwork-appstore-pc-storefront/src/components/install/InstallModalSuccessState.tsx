@@ -3,7 +3,15 @@ import { motion } from 'motion/react';
 import { useTranslation } from 'react-i18next';
 import { Check } from 'lucide-react';
 
-export const InstallModalSuccessState: React.FC = () => {
+interface InstallModalSuccessStateProps {
+  /** Absolute path of the saved installer, when the host reports one. */
+  savedPath?: string | null;
+}
+
+/** Completed install body: the installer reached local storage and is ready to run. */
+export const InstallModalSuccessState: React.FC<InstallModalSuccessStateProps> = ({
+  savedPath,
+}) => {
   const { t } = useTranslation();
 
   return (
@@ -16,6 +24,11 @@ export const InstallModalSuccessState: React.FC = () => {
         <Check className="w-6 h-6" />
       </div>
       <span className="font-bold text-sm">{t('install.modal.completed')}</span>
+      <p className="mt-2 text-[11px] font-medium text-store-ink-faint text-center">
+        {savedPath
+          ? t('install.modal.savedTo', { path: savedPath })
+          : t('install.modal.runInstallerHint')}
+      </p>
     </motion.div>
   );
 };

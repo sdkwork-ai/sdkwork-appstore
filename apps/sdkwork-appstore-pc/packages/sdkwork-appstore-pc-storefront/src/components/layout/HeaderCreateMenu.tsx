@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { AppWindow, Globe, Megaphone, Plus } from 'lucide-react';
+import { AppWindow, Gamepad2, Globe, Megaphone, PartyPopper, Plus } from 'lucide-react';
 
 /** Creation entries surfaced by the navbar plus button. Each preset maps to a
  *  store application type (`appstore_app.app_type`) carried through the
@@ -9,11 +9,13 @@ import { AppWindow, Globe, Megaphone, Plus } from 'lucide-react';
 const CREATE_TARGETS = [
   { type: 'app', icon: AppWindow },
   { type: 'website', icon: Globe },
+  { type: 'game', icon: Gamepad2 },
+  { type: 'festival', icon: PartyPopper },
   { type: 'promo', icon: Megaphone },
 ] as const;
 
 /** Navbar creation hub: the plus button opens a dropdown with the store's
- *  creation entries (new app / new website / new promo app). */
+ *  creation entries (new app / website / game / festival greeting / promo app). */
 export function HeaderCreateMenu() {
   const { t } = useTranslation();
   const navigate = useNavigate();

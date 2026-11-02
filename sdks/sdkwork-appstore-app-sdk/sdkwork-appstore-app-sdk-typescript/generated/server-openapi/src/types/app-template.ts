@@ -4,7 +4,8 @@ export interface AppTemplate {
   templateName: string;
   description?: string;
   templateType: 'APP' | 'PLUGIN' | 'AGENT' | 'EXPERT';
-  templatePlatform?: 'H5' | 'PC' | 'FLUTTER' | 'MINIPROGRAM';
+  /** Client application architecture code the template scaffolds, per APP_CLIENT_ARCHITECTURE_ALIGNMENT_SPEC section 2. */
+  templatePlatform?: 'PC' | 'PAD' | 'H5' | 'STATIC_WEB' | 'FLUTTER' | 'MINIPROGRAM' | 'ANDROID' | 'IOS' | 'HARMONY' | 'UNIAPP' | 'UNITY';
   categoryCode?: string;
   framework?: string;
   language?: string;

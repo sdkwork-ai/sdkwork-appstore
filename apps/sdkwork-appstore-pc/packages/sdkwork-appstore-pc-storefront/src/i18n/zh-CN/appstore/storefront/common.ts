@@ -113,6 +113,7 @@ export const common = {
     qrAndroid: '安卓扫码安装',
     qrIos: 'iOS 扫码安装',
     qrHarmonyos: '鸿蒙扫码安装',
+    qrH5: '扫码在手机上预览',
     qrMiniprogram: '扫码打开小程序',
     qrBrowserExtension: '浏览器扩展',
     qrGeneric: '扫码访问',

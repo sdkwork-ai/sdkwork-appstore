@@ -10,6 +10,7 @@ import {
 import { TemplateItem, AppItem } from '../../types';
 import { DynamicIcon } from '../DynamicIcon';
 import { TemplateDetailActionButtons } from './TemplateDetailActionButtons';
+import type { TemplateAppType } from '@sdkwork/appstore-pc-core';
 
 interface TemplateDetailHeaderCardProps {
   template: TemplateItem;
@@ -20,9 +21,15 @@ interface TemplateDetailHeaderCardProps {
   forking: boolean;
   forkedSuccess: boolean;
   copiedCli: boolean;
+  /** True while the star request is in flight. */
+  starring?: boolean | undefined;
+  /** Template application type, resolved from `template.platform`. */
+  appType?: TemplateAppType | undefined;
   onFork: () => void;
   onStar: () => void;
   onCopyCli: () => void;
+  /** Open the phone QR dialog; absent when the form is not phone-scannable. */
+  onScan?: (() => void) | undefined;
 }
 
 export const TemplateDetailHeaderCard: React.FC<TemplateDetailHeaderCardProps> = ({
@@ -34,9 +41,12 @@ export const TemplateDetailHeaderCard: React.FC<TemplateDetailHeaderCardProps> =
   forking,
   forkedSuccess,
   copiedCli,
+  starring = false,
+  appType,
   onFork,
   onStar,
   onCopyCli,
+  onScan,
 }) => {
   const { t } = useTranslation();
 
@@ -58,6 +68,18 @@ export const TemplateDetailHeaderCard: React.FC<TemplateDetailHeaderCardProps> =
 
           <div className="space-y-2 flex-1">
             <div className="flex flex-wrap items-center gap-2">
+              {appType ? (
+                <span
+                  className="px-2.5 py-0.5 rounded-full bg-store-info/10 text-store-info text-xs font-medium border border-store-info/20"
+                  data-template-app-type={appType.code}
+                >
+                  {t(`templates.platforms.${appType.labelKey}`)}
+                </span>
+              ) : template.platform ? (
+                <span className="px-2.5 py-0.5 rounded-full bg-store-info/10 text-store-info text-xs font-medium border border-store-info/20">
+                  {template.platform}
+                </span>
+              ) : null}
               <span className="px-2.5 py-0.5 rounded-full bg-store-brand-soft dark:bg-store-brand/60 text-store-brand text-xs font-medium border border-store-brand-soft dark:border-store-brand/50 ">
                 {template.category}
               </span>
@@ -111,9 +133,11 @@ export const TemplateDetailHeaderCard: React.FC<TemplateDetailHeaderCardProps> =
           forking={forking}
           forkedSuccess={forkedSuccess}
           copiedCli={copiedCli}
+          starring={starring}
           onFork={onFork}
           onStar={onStar}
           onCopyCli={onCopyCli}
+          {...(onScan === undefined ? {} : { onScan })}
         />
       </div>
 

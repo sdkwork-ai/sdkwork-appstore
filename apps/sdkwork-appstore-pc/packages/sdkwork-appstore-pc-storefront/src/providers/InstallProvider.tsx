@@ -1,24 +1,29 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AppstoreInstallContext, useInstall } from '@sdkwork/appstore-pc-commons';
 import {
+  DownloadCenter,
   beginPaidListingCheckoutForApp,
   desktopInstallCodes,
+  downloadProgressPercent,
+  installerFileName,
   isPaidPricingModel,
   openDistributionUrl,
   primaryDistributionAction,
   resolveInstallPlan,
+  saveDownloadedFile,
   selectInstallVariant,
-  startInstallerDownload,
   type AppPlatformGroupKey,
   type DesktopOs,
+  type DownloadTask,
+  type DownloadTaskStatus,
   type InstallSelection,
   type InstallVariant,
   type ListingArtifact,
 } from '@sdkwork/appstore-pc-core';
 import { AppItem } from '../types';
 import { AnimatePresence } from 'motion/react';
-import { InstallModal } from '../components/install/InstallModal';
+import { InstallModal, type InstallModalState } from '../components/install/InstallModal';
 import { QrCodeModal } from '../components/install/QrCodeModal';
 import { InstallService } from '../services/api';
 import { architectureLabelKey } from '../lib/installVariant';
@@ -33,6 +38,24 @@ function readLocalInstalledApps(): Set<string> {
   } catch {
     return new Set<string>();
   }
+}
+
+function persistInstalledApps(next: Set<string>): void {
+  try {
+    localStorage.setItem('sdkwork_installed_apps', JSON.stringify(Array.from(next)));
+  } catch {
+    // A full or disabled localStorage must not break the installed set.
+  }
+}
+
+function readExpectedBytes(...values: Array<string | null | undefined>): number | null {
+  for (const value of values) {
+    const bytes = Number.parseInt(value ?? '', 10);
+    if (Number.isFinite(bytes) && bytes > 0) {
+      return bytes;
+    }
+  }
+  return null;
 }
 
 /**
@@ -63,26 +86,81 @@ function resolveInstallArtifact(
   return app.artifacts.find((artifact) => artifact.platform === variant.platform);
 }
 
+function modalStateFor(status: DownloadTaskStatus): InstallModalState {
+  switch (status) {
+    case 'queued':
+    case 'downloading':
+      return 'downloading';
+    case 'paused':
+      return 'paused';
+    case 'failed':
+      return 'failed';
+    case 'completed':
+      return 'success';
+    case 'cancelled':
+      return 'confirm';
+  }
+}
+
+function createInstallDownloadCenter(): DownloadCenter {
+  return new DownloadCenter({
+    // A presigned installer URL expires; when storage rejects the stale one the
+    // center asks the install port for a fresh grant and continues from the
+    // same persisted byte offset.
+    refreshUrl: async (task) => {
+      if (task.artifactId === null) {
+        return undefined;
+      }
+      const delivery = await InstallService.resolveInstallerDownload(task.artifactId).catch(
+        () => undefined,
+      );
+      return delivery?.downloadUrl;
+    },
+  });
+}
+
 export function InstallProvider({ children }: { children: React.ReactNode }) {
   const { t } = useTranslation();
   const host = useHostPlatform();
+  const [downloadCenter] = useState(createInstallDownloadCenter);
+  const downloadSnapshot = useSyncExternalStore(
+    downloadCenter.subscribe,
+    downloadCenter.getSnapshot,
+    downloadCenter.getSnapshot,
+  );
+  const downloads = downloadSnapshot.tasks;
+
   const [appToInstall, setAppToInstall] = useState<AppItem | null>(null);
-  const [installState, setInstallState] = useState<'confirm' | 'downloading' | 'success'>('confirm');
-  const [progress, setProgress] = useState(0);
+  const [activeTaskId, setActiveTaskId] = useState<string | null>(null);
+  const [startingInstall, setStartingInstall] = useState(false);
   const [installError, setInstallError] = useState<string | null>(null);
   const [installedAppIds, setInstalledAppIds] = useState<Set<string>>(readLocalInstalledApps);
   const [qrTarget, setQrTarget] = useState<{ app: AppItem; group?: AppPlatformGroupKey } | null>(
     null,
   );
   const [selection, setSelection] = useState<InstallSelection | null>(null);
-  const [downloadingArtifactId, setDownloadingArtifactId] = useState<string | null>(null);
   const [notice, setNotice] = useState<{ kind: 'success' | 'error'; message: string } | null>(
     null,
   );
   const noticeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  // Ref, not the state above: two clicks in the same tick both see the old
-  // state, and each would mint another single-use download grant.
-  const downloadInFlight = useRef<string | null>(null);
+  const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Grant requests are single-use and two clicks in the same tick both see the
+  // old state, so in-flight decisions live in refs rather than state.
+  const startingRef = useRef(false);
+  const installAttempt = useRef(0);
+  const handledTaskIds = useRef(new Set<string>());
+  const appToInstallRef = useRef<AppItem | null>(null);
+  appToInstallRef.current = appToInstall;
+
+  useEffect(() => {
+    void downloadCenter.ready();
+    // Installer bytes live in IndexedDB; ask the browser not to evict them so
+    // a paused download can still resume after the tab was closed.
+    const storage = navigator.storage;
+    if (typeof storage?.persist === 'function') {
+      void storage.persist().catch(() => undefined);
+    }
+  }, [downloadCenter]);
 
   // Hydrate the installed set from the server-backed library. The server
   // response is authoritative — an empty library renders an empty state, no
@@ -112,13 +190,10 @@ export function InstallProvider({ children }: { children: React.ReactNode }) {
     return selectInstallVariant(resolveInstallPlan(appToInstall, host), selection);
   }, [appToInstall, host, selection]);
 
-  const persistLocal = (next: Set<string>) => {
-    try {
-      localStorage.setItem('sdkwork_installed_apps', JSON.stringify(Array.from(next)));
-    } catch {
-      // ignore
-    }
-  };
+  const activeTask = useMemo(
+    () => downloads.find((task) => task.id === activeTaskId) ?? null,
+    [downloads, activeTaskId],
+  );
 
   // One transient notice surface for actions that do not own a dialog: an app
   // launched into its sandbox, and installer downloads started for another
@@ -136,9 +211,8 @@ export function InstallProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(
     () => () => {
-      if (noticeTimer.current !== null) {
-        clearTimeout(noticeTimer.current);
-      }
+      if (noticeTimer.current !== null) clearTimeout(noticeTimer.current);
+      if (closeTimer.current !== null) clearTimeout(closeTimer.current);
     },
     [],
   );
@@ -152,38 +226,131 @@ export function InstallProvider({ children }: { children: React.ReactNode }) {
       : `${osLabel} · ${t(`common.distribution.architecture.${archKey}`)}`;
   };
 
+  const recordInstalled = (appId: string) => {
+    setInstalledAppIds((prev) => {
+      if (prev.has(appId)) return prev;
+      const next = new Set(prev);
+      next.add(appId);
+      persistInstalledApps(next);
+      return next;
+    });
+  };
+
+  /**
+   * Place a completed installer on local storage exactly once, then record the
+   * install. The task persists both markers, so a reload after completion does
+   * not save a duplicate file or create a second library record.
+   */
+  useEffect(() => {
+    const settle = async (task: DownloadTask): Promise<void> => {
+      let savedToDisk = task.savedAt !== null;
+      if (!savedToDisk) {
+        try {
+          const blob = await downloadCenter.getBlob(task.id);
+          if (blob === null) {
+            showNotice('error', t('install.download.saveFailed'));
+            return;
+          }
+          const saved = await saveDownloadedFile(blob, task.fileName);
+          if (saved.status === 'cancelled') {
+            showNotice('error', t('install.download.saveCancelled'));
+            return;
+          }
+          if (saved.status === 'unavailable') {
+            showNotice('error', t('install.download.saveUnavailable'));
+            return;
+          }
+          savedToDisk = true;
+          await downloadCenter.markSaved(task.id, saved.path ?? null);
+          if (task.purpose === 'download') {
+            showNotice('success', t('install.download.completed', { name: task.fileName }));
+          }
+        } catch {
+          showNotice('error', t('install.download.saveFailed'));
+          return;
+        }
+      }
+      if (!savedToDisk) return;
+      if (task.purpose === 'install' && task.installRecordedAt === null) {
+        try {
+          await InstallService.installApp(task.appId, task.platform, task.architecture ?? undefined);
+          await downloadCenter.markInstallRecorded(task.id);
+          recordInstalled(task.appId);
+          if (appToInstallRef.current?.id === task.appId) {
+            if (closeTimer.current !== null) clearTimeout(closeTimer.current);
+            closeTimer.current = setTimeout(() => {
+              setAppToInstall(null);
+              setActiveTaskId(null);
+            }, 1400);
+          } else {
+            showNotice('success', t('install.download.installedNotice', { name: task.appName }));
+          }
+        } catch (error) {
+          showNotice(
+            'error',
+            error instanceof Error ? error.message : t('install.modal.installFailed'),
+          );
+        }
+      }
+    };
+    for (const task of downloads) {
+      if (task.status !== 'completed' || handledTaskIds.current.has(task.id)) continue;
+      handledTaskIds.current.add(task.id);
+      void settle(task);
+    }
+  }, [downloads, downloadCenter, t]);
+
   /**
    * Download one artifact as a file without touching the installed library.
-   * A grant resolves the presigned URL; a missing URL or a rejected request is
-   * surfaced instead of failing silently, which is what makes "download for
-   * another platform" trustworthy.
+   * The download center owns the queue, progress, pause, and resume; a missing
+   * source is surfaced instead of failing silently.
    */
   const downloadBuild = (app: AppItem, variant: InstallVariant) => {
     const artifact = resolveInstallArtifact(app, variant);
     const artifactId = variant.artifactId ?? artifact?.id ?? null;
-    if (artifactId === null) {
+    if (artifactId === null || artifact === undefined) {
       showNotice('error', t('install.download.pending'));
       return;
     }
-    if (downloadInFlight.current !== null) {
-      return;
-    }
-    downloadInFlight.current = artifactId;
-    setDownloadingArtifactId(artifactId);
+    const alreadyQueued = downloads.some(
+      (task) =>
+        task.artifactId === artifactId
+        && (task.status === 'queued' || task.status === 'downloading' || task.status === 'paused'),
+    );
+    if (alreadyQueued) return;
     InstallService.resolveInstallerDownload(artifactId)
-      .then((delivery) => {
-        if (delivery?.downloadUrl && startInstallerDownload(delivery.downloadUrl)) {
-          showNotice('success', t('install.download.started', { platform: variantLabel(variant) }));
-        } else {
+      .then(async (delivery) => {
+        const url = delivery?.downloadUrl?.trim();
+        if (!url) {
           showNotice('error', t('install.download.unavailable'));
+          return;
         }
+        await downloadCenter.enqueue({
+          appId: app.id,
+          appName: app.name,
+          appVersion: app.version,
+          icon: app.icon,
+          iconColor: app.iconColor,
+          platform: variant.platform,
+          architecture: variant.architecture,
+          artifactId,
+          packageFormat: variant.packageFormat || artifact.packageFormat,
+          fileName: installerFileName({
+            appName: app.name,
+            appVersion: app.version,
+            platform: variant.platform,
+            architecture: variant.architecture,
+            packageFormat: variant.packageFormat || artifact.packageFormat,
+          }),
+          url,
+          expectedBytes: readExpectedBytes(delivery?.fileSizeBytes, artifact.fileSizeBytes),
+          checksumSha256: artifact.checksumSha256 ?? null,
+          purpose: 'download',
+        });
+        showNotice('success', t('install.download.queued', { platform: variantLabel(variant) }));
       })
       .catch(() => {
         showNotice('error', t('install.download.failed'));
-      })
-      .finally(() => {
-        downloadInFlight.current = null;
-        setDownloadingArtifactId(null);
       });
   };
 
@@ -203,9 +370,10 @@ export function InstallProvider({ children }: { children: React.ReactNode }) {
       }
     }
     setSelection(installSelection ?? null);
+    installAttempt.current += 1;
     setAppToInstall(app);
-    setInstallState('confirm');
-    setProgress(0);
+    setActiveTaskId(null);
+    setStartingInstall(false);
     setInstallError(null);
   };
 
@@ -214,10 +382,15 @@ export function InstallProvider({ children }: { children: React.ReactNode }) {
   };
 
   const uninstallApp = (appId: string) => {
+    for (const task of downloads) {
+      if (task.appId === appId) {
+        void downloadCenter.remove(task.id);
+      }
+    }
     setInstalledAppIds((prev) => {
       const next = new Set(prev);
       next.delete(appId);
-      persistLocal(next);
+      persistInstalledApps(next);
       return next;
     });
     // Record the uninstall on the server-backed library; the local state
@@ -228,24 +401,35 @@ export function InstallProvider({ children }: { children: React.ReactNode }) {
   };
 
   const isInstalled = (appId: string) => installedAppIds.has(appId);
-  const isDownloading = (appId: string) => appToInstall?.id === appId && installState === 'downloading';
-  const downloadProgress = (appId: string) => (appToInstall?.id === appId ? progress : 0);
+  const isDownloading = (appId: string) =>
+    downloads.some(
+      (task) =>
+        task.appId === appId && (task.status === 'queued' || task.status === 'downloading'),
+    );
+  const downloadProgress = (appId: string) => {
+    const task = [...downloads].reverse().find((entry) => entry.appId === appId);
+    return task ? downloadProgressPercent(task.receivedBytes, task.totalBytes) : 0;
+  };
 
   const confirmInstall = () => {
-    setInstallState('downloading');
-    setInstallError(null);
     const target = appToInstall;
-    if (!target) {
+    if (target === null || startingRef.current) {
       return;
     }
+    startingRef.current = true;
+    const attempt = ++installAttempt.current;
+    setInstallError(null);
     // Commercial gate: a PAID listing must never be adopted through the free
     // install path. The checkout walks the cloudrouter domains surface
     // fail-closed (single-SKU, currency match, idempotent session + quote);
     // the install record is only created once payment is in place.
     if (isPaidPricingModel(target.pricingModel) && !installedAppIds.has(target.id)) {
+      startingRef.current = false;
+      setStartingInstall(true);
       void beginPaidListingCheckoutForApp({ commerceProductId: target.commerceProductId })
         .then((result) => {
-          setInstallState('confirm');
+          if (attempt !== installAttempt.current) return;
+          setStartingInstall(false);
           if (result.status === 'ready') {
             setInstallError(`${result.message} 支付完成后即可下载安装。`);
           } else {
@@ -253,57 +437,142 @@ export function InstallProvider({ children }: { children: React.ReactNode }) {
           }
         })
         .catch(() => {
-          setInstallState('confirm');
+          if (attempt !== installAttempt.current) return;
+          setStartingInstall(false);
           setInstallError('结算服务暂不可用，请稍后重试。');
         });
       return;
     }
-    // Drive the flow from the server-backed library record; the progress ring
-    // reflects the real request instead of a simulated download. The library
-    // row records the selected platform and CPU architecture, and the download
-    // grant targets the exact artifact the user chose.
-    const platform =
-      activeVariant?.platform ?? resolveInstallPlatform(target, host.os);
-    const architecture = activeVariant?.architecture ?? undefined;
-    const artifact = resolveInstallArtifact(target, activeVariant);
-    InstallService.installApp(target.id, platform, architecture)
-      .then(async () => {
-        // Trigger the installer download for the matched artifact (best
-        // effort): the grant resolves a presigned URL when the drive
-        // integration is enabled; otherwise the install record stands alone.
-        if (artifact) {
-          try {
-            const delivery = await InstallService.resolveInstallerDownload(artifact.id);
-            if (!(delivery?.downloadUrl && startInstallerDownload(delivery.downloadUrl))) {
-              showNotice('error', t('install.download.unavailable'));
-            }
-          } catch {
-            showNotice('error', t('install.download.failed'));
-          }
+
+    const variant = activeVariant;
+    const platform = variant?.platform ?? resolveInstallPlatform(target, host.os) ?? 'windows';
+    const architecture = variant?.architecture ?? undefined;
+    const artifact = resolveInstallArtifact(target, variant);
+
+    // A listing-level install (the publisher declared the platform but has not
+    // uploaded an artifact yet) has no file to fetch. Reporting an install
+    // success here would be false, so surface the missing package instead.
+    if (artifact === undefined) {
+      startingRef.current = false;
+      setInstallError(t('install.download.pending'));
+      return;
+    }
+
+    startingRef.current = true;
+    setStartingInstall(true);
+    InstallService.resolveInstallerDownload(artifact.id)
+      .then(async (delivery) => {
+        if (attempt !== installAttempt.current) return;
+        const url = delivery?.downloadUrl?.trim();
+        if (!url) {
+          setStartingInstall(false);
+          startingRef.current = false;
+          setInstallError(t('install.download.pending'));
+          return;
         }
-        setProgress(100);
-        setInstallState('success');
-        setInstalledAppIds((prev) => {
-          const next = new Set(prev);
-          next.add(target.id);
-          persistLocal(next);
-          return next;
+        const packageFormat = variant?.packageFormat || artifact.packageFormat;
+        const task = await downloadCenter.enqueue({
+          appId: target.id,
+          appName: target.name,
+          appVersion: target.version,
+          icon: target.icon,
+          iconColor: target.iconColor,
+          platform,
+          architecture: architecture ?? null,
+          artifactId: artifact.id,
+          packageFormat,
+          fileName: installerFileName({
+            appName: target.name,
+            appVersion: target.version,
+            platform,
+            architecture: architecture ?? null,
+            packageFormat,
+          }),
+          url,
+          expectedBytes: readExpectedBytes(delivery?.fileSizeBytes, artifact.fileSizeBytes),
+          checksumSha256: artifact.checksumSha256 ?? null,
+          purpose: 'install',
         });
-        setTimeout(() => {
-          setAppToInstall(null);
-          setProgress(0);
-        }, 1200);
+        if (attempt !== installAttempt.current) {
+          await downloadCenter.cancel(task.id);
+          return;
+        }
+        setActiveTaskId(task.id);
+        setStartingInstall(false);
+        startingRef.current = false;
       })
       .catch((error) => {
-        setInstallError(error instanceof Error ? error.message : t('install.modal.installFailed'));
-        setInstallState('confirm');
+        if (attempt !== installAttempt.current) return;
+        startingRef.current = false;
+        setStartingInstall(false);
+        setInstallError(
+          error instanceof Error ? error.message : t('install.download.failed'),
+        );
       });
   };
 
   const cancelInstall = () => {
-    if (installState === 'confirm') {
-      setAppToInstall(null);
+    installAttempt.current += 1;
+    startingRef.current = false;
+    if (activeTaskId !== null) {
+      void downloadCenter.cancel(activeTaskId);
     }
+    setActiveTaskId(null);
+    setAppToInstall(null);
+    setStartingInstall(false);
+    setInstallError(null);
+  };
+
+  const pauseInstall = () => {
+    if (activeTaskId !== null) void downloadCenter.pause(activeTaskId);
+  };
+
+  const resumeInstall = () => {
+    if (activeTaskId !== null) {
+      setInstallError(null);
+      void downloadCenter.resume(activeTaskId);
+    }
+  };
+
+  const retryInstall = () => {
+    if (activeTaskId !== null) {
+      setInstallError(null);
+      void downloadCenter.retry(activeTaskId);
+    }
+  };
+
+  const installState: InstallModalState =
+    startingInstall
+      ? 'downloading'
+      : activeTask === null
+        ? 'confirm'
+        : modalStateFor(activeTask.status);
+
+  const progress = activeTask
+    ? downloadProgressPercent(activeTask.receivedBytes, activeTask.totalBytes)
+    : 0;
+
+  const saveDownload = async (taskId: string): Promise<boolean> => {
+    const task = downloadCenter.getTask(taskId);
+    if (task === undefined) return false;
+    const blob = await downloadCenter.getBlob(taskId);
+    if (blob === null) {
+      showNotice('error', t('install.download.saveUnavailable'));
+      return false;
+    }
+    const saved = await saveDownloadedFile(blob, task.fileName);
+    if (saved.status !== 'saved') {
+      showNotice(
+        'error',
+        saved.status === 'cancelled'
+          ? t('install.download.saveCancelled')
+          : t('install.download.saveUnavailable'),
+      );
+      return false;
+    }
+    await downloadCenter.markSaved(taskId, saved.path ?? null);
+    showNotice('success', t('install.download.completed', { name: task.fileName }));
+    return true;
   };
 
   return (
@@ -311,7 +580,12 @@ export function InstallProvider({ children }: { children: React.ReactNode }) {
       value={{
         installApp,
         downloadBuild,
-        downloadingArtifactId,
+        downloadingArtifactId:
+          downloads.find(
+            (task) =>
+              task.artifactId !== null
+              && (task.status === 'queued' || task.status === 'downloading'),
+          )?.artifactId ?? null,
         openApp,
         uninstallApp,
         isInstalled,
@@ -319,7 +593,38 @@ export function InstallProvider({ children }: { children: React.ReactNode }) {
         downloadProgress,
         installedAppIds,
         activeDownloadApp: appToInstall,
-        downloadState: appToInstall ? installState : null,
+        downloadState:
+          appToInstall === null
+            ? null
+            : installState === 'confirm'
+              ? 'confirm'
+              : installState === 'success'
+                ? 'success'
+                : installState === 'paused'
+                  ? 'paused'
+                  : installState === 'failed'
+                    ? 'failed'
+                    : 'downloading',
+        downloads,
+        pauseDownload: (taskId) => {
+          void downloadCenter.pause(taskId);
+        },
+        resumeDownload: (taskId) => {
+          void downloadCenter.resume(taskId);
+        },
+        cancelDownload: (taskId) => {
+          void downloadCenter.cancel(taskId);
+        },
+        retryDownload: (taskId) => {
+          void downloadCenter.retry(taskId);
+        },
+        removeDownload: (taskId) => {
+          void downloadCenter.remove(taskId);
+        },
+        clearCompletedDownloads: () => {
+          void downloadCenter.clearFinished();
+        },
+        saveDownload,
         host,
         requestQr: (app, group) => setQrTarget({ app, group }),
       }}
@@ -350,10 +655,14 @@ export function InstallProvider({ children }: { children: React.ReactNode }) {
             app={appToInstall}
             installState={installState}
             progress={progress}
-            error={installError}
+            error={installError ?? (activeTask?.status === 'failed' ? activeTask.error : null)}
             variant={activeVariant}
             hostOs={host.os}
+            task={activeTask}
             onConfirm={confirmInstall}
+            onPause={pauseInstall}
+            onResume={resumeInstall}
+            onRetry={retryInstall}
             onCancel={cancelInstall}
           />
         )}

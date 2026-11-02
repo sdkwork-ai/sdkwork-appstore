@@ -16,9 +16,11 @@ export interface DemandHallItem {
   categoryId?: string;
   /** Slash-delimited category tree path, for example `/software/web/admin-system`. */
   categoryPath?: string;
-  /** Application form being commissioned, per the SDKWork application standards. */
+  /** @deprecated Single-form compatibility alias; prefer `appForms`. */
   appForm?: DemandAppForm;
-  /** 需求大类：软件开发 / 求购 / 设计 / 其他。 */
+  /** Canonical ordered set of commissioned application forms. */
+  appForms?: DemandAppForm[];
+  /** 需求大类：软件开发 / 视频生成 / 图片生成 / 音乐创作 / 配音合成 / 设计 / 求购 / 其他。 */
   demandType: string;
   /** 展示预算文本；结构化区间见 budgetMin/budgetMax。 */
   budget: string;
@@ -29,6 +31,8 @@ export interface DemandHallItem {
   description: string;
   status: string;
   bidCount: number;
+  /** Detail-page counters the list payload does not emphasize. */
+  viewCount?: number;
   publisherUserId: string;
   companyName: string;
   publishedAt: string;
@@ -86,13 +90,34 @@ export interface DemandHallBid {
   createdAt: string;
 }
 
-export type DemandHallType = 'development' | 'purchase' | 'design' | 'other';
+/**
+ * The three discovery rails of the demand detail page, ranked by the company
+ * service: 最新需求 (latest), 相关需求 (related), 推荐需求 (recommended).
+ * The service guarantees a demand appears in at most one rail.
+ */
+export interface DemandSuggestionSections {
+  latest: DemandHallItem[];
+  related: DemandHallItem[];
+  recommended: DemandHallItem[];
+}
+
+export type DemandHallType =
+  | 'development'
+  | 'purchase'
+  | 'design'
+  | 'other'
+  | 'video'
+  | 'image'
+  | 'music'
+  | 'voice';
 
 export interface DemandPublishInput {
   title: string;
   /** Leaf category id from the cascading category menu; required by the service. */
   categoryId: string;
-  /** Application form being commissioned; required for a development demand. */
+  /** Application forms being commissioned; required for a development demand. */
+  appForms?: DemandAppForm[];
+  /** @deprecated Single-form compatibility alias; prefer `appForms`. */
   appForm?: DemandAppForm;
   demandType?: DemandHallType;
   budget?: string;
@@ -116,6 +141,11 @@ export interface DemandClaimInput {
 export interface ICompanyDemandsSDK {
   listDemands(query?: { q?: string; demandType?: string }): Promise<DemandHallItem[]>;
   getDemand(demandId: string): Promise<DemandHallItem>;
+  /**
+   * Read the detail page's discovery rails. One request returns all three
+   * sections, so the detail page renders its right column in one round trip.
+   */
+  listDemandSuggestions(demandId: string): Promise<DemandSuggestionSections>;
   publishDemand(input: DemandPublishInput): Promise<DemandHallItem>;
   /** Read the demand category tree that drives the cascading publish menu. */
   listDemandCategories(): Promise<DemandCategory[]>;
@@ -125,6 +155,18 @@ export interface ICompanyDemandsSDK {
   listDemandBids(demandId: string): Promise<DemandHallBid[]>;
   /** 我发出的投标。 */
   listMyBids(): Promise<DemandHallBid[]>;
+  /**
+   * Award the company-domain bid that mirrors an order claim. Keeps the demand
+   * status (published → assigned) and the legacy bid list in step with the
+   * order-owned claim lifecycle.
+   */
+  acceptDemandBid(demandId: string, bidId: string): Promise<void>;
+  /** Reject the company-domain bid mirroring a rejected order claim. */
+  rejectDemandBid(demandId: string, bidId: string, note?: string): Promise<void>;
+  /** Mark the awarded demand complete once the order claim is accepted. */
+  completeDemand(demandId: string): Promise<void>;
+  /** Remove the provider's open company-domain bid after an order withdrawal. */
+  withdrawMyBidForDemand(demandId: string): Promise<void>;
 }
 
 export type CompanyDemandsServicePort = ICompanyDemandsSDK;
@@ -139,11 +181,16 @@ export function configureCompanyDemandsServicePort(port: CompanyDemandsServicePo
 export const CompanyDemandsService: ICompanyDemandsSDK = {
   listDemands: (query) => companyDemandsPort.listDemands(query),
   getDemand: (demandId) => companyDemandsPort.getDemand(demandId),
+  listDemandSuggestions: (demandId) => companyDemandsPort.listDemandSuggestions(demandId),
   publishDemand: (input) => companyDemandsPort.publishDemand(input),
   listDemandCategories: () => companyDemandsPort.listDemandCategories(),
   claimDemand: (demandId, input) => companyDemandsPort.claimDemand(demandId, input),
   listDemandBids: (demandId) => companyDemandsPort.listDemandBids(demandId),
   listMyBids: () => companyDemandsPort.listMyBids(),
+  acceptDemandBid: (demandId, bidId) => companyDemandsPort.acceptDemandBid(demandId, bidId),
+  rejectDemandBid: (demandId, bidId, note) => companyDemandsPort.rejectDemandBid(demandId, bidId, note),
+  completeDemand: (demandId) => companyDemandsPort.completeDemand(demandId),
+  withdrawMyBidForDemand: (demandId) => companyDemandsPort.withdrawMyBidForDemand(demandId),
 };
 
 function createUnconfiguredCompanyDemandsPort(): CompanyDemandsServicePort {
@@ -153,11 +200,16 @@ function createUnconfiguredCompanyDemandsPort(): CompanyDemandsServicePort {
   return {
     listDemands: async () => unavailable(),
     getDemand: async () => unavailable(),
+    listDemandSuggestions: async () => unavailable(),
     publishDemand: async () => unavailable(),
     listDemandCategories: async () => unavailable(),
     claimDemand: async () => unavailable(),
     listDemandBids: async () => unavailable(),
     listMyBids: async () => unavailable(),
+    acceptDemandBid: async () => unavailable(),
+    rejectDemandBid: async () => unavailable(),
+    completeDemand: async () => unavailable(),
+    withdrawMyBidForDemand: async () => unavailable(),
   };
 }
 

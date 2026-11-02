@@ -24,6 +24,7 @@ Prefix lock:
 | `appstore.catalog.templates.create` | POST | `/app/v3/api/appstore/catalog/templates` | `appstore.catalog.write` |
 | `appstore.catalog.templates.retrieve` | GET | `/app/v3/api/appstore/catalog/templates/{templateId}` | — (tier 0 public) |
 | `appstore.catalog.templates.usage.create` | POST | `/app/v3/api/appstore/catalog/templates/{templateId}/usage` | `appstore.catalog.write` |
+| `appstore.catalog.templates.suggestions.retrieve` | GET | `/app/v3/api/appstore/catalog/templates/{templateId}/suggestions` | — (tier 0 public) |
 | `appstore.catalog.feedback.create` | POST | `/app/v3/api/appstore/catalog/feedback` | `appstore.catalog.write` |
 | `appstore.listings.ratings.list` | GET | `/app/v3/api/listings/{listingId}/ratings` | `appstore.listings.read` |
 | `appstore.listings.ratings.update` | PUT | `/app/v3/api/listings/{listingId}/ratings/me` | `appstore.listings.write` |

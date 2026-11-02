@@ -1,7 +1,7 @@
 import { appApiPath } from './paths';
 import type { ApiRequestOptions, HttpClient } from '../http/client';
 
-import type { AppTemplate, AppTemplateCreateRequest, AppTemplateUsageCreateRequest, AppTemplateUsageResult, CatalogChartSnapshot, CatalogCollection, CatalogFeaturedSlot, Category, Feedback, FeedbackCreateRequest, HomeFeedData, ListingSummary, PageInfo, SdkWorkPageData, SearchHistoryUpsertRequest } from '../types';
+import type { AppTemplate, AppTemplateCreateRequest, AppTemplateSuggestions, AppTemplateUsageCreateRequest, AppTemplateUsageResult, CatalogChartSnapshot, CatalogCollection, CatalogFeaturedSlot, Category, Feedback, FeedbackCreateRequest, HomeFeedData, ListingSummary, PageInfo, SdkWorkPageData, SearchHistoryUpsertRequest } from '../types';
 
 
 export interface CatalogAppstoreCatalogFeedbackCreateParams {
@@ -25,6 +25,27 @@ export class CatalogAppstoreCatalogFeedbackApi {
       {}
     );
     return this.client.request<Feedback>(appApiPath(`/appstore/catalog/feedback`), { ...(requestOptions?.signal !== undefined ? { signal: requestOptions.signal } : {}), ...(requestOptions?.timeout !== undefined ? { timeout: requestOptions.timeout } : {}), method: 'POST' as any, body, contentType: 'application/json', ...(requestHeaders !== undefined ? { headers: requestHeaders } : {}), sdkworkUnwrapKind: 'item' });
+  }
+}
+
+export interface CatalogAppstoreCatalogTemplatesSuggestionsRetrieveParams {
+  pageSize?: number;
+}
+
+export class CatalogAppstoreCatalogTemplatesSuggestionsApi {
+  private client: HttpClient;
+
+  constructor(client: HttpClient) {
+    this.client = client;
+  }
+
+
+/** List the discovery rails of a template detail page */
+  async retrieve(templateId: string, params?: CatalogAppstoreCatalogTemplatesSuggestionsRetrieveParams, requestOptions?: ApiRequestOptions): Promise<AppTemplateSuggestions> {
+    const query = buildQueryString([
+      { name: 'page_size', value: params?.pageSize, style: 'form', explode: true, allowReserved: false },
+    ]);
+    return this.client.request<AppTemplateSuggestions>(appendQueryString(appApiPath(`/appstore/catalog/templates/${serializePathParameter(templateId, { name: 'templateId', style: 'simple', explode: false })}/suggestions`), query), { ...(requestOptions?.signal !== undefined ? { signal: requestOptions.signal } : {}), ...(requestOptions?.timeout !== undefined ? { timeout: requestOptions.timeout } : {}), method: 'GET' as any, sdkworkUnwrapKind: 'item' });
   }
 }
 
@@ -56,7 +77,7 @@ export interface CatalogAppstoreCatalogTemplatesListParams {
   q?: string;
   categoryCode?: string;
   templateType?: 'APP' | 'PLUGIN' | 'AGENT' | 'EXPERT';
-  templatePlatform?: 'H5' | 'PC' | 'FLUTTER' | 'MINIPROGRAM';
+  templatePlatform?: 'PC' | 'PAD' | 'H5' | 'STATIC_WEB' | 'FLUTTER' | 'MINIPROGRAM' | 'ANDROID' | 'IOS' | 'HARMONY' | 'UNIAPP' | 'UNITY';
   cursor?: string;
   pageSize?: number;
 }
@@ -68,10 +89,12 @@ export interface CatalogAppstoreCatalogTemplatesCreateParams {
 export class CatalogAppstoreCatalogTemplatesApi {
   private client: HttpClient;
   public readonly usage: CatalogAppstoreCatalogTemplatesUsageApi;
+  public readonly suggestions: CatalogAppstoreCatalogTemplatesSuggestionsApi;
 
   constructor(client: HttpClient) {
     this.client = client;
     this.usage = new CatalogAppstoreCatalogTemplatesUsageApi(client);
+    this.suggestions = new CatalogAppstoreCatalogTemplatesSuggestionsApi(client);
   }
 
 

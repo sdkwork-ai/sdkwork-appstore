@@ -175,6 +175,14 @@ pub const ROUTES: &[RouteDefinition] = &[
         service_method: "catalog_template_usage_create",
     },
     RouteDefinition {
+        method: "GET",
+        path: "/app/v3/api/appstore/catalog/templates/{templateId}/suggestions",
+        operation_id: "appstore.catalog.templates.suggestions.retrieve",
+        auth: RouteAuth::DualToken,
+        handler: "catalog_template_suggestions_retrieve",
+        service_method: "catalog_template_suggestions_retrieve",
+    },
+    RouteDefinition {
         method: "POST",
         path: "/app/v3/api/appstore/catalog/feedback",
         operation_id: "appstore.catalog.feedback.create",

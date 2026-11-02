@@ -130,6 +130,12 @@ const HTTP_ROUTES: &[HttpRoute] = &[
         "appstore.catalog.templates.usage.create",
     ),
     HttpRoute::dual_token(
+        HttpMethod::Get,
+        "/app/v3/api/appstore/catalog/templates/{templateId}/suggestions",
+        "appstore",
+        "appstore.catalog.templates.suggestions.retrieve",
+    ),
+    HttpRoute::dual_token(
         HttpMethod::Post,
         "/app/v3/api/appstore/catalog/feedback",
         "appstore",

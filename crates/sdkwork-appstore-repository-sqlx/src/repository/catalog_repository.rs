@@ -42,7 +42,9 @@ use sdkwork_appstore_catalog_service::domain::models::{
     SearchSuggestion, TrendingTerm,
 };
 use sdkwork_appstore_catalog_service::error::AppstoreServiceError;
-use sdkwork_appstore_catalog_service::ports::repository::CatalogRepositoryPort;
+use sdkwork_appstore_catalog_service::ports::repository::{
+    CatalogRepositoryPort, TemplateFeedOrder, TemplateFeedQuery,
+};
 
 #[derive(Debug, Clone)]
 pub struct SqlxCatalogRepository {
@@ -1967,6 +1969,123 @@ impl CatalogRepositoryPort for SqlxCatalogRepository {
             q = q.bind(cursor_bigint_id(cursor_id));
         }
         q = q.bind(limit);
+
+        let rows = q
+            .fetch_all(&self.db)
+            .await
+            .map_err(|e| AppstoreServiceError::Internal(format!("Database error: {}", e)))?;
+        rows.into_iter()
+            .map(map_app_template_row_to_domain)
+            .collect::<Result<Vec<_>, _>>()
+            .map_err(AppstoreServiceError::Internal)
+    }
+
+    async fn find_template_feed(
+        &self,
+        context: &AppstoreRequestContext,
+        query: TemplateFeedQuery<'_>,
+    ) -> Result<Vec<AppTemplate>, AppstoreServiceError> {
+        let mut sql = String::from(
+            r#"
+            SELECT t.id, t.tenant_id::text, t.organization_id::text, t.template_code,
+                   t.template_name, t.description, t.template_type, t.template_platform,
+                   t.category_code, t.framework, t.language, t.icon_media_resource_id,
+                   t.git_repo_url,
+                   COALESCE(t.capability_manifest::text, '{}') AS capability_manifest, COALESCE(t.metadata::text, '{}') AS metadata,
+                   t.published_at, t.created_at, t.updated_at,
+                   COALESCE(star_counts.cnt, 0) AS star_count,
+                   COALESCE(fork_counts.cnt, 0) AS fork_count,
+                   COALESCE(clone_counts.cnt, 0) AS clone_count,
+                   COALESCE(user_state.enabled, FALSE) AS is_enabled
+            FROM appstore_app_template t
+            LEFT JOIN (
+                SELECT template_id, COUNT(*) AS cnt
+                FROM appstore_app_template_usage
+                WHERE usage_type = 1 AND metadata->>'action' IS DISTINCT FROM 'unstar'
+                GROUP BY template_id
+            ) star_counts ON star_counts.template_id = t.id
+            LEFT JOIN (
+                SELECT template_id, COUNT(*) AS cnt
+                FROM appstore_app_template_usage
+                WHERE usage_type = 2
+                GROUP BY template_id
+            ) fork_counts ON fork_counts.template_id = t.id
+            LEFT JOIN (
+                SELECT template_id, COUNT(*) AS cnt
+                FROM appstore_app_template_usage
+                WHERE usage_type = 3
+                GROUP BY template_id
+            ) clone_counts ON clone_counts.template_id = t.id
+            LEFT JOIN LATERAL (
+                SELECT
+                    CASE
+                        WHEN usage_type = 4 AND metadata->>'action' IS DISTINCT FROM 'disable' THEN TRUE
+                        ELSE FALSE
+                    END AS enabled
+                FROM appstore_app_template_usage u
+                WHERE u.template_id = t.id AND u.user_id = ? AND u.usage_type IN (4, 5)
+                ORDER BY u.created_at DESC, u.id DESC
+                LIMIT 1
+            ) user_state ON TRUE
+            WHERE t.tenant_id = ? AND t.status = 1 AND t.deleted_at IS NULL
+              AND t.visibility = 1 AND t.publish_status = 1
+            "#,
+        );
+
+        if query.template_type.is_some() {
+            sql.push_str("  AND t.template_type = ?\n");
+        }
+        if query.template_platform.is_some() {
+            sql.push_str("  AND t.template_platform = ?\n");
+        }
+        if query.category_code.is_some() {
+            sql.push_str("  AND t.category_code = ?\n");
+        }
+        if !query.exclude_ids.is_empty() {
+            let placeholders = query
+                .exclude_ids
+                .iter()
+                .map(|_| "?")
+                .collect::<Vec<_>>()
+                .join(", ");
+            sql.push_str(&format!("  AND t.id NOT IN ({placeholders})\n"));
+        }
+        match query.order {
+            TemplateFeedOrder::Latest => {
+                sql.push_str("ORDER BY t.published_at DESC NULLS LAST, t.created_at DESC, t.id DESC\n");
+            }
+            TemplateFeedOrder::Popular => {
+                sql.push_str(
+                    "ORDER BY COALESCE(star_counts.cnt, 0) DESC, COALESCE(fork_counts.cnt, 0) DESC, t.created_at DESC, t.id DESC\n",
+                );
+            }
+        }
+        sql.push_str("LIMIT ?\n");
+
+        let adapted = self.db.adapt_sql(&sql);
+        let mut q = self
+            .db
+            .query_as::<AppTemplateRow>(&adapted)
+            .bind(
+                query
+                    .user_id
+                    .and_then(|value| value.parse::<i64>().ok())
+                    .unwrap_or(0),
+            )
+            .bind(context.tenant_id.parse::<i64>().unwrap_or(0));
+        if let Some(template_type) = query.template_type {
+            q = q.bind(template_type);
+        }
+        if let Some(template_platform) = query.template_platform {
+            q = q.bind(template_platform);
+        }
+        if let Some(category_code) = query.category_code {
+            q = q.bind(category_code);
+        }
+        for template_id in query.exclude_ids {
+            q = q.bind(template_id);
+        }
+        q = q.bind(query.limit);
 
         let rows = q
             .fetch_all(&self.db)

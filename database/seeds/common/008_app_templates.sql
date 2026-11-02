@@ -1,7 +1,9 @@
 -- 008_app_templates.sql — app templates and PLUGIN-type plugins (BIGINT id tables).
--- APP rows carry template_platform (H5 | PC | FLUTTER | MINIPROGRAM); PLUGIN
--- rows stay NULL — the platform dimension describes the application form a
--- template scaffolds, which a plugin does not have.
+-- APP rows carry template_platform, one SDKWork client application architecture
+-- code (PC | PAD | H5 | STATIC_WEB | FLUTTER | MINIPROGRAM | ANDROID | IOS |
+-- HARMONY | UNIAPP | UNITY); PLUGIN rows stay NULL — the platform dimension
+-- describes the application form a template scaffolds, which a plugin does not
+-- have.
 
 INSERT INTO appstore_app_template
     (id, uuid, tenant_id, organization_id, data_scope, status, created_at, updated_at, version, metadata, template_no, template_code, template_name, description, category_code, template_type, template_platform, framework, language, icon_media_resource_id, visibility, publish_status, featured, sort_weight, owner_user_id, git_repo_url, capability_manifest, published_at)
@@ -83,3 +85,26 @@ WHERE tenant_id = 100001
     OR jsonb_typeof(capability_manifest->'capabilities') <> 'array'
     OR jsonb_array_length(capability_manifest->'capabilities') = 0
   );
+
+-- Mobile-form templates demonstrate the detail page's scan-to-try action. Their
+-- related apps are not part of the seeded storefront catalog, so the catalog
+-- carries the author's live demo address instead; the QR code opens it on a
+-- phone. Rows that already declare a demo URL are left untouched.
+UPDATE appstore_app_template
+SET metadata = jsonb_set(
+    metadata,
+    '{demoUrl}',
+    to_jsonb(
+      CASE template_code
+        WHEN 'tpl-h5-retail' THEN 'https://apps.sdkwork.com/h5-retail'
+        WHEN 'tpl-ecommerce-ai' THEN 'https://apps.sdkwork.com/ecommerce-ai'
+        WHEN 'tpl-flutter-app' THEN 'https://apps.sdkwork.com/flutter-app'
+        WHEN 'tpl-mp-shop' THEN 'https://apps.sdkwork.com/mp-shop'
+        ELSE COALESCE(metadata->>'demoUrl', '')
+      END
+    ),
+    true
+)
+WHERE tenant_id = 100001
+  AND template_code IN ('tpl-h5-retail', 'tpl-ecommerce-ai', 'tpl-flutter-app', 'tpl-mp-shop')
+  AND COALESCE(metadata->>'demoUrl', '') = '';

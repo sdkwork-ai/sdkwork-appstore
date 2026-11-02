@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { GitFork, Check, LayoutGrid, ArrowRight, Terminal, Star } from 'lucide-react';
+import { GitFork, Check, LayoutGrid, ArrowRight, Terminal, Star, QrCode } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { AppItem } from '../../types';
 
@@ -13,6 +13,10 @@ interface TemplateDetailActionButtonsProps {
   onFork: () => void;
   onStar: () => void;
   onCopyCli: () => void;
+  /** True while the star request is in flight; the toggle is disabled. */
+  starring?: boolean | undefined;
+  /** Open the phone QR dialog; absent for forms that do not run on a phone. */
+  onScan?: (() => void) | undefined;
 }
 
 export const TemplateDetailActionButtons: React.FC<TemplateDetailActionButtonsProps> = ({
@@ -24,6 +28,8 @@ export const TemplateDetailActionButtons: React.FC<TemplateDetailActionButtonsPr
   onFork,
   onStar,
   onCopyCli,
+  starring = false,
+  onScan,
 }) => {
   const { t } = useTranslation();
 
@@ -47,6 +53,19 @@ export const TemplateDetailActionButtons: React.FC<TemplateDetailActionButtonsPr
           </>
         )}
       </button>
+
+      {/* Scan action: the phone runs this app form, so the QR is the shortcut. */}
+      {onScan ? (
+        <button
+          type="button"
+          onClick={onScan}
+          data-template-scan-action
+          className="w-full py-2.5 px-4 rounded-store-control border border-store-brand/40 bg-store-brand/5 hover:bg-store-brand/10 text-store-brand font-medium text-xs transition-colors flex items-center justify-center gap-2 cursor-pointer"
+        >
+          <QrCode className="w-4 h-4" />
+          <span>{t('templates.detail.scanAction')}</span>
+        </button>
+      ) : null}
 
       {/* Secondary Action: Go to Associated App Detail */}
       {relatedApp && (
@@ -81,7 +100,8 @@ export const TemplateDetailActionButtons: React.FC<TemplateDetailActionButtonsPr
       {/* Star button */}
       <button
         onClick={onStar}
-        className={`w-full py-2.5 px-4 rounded-store-control border text-xs font-medium transition-all flex items-center justify-center gap-2 cursor-pointer ${
+        disabled={starring}
+        className={`w-full py-2.5 px-4 rounded-store-control border text-xs font-medium transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed ${
           starred
             ? 'bg-store-warning/10 border-store-warning/30 text-store-warning '
             : 'border-store-line text-store-ink-soft hover:bg-store-subtle '

@@ -86,7 +86,10 @@ export function createConsoleServicePort(client: AppStoreClient): ConsoleService
         appKey: `dev-${slug}`,
         displayName: appData.name,
         defaultLocale: 'zh-CN',
-        appType: appData.appType ?? 'APP',
+        // `appType` is a PlusProjectType value, never a create-menu preset
+        // (`APP_ASSETS_SPEC.md` section 5.3); React web/desktop is the default
+        // client root the "app" preset scaffolds.
+        appType: appData.appType ?? 'APP_REACT',
         listingSlug: `dev-${slug}`,
         ...(pricingModel === 'FREEMIUM' || pricingModel === 'PAID'
           ? { pricingModel }

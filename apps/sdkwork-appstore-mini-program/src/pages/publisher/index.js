@@ -5,23 +5,30 @@ const { isIamAuthenticated } = require("../../bootstrap/iamRuntime");
 const CREATE_TYPES = {
   app: "应用",
   website: "官网",
+  game: "游戏",
+  festival: "节日祝福",
   promo: "宣传应用",
 };
 
+// Create-menu presets resolved to canonical app.appType values
+// (APP_ASSETS_SPEC.md section 5.3); a preset is never stored as the app type.
 const APP_TYPE_BY_PARAM = {
-  app: "APP",
-  website: "WEBSITE",
-  promo: "PROMO",
+  app: "APP_REACT",
+  website: "APP_HTML",
+  game: "APP_HTML",
+  festival: "POSTER",
+  promo: "VIDEO",
 };
 
 Page({
-  data: { authed: false, createPanel: false, createTypeName: "", createName: "", createKey: "", creating: false, createError: "" },
+  data: { authed: false, createPanel: false, createType: "", createTypeName: "", createName: "", createKey: "", creating: false, createError: "" },
   onLoad(options) {
     const create = options && typeof options.create === "string" ? options.create : "";
     const createTypeName = CREATE_TYPES[create] || "";
     this.setData({
       authed: isIamAuthenticated(),
       createPanel: Boolean(createTypeName),
+      createType: createTypeName ? create : "",
       createTypeName,
     });
     if (this.data.authed) {
@@ -52,10 +59,10 @@ Page({
     wx.navigateTo({ url: `/pages/app-detail/index?id=${id}` });
   },
   onCreateFabTap() {
-    this.setData({ createPanel: true, createTypeName: "应用" });
+    this.setData({ createPanel: true, createType: "app", createTypeName: "应用" });
   },
   onCreateCancel() {
-    this.setData({ createPanel: false, createName: "", createKey: "", createError: "" });
+    this.setData({ createPanel: false, createType: "", createName: "", createKey: "", createError: "" });
   },
   onCreateNameInput(event) {
     this.setData({ createName: event.detail.value });
@@ -75,7 +82,7 @@ Page({
       .createPublisherApp({
         displayName: name,
         appKey,
-        appType: APP_TYPE_BY_PARAM[this.data.createTypeName === "官网" ? "website" : this.data.createTypeName === "宣传应用" ? "promo" : "app"] || "APP",
+        appType: APP_TYPE_BY_PARAM[this.data.createType] || "APP_REACT",
       })
       .then(() => {
         wx.showToast({ title: "草稿已保存", icon: "success" });

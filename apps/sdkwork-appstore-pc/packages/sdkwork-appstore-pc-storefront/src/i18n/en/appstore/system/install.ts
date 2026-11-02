@@ -9,10 +9,16 @@ export const install = {
     autoStart: 'Launch at System Startup',
     confirmInstall: 'Start Installation',
     installing: 'Writing package files to disk...',
-    completed: 'Application Installed Successfully!',
+    completed: 'Installer downloaded',
     launchNow: 'Launch App Now',
     runningNotice: 'App "{{name}}" is running in the local desktop sandbox...',
     installFailed: 'Installation failed, please try again later',
+    paused: 'Download paused',
+    pause: 'Pause download',
+    resume: 'Resume download',
+    stop: 'Stop download',
+    savedTo: 'Installer saved to {{path}}',
+    runInstallerHint: 'The installer is saved locally; run it to finish installation',
     platformNote: 'Detected on this system — installing {{platform}}',
     platformNoteGeneric: 'Installing {{platform}}',
     compatibilityNote: 'This build runs in compatibility mode on your device',
@@ -25,6 +31,12 @@ export const install = {
     started: 'Download started — {{platform}}',
     pending: 'This installer is not published yet',
     unavailable: 'The download link is not available yet. Please try again later.',
-    failed: 'Download failed. Please try again later.'
+    failed: 'Download failed. Please try again later.',
+    queued: '{{platform}} installer added to the download queue',
+    completed: '{{name}} downloaded',
+    installedNotice: 'The {{name}} installer finished downloading',
+    saveUnavailable: 'This environment cannot save the installer; check the downloads folder.',
+    saveCancelled: 'Saving the installer was cancelled. Please try again.',
+    saveFailed: 'Could not save the installer. Please try again.'
   }
 };

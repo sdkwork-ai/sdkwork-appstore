@@ -95,6 +95,8 @@ export type { AppTemplateUsageResult } from './app-template-usage-result';
 export type { AppTemplateListResponse } from './app-template-list-response';
 export type { AppTemplateResponse } from './app-template-response';
 export type { AppTemplateUsageResponse } from './app-template-usage-response';
+export type { AppTemplateSuggestions } from './app-template-suggestions';
+export type { AppTemplateSuggestionsResponse } from './app-template-suggestions-response';
 export type { ListingRating } from './listing-rating';
 export type { ListingRatingUpsertRequest } from './listing-rating-upsert-request';
 export type { ListingRatingListResponse } from './listing-rating-list-response';

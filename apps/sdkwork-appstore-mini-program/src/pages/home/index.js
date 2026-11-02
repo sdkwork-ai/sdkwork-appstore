@@ -17,6 +17,8 @@ const CAPABILITIES = [
 const CREATE_TARGETS = [
   { type: "app", name: "新建应用", desc: "发布一个全新的应用" },
   { type: "website", name: "新建官网", desc: "搭建并发布官方网站" },
+  { type: "game", name: "创建游戏", desc: "创建一个可在应用商店运行的游戏" },
+  { type: "festival", name: "创建节日祝福", desc: "制作节日祝福海报或互动贺卡" },
   { type: "promo", name: "新建宣传应用", desc: "创建宣传页应用" },
 ];
 

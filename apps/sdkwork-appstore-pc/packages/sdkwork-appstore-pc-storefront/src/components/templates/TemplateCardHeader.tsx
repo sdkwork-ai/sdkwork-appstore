@@ -1,5 +1,7 @@
 import React from 'react';
 import { CheckCircle2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { resolveTemplateAppType } from '@sdkwork/appstore-pc-core';
 import { TemplateItem } from '../../types';
 import { DynamicIcon } from '../DynamicIcon';
 
@@ -8,6 +10,8 @@ interface TemplateCardHeaderProps {
 }
 
 export const TemplateCardHeader: React.FC<TemplateCardHeaderProps> = ({ template }) => {
+  const { t } = useTranslation();
+  const appType = resolveTemplateAppType(template.platform);
   return (
     <div className="flex items-start justify-between gap-3">
       <div className="flex items-center gap-3 min-w-0">
@@ -23,8 +27,11 @@ export const TemplateCardHeader: React.FC<TemplateCardHeaderProps> = ({ template
               <CheckCircle2 className="w-4 h-4 text-store-brand shrink-0" />
             )}
             {template.platform && (
-              <span className="px-1.5 py-0.5 rounded-full bg-store-subtle border border-store-line text-store-ink-soft text-[10px] font-medium leading-none shrink-0">
-                {template.platform}
+              <span
+                className="max-w-[50%] truncate px-1.5 py-0.5 rounded-full bg-store-subtle border border-store-line text-store-ink-soft text-[10px] font-medium leading-none shrink-0"
+                data-template-app-type={appType?.code ?? template.platform}
+              >
+                {appType ? t(`templates.platforms.${appType.labelKey}`) : template.platform}
               </span>
             )}
           </div>

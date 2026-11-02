@@ -7,7 +7,17 @@ interface DemandsCategoryFilterProps {
 }
 
 /** 需求大类过滤，值与 `company_demand.demand_type` 对齐。 */
-export const DEMAND_TYPE_VALUES = ['all', 'development', 'purchase', 'design', 'other'] as const;
+export const DEMAND_TYPE_VALUES = [
+  'all',
+  'development',
+  'video',
+  'image',
+  'music',
+  'voice',
+  'design',
+  'purchase',
+  'other',
+] as const;
 
 export const DemandsCategoryFilter: React.FC<DemandsCategoryFilterProps> = ({
   selectedType,
@@ -21,6 +31,14 @@ export const DemandsCategoryFilter: React.FC<DemandsCategoryFilterProps> = ({
         return t('common.actions.all');
       case 'development':
         return t('demands.types.development');
+      case 'video':
+        return t('demands.types.video');
+      case 'image':
+        return t('demands.types.image');
+      case 'music':
+        return t('demands.types.music');
+      case 'voice':
+        return t('demands.types.voice');
       case 'purchase':
         return t('demands.types.purchase');
       case 'design':

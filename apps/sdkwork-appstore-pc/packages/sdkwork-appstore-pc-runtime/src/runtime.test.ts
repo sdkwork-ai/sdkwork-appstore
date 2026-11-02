@@ -19,6 +19,7 @@ const fixtureConfig: AppstorePcRuntimeConfig = {
   iamAppApiBaseUrl: 'https://iam.example.test',
   locale: 'zh-CN',
   mcpAppApiBaseUrl: 'https://mcp.example.test',
+  orderAppApiBaseUrl: 'https://order.example.test',
   runtimeTarget: 'browser',
   skillsAppApiBaseUrl: 'https://skills.example.test',
 };

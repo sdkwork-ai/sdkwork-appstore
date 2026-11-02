@@ -40,6 +40,9 @@ import {
   WishlistPage,
   UserStorePage,
   PublicUserStorePage,
+  DemandDetailPage,
+  DemandClaimsPage,
+  DemandClaimDetailPage,
   initializeAppstorePcI18n,
   i18n,
 } from '@sdkwork/appstore-pc-storefront'
@@ -134,6 +137,9 @@ export function AppstorePcRoutes({
             <Route path="mcp" element={<McpPage searchQuery="" />} />
             <Route path="templates" element={<TemplatesPage searchQuery="" />} />
             <Route path="demands" element={<DemandsPage searchQuery="" />} />
+            <Route path="demands/my-claims" element={<DemandClaimsPage />} />
+            <Route path="demands/my-claims/:claimId" element={<DemandClaimDetailPage />} />
+            <Route path="demands/:demandId" element={<DemandDetailPage />} />
             <Route path="template/:id" element={<TemplateDetailPage />} />
             <Route path="templates/:id" element={<TemplateDetailPage />} />
             <Route path="api-market" element={<ApiMarketPage />} />

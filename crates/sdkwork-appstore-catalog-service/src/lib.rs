@@ -16,14 +16,14 @@ pub use domain::commands::{
     HomeRetrieveRequest, ListingsSearchRequest, MetricsRetrieveRequest, PublicFeaturedListRequest,
     RecentlyUpdatedListRequest, RecommendationsListRequest, SearchHistoryClearRequest,
     SearchHistoryListRequest, SearchHistoryUpsertRequest, SearchSuggestionsListRequest,
-    SearchTrendingListRequest,
+    SearchTrendingListRequest, TemplateSuggestionsRetrieveRequest,
 };
 pub use domain::models::{
     AudienceScope, CatalogChartSnapshot, CatalogCollection, CatalogCollectionItem,
     CatalogCollectionLocalization, CatalogFeaturedSlot, Category, CategoryId, CategoryLocalization,
     CategoryStatus, CategoryWithLocalizations, CollectionId, CollectionStatus, CollectionType,
     CollectionWithItems, FeaturedSlotId, FeaturedSlotStatus, ListingMetricSnapshot, ListingSummary,
-    PlatformScope, SearchHistoryEntry, SearchSuggestion, TrendingTerm,
+    PlatformScope, SearchHistoryEntry, SearchSuggestion, TemplateSuggestions, TrendingTerm,
 };
 pub use domain::results::{
     CategoriesListResult, CategoryCreateResult, CategoryRetrieveResult, CategoryUpdateResult,
@@ -33,10 +33,10 @@ pub use domain::results::{
     ListingsSearchResult, MetricsRetrieveResult, PublicFeaturedListResult,
     RecentlyUpdatedListResult, RecommendationsListResult, SearchHistoryClearResult,
     SearchHistoryListResult, SearchHistoryUpsertResult, SearchSuggestionsListResult,
-    SearchTrendingListResult,
+    SearchTrendingListResult, TemplateSuggestionsRetrieveResult,
 };
 pub use error::{AppstoreServiceError, AppstoreServiceResult};
-pub use ports::repository::CatalogRepositoryPort;
+pub use ports::repository::{CatalogRepositoryPort, TemplateFeedOrder, TemplateFeedQuery};
 pub use service::catalog_service::{CatalogOperations, CatalogService};
 
 pub const CAPABILITY: &str = "catalog";

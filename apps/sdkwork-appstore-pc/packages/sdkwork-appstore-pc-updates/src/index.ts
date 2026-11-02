@@ -6,6 +6,7 @@ export {
   UpdatesTabNav,
   StorageStatsBanner,
   DownloadQueueCard,
+  DownloadQueuePanel,
   LibraryAppsGrid,
   ReleaseNotesSection,
 } from '@sdkwork/appstore-pc-storefront';

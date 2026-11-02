@@ -1031,6 +1031,28 @@ impl TemplateRetrieveRequest {
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
+pub struct TemplateSuggestionsRetrieveRequest {
+    pub template_id: String,
+    /// Per-rail page size. The service clamps it to the catalog's rail bound.
+    pub limit: Option<i32>,
+}
+
+impl TemplateSuggestionsRetrieveRequest {
+    pub fn new(template_id: impl Into<String>) -> Self {
+        Self {
+            template_id: template_id.into(),
+            limit: None,
+        }
+    }
+
+    pub fn with_limit(mut self, limit: i32) -> Self {
+        self.limit = Some(limit);
+        self
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct TemplateCreateRequest {
     pub template_code: Option<String>,
     pub template_name: String,

@@ -50,13 +50,24 @@ export const updates = {
     browseMarket: 'Browse Apps'
   },
   queue: {
-    title: 'Active Task Queue',
+    title: 'Download Task Queue',
     empty: 'No pending downloads or active updates',
     pauseAll: 'Pause All',
     resumeAll: 'Resume All',
     clearCompleted: 'Clear Completed Tasks',
+    remove: 'Remove record',
+    saved: 'Saved locally',
+    saveNow: 'Save installer',
     downloading: 'Downloading',
-    completed: 'Completed'
+    completed: 'Completed',
+    status: {
+      queued: 'Queued',
+      downloading: 'Downloading',
+      paused: 'Paused',
+      completed: 'Downloaded',
+      failed: 'Failed',
+      cancelled: 'Stopped'
+    }
   },
   pendingList: {
     title: 'Pending Updates List ({{count}})',

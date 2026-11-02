@@ -96,6 +96,7 @@ describe('appStore service artifact mapping', () => {
               architecture: 'x86_64',
               packageFormat: 'msi',
               fileSizeBytes: '52428800',
+              checksumSha256: 'sha256:abc123',
             },
           ],
         },
@@ -112,6 +113,7 @@ describe('appStore service artifact mapping', () => {
         architecture: 'x86_64',
         packageFormat: 'msi',
         fileSizeBytes: '52428800',
+        checksumSha256: 'sha256:abc123',
       },
     ]);
   });

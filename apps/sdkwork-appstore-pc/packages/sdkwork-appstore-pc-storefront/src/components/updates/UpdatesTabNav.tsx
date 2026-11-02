@@ -1,14 +1,15 @@
 import React from 'react';
-import { Download, FolderHeart, Sparkle } from 'lucide-react';
+import { Download, FolderHeart, ListTodo, Sparkle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-export type UpdatesTabType = 'downloads' | 'library' | 'new';
+export type UpdatesTabType = 'downloads' | 'queue' | 'library' | 'new';
 
 interface UpdatesTabNavProps {
   currentTab: UpdatesTabType;
   onSelectTab: (tab: UpdatesTabType) => void;
   pendingUpdatesCount: number;
   installedAppsCount: number;
+  queueCount?: number;
 }
 
 export const UpdatesTabNav: React.FC<UpdatesTabNavProps> = ({
@@ -16,6 +17,7 @@ export const UpdatesTabNav: React.FC<UpdatesTabNavProps> = ({
   onSelectTab,
   pendingUpdatesCount,
   installedAppsCount,
+  queueCount = 0,
 }) => {
   const { t } = useTranslation();
 
@@ -38,6 +40,27 @@ export const UpdatesTabNav: React.FC<UpdatesTabNavProps> = ({
             }`}
           >
             {pendingUpdatesCount}
+          </span>
+        )}
+      </button>
+
+      <button
+        onClick={() => onSelectTab('queue')}
+        className={`flex items-center gap-2 px-4 py-2 rounded-store-control text-xs font-medium transition-all cursor-pointer ${
+          currentTab === 'queue'
+            ? 'bg-store-brand text-white shadow-sm'
+            : 'text-store-ink-soft hover:bg-store-raised/60 dark:hover:bg-store-surface '
+        }`}
+      >
+        <ListTodo className="w-4 h-4" />
+        <span>{t('updates.tabs.queue')}</span>
+        {queueCount > 0 && (
+          <span
+            className={`px-1.5 py-0.2 text-[10px] rounded-full font-bold ${
+              currentTab === 'queue' ? 'bg-store-surface text-store-brand' : 'bg-store-raised text-store-ink-soft'
+            }`}
+          >
+            {queueCount}
           </span>
         )}
       </button>
@@ -77,4 +100,3 @@ export const UpdatesTabNav: React.FC<UpdatesTabNavProps> = ({
     </div>
   );
 };
-

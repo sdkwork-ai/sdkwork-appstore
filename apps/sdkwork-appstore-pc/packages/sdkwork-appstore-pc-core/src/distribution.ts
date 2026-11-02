@@ -5,6 +5,7 @@
  * distribution type carries on the PC storefront:
  *
  *   pcWeb / h5Web      -> `open`: direct open in a new independent window
+ *   h5Web              -> also `qr`: scan to preview the phone-first surface
  *   pcDesktop          -> `install`: download + install for the detected OS
  *   android/ios/harmonyos, miniprogram, browserExtension
  *                      -> `qr`: scan a QR code to continue on that device
@@ -110,9 +111,14 @@ function listingFallbackUrl(appId: string): string {
  *
  * Browser groups without an access URL still resolve as `open` actions with
  * an undefined url — callers keep the button but surface the missing link.
+ * The H5 group resolves to two actions: the desktop open link, and the mobile
+ * preview reached by scanning a code. H5 is a phone-first surface, so a PC
+ * visitor needs the scan path even when the page also opens in a new window;
+ * the scan target is the per-platform `h5` link when the app publishes one and
+ * the access URL otherwise.
  * @param app - listing item (platform codes + access URL).
  * @param detectedOs - host desktop OS for install ordering; detected on demand.
- * @returns one action per supported distribution group.
+ * @returns every action of every supported distribution group.
  */
 export function resolveDistributionActions(
   app: Pick<AppItem, 'platforms' | 'accessUrl' | 'platformLinks' | 'id'>,
@@ -124,17 +130,38 @@ export function resolveDistributionActions(
   }
   const os = detectedOs === undefined ? detectDesktopOs() : detectedOs;
   const desktopCodes = desktopInstallCodes(app.platforms, os);
-  return groups.map((group) => {
-    if (group === 'pcWeb' || group === 'h5Web') {
-      return { group, kind: 'open', platformCodes: [], url: app.accessUrl };
+  const actions: DistributionAction[] = [];
+  for (const group of groups) {
+    if (group === 'pcWeb') {
+      actions.push({ group, kind: 'open', platformCodes: [], url: app.accessUrl });
+      continue;
+    }
+    if (group === 'h5Web') {
+      actions.push({ group, kind: 'open', platformCodes: [], url: app.accessUrl });
+      const code = firstCodeForGroup(app.platforms ?? [], group);
+      const qrUrl = (code && app.platformLinks?.[code]) || app.accessUrl;
+      actions.push({
+        group,
+        kind: 'qr',
+        platformCodes: [],
+        url: qrUrl ?? listingFallbackUrl(app.id),
+      });
+      continue;
     }
     if (group === 'pcDesktop') {
-      return { group, kind: 'install', platformCodes: desktopCodes };
+      actions.push({ group, kind: 'install', platformCodes: desktopCodes });
+      continue;
     }
     const code = firstCodeForGroup(app.platforms ?? [], group);
     const qrUrl = (code && app.platformLinks?.[code]) || app.accessUrl;
-    return { group, kind: 'qr', platformCodes: [], url: qrUrl ?? listingFallbackUrl(app.id) };
-  });
+    actions.push({
+      group,
+      kind: 'qr',
+      platformCodes: [],
+      url: qrUrl ?? listingFallbackUrl(app.id),
+    });
+  }
+  return actions;
 }
 
 /** Primary-action priority on the PC storefront: instant open, then install, then QR. */

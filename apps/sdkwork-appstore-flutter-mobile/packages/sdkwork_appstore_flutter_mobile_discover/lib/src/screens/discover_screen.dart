@@ -51,8 +51,9 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
       appBar: AppBar(
         title: Text(discoverMessages['titleZh'] ?? discoverMessages['title'] ?? '发现'),
         actions: <Widget>[
-          // Creation hub: new app / new website / new promo app, each carrying
-          // its store application type into the publisher create flow.
+          // Creation hub: new app / new website / new game / festival greeting /
+          // new promo app, each carrying its store application type into the
+          // publisher create flow.
           PopupMenuButton<String>(
             tooltip: '新建',
             icon: Icon(
@@ -79,6 +80,24 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                   leading: Icon(Icons.language),
                   title: Text('新建官网'),
                   subtitle: Text('搭建并发布官方网站'),
+                ),
+              ),
+              PopupMenuItem<String>(
+                value: 'game',
+                child: ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: Icon(Icons.sports_esports),
+                  title: Text('创建游戏'),
+                  subtitle: Text('创建一个可在应用商店运行的游戏'),
+                ),
+              ),
+              PopupMenuItem<String>(
+                value: 'festival',
+                child: ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: Icon(Icons.celebration),
+                  title: Text('创建节日祝福'),
+                  subtitle: Text('制作节日祝福海报或互动贺卡'),
                 ),
               ),
               PopupMenuItem<String>(

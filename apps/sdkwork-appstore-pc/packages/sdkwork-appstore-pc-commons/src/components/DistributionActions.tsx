@@ -10,7 +10,7 @@ interface DistributionActionsProps {
   app: AppItem
   /** Handle a web/H5 open action (new independent window). */
   onOpen: (action: DistributionAction) => void
-  /** Handle a scan-to-continue action (mobile, mini program, extension). */
+  /** Handle a scan-to-continue action (H5, mobile, mini program, extension). */
   onQr: (app: AppItem, action: DistributionAction) => void
   className?: string
 }
@@ -19,6 +19,7 @@ const GROUP_QR_KEY: Partial<Record<DistributionAction['group'], string>> = {
   android: 'qrAndroid',
   ios: 'qrIos',
   harmonyos: 'qrHarmonyos',
+  h5Web: 'qrH5',
   miniprogram: 'qrMiniprogram',
   browserExtension: 'qrBrowserExtension',
 }
@@ -55,7 +56,7 @@ export function DistributionActions({ app, onOpen, onQr, className }: Distributi
               : t('common.distribution.openPcWeb')
           return (
             <button
-              key={action.group}
+              key={`${action.group}:${action.kind}`}
               type="button"
               title={action.url ?? t('common.distribution.missingUrl')}
               onClick={() => onOpen(action)}
@@ -68,7 +69,7 @@ export function DistributionActions({ app, onOpen, onQr, className }: Distributi
         }
         return (
           <button
-            key={action.group}
+            key={`${action.group}:${action.kind}`}
             type="button"
             onClick={() => onQr(app, action)}
             className={`${buttonClass} bg-violet-500/10 text-violet-600 dark:text-violet-400 border-violet-500/20 hover:bg-violet-500/20`}

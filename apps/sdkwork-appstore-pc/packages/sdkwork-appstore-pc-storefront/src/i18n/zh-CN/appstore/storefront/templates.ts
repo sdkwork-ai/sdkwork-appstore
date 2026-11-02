@@ -24,10 +24,17 @@ export const templates = {
   },
   platforms: {
     all: '全部平台',
-    h5: 'H5',
-    pc: 'PC',
-    flutter: 'Flutter',
-    miniprogram: '小程序'
+    pc: 'PC 应用',
+    pad: '平板应用',
+    h5: 'H5 应用',
+    staticWeb: '静态网站',
+    flutter: 'Flutter 移动应用',
+    miniprogram: '小程序',
+    android: 'Android 应用',
+    ios: 'iOS 应用',
+    harmony: 'HarmonyOS 应用',
+    uniapp: 'uni-app 跨端应用',
+    unity: 'Unity 应用'
   },
   form: {
     selectApp: '选择要提取发布的目标应用项目',
@@ -72,6 +79,21 @@ export const templates = {
     officialRec: '官方推荐'
   },
   detail: {
+    backToLibrary: '应用模板库',
+    notFoundTitle: '模板不存在或已下架',
+    notFoundHint: '该模板可能已被删除，请返回模板库重新选择。',
+    scanAction: '手机扫码体验',
+    scanTitle: '扫码在手机上体验',
+    scanHint: '使用手机相机或微信扫码，即可打开该模板的移动端体验。',
+    scanSourceDemo: '模板作者的在线体验地址',
+    scanSourceApp: '该模板构建的应用移动端入口',
+    sections: {
+      latest: '最新模板',
+      related: '相关模板',
+      recommended: '推荐模板',
+      loading: '加载中...',
+      empty: '暂无模板'
+    },
     clonedSuccess: '已成功克隆到工作区',
     forking: '正在创建分支...',
     forkBtn: 'Fork / 使用此模板',

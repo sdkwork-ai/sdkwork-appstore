@@ -3,7 +3,7 @@ import { createClient as createGeneratedClient, SdkworkAppstoreAppClient } from 
 import type { AuthTokenManager } from '../generated/server-openapi/src/auth/index';
 import type { SdkworkAppConfig } from '../generated/server-openapi/src/types/common';
 import type {
-  AppTemplateCreateRequest, AppTemplateUsageCreateRequest, CompliancePermissionUpdateRequest,
+  AppTemplate, AppTemplateCreateRequest, AppTemplateUsageCreateRequest, CompliancePermissionUpdateRequest,
   ComplianceProfileUpdateRequest, DownloadGrantCreateRequest,
   FeedbackCreateRequest, LibraryInstallRequest, LibraryUninstallRequest,
   LibraryUpdatesCheckRequest, ListingCategoryBindRequest, ListingCreateRequest,
@@ -82,9 +82,11 @@ function createCatalogFacade(client: SdkworkAppstoreAppClient) {
     listSearchHistory: (p?: { cursor?: string; limit?: number }) => api.search.history.list(pageParams(p)),
     upsertSearchHistory: (body: SearchHistoryUpsertRequest) => api.search.history.update(body),
     clearSearchHistory: () => api.search.history.delete(),
-    listTemplates: (p?: { q?: string; categoryCode?: string; templateType?: 'APP' | 'PLUGIN' | 'AGENT' | 'EXPERT'; templatePlatform?: 'H5' | 'PC' | 'FLUTTER' | 'MINIPROGRAM'; cursor?: string; limit?: number }) =>
+    listTemplates: (p?: { q?: string; categoryCode?: string; templateType?: 'APP' | 'PLUGIN' | 'AGENT' | 'EXPERT'; templatePlatform?: AppTemplate['templatePlatform']; cursor?: string; limit?: number }) =>
       api.templates.list(omitUndefined({ q: p?.q, categoryCode: p?.categoryCode, templateType: p?.templateType, templatePlatform: p?.templatePlatform, cursor: p?.cursor, pageSize: p?.limit })),
     getTemplate: (id: string) => api.templates.retrieve(id),
+    listTemplateSuggestions: (id: string, limit?: number) =>
+      api.templates.suggestions.retrieve(id, omitUndefined({ pageSize: limit })),
     createTemplate: (body: AppTemplateCreateRequest) => api.templates.create(body, commandOptions()),
     recordTemplateUsage: (id: string, body: AppTemplateUsageCreateRequest) =>
       api.templates.usage.create(id, body, commandOptions()),

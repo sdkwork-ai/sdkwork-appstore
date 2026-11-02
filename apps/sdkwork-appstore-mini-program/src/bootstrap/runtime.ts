@@ -800,13 +800,14 @@ function createPageLoaders(getClient: () => AppstoreAppClient) {
 
     /**
      * Publisher: bootstrap a new app draft (publishers domain, auth required).
-     * `appType` presets the store application type (APP | WEBSITE | PROMO)
-     * selected from the creation hub.
+     * `appType` is a canonical PlusProjectType value (`APP_REACT` | `APP_HTML`
+     * | `VIDEO`) resolved from the creation-hub preset; the preset itself is
+     * never stored as the application type (`APP_ASSETS_SPEC.md` section 5.3).
      */
     async createPublisherApp(input: {
       displayName: string;
       appKey: string;
-      appType: 'APP' | 'WEBSITE' | 'PROMO';
+      appType: 'APP_REACT' | 'APP_HTML' | 'VIDEO';
     }): Promise<{ listingId: string; displayName: string; status: string }> {
       const result = await getClient().publishers.bootstrapApp({
         appKey: input.appKey,

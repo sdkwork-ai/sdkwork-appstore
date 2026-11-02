@@ -11,6 +11,7 @@ import { UpdatesEmptyState } from '../components/updates/UpdatesEmptyState';
 import { UpdatesTabNav, UpdatesTabType } from '../components/updates/UpdatesTabNav';
 import { StorageStatsBanner } from '../components/updates/StorageStatsBanner';
 import { DownloadQueueCard } from '../components/updates/DownloadQueueCard';
+import { DownloadQueuePanel } from '../components/updates/DownloadQueuePanel';
 import { LibraryAppsGrid } from '../components/updates/LibraryAppsGrid';
 import { ReleaseNotesSection } from '../components/updates/ReleaseNotesSection';
 import { useInstall } from '../providers/InstallProvider';
@@ -30,9 +31,14 @@ export default function Updates() {
     installedAppIds,
     uninstallApp,
     openApp,
-    activeDownloadApp,
-    downloadState,
-    downloadProgress
+    downloads,
+    pauseDownload,
+    resumeDownload,
+    cancelDownload,
+    retryDownload,
+    removeDownload,
+    clearCompletedDownloads,
+    saveDownload,
   } = useInstall();
 
   useEffect(() => {
@@ -93,6 +99,11 @@ export default function Updates() {
   }
 
   const installedApps = allApps.filter(a => installedAppIds.has(a.id));
+  const activeDownloads = downloads.filter(
+    (task) => task.status === 'queued' || task.status === 'downloading' || task.status === 'paused',
+  );
+  const leadingDownload = activeDownloads[0] ?? null;
+  const queueCount = activeDownloads.length;
 
   // Real release notes: pending-update apps carry the latest release notes;
   // installed apps without pending updates keep their listing summary.
@@ -117,6 +128,7 @@ export default function Updates() {
         onSelectTab={(tab) => setSearchParams({ tab })}
         pendingUpdatesCount={appsWithUpdates.length}
         installedAppsCount={installedApps.length}
+        queueCount={queueCount}
       />
 
       {/* Tab Content: Downloads & Management */}
@@ -132,13 +144,18 @@ export default function Updates() {
           {/* Sub-component: System Storage & Queue Banner */}
           <StorageStatsBanner installedAppsCount={installedApps.length} />
 
-          {/* Sub-component: Active Downloading Task Queue */}
-          {activeDownloadApp && (
+          {/* Sub-component: Leading active download task */}
+          {leadingDownload && (
             <DownloadQueueCard
-              app={activeDownloadApp}
-              downloadState={downloadState}
-              progress={downloadProgress(activeDownloadApp.id)}
-              onOpenApp={openApp}
+              task={leadingDownload}
+              onPause={pauseDownload}
+              onResume={resumeDownload}
+              onCancel={cancelDownload}
+              onRetry={retryDownload}
+              onRemove={removeDownload}
+              onSave={(taskId) => {
+                void saveDownload(taskId);
+              }}
             />
           )}
 
@@ -166,6 +183,22 @@ export default function Updates() {
         </div>
       )}
 
+      {/* Tab Content: Download Center Queue */}
+      {currentTab === 'queue' && (
+        <DownloadQueuePanel
+          tasks={downloads}
+          onPause={pauseDownload}
+          onResume={resumeDownload}
+          onCancel={cancelDownload}
+          onRetry={retryDownload}
+          onRemove={removeDownload}
+          onClearCompleted={clearCompletedDownloads}
+          onSave={(taskId) => {
+            void saveDownload(taskId);
+          }}
+        />
+      )}
+
       {/* Tab Content: My Application Library */}
       {currentTab === 'library' && (
         <LibraryAppsGrid
@@ -182,4 +215,3 @@ export default function Updates() {
     </div>
   );
 }
-

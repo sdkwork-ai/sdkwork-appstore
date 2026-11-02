@@ -40,9 +40,9 @@ The storefront resolves one action per distribution of a listing
 
 | Distribution | Platform codes | Action |
 | --- | --- | --- |
-| PC desktop | `windows` `macos` `linux` | OS-aware download + install: the modal matches the detected OS, shows the verified artifact (format + size), issues and consumes a download grant, and opens the presigned installer URL in a new independent window. |
+| PC desktop | `windows` `macos` `linux` | OS-aware install: the modal matches the detected OS, shows the verified artifact (format + size), issues and consumes a download grant, and queues the presigned installer in the local download center. |
 | PC web | `web` `web-pc` `pwa` | Direct open in a new independent window (`noopener`). |
-| H5 web | `h5` `web-h5` `mobile-web` | Direct open in a new independent window (`noopener`). |
+| H5 web | `h5` `web-h5` `mobile-web` | Direct open in a new independent window (`noopener`) **and** a scan-to-preview QR dialog, so a phone-first surface can be experienced on a phone from the PC storefront. |
 | Mobile | `android` `ios` `harmonyos` | Scan-to-continue QR dialog labelled with the scanned platform. |
 | Mini programs | `miniprogram-*` | Scan-to-continue QR dialog. |
 | Browser extensions | `browser-extension-*` | Scan-to-continue QR dialog. |
@@ -62,6 +62,29 @@ delivers the presigned URL when the drive integration is enabled
 (`APPSTORE_DRIVE_*` environment; without it the install record stands
 alone).
 
+## Local installer downloads
+
+`packages/sdkwork-appstore-pc-core/src/download/` owns a framework-free
+`DownloadCenter` used by both the install dialog and the Updates download
+queue:
+
+- **Queue** — installs and plain build downloads enter one FIFO queue with a
+  single active transfer; each task reports queued, downloading, paused,
+  completed, failed, or cancelled.
+- **Resume** — bytes and metadata persist in IndexedDB. A transfer reads
+  `Content-Range`, persists every received chunk, and resumes with
+  `Range: bytes=<received>-` plus `If-Range`; a server that ignores the range
+  restarts cleanly instead of stitching two representations. Interrupted
+  tasks resume after a reload from the first missing byte.
+- **Pause / resume / stop / retry** — pausing aborts the active request while
+  keeping persisted bytes; stop discards them; retry resumes a failed task
+  and re-mints an expired presigned URL through the install port.
+- **Local hand-off** — a completed task is saved through the BirdCoder
+  trusted-window save bridge when present, otherwise through a browser anchor
+  download. The completed library record is written only after the installer
+  reaches local storage, so a failed save never reports a successful install.
+
+
 ## Initialization data
 
 `database/seeds/` follows the shared database initialization standard
@@ -77,7 +100,16 @@ with content. The storefront-relevant seed chain:
 - `011` — the platform dictionary (`appstore_platform_dictionary`).
 - `012` — distribution projections (`appstore_app.platforms`,
   `access_url`) across the catalog.
-- `013` — per-platform scan links (`appstore_app_platform`).
+- `018` — canonical application identity (`app_type`, `runtime_family`,
+  `runtime_framework`, `platforms`) and release distribution snapshots derived
+  from the declared delivery platforms.
+- `010` — the installer matrix: one verified artifact per declared operating
+  system and CPU architecture (Windows x64/arm64, macOS arm64/x64, Linux
+  x64/arm64, Android arm64/x64, iOS/iPadOS universal, HarmonyOS arm64),
+  entitlements, download grants, and install events. Web/H5/mini-program
+  listings carry no installer.
+- `013` — per-platform scan links (`appstore_app_platform`) for mobile stores,
+  H5 preview, mini programs, and browser extensions (`config_json.qrUrl`).
 
 Apply with the database CLI (from the repository root):
 

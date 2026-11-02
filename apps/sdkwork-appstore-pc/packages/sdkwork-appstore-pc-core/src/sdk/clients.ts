@@ -16,6 +16,10 @@ import {
   type SdkworkAppClient as CompanyAppClient,
 } from '@sdkwork/company-app-sdk';
 import {
+  createClient as createOrderAppClient,
+  type SdkworkAppClient as OrderAppClient,
+} from '@sdkwork/order-app-sdk';
+import {
   createClient as createAgentsAppClient,
   type SdkworkAppClient as AgentsAppClient,
   type AgentRuntimeExecutionRecord,
@@ -46,6 +50,7 @@ export type {
   DownloadGrant,
   McpAppClient,
   McpServerRecord,
+  OrderAppClient,
   SkillArtifactRecord,
   SkillInstallationRecord,
   SkillRecord,
@@ -61,6 +66,8 @@ export interface AppstorePcSdkClientInventory {
   mcp: McpAppClient;
   /** Anonymous open-api client (`/store/v3/api`); public share views. */
   open: AppStoreOpenClient;
+  /** Commerce order client: demand claims (抢单) and delivery lifecycle. */
+  order: OrderAppClient;
   sdkFamilies: {
     app: readonly string[];
   };
@@ -75,6 +82,7 @@ export interface AppstorePcSdkBaseUrls {
   companyAppApiBaseUrl: string;
   iamAppApiBaseUrl: string;
   mcpAppApiBaseUrl: string;
+  orderAppApiBaseUrl: string;
   skillsAppApiBaseUrl: string;
 }
 
@@ -106,6 +114,12 @@ export function createAppstorePcSdkClients(
     platform: 'pc',
     tokenManager,
   });
+  const order = createOrderAppClient({
+    authMode: 'dual-token',
+    baseUrl: normalizeGeneratedSdkBaseUrl(config.orderAppApiBaseUrl, '/app/v3/api'),
+    platform: 'pc',
+    tokenManager,
+  });
   const skills = createSkillsAppClient({
     authMode: 'dual-token',
     baseUrl: normalizeGeneratedSdkBaseUrl(config.skillsAppApiBaseUrl, '/app/v3/api'),
@@ -131,6 +145,7 @@ export function createAppstorePcSdkClients(
     company,
     mcp,
     open,
+    order,
     sdkFamilies: {
       app: [
         'sdkwork-appstore-app-sdk',
@@ -141,6 +156,7 @@ export function createAppstorePcSdkClients(
         'sdkwork-mcp-app-sdk',
         'sdkwork-comments-app-sdk',
         'sdkwork-company-app-sdk',
+        'sdkwork-order-app-sdk',
       ],
     },
     skills,

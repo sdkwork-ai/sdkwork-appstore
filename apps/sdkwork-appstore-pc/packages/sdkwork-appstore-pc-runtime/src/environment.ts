@@ -21,6 +21,8 @@ export interface AppstorePcRuntimeConfig {
   iamAppApiBaseUrl: string;
   locale: string;
   mcpAppApiBaseUrl: string;
+  /** Commerce order API origin; demand claims (抢单) live there. */
+  orderAppApiBaseUrl: string;
   runtimeTarget: AppstorePcRuntimeTarget;
   skillsAppApiBaseUrl: string;
 }
@@ -58,6 +60,7 @@ export interface AppstorePcRuntimeConfigOverrides {
   backendApiBaseUrl?: string
   iamAppApiBaseUrl?: string
   mcpAppApiBaseUrl?: string
+  orderAppApiBaseUrl?: string
   skillsAppApiBaseUrl?: string
   locale?: string
   deploymentProfile?: AppstorePcDeploymentProfile
@@ -117,6 +120,8 @@ export function resolveAppstorePcRuntimeConfig(
     locale: overrides.locale ?? readEnv('VITE_SDKWORK_APPSTORE_DEFAULT_LOCALE') ?? 'zh-CN',
     mcpAppApiBaseUrl:
       overrides.mcpAppApiBaseUrl ?? readEnv('VITE_SDKWORK_MCP_APP_API_BASE_URL') ?? platformApiGatewayUrl,
+    orderAppApiBaseUrl:
+      overrides.orderAppApiBaseUrl ?? readEnv('VITE_SDKWORK_ORDER_APP_API_BASE_URL') ?? platformApiGatewayUrl,
     runtimeTarget: overrides.runtimeTarget ?? runtimeTarget,
     skillsAppApiBaseUrl:
       overrides.skillsAppApiBaseUrl ?? readEnv('VITE_SDKWORK_SKILLS_APP_API_BASE_URL') ?? platformApiGatewayUrl,
