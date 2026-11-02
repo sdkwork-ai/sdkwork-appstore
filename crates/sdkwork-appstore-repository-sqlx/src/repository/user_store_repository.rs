@@ -230,7 +230,7 @@ impl UserStoreRepositoryPort for SqlxUserStoreRepository {
                 r#"UPDATE appstore_user_category SET
                 name = ?, description = ?, icon_media_resource_id = ?,
                 sort_order = ?, category_status = ?, updated_at = ?
-            WHERE id = ? AND tenant_id = ?"#,
+            WHERE id = ? AND tenant_id = ? AND organization_id = ?"#,
             )
             .bind(&category.name)
             .bind(&category.description)
@@ -240,6 +240,7 @@ impl UserStoreRepositoryPort for SqlxUserStoreRepository {
             .bind(category.updated_at)
             .bind(&category.id)
             .bind(&context.tenant_id)
+            .bind(&context.organization_id)
             .execute_unified(&self.db)
             .await
             .map_err(db_error)?;
@@ -253,17 +254,19 @@ impl UserStoreRepositoryPort for SqlxUserStoreRepository {
     ) -> Result<(), AppstoreServiceError> {
         self.db
             .query(
-                "DELETE FROM appstore_user_category_item WHERE tenant_id = ? AND user_category_id = ?",
+                "DELETE FROM appstore_user_category_item WHERE tenant_id = ? AND organization_id = ? AND user_category_id = ?",
             )
             .bind(&context.tenant_id)
+            .bind(&context.organization_id)
             .bind(category_id.as_str())
             .execute_unified(&self.db)
             .await
             .map_err(db_error)?;
 
         self.db
-            .query("DELETE FROM appstore_user_category WHERE tenant_id = ? AND id = ?")
+            .query("DELETE FROM appstore_user_category WHERE tenant_id = ? AND organization_id = ? AND id = ?")
             .bind(&context.tenant_id)
+            .bind(&context.organization_id)
             .bind(category_id.as_str())
             .execute_unified(&self.db)
             .await
@@ -427,13 +430,14 @@ impl UserStoreRepositoryPort for SqlxUserStoreRepository {
             .query(
                 r#"UPDATE appstore_user_category_item SET
                 note = ?, sort_order = ?, updated_at = ?
-            WHERE id = ? AND tenant_id = ?"#,
+            WHERE id = ? AND tenant_id = ? AND organization_id = ?"#,
             )
             .bind(&item.note)
             .bind(item.sort_order)
             .bind(item.updated_at)
             .bind(&item.id)
             .bind(&context.tenant_id)
+            .bind(&context.organization_id)
             .execute_unified(&self.db)
             .await
             .map_err(db_error)?;
@@ -446,9 +450,10 @@ impl UserStoreRepositoryPort for SqlxUserStoreRepository {
         item_id: &UserCategoryItemId,
     ) -> Result<(), AppstoreServiceError> {
         self.db
-            .query("DELETE FROM appstore_user_category_item WHERE id = ? AND tenant_id = ?")
+            .query("DELETE FROM appstore_user_category_item WHERE id = ? AND tenant_id = ? AND organization_id = ?")
             .bind(item_id.as_str())
             .bind(&context.tenant_id)
+            .bind(&context.organization_id)
             .execute_unified(&self.db)
             .await
             .map_err(db_error)?;
