@@ -222,7 +222,7 @@ impl sdkwork_appstore_market_service::ports::repository::MarketRepositoryPort
             UPDATE appstore_market_channel
             SET channel_type = ?, provider = ?, channel_status = ?, external_store_code = ?,
                 api_capability_json = ?, config_json = ?, updated_at = ?
-            WHERE id = ? AND tenant_id = ?
+            WHERE id = ? AND tenant_id = ? AND organization_id = ?
             "#,
             )
             .bind(&channel_type)
@@ -234,6 +234,7 @@ impl sdkwork_appstore_market_service::ports::repository::MarketRepositoryPort
             .bind(channel.updated_at)
             .bind(channel.id.as_str())
             .bind(&context.tenant_id)
+            .bind(&context.organization_id)
             .execute_unified(&self.db)
             .await
             .map_err(|e| AppstoreServiceError::Internal(format!("Database error: {}", e)))?;
@@ -348,7 +349,7 @@ impl sdkwork_appstore_market_service::ports::repository::MarketRepositoryPort
             SET market_status = ?, rollout_percent = ?, countries_json = ?, store_url = ?,
                 external_status_json = ?, submitted_at = ?, approved_at = ?, released_at = ?,
                 rejected_at = ?, last_synced_at = ?, updated_at = ?
-            WHERE id = ? AND tenant_id = ?
+            WHERE id = ? AND tenant_id = ? AND organization_id = ?
             "#,
             )
             .bind(&market_status)
@@ -364,6 +365,7 @@ impl sdkwork_appstore_market_service::ports::repository::MarketRepositoryPort
             .bind(release.updated_at)
             .bind(release.id.as_str())
             .bind(&context.tenant_id)
+            .bind(&context.organization_id)
             .execute_unified(&self.db)
             .await
             .map_err(|e| AppstoreServiceError::Internal(format!("Database error: {}", e)))?;

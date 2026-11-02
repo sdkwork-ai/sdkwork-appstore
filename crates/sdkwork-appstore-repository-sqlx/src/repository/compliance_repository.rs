@@ -156,7 +156,7 @@ impl sdkwork_appstore_compliance_service::ports::repository::ComplianceRepositor
             SET privacy_nutrition_json = ?, content_rating_questionnaire_json = ?,
                 data_safety_json = ?, target_audience_json = ?, compliance_status = ?,
                 reviewed_by = ?, reviewed_at = ?, updated_at = ?
-            WHERE id = ? AND tenant_id = ?
+            WHERE id = ? AND tenant_id = ? AND organization_id = ?
             "#,
             )
             .bind(&privacy_nutrition_json)
@@ -169,6 +169,7 @@ impl sdkwork_appstore_compliance_service::ports::repository::ComplianceRepositor
             .bind(profile.updated_at)
             .bind(profile.id.as_str())
             .bind(&context.tenant_id)
+            .bind(&context.organization_id)
             .execute_unified(&self.db)
             .await
             .map_err(|e| AppstoreServiceError::Internal(format!("Database error: {}", e)))?;
@@ -283,7 +284,7 @@ impl sdkwork_appstore_compliance_service::ports::repository::ComplianceRepositor
                 r#"
             UPDATE appstore_compliance_permission_disclosure
             SET usage_purpose = ?, is_required = ?, disclosure_status = ?, updated_at = ?
-            WHERE id = ? AND tenant_id = ?
+            WHERE id = ? AND tenant_id = ? AND organization_id = ?
             "#,
             )
             .bind(&disclosure.usage_purpose)
@@ -292,6 +293,7 @@ impl sdkwork_appstore_compliance_service::ports::repository::ComplianceRepositor
             .bind(disclosure.updated_at)
             .bind(&disclosure.id)
             .bind(&context.tenant_id)
+            .bind(&context.organization_id)
             .execute_unified(&self.db)
             .await
             .map_err(|e| AppstoreServiceError::Internal(format!("Database error: {}", e)))?;
