@@ -471,12 +471,13 @@ impl UserStoreRepositoryPort for SqlxUserStoreRepository {
                 .query(
                     r#"UPDATE appstore_user_category_item
                 SET sort_order = ?, updated_at = ?
-                WHERE id = ? AND tenant_id = ? AND user_category_id = ?"#,
+                WHERE id = ? AND tenant_id = ? AND organization_id = ? AND user_category_id = ?"#,
                 )
                 .bind(position as i32)
                 .bind(chrono::Utc::now())
                 .bind(item_id)
                 .bind(&context.tenant_id)
+                .bind(&context.organization_id)
                 .bind(category_id.as_str())
                 .execute_unified(&self.db)
                 .await
