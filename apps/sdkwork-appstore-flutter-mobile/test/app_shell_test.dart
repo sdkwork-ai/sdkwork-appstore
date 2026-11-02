@@ -23,6 +23,21 @@ void main() {
     expect(find.text('搜索'), findsWidgets);
     expect(find.text('库'), findsWidgets);
 
+    final destinations = tester
+        .widgetList<NavigationDestination>(find.byType(NavigationDestination))
+        .toList();
+    expect(destinations, hasLength(5));
+    expect((destinations[0].icon as Icon).icon, Icons.explore_outlined);
+    expect((destinations[0].selectedIcon as Icon).icon, Icons.explore);
+    expect((destinations[1].icon as Icon).icon, Icons.widgets_outlined);
+    expect((destinations[1].selectedIcon as Icon).icon, Icons.widgets);
+    expect((destinations[2].icon as Icon).icon, Icons.sports_esports_outlined);
+    expect((destinations[2].selectedIcon as Icon).icon, Icons.sports_esports);
+    expect((destinations[3].icon as Icon).icon, Icons.find_in_page_outlined);
+    expect((destinations[3].selectedIcon as Icon).icon, Icons.find_in_page);
+    expect((destinations[4].icon as Icon).icon, Icons.download_outlined);
+    expect((destinations[4].selectedIcon as Icon).icon, Icons.download);
+
     // The store feed rides the generated Dart SDK transport; without a
     // reachable gateway the per-rail degradation renders the empty-store
     // state, and no demo content is ever injected.
@@ -33,7 +48,8 @@ void main() {
     WidgetTester tester,
   ) async {
     final runtime = await bootstrap();
-    await tester.pumpWidget(AppstoreApp(runtime: runtime, initialRoute: '/app/1234567890123456789'));
+    await tester.pumpWidget(AppstoreApp(
+        runtime: runtime, initialRoute: '/app/1234567890123456789'));
     await tester.pumpAndSettle();
 
     // The detail screen renders; the transport-gated data area shows the
@@ -48,7 +64,8 @@ void main() {
   ) async {
     final runtime = await bootstrap();
     getIamRuntime().clearSession();
-    await tester.pumpWidget(AppstoreApp(runtime: runtime, initialRoute: '/library'));
+    await tester
+        .pumpWidget(AppstoreApp(runtime: runtime, initialRoute: '/library'));
     await tester.pumpAndSettle();
 
     expect(find.byType(TextField), findsNWidgets(2));

@@ -14,7 +14,8 @@ typedef AppstoreRouteScreenBuilder = Widget Function(
 );
 
 /// Authentication check for `auth: required` routes.
-typedef AppstoreRouteAuthGuard = bool Function(SdkworkUiRouteContribution route);
+typedef AppstoreRouteAuthGuard = bool Function(
+    SdkworkUiRouteContribution route);
 
 /// Login callback for `auth: required` routes.
 typedef AppstoreRouteLoginHandler = Future<void> Function(
@@ -29,12 +30,14 @@ class AppstoreTabSpec {
     required this.path,
     required this.label,
     required this.icon,
+    required this.selectedIcon,
   });
 
   final String routeId;
   final String path;
   final String label;
   final IconData icon;
+  final IconData selectedIcon;
 }
 
 /// Canonical-route resolver for the application navigator.
@@ -62,7 +65,8 @@ class AppstoreRouteStack {
   final AppstoreRouteLoginHandler? loginHandler;
 
   Map<String, int> get _tabPaths => <String, int>{
-        for (var index = 0; index < tabs.length; index++) tabs[index].path: index,
+        for (var index = 0; index < tabs.length; index++)
+          tabs[index].path: index,
       };
 
   /// `MaterialApp.onGenerateRoute` implementation.
@@ -76,7 +80,9 @@ class AppstoreRouteStack {
       );
     }
     final guard = authGuard;
-    if (match.route.auth == 'required' && guard != null && !guard(match.route)) {
+    if (match.route.auth == 'required' &&
+        guard != null &&
+        !guard(match.route)) {
       return MaterialPageRoute<void>(
         settings: settings,
         builder: (BuildContext context) => _AppstoreAuthRequiredScreen(
@@ -89,7 +95,8 @@ class AppstoreRouteStack {
     if (builder == null) {
       return MaterialPageRoute<void>(
         settings: settings,
-        builder: (BuildContext context) => _AppstoreMissingScreen(routeId: match.route.id),
+        builder: (BuildContext context) =>
+            _AppstoreMissingScreen(routeId: match.route.id),
       );
     }
     final tabIndex = _tabPaths[name];
@@ -99,7 +106,8 @@ class AppstoreRouteStack {
         builder: (BuildContext context) => AppstoreTabShell(
           tabs: tabs,
           initialIndex: tabIndex,
-          buildTabScreen: (BuildContext context, int index) => _buildTabScreen(context, index),
+          buildTabScreen: (BuildContext context, int index) =>
+              _buildTabScreen(context, index),
         ),
       );
     }
@@ -164,10 +172,15 @@ class _AppstoreTabShellState extends State<AppstoreTabShell> {
       ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _currentIndex,
-        onDestinationSelected: (int index) => setState(() => _currentIndex = index),
+        onDestinationSelected: (int index) =>
+            setState(() => _currentIndex = index),
         destinations: <Widget>[
           for (final tab in widget.tabs)
-            NavigationDestination(icon: Icon(tab.icon), label: tab.label),
+            NavigationDestination(
+              icon: Icon(tab.icon),
+              selectedIcon: Icon(tab.selectedIcon),
+              label: tab.label,
+            ),
         ],
       ),
     );
@@ -235,8 +248,7 @@ class _AppstoreAuthRequiredScreenState
       }
     } catch (error) {
       if (mounted) {
-        setState(() =>
-            _error = '登录失败，请检查账号密码后重试');
+        setState(() => _error = '登录失败，请检查账号密码后重试');
       }
     } finally {
       if (mounted) setState(() => _submitting = false);

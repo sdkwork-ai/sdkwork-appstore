@@ -57,7 +57,8 @@ class AppstoreMobileRuntime {
         libraryService = LibraryService(clients: sdkClients),
         updatesService = UpdatesService(clients: sdkClients),
         wishlistService = WishlistService(clients: sdkClients),
-        userStoreService = UserStoreService(clients: sdkClients, openClient: openClient),
+        userStoreService =
+            UserStoreService(clients: sdkClients, openClient: openClient),
         publisherService = PublisherService(clients: sdkClients),
         settingsService = SettingsService(iamRuntime: getIamRuntime()) {
     getIamRuntime().bindTokenSink((AppstoreSession session) {
@@ -115,66 +116,81 @@ class AppstoreMobileRuntime {
           path: '/',
           label: '发现',
           icon: Icons.explore_outlined,
+          selectedIcon: Icons.explore,
         ),
         AppstoreTabSpec(
           routeId: 'app.store.apps.index',
           path: '/apps',
           label: '应用',
-          icon: Icons.apps,
+          icon: Icons.widgets_outlined,
+          selectedIcon: Icons.widgets,
         ),
         AppstoreTabSpec(
           routeId: 'app.store.games.index',
           path: '/games',
           label: '游戏',
           icon: Icons.sports_esports_outlined,
+          selectedIcon: Icons.sports_esports,
         ),
         AppstoreTabSpec(
           routeId: 'app.store.search.index',
           path: '/search',
           label: '搜索',
-          icon: Icons.search,
+          icon: Icons.find_in_page_outlined,
+          selectedIcon: Icons.find_in_page,
         ),
         AppstoreTabSpec(
           routeId: 'app.store.library.index',
           path: '/library',
           label: '库',
           icon: Icons.download_outlined,
+          selectedIcon: Icons.download,
         ),
       ];
 
   /// Canonical route id -> screen builder, composed from capability screens.
   Map<String, AppstoreRouteScreenBuilder> createScreenBuilders() {
     return <String, AppstoreRouteScreenBuilder>{
-      'app.store.discover.index': (BuildContext context, AppstoreRouteMatch match) =>
-          DiscoverScreen(service: discoverService),
-      'app.store.apps.index': (BuildContext context, AppstoreRouteMatch match) =>
-          AppsScreen(service: appsService),
-      'app.store.games.index': (BuildContext context, AppstoreRouteMatch match) =>
-          GamesScreen(service: gamesService),
-      'app.store.charts.index': (BuildContext context, AppstoreRouteMatch match) =>
-          ChartsScreen(service: chartsService),
-      'app.store.category.detail': (BuildContext context, AppstoreRouteMatch match) =>
-          CategoryScreen(
-            service: categoryService,
-            categoryId: match.params['id'] ?? '',
-          ),
-      'app.store.collection.detail': (BuildContext context, AppstoreRouteMatch match) =>
-          CollectionScreen(
-            service: collectionService,
-            collectionId: match.params['id'] ?? '',
-          ),
-      'app.store.ai-hub.index': (BuildContext context, AppstoreRouteMatch match) =>
-          AiHubScreen(service: aiHubService, screen: match.route.screen),
-      'app.store.ai-hub.experts': (BuildContext context, AppstoreRouteMatch match) =>
-          AiHubScreen(service: aiHubService, screen: match.route.screen),
-      'app.store.ai-hub.plugins': (BuildContext context, AppstoreRouteMatch match) =>
-          AiHubScreen(service: aiHubService, screen: match.route.screen),
-      'app.store.ai-hub.skills': (BuildContext context, AppstoreRouteMatch match) =>
-          AiHubScreen(service: aiHubService, screen: match.route.screen),
-      'app.store.ai-hub.mcp': (BuildContext context, AppstoreRouteMatch match) =>
-          AiHubScreen(service: aiHubService, screen: match.route.screen),
-      'app.store.ai-hub.templates': (BuildContext context, AppstoreRouteMatch match) =>
-          AiHubScreen(service: aiHubService, screen: match.route.screen),
+      'app.store.discover.index':
+          (BuildContext context, AppstoreRouteMatch match) =>
+              DiscoverScreen(service: discoverService),
+      'app.store.apps.index':
+          (BuildContext context, AppstoreRouteMatch match) =>
+              AppsScreen(service: appsService),
+      'app.store.games.index':
+          (BuildContext context, AppstoreRouteMatch match) =>
+              GamesScreen(service: gamesService),
+      'app.store.charts.index':
+          (BuildContext context, AppstoreRouteMatch match) =>
+              ChartsScreen(service: chartsService),
+      'app.store.category.detail':
+          (BuildContext context, AppstoreRouteMatch match) => CategoryScreen(
+                service: categoryService,
+                categoryId: match.params['id'] ?? '',
+              ),
+      'app.store.collection.detail':
+          (BuildContext context, AppstoreRouteMatch match) => CollectionScreen(
+                service: collectionService,
+                collectionId: match.params['id'] ?? '',
+              ),
+      'app.store.ai-hub.index':
+          (BuildContext context, AppstoreRouteMatch match) =>
+              AiHubScreen(service: aiHubService, screen: match.route.screen),
+      'app.store.ai-hub.experts':
+          (BuildContext context, AppstoreRouteMatch match) =>
+              AiHubScreen(service: aiHubService, screen: match.route.screen),
+      'app.store.ai-hub.plugins':
+          (BuildContext context, AppstoreRouteMatch match) =>
+              AiHubScreen(service: aiHubService, screen: match.route.screen),
+      'app.store.ai-hub.skills':
+          (BuildContext context, AppstoreRouteMatch match) =>
+              AiHubScreen(service: aiHubService, screen: match.route.screen),
+      'app.store.ai-hub.mcp':
+          (BuildContext context, AppstoreRouteMatch match) =>
+              AiHubScreen(service: aiHubService, screen: match.route.screen),
+      'app.store.ai-hub.templates':
+          (BuildContext context, AppstoreRouteMatch match) =>
+              AiHubScreen(service: aiHubService, screen: match.route.screen),
       'app.store.ai-hub.template-detail': (
         BuildContext context,
         AppstoreRouteMatch match,
@@ -193,31 +209,36 @@ class AppstoreMobileRuntime {
             screen: match.route.screen,
             templateId: match.params['id'] ?? '',
           ),
-      'app.store.search.index': (BuildContext context, AppstoreRouteMatch match) =>
-          SearchScreen(service: searchService),
-      'app.store.app-detail.detail': (BuildContext context, AppstoreRouteMatch match) =>
-          AppDetailScreen(
-            service: appDetailService,
-            listingId: match.params['id'] ?? '',
-          ),
-      'app.store.events.detail': (BuildContext context, AppstoreRouteMatch match) =>
-          EventScreen(
-            service: eventsService,
-            eventId: match.params['id'] ?? '',
-          ),
-      'app.store.library.index': (BuildContext context, AppstoreRouteMatch match) =>
-          LibraryScreen(service: libraryService),
-      'app.store.updates.index': (BuildContext context, AppstoreRouteMatch match) =>
-          UpdatesScreen(service: updatesService),
-      'app.store.wishlist.index': (BuildContext context, AppstoreRouteMatch match) =>
-          WishlistScreen(service: wishlistService),
-      'app.store.user-store.index': (BuildContext context, AppstoreRouteMatch match) =>
-          UserStoreScreen(service: userStoreService),
-      'app.store.user-store.public': (BuildContext context, AppstoreRouteMatch match) =>
-          UserStoreScreen(
-            service: userStoreService,
-            shareToken: match.params['shareToken'] ?? '',
-          ),
+      'app.store.search.index':
+          (BuildContext context, AppstoreRouteMatch match) =>
+              SearchScreen(service: searchService),
+      'app.store.app-detail.detail':
+          (BuildContext context, AppstoreRouteMatch match) => AppDetailScreen(
+                service: appDetailService,
+                listingId: match.params['id'] ?? '',
+              ),
+      'app.store.events.detail':
+          (BuildContext context, AppstoreRouteMatch match) => EventScreen(
+                service: eventsService,
+                eventId: match.params['id'] ?? '',
+              ),
+      'app.store.library.index':
+          (BuildContext context, AppstoreRouteMatch match) =>
+              LibraryScreen(service: libraryService),
+      'app.store.updates.index':
+          (BuildContext context, AppstoreRouteMatch match) =>
+              UpdatesScreen(service: updatesService),
+      'app.store.wishlist.index':
+          (BuildContext context, AppstoreRouteMatch match) =>
+              WishlistScreen(service: wishlistService),
+      'app.store.user-store.index':
+          (BuildContext context, AppstoreRouteMatch match) =>
+              UserStoreScreen(service: userStoreService),
+      'app.store.user-store.public':
+          (BuildContext context, AppstoreRouteMatch match) => UserStoreScreen(
+                service: userStoreService,
+                shareToken: match.params['shareToken'] ?? '',
+              ),
       'console.store.publisher.overview': (
         BuildContext context,
         AppstoreRouteMatch match,
