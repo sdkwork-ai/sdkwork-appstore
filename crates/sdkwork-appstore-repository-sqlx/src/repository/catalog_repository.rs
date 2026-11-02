@@ -301,7 +301,7 @@ impl CatalogRepositoryPort for SqlxCatalogRepository {
             UPDATE appstore_category
             SET category_code = ?, parent_category_id = ?, category_level = ?,
                 category_status = ?, sort_order = ?, icon_media_resource_id = ?, updated_at = ?
-            WHERE id = ? AND tenant_id = ? AND organization_id = ?
+            WHERE id = ? AND tenant_id = ?
             "#,
             )
             .bind(&category.category_code)
@@ -313,7 +313,6 @@ impl CatalogRepositoryPort for SqlxCatalogRepository {
             .bind(category.updated_at)
             .bind(category.id.as_str())
             .bind(&context.tenant_id)
-            .bind(&context.organization_id)
             .execute_unified(&self.db)
             .await
             .map_err(|e| AppstoreServiceError::Internal(format!("Database error: {}", e)))?;
@@ -560,7 +559,7 @@ impl CatalogRepositoryPort for SqlxCatalogRepository {
             SET collection_code = ?, collection_type = ?, collection_status = ?,
                 audience_scope = ?, sort_order = ?, cover_media_resource_id = ?,
                 starts_at = ?, ends_at = ?, updated_at = ?
-            WHERE id = ? AND tenant_id = ? AND organization_id = ?
+            WHERE id = ? AND tenant_id = ?
             "#,
             )
             .bind(&collection.collection_code)
@@ -574,7 +573,6 @@ impl CatalogRepositoryPort for SqlxCatalogRepository {
             .bind(collection.updated_at)
             .bind(collection.id.as_str())
             .bind(&context.tenant_id)
-            .bind(&context.organization_id)
             .execute_unified(&self.db)
             .await
             .map_err(|e| AppstoreServiceError::Internal(format!("Database error: {}", e)))?;
@@ -622,12 +620,11 @@ impl CatalogRepositoryPort for SqlxCatalogRepository {
             .query(
                 r#"
             DELETE FROM appstore_catalog_collection_item
-            WHERE collection_id = ? AND tenant_id = ? AND organization_id = ?
+            WHERE collection_id = ? AND tenant_id = ?
             "#,
             )
             .bind(collection_id.as_str())
             .bind(&context.tenant_id)
-            .bind(&context.organization_id)
             .execute_unified(&self.db)
             .await
             .map_err(|e| AppstoreServiceError::Internal(format!("Database error: {}", e)))?;
@@ -651,12 +648,11 @@ impl CatalogRepositoryPort for SqlxCatalogRepository {
             .query(
                 r#"
             DELETE FROM appstore_catalog_collection_item
-            WHERE collection_id = ? AND tenant_id = ? AND organization_id = ?
+            WHERE collection_id = ? AND tenant_id = ?
             "#,
             )
             .bind(collection_id.as_str())
             .bind(&context.tenant_id)
-            .bind(&context.organization_id)
             .execute_tx(&mut tx)
             .await
             .map_err(|e| AppstoreServiceError::Internal(format!("Database error: {}", e)))?;
@@ -1526,11 +1522,10 @@ impl CatalogRepositoryPort for SqlxCatalogRepository {
             .query(
                 r#"
             DELETE FROM appstore_catalog_search_history
-            WHERE tenant_id = ? AND organization_id = ? AND user_id = ?
+            WHERE tenant_id = ? AND user_id = ?
             "#,
             )
             .bind(&context.tenant_id)
-            .bind(&context.organization_id)
             .bind(user_id)
             .execute_unified(&self.db)
             .await
