@@ -140,6 +140,9 @@ __pycache__/
 # Added by repo-commit sweep; targeted rules only.
 /cols.txt
 
+# Local one-off seed download completeness audit output (never committed).
+/appstore-seed-download-report.md
+
 # ---- auto-audited: local artifacts that must never be committed ----
 *.key
 *.pem
