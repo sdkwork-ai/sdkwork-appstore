@@ -206,7 +206,7 @@ impl LibraryRepositoryPort for SqlxLibraryRepository {
                 installed_release_id = ?, installed_version_code = ?, install_source = ?,
                 platform = ?, architecture = ?, device_id = ?, last_checked_at = ?,
                 installed_at = ?, updated_at = ?, removed_at = ?
-            WHERE id = ? AND tenant_id = ?"#,
+            WHERE id = ? AND tenant_id = ? AND organization_id = ?"#,
             )
             .bind(&item.listing_id)
             .bind(&item.app_key)
@@ -223,6 +223,7 @@ impl LibraryRepositoryPort for SqlxLibraryRepository {
             .bind(item.removed_at)
             .bind(item.id.as_str())
             .bind(&context.tenant_id)
+            .bind(&context.organization_id)
             .execute_unified(&self.db)
             .await
             .map_err(|e| AppstoreServiceError::Internal(format!("Database error: {}", e)))?;
@@ -335,12 +336,13 @@ impl LibraryRepositoryPort for SqlxLibraryRepository {
             .query(
                 r#"UPDATE appstore_user_wishlist_item
             SET wishlist_status = ?, updated_at = ?
-            WHERE id = ? AND tenant_id = ?"#,
+            WHERE id = ? AND tenant_id = ? AND organization_id = ?"#,
             )
             .bind(&wishlist_status)
             .bind(item.updated_at)
             .bind(&item.id)
             .bind(&context.tenant_id)
+            .bind(&context.organization_id)
             .execute_unified(&self.db)
             .await
             .map_err(|e| AppstoreServiceError::Internal(format!("Database error: {}", e)))?;
@@ -434,7 +436,7 @@ impl LibraryRepositoryPort for SqlxLibraryRepository {
                     ELSE consumed_at
                 END,
                 updated_at = ?
-            WHERE id = ? AND tenant_id = ?
+            WHERE id = ? AND tenant_id = ? AND organization_id = ?
               AND user_id = ?
               AND grant_status = 'active'
               AND download_count < max_download_count
@@ -444,6 +446,7 @@ impl LibraryRepositoryPort for SqlxLibraryRepository {
             .bind(now)
             .bind(grant_id)
             .bind(&context.tenant_id)
+            .bind(&context.organization_id)
             .bind(user_id)
             .bind(now)
             .execute_unified(&self.db)
@@ -760,7 +763,7 @@ impl LibraryRepositoryPort for SqlxLibraryRepository {
             r#"
             UPDATE appstore_entitlement
             SET entitlement_status = 'revoked', revoked_at = ?, updated_at = ?
-            WHERE tenant_id = ? AND app_id = ? AND subject_type = ? AND subject_id = ?
+            WHERE tenant_id = ? AND organization_id = ? AND app_id = ? AND subject_type = ? AND subject_id = ?
               AND entitlement_type = ? AND entitlement_status = 'active'
             "#,
         );
@@ -770,6 +773,7 @@ impl LibraryRepositoryPort for SqlxLibraryRepository {
             .bind(revoked_at)
             .bind(revoked_at)
             .bind(&context.tenant_id)
+            .bind(&context.organization_id)
             .bind(app_id)
             .bind(EntitlementSubjectType::User.as_str())
             .bind(subject_id)
