@@ -546,8 +546,9 @@ impl ListingRepositoryPort for SqlxListingRepository {
         media_id: &str,
     ) -> Result<(), AppstoreServiceError> {
         self.db
-            .query(r#"DELETE FROM appstore_listing_media WHERE tenant_id = ? AND id = ?"#)
+            .query(r#"DELETE FROM appstore_listing_media WHERE tenant_id = ? AND organization_id = ? AND id = ?"#)
             .bind(&context.tenant_id)
+            .bind(&context.organization_id)
             .bind(media_id)
             .execute_unified(&self.db)
             .await
@@ -593,9 +594,10 @@ impl ListingRepositoryPort for SqlxListingRepository {
             .map_err(|e| AppstoreServiceError::Internal(format!("Database error: {}", e)))?;
 
         self.db.query(
-            r#"DELETE FROM appstore_listing_category_binding WHERE tenant_id = ? AND listing_id = ?"#,
+            r#"DELETE FROM appstore_listing_category_binding WHERE tenant_id = ? AND organization_id = ? AND listing_id = ?"#,
         )
         .bind(&context.tenant_id)
+        .bind(&context.organization_id)
         .bind(listing_id.as_str())
         .execute_tx(&mut tx)
         .await
@@ -857,7 +859,7 @@ impl ListingRepositoryPort for SqlxListingRepository {
                 r#"UPDATE appstore_listing_submission
             SET release_id = ?, submission_type = ?, submission_status = ?, submitted_by = ?,
                 submitted_at = ?, payload_snapshot_json = ?, idempotency_key = ?, updated_at = ?
-            WHERE tenant_id = ? AND id = ?"#,
+            WHERE tenant_id = ? AND organization_id = ? AND id = ?"#,
             )
             .bind(&submission.release_id)
             .bind(&submission_type)
@@ -868,6 +870,7 @@ impl ListingRepositoryPort for SqlxListingRepository {
             .bind(&submission.idempotency_key)
             .bind(submission.updated_at)
             .bind(&context.tenant_id)
+            .bind(&context.organization_id)
             .bind(&submission.id)
             .execute_unified(&self.db)
             .await
