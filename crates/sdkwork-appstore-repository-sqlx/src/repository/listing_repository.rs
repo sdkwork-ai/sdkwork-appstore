@@ -340,7 +340,7 @@ impl ListingRepositoryPort for SqlxListingRepository {
                 featured_score = ?, download_count = ?, average_rating = ?,
                 rating_count = ?, version = ?, submitted_at = ?, published_at = ?,
                 delisted_at = ?, deleted_at = ?, updated_at = ?
-            WHERE id = ? AND tenant_id = ? AND version = ?"#,
+            WHERE id = ? AND tenant_id = ? AND organization_id = ? AND version = ?"#,
             )
             .bind(&listing.listing_no)
             .bind(&listing.app_id)
@@ -372,6 +372,7 @@ impl ListingRepositoryPort for SqlxListingRepository {
             .bind(listing.updated_at)
             .bind(listing.id.as_str())
             .bind(&context.tenant_id)
+            .bind(&context.organization_id)
             .bind(listing.version - 1)
             .execute_unified(&self.db)
             .await
