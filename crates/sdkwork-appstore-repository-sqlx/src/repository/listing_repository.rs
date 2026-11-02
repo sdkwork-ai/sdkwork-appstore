@@ -666,9 +666,10 @@ impl ListingRepositoryPort for SqlxListingRepository {
             .map_err(|e| AppstoreServiceError::Internal(format!("Database error: {}", e)))?;
 
         self.db.query(
-            r#"DELETE FROM appstore_regional_availability WHERE tenant_id = ? AND listing_id = ?"#,
+            r#"DELETE FROM appstore_regional_availability WHERE tenant_id = ? AND organization_id = ? AND listing_id = ?"#,
         )
         .bind(&context.tenant_id)
+        .bind(&context.organization_id)
         .bind(listing_id.as_str())
         .execute_tx(&mut tx)
         .await
