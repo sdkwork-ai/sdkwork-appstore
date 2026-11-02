@@ -255,7 +255,7 @@ impl sdkwork_appstore_moderation_service::ports::repository::ModerationRepositor
             UPDATE appstore_moderation_review
             SET review_status = ?, priority = ?, assigned_to = ?, queue_code = ?,
                 sla_due_at = ?, started_at = ?, completed_at = ?, updated_at = ?
-            WHERE id = ? AND tenant_id = ? AND updated_at = ?
+            WHERE id = ? AND tenant_id = ? AND organization_id = ? AND updated_at = ?
             "#,
             )
             .bind(&review_status)
@@ -268,6 +268,7 @@ impl sdkwork_appstore_moderation_service::ports::repository::ModerationRepositor
             .bind(review.updated_at)
             .bind(review.id.as_str())
             .bind(&context.tenant_id)
+            .bind(&context.organization_id)
             .bind(expected_updated_at)
             .execute_unified(&self.db)
             .await
@@ -328,7 +329,7 @@ impl sdkwork_appstore_moderation_service::ports::repository::ModerationRepositor
             UPDATE appstore_moderation_review
             SET review_status = ?, priority = ?, assigned_to = ?, queue_code = ?,
                 sla_due_at = ?, started_at = ?, completed_at = ?, updated_at = ?
-            WHERE id = ? AND tenant_id = ? AND updated_at = ?
+            WHERE id = ? AND tenant_id = ? AND organization_id = ? AND updated_at = ?
             "#,
             )
             .bind(&review_status)
@@ -341,6 +342,7 @@ impl sdkwork_appstore_moderation_service::ports::repository::ModerationRepositor
             .bind(review.updated_at)
             .bind(review.id.as_str())
             .bind(&context.tenant_id)
+            .bind(&context.organization_id)
             .bind(expected_review_updated_at)
             .execute_tx(&mut transaction)
             .await
@@ -592,7 +594,7 @@ impl sdkwork_appstore_moderation_service::ports::repository::ModerationRepositor
             UPDATE appstore_moderation_appeal
             SET appeal_status = ?, decided_by = ?, decision_note = ?,
                 decided_at = ?, updated_at = ?
-            WHERE id = ? AND tenant_id = ? AND updated_at = ?
+            WHERE id = ? AND tenant_id = ? AND organization_id = ? AND updated_at = ?
             "#,
             )
             .bind(appeal.appeal_status.as_str())
@@ -602,6 +604,7 @@ impl sdkwork_appstore_moderation_service::ports::repository::ModerationRepositor
             .bind(appeal.updated_at)
             .bind(appeal.id.as_str())
             .bind(&context.tenant_id)
+            .bind(&context.organization_id)
             .bind(expected_updated_at)
             .execute_unified(&self.db)
             .await

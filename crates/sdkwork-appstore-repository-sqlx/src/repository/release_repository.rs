@@ -328,7 +328,7 @@ impl ReleaseRepositoryPort for SqlxReleaseRepository {
                 version_code = ?, build_number = ?, release_status = ?, minimum_os_version = ?,
                 release_notes_default_locale = ?, manifest_snapshot_json = ?, submitted_at = ?,
                 approved_at = ?, published_at = ?, retired_at = ?, version = ?, updated_at = ?
-            WHERE id = ? AND tenant_id = ? AND version = ?"#,
+            WHERE id = ? AND tenant_id = ? AND organization_id = ? AND version = ?"#,
             )
             .bind(&release.listing_id)
             .bind(&release.release_no)
@@ -348,6 +348,7 @@ impl ReleaseRepositoryPort for SqlxReleaseRepository {
             .bind(release.updated_at)
             .bind(release.id.as_str())
             .bind(&context.tenant_id)
+            .bind(&context.organization_id)
             .bind(release.version - 1)
             .execute_unified(&self.db)
             .await
@@ -424,12 +425,13 @@ impl ReleaseRepositoryPort for SqlxReleaseRepository {
             .query(
                 r#"UPDATE appstore_release_note_localization
             SET release_notes = ?, updated_at = ?
-            WHERE id = ? AND tenant_id = ?"#,
+            WHERE id = ? AND tenant_id = ? AND organization_id = ?"#,
             )
             .bind(&notes.release_notes)
             .bind(notes.updated_at)
             .bind(&notes.id)
             .bind(&context.tenant_id)
+            .bind(&context.organization_id)
             .execute_unified(&self.db)
             .await
             .map_err(|e| AppstoreServiceError::Internal(format!("Database error: {}", e)))?;
@@ -619,7 +621,7 @@ impl ReleaseRepositoryPort for SqlxReleaseRepository {
                 rollout_strategy = ?, rollout_status = ?, target_percentage = ?,
                 current_percentage = ?, region_filter_json = ?, device_filter_json = ?,
                 started_at = ?, completed_at = ?, paused_at = ?, updated_at = ?
-            WHERE id = ? AND tenant_id = ?"#,
+            WHERE id = ? AND tenant_id = ? AND organization_id = ?"#,
             )
             .bind(&rollout_strategy)
             .bind(&rollout_status)
@@ -633,6 +635,7 @@ impl ReleaseRepositoryPort for SqlxReleaseRepository {
             .bind(rollout.updated_at)
             .bind(&rollout.id)
             .bind(&context.tenant_id)
+            .bind(&context.organization_id)
             .execute_unified(&self.db)
             .await
             .map_err(|e| AppstoreServiceError::Internal(format!("Database error: {}", e)))?;
