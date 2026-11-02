@@ -306,7 +306,7 @@ impl PublisherRepositoryPort for SqlxPublisherRepository {
                 contact_snapshot_json = ?, profile_snapshot_json = ?, website_url = ?,
                 support_email = ?, logo_media_resource_id = ?, version = ?, verified_at = ?,
                 suspended_at = ?, deleted_at = ?, updated_at = ?
-            WHERE id = ? AND tenant_id = ? AND version = ?
+            WHERE id = ? AND tenant_id = ? AND organization_id = ? AND version = ?
             "#,
                 )
                 .bind(&publisher.display_name)
@@ -325,6 +325,7 @@ impl PublisherRepositoryPort for SqlxPublisherRepository {
                 .bind(publisher.updated_at)
                 .bind(publisher.id.as_str())
                 .bind(&context.tenant_id)
+                .bind(&context.organization_id)
                 .bind(publisher.version - 1)
                 .execute_unified(&self.db)
                 .await
@@ -494,7 +495,7 @@ impl PublisherRepositoryPort for SqlxPublisherRepository {
                 r#"
             UPDATE appstore_publisher_member
             SET member_role = ?, member_status = ?, joined_at = ?, updated_at = ?
-            WHERE id = ? AND tenant_id = ?
+            WHERE id = ? AND tenant_id = ? AND organization_id = ?
             "#,
             )
             .bind(&member_role)
@@ -503,6 +504,7 @@ impl PublisherRepositoryPort for SqlxPublisherRepository {
             .bind(member.updated_at)
             .bind(&member.id)
             .bind(&context.tenant_id)
+            .bind(&context.organization_id)
             .execute_unified(&self.db)
             .await
             .map_err(|e| {
