@@ -1,0 +1,108 @@
+{
+  "schemaVersion": 1,
+  "kind": "sdkwork.client-env-materialization",
+  "application": "sdkwork-appstore",
+  "profiles": [
+    "standalone.development",
+    "standalone.test",
+    "standalone.staging",
+    "standalone.demo",
+    "standalone.production",
+    "cloud.development",
+    "cloud.test",
+    "cloud.staging",
+    "cloud.demo",
+    "cloud.production"
+  ],
+  "surfaces": [
+    {
+      "id": "sdkwork-appstore-flutter-mobile",
+      "root": "apps/sdkwork-appstore-flutter-mobile",
+      "format": "flutter",
+      "runtimeTarget": "flutter-android",
+      "bindings": {},
+      "accessToken": {
+        "appId": "sdkwork-appstore",
+        "tenantId": "100001",
+        "organizationId": "0",
+        "permissionScope": [
+          "iam:self"
+        ]
+      }
+    },
+    {
+      "id": "sdkwork-appstore-mini-program",
+      "root": "apps/sdkwork-appstore-mini-program",
+      "format": "mini-program",
+      "runtimeTarget": "mini-program",
+      "bindings": {},
+      "accessToken": {
+        "appId": "sdkwork-appstore",
+        "tenantId": "100001",
+        "organizationId": "0",
+        "permissionScope": [
+          "iam:self"
+        ]
+      }
+    },
+    {
+      "id": "sdkwork-appstore-h5",
+      "root": "apps/sdkwork-appstore-h5",
+      "format": "vite",
+      "runtimeTarget": "browser",
+      "bindings": {},
+      "accessToken": {
+        "appId": "sdkwork-appstore-h5",
+        "tenantId": "100001",
+        "organizationId": "0",
+        "permissionScope": [
+          "iam:self"
+        ]
+      }
+    },
+    {
+      "id": "sdkwork-appstore-pc",
+      "root": "apps/sdkwork-appstore-pc",
+      "format": "vite",
+      "runtimeTarget": "browser",
+      "bindings": {},
+      "accessToken": {
+        "appId": "sdkwork-appstore-pc",
+        "tenantId": "100001",
+        "organizationId": "0",
+        "permissionScope": [
+          "iam:self"
+        ]
+      }
+    },
+    {
+      "id": "sdkwork-appstore-harmony-mobile",
+      "root": "apps/sdkwork-appstore-harmony-mobile",
+      "format": "harmony-native",
+      "runtimeTarget": "harmony-native",
+      "bindings": {},
+      "accessToken": {
+        "appId": "sdkwork-appstore",
+        "tenantId": "100001",
+        "organizationId": "0",
+        "permissionScope": [
+          "iam:self"
+        ]
+      }
+    }
+  ],
+  "sourceIdentity": {
+    "deploymentProfileKeys": [
+      "SDKWORK_APPSTORE_DEPLOYMENT_PROFILE",
+      "SDKWORK_DEPLOYMENT_PROFILE"
+    ],
+    "environmentKeys": [
+      "SDKWORK_APPSTORE_ENVIRONMENT",
+      "SDKWORK_ENVIRONMENT"
+    ],
+    "profileIdKeys": [
+      "SDKWORK_APPSTORE_PROFILE_ID",
+      "SDKWORK_PROFILE_ID"
+    ]
+  }
+}
