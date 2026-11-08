@@ -102,14 +102,14 @@ export function McpPage({ searchQuery }: McpPageProps = {}) {
       <div className="flex md:justify-end">
         <button
           onClick={() => setIsAddOpen(true)}
-          className="px-4 py-2 bg-store-info hover:bg-store-info-hover text-white rounded-store-control text-xs font-medium transition-all shadow-sm shrink-0 flex items-center justify-center gap-1.5 cursor-pointer"
+          className="px-4 py-2 bg-store-brand hover:bg-store-brand-hover text-white rounded-store-control text-xs font-medium transition-all shadow-sm shrink-0 flex items-center justify-center gap-1.5 cursor-pointer"
         >
           <Plus className="w-4 h-4" />
           <span>{t('mcp.header.deployBtn')}</span>
         </button>
       </div>
       {actionError && (
-        <p role="alert" className="text-xs text-store-info ">
+        <p role="alert" className="text-xs text-store-danger ">
           {actionError}
         </p>
       )}

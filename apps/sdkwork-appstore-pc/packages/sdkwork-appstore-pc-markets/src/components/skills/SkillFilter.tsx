@@ -23,7 +23,7 @@ export const SkillFilter: React.FC<SkillFilterProps> = ({
           onClick={() => onSelectCategory(category.value)}
           className={`px-3 py-1.5 rounded-store-control text-xs font-medium whitespace-nowrap transition-all shrink-0 cursor-pointer ${
             selectedCategory === category.value
-              ? 'bg-purple-600 text-white shadow-sm'
+              ? 'bg-store-brand text-white shadow-sm'
               : 'bg-store-surface text-store-ink-soft border border-store-line hover:bg-store-subtle '
           }`}
         >

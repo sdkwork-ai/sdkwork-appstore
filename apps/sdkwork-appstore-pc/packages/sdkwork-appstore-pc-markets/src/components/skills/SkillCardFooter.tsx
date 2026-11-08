@@ -14,7 +14,7 @@ export const SkillCardFooter: React.FC<SkillCardFooterProps> = ({ skill, onToggl
   return (
     <div className="flex items-center justify-between mt-4 pt-3 border-t border-store-line-soft ">
       <span className="text-xs text-store-ink-faint flex items-center gap-1 font-medium">
-        <Zap className="w-3.5 h-3.5 text-store-warning" />
+        <Zap className="w-3.5 h-3.5 text-store-ink-faint" />
         {(skill.activeCount / 1000).toFixed(1)}k {t('skills.modal.activeUses')}
       </span>
 
@@ -25,7 +25,7 @@ export const SkillCardFooter: React.FC<SkillCardFooterProps> = ({ skill, onToggl
         }}
         className={`flex items-center gap-1.5 px-3 py-1.5 rounded-store-control text-xs font-medium transition-all shadow-sm ${
           skill.isInstalled
-            ? 'bg-purple-600 hover:bg-purple-700 text-white'
+            ? 'bg-store-success hover:bg-store-success-hover text-white'
             : 'bg-store-subtle hover:bg-store-raised text-store-ink-soft '
         }`}
       >

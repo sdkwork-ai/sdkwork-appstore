@@ -37,7 +37,7 @@ export const SkillSandboxTab: React.FC<SkillSandboxTabProps> = ({
       <button
         onClick={onRunSandbox}
         disabled={running}
-        className="w-full py-2 bg-store-warning hover:bg-store-warning text-white rounded-store-control font-medium flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 transition-colors text-sm"
+        className="w-full py-2 bg-store-brand hover:bg-store-brand-hover text-white rounded-store-control font-medium flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 transition-colors text-sm"
       >
         {running ? (
           <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -55,7 +55,7 @@ export const SkillSandboxTab: React.FC<SkillSandboxTabProps> = ({
               Tokens: <strong>{output.tokensUsed}</strong>
             </span>
           </div>
-          <pre className="p-3 rounded-store-control bg-gray-900 text-store-warning font-mono text-[11px] overflow-x-auto max-h-48 leading-relaxed border border-store-line whitespace-pre-wrap select-text">
+          <pre className="p-3 rounded-store-control bg-gray-900 text-store-info font-mono text-[11px] overflow-x-auto max-h-48 leading-relaxed border border-store-line whitespace-pre-wrap select-text">
             {output.output}
           </pre>
         </div>

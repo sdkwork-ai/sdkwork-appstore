@@ -54,7 +54,7 @@ export const PublishSkillModal: React.FC<PublishSkillModalProps> = ({
     <ModalShell onClose={onClose} maxWidthClass="max-w-md">
       <div className="flex items-center justify-between pb-3 border-b border-store-line-soft ">
         <h3 className="text-sm font-bold text-store-ink flex items-center gap-2 ">
-          <Zap className="w-4 h-4 text-store-warning" />
+          <Zap className="w-4 h-4 text-store-brand" />
           <span>{t('skills.modal.publishTitle')}</span>
         </h3>
         <button onClick={onClose} className="text-store-ink-faint hover:text-store-ink-soft cursor-pointer ">

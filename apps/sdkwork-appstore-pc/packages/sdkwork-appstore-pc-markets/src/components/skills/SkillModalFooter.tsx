@@ -34,11 +34,7 @@ export const SkillModalFooter: React.FC<SkillModalFooterProps> = ({
             onToggleInstall(skill.id);
             onClose();
           }}
-          className={`flex items-center gap-2 px-5 py-2 rounded-store-control text-xs font-medium text-white shadow-md transition-all cursor-pointer ${
-            skill.isInstalled
-              ? 'bg-purple-600 hover:bg-purple-700'
-              : 'bg-store-success hover:bg-store-success-hover'
-          }`}
+          className="flex items-center gap-2 px-5 py-2 rounded-store-control text-xs font-medium text-white shadow-md transition-all cursor-pointer bg-store-success hover:bg-store-success-hover"
         >
           {skill.isInstalled ? (
             <>

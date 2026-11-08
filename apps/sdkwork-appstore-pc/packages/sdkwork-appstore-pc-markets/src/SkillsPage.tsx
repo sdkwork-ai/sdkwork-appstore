@@ -159,14 +159,14 @@ export function SkillsPage({ searchQuery }: SkillsPageProps = {}) {
         </div>
         <button
           onClick={() => setIsPublishOpen(true)}
-          className="px-4 py-2 bg-store-warning hover:bg-store-warning text-white rounded-store-control text-xs font-medium transition-all shadow-sm shrink-0 flex items-center justify-center gap-1.5 cursor-pointer h-10"
+          className="px-4 py-2 bg-store-brand hover:bg-store-brand-hover text-white rounded-store-control text-xs font-medium transition-all shadow-sm shrink-0 flex items-center justify-center gap-1.5 cursor-pointer h-10"
         >
           <Plus className="w-4 h-4" />
           <span>{t('skills.header.createBtn')}</span>
         </button>
       </div>
       {actionError && (
-        <p role="alert" className="text-xs text-store-warning ">
+        <p role="alert" className="text-xs text-store-danger ">
           {actionError}
         </p>
       )}

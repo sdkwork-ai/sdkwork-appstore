@@ -108,7 +108,7 @@ export const PublishSkillFormFields: React.FC<PublishSkillFormFieldsProps> = ({
         </button>
         <button
           type="submit"
-          className="px-4 py-2 rounded-store-control bg-store-warning hover:bg-store-warning text-white font-medium cursor-pointer text-sm"
+          className="px-4 py-2 rounded-store-control bg-store-brand hover:bg-store-brand-hover text-white font-medium cursor-pointer text-sm"
         >
           {t('skills.form.submitBtn')}
         </button>

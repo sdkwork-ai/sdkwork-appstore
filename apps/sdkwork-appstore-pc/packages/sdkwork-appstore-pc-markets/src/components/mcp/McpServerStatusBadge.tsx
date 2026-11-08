@@ -33,7 +33,7 @@ export const McpServerStatusBadge: React.FC<McpServerStatusBadgeProps> = ({ stat
       );
     default:
       return (
-        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-500/10 text-store-ink-faint border border-gray-500/20 ">
+        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-store-subtle text-store-ink-faint border border-store-line ">
           <WifiOff className="w-3 h-3" />
           {t('mcp.status.disconnected')}
         </span>

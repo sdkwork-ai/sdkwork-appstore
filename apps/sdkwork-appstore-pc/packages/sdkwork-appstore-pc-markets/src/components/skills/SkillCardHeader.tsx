@@ -14,7 +14,7 @@ export const SkillCardHeader: React.FC<SkillCardHeaderProps> = ({ skill }) => {
           <DynamicIcon name={skill.icon} className="w-6 h-6" />
         </div>
         <div className="min-w-0">
-          <h3 className="font-bold text-sm text-store-ink group-hover:text-purple-500 transition-colors truncate ">
+          <h3 className="font-bold text-sm text-store-ink group-hover:text-store-brand transition-colors truncate ">
             {skill.name}
           </h3>
           <p className="text-xs text-store-ink-faint truncate mt-0.5">
@@ -23,7 +23,7 @@ export const SkillCardHeader: React.FC<SkillCardHeaderProps> = ({ skill }) => {
         </div>
       </div>
 
-      <span className="text-xs font-medium px-2.5 py-0.5 rounded-full bg-purple-500/10 text-purple-600 dark:text-purple-400 shrink-0">
+      <span className="text-xs font-medium px-2.5 py-0.5 rounded-full bg-store-brand/10 text-store-brand shrink-0">
         v{skill.version}
       </span>
     </div>

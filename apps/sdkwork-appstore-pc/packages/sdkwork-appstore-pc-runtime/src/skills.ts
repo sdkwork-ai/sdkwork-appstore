@@ -132,7 +132,7 @@ function mapSkillRecord(
     category: record.categories[0] ?? 'General',
     description: record.summary ?? record.description ?? '',
     icon: 'Zap',
-    iconColor: 'bg-store-warning',
+    iconColor: 'bg-store-brand',
     id: record.id,
     isInstalled:
       installedSkillIds.has(record.id) || installedPackageIds.has(record.packageId),

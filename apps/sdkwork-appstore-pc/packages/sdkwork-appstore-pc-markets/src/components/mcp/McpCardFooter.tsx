@@ -30,7 +30,7 @@ export const McpCardFooter: React.FC<McpCardFooterProps> = ({
         onClick={() => onToggleConnect(server.id)}
         className={`px-3 py-1.5 rounded-store-control text-xs font-medium transition-all shadow-sm cursor-pointer ${
           server.connected
-            ? 'bg-store-info hover:bg-store-info-hover text-white'
+            ? 'bg-store-success hover:bg-store-success-hover text-white'
             : 'bg-store-subtle hover:bg-store-raised text-store-ink-soft '
         }`}
       >
