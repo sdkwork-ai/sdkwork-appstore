@@ -1,0 +1,23 @@
+{
+  "comment": "Deliberate exceptions to MODULE_SPEC.md §4.2 (Backend Module Call Boundary, In-Process First). App Store reaches sdkwork-drive and sdkwork-search IN-PROCESS by default: crates/sdkwork-appstore-service-host/src/integrations/{drive,search}_inprocess.rs call the sibling modules' service/repository crates over the shared PostgreSQL, and no sibling endpoint variable is read unless a deployment explicitly opts in. The three entries below are the ONLY remaining split-deployment paths. Each is gated behind APPSTORE_INTEGRATION_MODE=http, is built during startup (so a missing endpoint or service credential aborts the boot instead of failing the first business request), and is never constructed by a deployment that leaves the mode unset. Removing them would delete the supported real-split-deployment topology, which §4.2.3 records as an allowed exception.",
+  "allow": [
+    {
+      "file": "crates/sdkwork-appstore-service-host/src/integrations/drive_http_adapter.rs",
+      "envVar": "APPSTORE_DRIVE_BASE_URL",
+      "module": "drive",
+      "reason": "Opt-in split deployment only. APPSTORE_INTEGRATION_MODE=http selects this adapter; the default is integrations::drive_inprocess over sdkwork-drive-workspace-service/sdkwork-drive-object-runtime. from_env() fails at startup when APPSTORE_DRIVE_BASE_URL is missing, so it can never be reached by accident. This is the same shape recorded for sdkwork-order -> account in MODULE_SPEC.md §4.2.6."
+    },
+    {
+      "file": "crates/sdkwork-appstore-service-host/src/integrations/search_http_adapter.rs",
+      "envVar": "APPSTORE_SEARCH_BASE_URL",
+      "module": "search",
+      "reason": "Opt-in split deployment only. Requires APPSTORE_INTEGRATION_MODE=http AND APPSTORE_SEARCH_ENABLED=1; the default is integrations::search_inprocess over sdkwork-search-provider-postgresql, and an unset deployment leaves search federation off entirely. from_env() fails at startup when APPSTORE_SEARCH_BASE_URL is missing."
+    },
+    {
+      "file": "crates/sdkwork-appstore-service-host/src/integrations/search_projection_http_adapter.rs",
+      "envVar": "APPSTORE_SEARCH_BACKEND_BASE_URL",
+      "module": "search",
+      "reason": "Opt-in split deployment only. Requires APPSTORE_INTEGRATION_MODE=http AND APPSTORE_SEARCH_PROJECTION_ENABLED=1; the default is integrations::search_inprocess over sdkwork-search-provider-postgresql. from_env() fails at startup when APPSTORE_SEARCH_BACKEND_BASE_URL or APPSTORE_SEARCH_INDEX_ID is missing. The only consumer is the listing publish/unpublish projection, which already treats projection failure as a logged warning."
+    }
+  ]
+}

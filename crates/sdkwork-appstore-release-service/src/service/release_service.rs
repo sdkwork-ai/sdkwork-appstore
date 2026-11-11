@@ -1312,18 +1312,30 @@ where
             updated_at: now,
         };
 
+        // Validate every artifact's Drive node once, before any row is created:
+        // a batch release usually repeats one node across platforms, and each
+        // check is a tenant-scoped node lookup plus a Drive ACL resolution
+        // (MODULE_SPEC.md §4.2.7: no per-item round trip on a batch path).
+        if let Some(provider) = &self.provider {
+            for drive_node_id in pending_drive_node_validations(
+                request
+                    .artifacts
+                    .iter()
+                    .map(|spec| spec.drive_node_id.as_str()),
+            ) {
+                provider
+                    .validate_drive_node(&context.tenant_id, drive_node_id)
+                    .await
+                    .map_err(AppstoreServiceError::ValidationFailed)?;
+            }
+        }
+
         let mut artifacts = Vec::with_capacity(request.artifacts.len());
         for spec in &request.artifacts {
             if spec.drive_node_id.trim().is_empty() {
                 return Err(AppstoreServiceError::ValidationFailed(
                     "Each automation artifact requires a drive_node_id".to_string(),
                 ));
-            }
-            if let Some(provider) = &self.provider {
-                provider
-                    .validate_drive_node(&context.tenant_id, spec.drive_node_id.trim())
-                    .await
-                    .map_err(AppstoreServiceError::ValidationFailed)?;
             }
 
             let artifact_id = ArtifactId::new(Uuid::new_v4().to_string());
@@ -1383,4 +1395,51 @@ where
 fn pricing_is_free(pricing_model: &str) -> bool {
     let model = pricing_model.trim();
     model.eq_ignore_ascii_case("free") || model.eq_ignore_ascii_case("freemium")
+}
+
+/// Drive node ids that still need a validation call for one batch.
+///
+/// A release usually repeats one node across platforms/architectures, and every
+/// `validate_drive_node` call is a tenant-scoped node lookup plus a Drive ACL
+/// resolution. Validating each distinct node once keeps the batch path linear in
+/// *distinct nodes* instead of artifacts (MODULE_SPEC.md §4.2.7).
+fn pending_drive_node_validations<'a>(
+    drive_node_ids: impl IntoIterator<Item = &'a str>,
+) -> Vec<&'a str> {
+    let mut seen = std::collections::HashSet::new();
+    drive_node_ids
+        .into_iter()
+        .map(str::trim)
+        .filter(|node_id| !node_id.is_empty())
+        .filter(|node_id| seen.insert(*node_id))
+        .collect()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{pending_drive_node_validations, pricing_is_free};
+
+    #[test]
+    fn a_repeated_drive_node_is_validated_once_per_batch() {
+        let nodes = ["node-a", "node-b", "node-a", " node-b ", "node-c", ""];
+        assert_eq!(
+            pending_drive_node_validations(nodes),
+            vec!["node-a", "node-b", "node-c"],
+            "each distinct drive node must be validated exactly once"
+        );
+    }
+
+    #[test]
+    fn an_empty_batch_asks_for_no_validation() {
+        assert!(pending_drive_node_validations(std::iter::empty()).is_empty());
+        assert!(pending_drive_node_validations(["", "   "]).is_empty());
+    }
+
+    #[test]
+    fn only_free_pricing_models_skip_the_entitlement_gate() {
+        assert!(pricing_is_free("free"));
+        assert!(pricing_is_free(" FREEMIUM "));
+        assert!(!pricing_is_free("paid"));
+        assert!(!pricing_is_free(""));
+    }
 }

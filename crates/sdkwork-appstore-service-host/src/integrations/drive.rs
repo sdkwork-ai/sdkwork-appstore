@@ -10,7 +10,11 @@ pub const CAPABILITY: IntegrationCapability = IntegrationCapability {
     key: "drive",
     owner: IntegrationOwner::Dependency("sdkwork-drive"),
     purpose: "icons, screenshots, binaries, release artifacts",
-    surfaces: &[IntegrationSurface::AppApi, IntegrationSurface::ServicePort],
+    surfaces: &[IntegrationSurface::ServicePort],
     required: true,
-    todo: "Service adapter uses sdkwork-drive uploader + assets app-api; set APPSTORE_DRIVE_BASE_URL and service tokens.",
+    // Delivered by `integrations::drive_inprocess` over Drive's service crates.
+    // No deployment-time endpoint or service credential is required
+    // (MODULE_SPEC.md §4.2); the HTTP transport is an explicit split-deployment
+    // opt-in.
+    todo: "",
 };

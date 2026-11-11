@@ -33,3 +33,10 @@ sdkwork-appstore-library-service.workspace = true
 sdkwork-appstore-moderation-service.workspace = true
 sdkwork-appstore-compliance-service.workspace = true
 sdkwork-appstore-market-service.workspace = true
+sqlx = { version = "0.9", features = ["runtime-tokio", "tls-rustls", "postgres"] }
+# In-process sibling module ports (MODULE_SPEC.md §4.2).
+sdkwork-drive-workspace-service.workspace = true
+sdkwork-drive-object-runtime.workspace = true
+sdkwork-drive-storage-contract.workspace = true
+sdkwork-search-provider-spi.workspace = true
+sdkwork-search-provider-postgresql.workspace = true

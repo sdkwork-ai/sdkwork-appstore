@@ -201,7 +201,7 @@ mod tests {
                 "drive",
                 true,
                 &[IntegrationSurface::ServicePort],
-                "set APPSTORE_DRIVE_BASE_URL",
+                "pending adapter wiring",
             ),
             capability(
                 "optional_tool",

@@ -1,4 +1,13 @@
-//! Drive integration adapter for artifact download URLs and uploads via sdkwork-drive app-api.
+//! Split-deployment sdkwork-drive adapter (HTTP).
+//!
+//! `MODULE_SPEC.md` §4.2 makes the in-process adapter the default; this adapter
+//! exists only for an explicit split deployment where sdkwork-drive really runs
+//! in another process or container. It is selected by
+//! `APPSTORE_INTEGRATION_MODE=http` and is built during startup, so a missing
+//! endpoint or service credential aborts the boot instead of failing the first
+//! business request.
+//!
+//! Deliberate exception recorded in `specs/backend-module-call-boundary.allow.json`.
 
 use async_trait::async_trait;
 use serde::Deserialize;
@@ -14,21 +23,26 @@ use sdkwork_appstore_release_service::ports::provider::{
 use super::drive_uploader::DriveUploaderClient;
 use super::http_client::IntegrationHttpClient;
 
+/// Drive ports backed by sdkwork-drive's app-api over HTTP.
 #[derive(Debug, Clone)]
-pub struct DriveIntegrationAdapter {
+pub struct DriveHttpAdapter {
     http: IntegrationHttpClient,
     uploader: DriveUploaderClient,
-    enabled: bool,
 }
 
-impl DriveIntegrationAdapter {
+impl DriveHttpAdapter {
+    /// Build the split-deployment adapter from the documented environment
+    /// contract.
+    ///
+    /// # Errors
+    ///
+    /// Fails when the drive endpoint is absent or the HTTP client cannot be
+    /// configured. This is a startup failure on purpose (MODULE_SPEC.md §4.2.3).
     pub fn from_env() -> Result<Self, String> {
-        let enabled = !matches!(
-            std::env::var("APPSTORE_DRIVE_ENABLED").as_deref(),
-            Ok("0") | Ok("false") | Ok("off")
-        );
         let base_url = std::env::var("APPSTORE_DRIVE_BASE_URL").map_err(|_| {
-            "APPSTORE_DRIVE_BASE_URL is required for sdkwork-drive integration".to_string()
+            "APPSTORE_INTEGRATION_MODE=http requires APPSTORE_DRIVE_BASE_URL for the \
+             sdkwork-drive split deployment"
+                .to_string()
         })?;
         let auth_token = std::env::var("APPSTORE_DRIVE_SERVICE_AUTH_TOKEN")
             .ok()
@@ -39,11 +53,7 @@ impl DriveIntegrationAdapter {
         let http =
             IntegrationHttpClient::with_access_token(base_url, auth_token, access_token, 120)?;
         let uploader = DriveUploaderClient::new(http.clone());
-        Ok(Self {
-            http,
-            uploader,
-            enabled,
-        })
+        Ok(Self { http, uploader })
     }
 }
 
@@ -53,7 +63,7 @@ struct DriveNodeWire {
     id: String,
 }
 
-impl DriveIntegrationAdapter {
+impl DriveHttpAdapter {
     async fn fetch_drive_node(&self, drive_node_id: &str) -> Result<(), String> {
         let path = format!("/app/v3/api/drive/nodes/{drive_node_id}");
         let node: DriveNodeWire = self
@@ -97,7 +107,7 @@ struct MediaResourceWire {
 }
 
 #[async_trait]
-impl ReleaseProviderPort for DriveIntegrationAdapter {
+impl ReleaseProviderPort for DriveHttpAdapter {
     async fn upload_artifact(
         &self,
         _tenant_id: &str,
@@ -106,10 +116,6 @@ impl ReleaseProviderPort for DriveIntegrationAdapter {
         content_type: &str,
         data: &[u8],
     ) -> Result<ArtifactUploadResult, String> {
-        if !self.enabled {
-            return Err("sdkwork-drive integration disabled".to_string());
-        }
-
         let resource_id = format!("artifact-{}", uuid::Uuid::new_v4());
         let uploaded = self
             .uploader
@@ -149,12 +155,6 @@ impl ReleaseProviderPort for DriveIntegrationAdapter {
         drive_node_id: &str,
         expires_in_seconds: i64,
     ) -> Result<String, String> {
-        if !self.enabled {
-            return Err(format!(
-                "sdkwork-drive integration disabled; cannot resolve download for node {drive_node_id}"
-            ));
-        }
-
         let ttl = expires_in_seconds.clamp(30, 300).to_string();
         let path = format!("/app/v3/api/drive/nodes/{drive_node_id}/download_url");
         let item: CreateDownloadUrlWire = self
@@ -173,11 +173,6 @@ impl ReleaseProviderPort for DriveIntegrationAdapter {
         _tenant_id: &str,
         drive_node_id: &str,
     ) -> Result<(), String> {
-        if !self.enabled {
-            return Err(format!(
-                "sdkwork-drive integration disabled; cannot validate node {drive_node_id}"
-            ));
-        }
         if drive_node_id.trim().is_empty() {
             return Err("drive node id is required".to_string());
         }
@@ -188,7 +183,7 @@ impl ReleaseProviderPort for DriveIntegrationAdapter {
 }
 
 #[async_trait]
-impl ListingProviderPort for DriveIntegrationAdapter {
+impl ListingProviderPort for DriveHttpAdapter {
     async fn resolve_app(&self, _tenant_id: &str, app_id: &str) -> Result<AppReference, String> {
         Err(format!(
             "app resolution is owned by platform adapter; requested app_id={app_id}"
@@ -200,12 +195,6 @@ impl ListingProviderPort for DriveIntegrationAdapter {
         _tenant_id: &str,
         media_resource_id: &str,
     ) -> Result<MediaUploadResult, String> {
-        if !self.enabled {
-            return Err(format!(
-                "sdkwork-drive integration disabled; cannot resolve media resource {media_resource_id}"
-            ));
-        }
-
         let path = format!("/app/v3/api/assets/{media_resource_id}");
         let item: AssetItemWire =
             self.http
@@ -252,7 +241,7 @@ impl Default for MediaResourceWire {
 }
 
 #[async_trait]
-impl LibraryProviderPort for DriveIntegrationAdapter {
+impl LibraryProviderPort for DriveHttpAdapter {
     async fn check_entitlement(
         &self,
         _tenant_id: &str,

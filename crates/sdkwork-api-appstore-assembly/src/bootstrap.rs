@@ -30,8 +30,7 @@ use sdkwork_appstore_repository_sqlx::AppstoreSqlxDb;
 use sdkwork_appstore_routes_common::AppState;
 use sdkwork_appstore_service_host::integrations::http_market_channel_connector::register_http_market_connectors;
 use sdkwork_appstore_service_host::integrations::{
-    DriveIntegrationAdapter, MarketChannelIntegrationAdapter, PlatformIntegrationAdapter,
-    SearchFederationAdapter, SearchProjectionAdapter,
+    integration_ports_from_env, MarketChannelIntegrationAdapter, PlatformIntegrationAdapter,
 };
 use sdkwork_appstore_user_store_service::service::user_store_service::UserStoreService;
 use sdkwork_database_sqlx::DatabasePool;
@@ -61,6 +60,18 @@ pub async fn assemble_api_router_with_pool(pool: DatabasePool) -> Result<ApiAsse
     let db = AppstoreSqlxDb::from_database_pool(&pool)
         .map_err(|e| format!("Failed to create appstore db from pool: {e}"))?;
 
+    // MODULE_SPEC.md §4.2: sibling SDKWork modules are reached in-process by
+    // default. HTTP is an explicit split-deployment opt-in, validated here at
+    // startup rather than on the first business request.
+    let ports = integration_ports_from_env(&pool)?;
+    tracing::info!(
+        integration_mode = ports.mode.label(),
+        drive_port = ports.release_provider.is_some(),
+        search_federation = ports.search_federation.is_some(),
+        search_projection = ports.search_projection.is_some(),
+        "appstore sibling-module integration ports resolved"
+    );
+
     let publisher_repo = SqlxPublisherRepository::new(db.clone());
     let listing_repo = SqlxListingRepository::new(db.clone());
     let release_repo = SqlxReleaseRepository::new(db.clone());
@@ -76,11 +87,11 @@ pub async fn assemble_api_router_with_pool(pool: DatabasePool) -> Result<ApiAsse
         if let Ok(adapter) = PlatformIntegrationAdapter::from_env() {
             service = service.with_platform_provider(Arc::new(adapter));
         }
-        if let Ok(adapter) = DriveIntegrationAdapter::from_env() {
-            service = service.with_media_provider(Arc::new(adapter));
+        if let Some(provider) = ports.listing_media_provider.clone() {
+            service = service.with_media_provider(provider);
         }
-        if let Ok(adapter) = SearchProjectionAdapter::from_env() {
-            service = service.with_search_projection(Arc::new(adapter));
+        if let Some(projection) = ports.search_projection.clone() {
+            service = service.with_search_projection(projection);
         }
         service
     };
@@ -91,26 +102,20 @@ pub async fn assemble_api_router_with_pool(pool: DatabasePool) -> Result<ApiAsse
     let listing_service = listing_service
         .with_moderation_port(submission_moderation_port(moderation_service.clone()));
 
-    let release_service = {
-        let service = ReleaseService::new(release_repo);
-        match DriveIntegrationAdapter::from_env() {
-            Ok(adapter) => service.with_provider(Arc::new(adapter)),
-            Err(_) => service,
-        }
+    let release_service = match ports.release_provider.clone() {
+        Some(provider) => ReleaseService::new(release_repo).with_provider(provider),
+        None => ReleaseService::new(release_repo),
     };
 
-    let library_service = {
-        let service = LibraryService::new(library_repo);
-        match DriveIntegrationAdapter::from_env() {
-            Ok(adapter) => service.with_provider(Arc::new(adapter)),
-            Err(_) => service,
-        }
+    let library_service = match ports.library_provider.clone() {
+        Some(provider) => LibraryService::new(library_repo).with_provider(provider),
+        None => LibraryService::new(library_repo),
     };
 
     let catalog_service = {
         let mut service = CatalogService::new(catalog_repo);
-        if let Ok(adapter) = SearchFederationAdapter::from_env() {
-            service = service.with_search_federation(Arc::new(adapter));
+        if let Some(federation) = ports.search_federation.clone() {
+            service = service.with_search_federation(federation);
         }
         service
     };

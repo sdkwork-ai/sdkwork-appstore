@@ -1,4 +1,10 @@
-//! Federated catalog search via sdkwork-search app-api.
+//! Split-deployment sdkwork-search federation adapter (HTTP).
+//!
+//! Selected only by `APPSTORE_INTEGRATION_MODE=http` plus
+//! `APPSTORE_SEARCH_ENABLED=1`; see `ports.rs`. The default deployment
+//! federates in-process (`search_inprocess.rs`).
+//!
+//! Deliberate exception recorded in `specs/backend-module-call-boundary.allow.json`.
 
 use async_trait::async_trait;
 use serde::Deserialize;
@@ -8,23 +14,26 @@ use sdkwork_appstore_catalog_service::ports::search_federation::CatalogSearchFed
 
 use super::http_client::IntegrationHttpClient;
 
+/// Catalog search federation backed by sdkwork-search's app-api over HTTP.
 #[derive(Debug, Clone)]
-pub struct SearchFederationAdapter {
+pub struct SearchFederationHttpAdapter {
     http: IntegrationHttpClient,
     capability_ids: Vec<String>,
 }
 
-impl SearchFederationAdapter {
+impl SearchFederationHttpAdapter {
+    /// Build the split-deployment adapter from the documented environment
+    /// contract.
+    ///
+    /// # Errors
+    ///
+    /// Fails when the search endpoint is absent. This is a startup failure on
+    /// purpose (MODULE_SPEC.md §4.2.3).
     pub fn from_env() -> Result<Self, String> {
-        let enabled = !matches!(
-            std::env::var("APPSTORE_SEARCH_ENABLED").as_deref(),
-            Ok("0") | Ok("false") | Ok("off")
-        );
-        if !enabled {
-            return Err("APPSTORE_SEARCH_ENABLED is disabled".to_string());
-        }
         let base_url = std::env::var("APPSTORE_SEARCH_BASE_URL").map_err(|_| {
-            "APPSTORE_SEARCH_BASE_URL is required for sdkwork-search federation".to_string()
+            "APPSTORE_INTEGRATION_MODE=http with APPSTORE_SEARCH_ENABLED=1 requires \
+             APPSTORE_SEARCH_BASE_URL for the sdkwork-search split deployment"
+                .to_string()
         })?;
         let auth_token = std::env::var("APPSTORE_SEARCH_SERVICE_AUTH_TOKEN")
             .ok()
@@ -71,7 +80,7 @@ struct SearchDocumentWire {
 }
 
 #[async_trait]
-impl CatalogSearchFederationPort for SearchFederationAdapter {
+impl CatalogSearchFederationPort for SearchFederationHttpAdapter {
     async fn resolve_listing_ids(
         &self,
         _tenant_id: &str,

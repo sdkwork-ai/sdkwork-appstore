@@ -42,7 +42,7 @@ sdkwork-api-appstore-standalone-gateway
       moderation | compliance | market
   → sdkwork-appstore-repository-sqlx (SQLite + PostgreSQL dialect)
   → sdkwork-appstore-analytics-worker (projections / scheduled jobs)
-External SDKs: IAM, Drive, Platform, Comments, Notifications, Commerce checkout (cloudrouter domains) wired on PC/H5; Search federation + optional index projection (`APPSTORE_SEARCH_*`)
+External SDKs: IAM, Drive, Platform, Comments, Notifications, Commerce checkout (cloudrouter domains) wired on PC/H5. Server-side sibling modules are reached IN-PROCESS (`MODULE_SPEC.md` §4.2): `integrations::drive_inprocess` over `sdkwork-drive-workspace-service`, `integrations::search_inprocess` over `sdkwork-search-provider-postgresql`, IAM through `sdkwork-iam-web-adapter`. No sibling endpoint is required to boot; a split deployment opts in with `APPSTORE_INTEGRATION_MODE=http`.
 ```
 
 ## 3. Capability Modules
@@ -68,7 +68,7 @@ External SDKs: IAM, Drive, Platform, Comments, Notifications, Commerce checkout 
 | Media / artifacts | drive | Store `drive_node_id` references only |
 | Reviews / threads | comments | `comments_thread_id` + `@sdkwork/comments-app-sdk` on PC/H5 listing detail |
 | Payments / IAP | commerce (via cloudrouter domains) | `commerce_product_id` on listings; PC/H5 paid acquire via `@sdkwork/appstore-listing-acquire-core` + `@sdkwork/cloudrouter-app-sdk/domains` |
-| Full-text search | search | Federation via `SearchFederationAdapter` + SQL fallback; optional index projection (upsert on publish, remove on hide) |
+| Full-text search | search | In-process federation via `integrations::search_inprocess::InProcessSearchFederationAdapter` + SQL fallback; optional index projection (upsert on publish, remove on hide) |
 | Push / inbox | cloudrouter notification API | `@sdkwork/cloudrouter-app-sdk` + `appstore-notification-core` on PC/H5 |
 
 ## 5. Client Applications

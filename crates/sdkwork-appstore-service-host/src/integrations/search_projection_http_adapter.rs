@@ -1,4 +1,10 @@
-//! Project published listings into sdkwork-search backend indexes.
+//! Split-deployment sdkwork-search index projection adapter (HTTP).
+//!
+//! Selected only by `APPSTORE_INTEGRATION_MODE=http` plus
+//! `APPSTORE_SEARCH_PROJECTION_ENABLED=1`; see `ports.rs`. The default
+//! deployment projects in-process (`search_inprocess.rs`).
+//!
+//! Deliberate exception recorded in `specs/backend-module-call-boundary.allow.json`.
 
 use async_trait::async_trait;
 use serde_json::json;
@@ -9,23 +15,26 @@ use sdkwork_appstore_listing_service::ports::search_projection::{
 
 use super::http_client::IntegrationHttpClient;
 
+/// Published-listing projection backed by sdkwork-search's backend-api over HTTP.
 #[derive(Debug, Clone)]
-pub struct SearchProjectionAdapter {
+pub struct SearchProjectionHttpAdapter {
     http: IntegrationHttpClient,
     index_id: String,
 }
 
-impl SearchProjectionAdapter {
+impl SearchProjectionHttpAdapter {
+    /// Build the split-deployment adapter from the documented environment
+    /// contract.
+    ///
+    /// # Errors
+    ///
+    /// Fails when the search backend endpoint or the index id is absent. This is
+    /// a startup failure on purpose (MODULE_SPEC.md §4.2.3).
     pub fn from_env() -> Result<Self, String> {
-        let enabled = matches!(
-            std::env::var("APPSTORE_SEARCH_PROJECTION_ENABLED").as_deref(),
-            Ok("1") | Ok("true") | Ok("on")
-        );
-        if !enabled {
-            return Err("APPSTORE_SEARCH_PROJECTION_ENABLED is not set".to_string());
-        }
         let base_url = std::env::var("APPSTORE_SEARCH_BACKEND_BASE_URL").map_err(|_| {
-            "APPSTORE_SEARCH_BACKEND_BASE_URL is required for search index projection".to_string()
+            "APPSTORE_INTEGRATION_MODE=http with APPSTORE_SEARCH_PROJECTION_ENABLED=1 requires \
+             APPSTORE_SEARCH_BACKEND_BASE_URL for the sdkwork-search split deployment"
+                .to_string()
         })?;
         let index_id = std::env::var("APPSTORE_SEARCH_INDEX_ID").map_err(|_| {
             "APPSTORE_SEARCH_INDEX_ID is required for search index projection".to_string()
@@ -43,7 +52,7 @@ impl SearchProjectionAdapter {
 }
 
 #[async_trait]
-impl ListingSearchProjectionPort for SearchProjectionAdapter {
+impl ListingSearchProjectionPort for SearchProjectionHttpAdapter {
     async fn upsert_published_listing(
         &self,
         document: &PublishedListingSearchDocument,

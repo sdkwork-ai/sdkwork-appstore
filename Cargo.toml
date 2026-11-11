@@ -102,3 +102,12 @@ sdkwork-routes-publisher-backend-api = { path = "crates/sdkwork-routes-publisher
 sdkwork-routes-release-app-api = { path = "crates/sdkwork-routes-release-app-api" }
 sdkwork-routes-release-open-api = { path = "crates/sdkwork-routes-release-open-api" }
 sdkwork-appstore-authorization = { path = "crates/sdkwork-appstore-authorization" }
+
+# Sibling modules reached in-process (MODULE_SPEC.md §4.2). A packaged SDKWork
+# deployment runs one backend process against one PostgreSQL, so these ports are
+# called through their service/repository crates instead of over HTTP.
+sdkwork-drive-workspace-service = { path = "../sdkwork-drive/crates/sdkwork-drive-workspace-service" }
+sdkwork-drive-object-runtime = { path = "../sdkwork-drive/crates/sdkwork-drive-object-runtime" }
+sdkwork-drive-storage-contract = { path = "../sdkwork-drive/crates/sdkwork-drive-storage-contract" }
+sdkwork-search-provider-spi = { path = "../sdkwork-search/crates/sdkwork-search-provider-spi" }
+sdkwork-search-provider-postgresql = { path = "../sdkwork-search/crates/sdkwork-search-provider-postgresql" }

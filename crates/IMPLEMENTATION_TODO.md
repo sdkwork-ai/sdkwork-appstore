@@ -12,11 +12,11 @@ Last updated: 2026-10-25
 | `sdkwork-database` | Integrated | PostgreSQL authoritative (`sdkwork-appstore-database-host`); SQLite test/development adapter with dialect translation in `sdkwork-appstore-repository-sqlx` |
 | `sdkwork-utils` | Integrated | Rust envelope helpers; TypeScript record helpers in PC/H5 commons via `@sdkwork/utils` |
 | `sdkwork-discovery` | Deferred | HTTP-only unified-process gateway; adopt when RPC split-services land |
-| `sdkwork-drive` | Integrated | PC/H5 `@sdkwork/drive-app-sdk` upload helpers; Rust `drive_adapter` + `drive_uploader` |
+| `sdkwork-drive` | Integrated (in-process) | PC/H5 `@sdkwork/drive-app-sdk` upload helpers; Rust `integrations::drive_inprocess` over `sdkwork-drive-workspace-service` (default). HTTP split deployment is opt-in via `APPSTORE_INTEGRATION_MODE=http` |
 | `sdkwork-comments` | Integrated | PC/H5 `@sdkwork/comments-app-sdk` listing reviews via `comments_thread_id` |
 | `sdkwork-cloudrouter` (notifications) | Integrated | PC/H5 inbox via `@sdkwork/cloudrouter-app-sdk` + `appstore-notification-core` |
 | `sdkwork-cloudrouter` (commerce checkout) | Integrated | PC/H5 paid listing acquire via `@sdkwork/cloudrouter-app-sdk/domains` + `appstore-listing-acquire-core` |
-| `sdkwork-search` | Integrated (optional) | `SearchFederationAdapter` + SQL fallback; env `APPSTORE_SEARCH_BASE_URL` |
+| `sdkwork-search` | Integrated (optional, in-process) | `integrations::search_inprocess` over `sdkwork-search-provider-postgresql` + SQL fallback; enable with `APPSTORE_SEARCH_ENABLED=1` |
 | `sdkwork-appbase` | Integrated |
 | `sdkwork-market_channels` | Integrated (fail-closed) | Market channel relay connectors require a configured provider; without `APPSTORE_MARKET_PROVIDER_ENABLED` every sync mode returns `InvalidState` — client-reported status is never accepted |
 | `sdkwork-platform` | Integrated | Platform context resolver wired in standalone gateway preflight; IAM dual-token context propagation |
@@ -37,7 +37,7 @@ All catalog, listing, library, publisher, moderation, compliance, analytics, and
 | Library updates UX core | Implemented | `@sdkwork/appstore-library-core`; PC/H5 updates page shared mapper |
 | Listing support UX core | Implemented | `@sdkwork/appstore-listing-support-core`; PC/H5 listing report via support/mailto channel |
 | Library actions core | Implemented | `@sdkwork/appstore-library-core`; PC/H5 uninstall + wishlist remove wired to app-api |
-| Search index projection | Implemented | `SearchProjectionAdapter` on moderation approve; remove on storefront hide (optional env) |
+| Search index projection | Implemented (in-process) | `integrations::search_inprocess` on moderation approve; remove on storefront hide; enable with `APPSTORE_SEARCH_PROJECTION_ENABLED=1` |
 | Market channel HTTP connectors | Implemented (fail-closed) | Apple/Google/Enterprise relay requires `APPSTORE_MARKET_*_SUBMIT_URL` + `APPSTORE_MARKET_PROVIDER_ENABLED` |
 
 ## Security & Authorization (2026-08-08 完成)

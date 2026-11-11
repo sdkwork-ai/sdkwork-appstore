@@ -17,7 +17,7 @@ mod server;
 use bootstrap::config::AppstoreGatewayConfig;
 
 #[tokio::main]
-async fn main() {
+async fn main() -> Result<(), String> {
     tracing_subscriber::fmt()
         .with_env_filter(
             EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new("info")),
@@ -27,6 +27,10 @@ async fn main() {
     enable_process_shared_database_pool();
 
     let config = AppstoreGatewayConfig::from_env();
+    // Fail fast on a misspelled integration mode. The default is the in-process
+    // transport (MODULE_SPEC.md §4.2), so this cannot fail for an unconfigured
+    // deployment.
+    let integration_mode = sdkwork_appstore_service_host::integrations::integration_mode()?;
     let adapters = bootstrap::adapters::DependencyAdapters::from_env();
     tracing::info!(
         bind = %config.bind_address,
@@ -35,16 +39,26 @@ async fn main() {
     tracing::info!(
         active_dependency_surfaces = ?preflight::dependency_surfaces::active_dependency_surfaces()
             .iter()
-            .map(|surface| surface.code())
+            .map(|surface| format!(
+                "{}:{}",
+                surface.code(),
+                match surface.activation() {
+                    preflight::dependency_surfaces::SurfaceActivation::Always => "always",
+                    preflight::dependency_surfaces::SurfaceActivation::OptIn => "opt-in",
+                }
+            ))
             .collect::<Vec<_>>(),
-        drive_enabled = adapters.drive_enabled(),
-        platform_enabled = adapters.platform_enabled(),
-        search_enabled = adapters.search_enabled(),
+        integration_mode = integration_mode.label(),
+        in_process_transport = adapters.in_process(),
+        http_transport = adapters.http(),
+        platform_enabled = adapters.platform_enabled,
+        search_enabled = adapters.search_enabled,
+        search_projection_enabled = adapters.search_projection_enabled,
         "appstore gateway dependency surfaces"
     );
 
     tracing::info!("connecting appstore database and assembling routes");
-    let appstore = bootstrap::routers::assemble_router().await;
+    let appstore = bootstrap::routers::assemble_router().await?;
     let iam = sdkwork_api_iam_assembly::assemble_app_api_contribution()
         .await
         .expect("IAM app API contribution assembly failed");
@@ -79,6 +93,7 @@ async fn main() {
         .layer(cors_layer_from_env());
 
     server::serve(config.addr(), app).await;
+    Ok(())
 }
 
 fn cors_layer_from_env() -> sdkwork_web_axum::CanonicalCorsLayer {

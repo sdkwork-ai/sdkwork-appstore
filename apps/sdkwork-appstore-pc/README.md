@@ -58,8 +58,9 @@ Catalog data comes from the app API
 `artifacts`. Desktop installs record the detected platform through the
 library API; download grants flow through
 `POST /app/v3/api/download_grants` and `.../consume`, whose response
-delivers the presigned URL when the drive integration is enabled
-(`APPSTORE_DRIVE_*` environment; without it the install record stands
+delivers the presigned URL through the in-process Drive port
+(`integrations::drive_inprocess`, no `APPSTORE_DRIVE_*` configuration
+required; without an active Drive storage object the install record stands
 alone).
 
 ## Local installer downloads
