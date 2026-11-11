@@ -1,5 +1,5 @@
 {
-  "comment": "Deliberate exceptions to MODULE_SPEC.md §4.2 (Backend Module Call Boundary, In-Process First). App Store reaches sdkwork-drive and sdkwork-search IN-PROCESS by default: crates/sdkwork-appstore-service-host/src/integrations/{drive,search}_inprocess.rs call the sibling modules' service/repository crates over the shared PostgreSQL, and no sibling endpoint variable is read unless a deployment explicitly opts in. The three entries below are the ONLY remaining split-deployment paths. Each is gated behind APPSTORE_INTEGRATION_MODE=http, is built during startup (so a missing endpoint or service credential aborts the boot instead of failing the first business request), and is never constructed by a deployment that leaves the mode unset. Removing them would delete the supported real-split-deployment topology, which §4.2.3 records as an allowed exception.",
+  "comment": "Deliberate exceptions to MODULE_SPEC.md §4.2 (Backend Module Call Boundary, In-Process First). App Store reaches sdkwork-drive and sdkwork-search IN-PROCESS by default: crates/sdkwork-appstore-service-host/src/integrations/{drive,search}_inprocess.rs call the sibling modules' service/repository crates over the shared PostgreSQL, and no sibling endpoint variable is read unless a deployment explicitly opts in. The entries below are the ONLY remaining split-deployment paths. Each is gated behind APPSTORE_INTEGRATION_MODE=http, is built during startup (so a missing endpoint or service credential aborts the boot instead of failing the first business request), and is never constructed by a deployment that leaves the mode unset. Removing them would delete the supported real-split-deployment topology, which §4.2.3 records as an allowed exception.",
   "allow": [
     {
       "file": "crates/sdkwork-appstore-service-host/src/integrations/drive_http_adapter.rs",
@@ -18,6 +18,10 @@
       "envVar": "APPSTORE_SEARCH_BACKEND_BASE_URL",
       "module": "search",
       "reason": "Opt-in split deployment only. Requires APPSTORE_INTEGRATION_MODE=http AND APPSTORE_SEARCH_PROJECTION_ENABLED=1; the default is integrations::search_inprocess over sdkwork-search-provider-postgresql. from_env() fails at startup when APPSTORE_SEARCH_BACKEND_BASE_URL or APPSTORE_SEARCH_INDEX_ID is missing. The only consumer is the listing publish/unpublish projection, which already treats projection failure as a logged warning."
+    },
+    {
+      "file": "crates/sdkwork-appstore-service-host/src/integrations/drive_uploader.rs",
+      "reason": "Explicit HTTP opt-in, default is in-process, startup-validated. File-scoped entry for the second detection mode: this is the Drive upload-session HTTP client, used only by DriveHttpAdapter (drive_http_adapter.rs), which APPSTORE_INTEGRATION_MODE=http selects and which fails at startup without APPSTORE_DRIVE_BASE_URL. It is not a leftover upload path: the default in-process Drive port already uploads through DriveUploaderService::upload_bytes (prepare -> object write -> part mark -> completion), so no default deployment can reach this file."
     }
   ]
 }

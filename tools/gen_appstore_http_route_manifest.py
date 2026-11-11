@@ -47,6 +47,7 @@ def render(
         auth_constructor = {
             "ApiKey": "api_key",
             "DualToken": "dual_token",
+            "DualTokenOrAnonymous": "dual_token_or_anonymous",
             "Public": "public",
         }[auth]
         lines.extend(

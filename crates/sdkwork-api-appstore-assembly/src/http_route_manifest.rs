@@ -105,13 +105,13 @@ const HTTP_ROUTES: &[HttpRoute] = &[
         "appstore",
         "appstore.catalog.search.history.delete",
     ),
-    HttpRoute::dual_token(
+    HttpRoute::dual_token_or_anonymous(
         HttpMethod::Get,
         "/app/v3/api/appstore/catalog/templates",
         "appstore",
         "appstore.catalog.templates.list",
     ),
-    HttpRoute::dual_token(
+    HttpRoute::dual_token_or_anonymous(
         HttpMethod::Get,
         "/app/v3/api/appstore/catalog/templates/{templateId}",
         "appstore",
@@ -129,7 +129,7 @@ const HTTP_ROUTES: &[HttpRoute] = &[
         "appstore",
         "appstore.catalog.templates.usage.create",
     ),
-    HttpRoute::dual_token(
+    HttpRoute::dual_token_or_anonymous(
         HttpMethod::Get,
         "/app/v3/api/appstore/catalog/templates/{templateId}/suggestions",
         "appstore",
