@@ -33,11 +33,60 @@ const TASK_STORE = 'tasks'
 const CHUNK_STORE = 'chunks'
 const CHUNK_INDEX = 'taskId'
 
+/**
+ * Account scope of the download queue.
+ *
+ * Download tasks carry presigned URLs and install records, so records written
+ * by one signed-in account must never be listed for another. Both identities
+ * are required: a snapshot missing either one collapses to the anonymous scope
+ * instead of sharing a bucket with a partially known account.
+ */
+export interface DownloadStorageScope {
+  tenantId: string
+  userId: string
+}
+
+interface StoredTaskRecord extends DownloadTask {
+  /** Owning scope; absent on records written before scoping existed. */
+  storageScope?: string
+}
+
 interface StoredChunk {
   key: string
   taskId: string
   sequence: number
   data: ArrayBuffer
+}
+
+/**
+ * Stable storage key of one account.
+ * @param scope - account identity, or undefined for the legacy unscoped adapter.
+ * @returns the composite key, or undefined when no scope was supplied.
+ */
+export function downloadStorageScopeKey(
+  scope: DownloadStorageScope | undefined,
+): string | undefined {
+  if (scope === undefined) return undefined
+  return `${scope.tenantId.trim()}\u0000${scope.userId.trim()}`
+}
+
+/**
+ * Decide whether one stored record belongs to the current account.
+ *
+ * Unscoped adapters keep the pre-scoping behaviour of seeing every record.
+ * Scoped adapters only see their own scope, and fail closed for legacy records
+ * written before scoping existed.
+ * @param recordScopeKey - scope stored alongside the record.
+ * @param currentScopeKey - scope of the adapter reading it.
+ * @returns whether the record may be shown to the current account.
+ */
+export function downloadStorageRecordMatchesScope(
+  recordScopeKey: string | undefined,
+  currentScopeKey: string | undefined,
+): boolean {
+  if (currentScopeKey === undefined) return true
+  if (recordScopeKey === undefined) return false
+  return recordScopeKey === currentScopeKey
 }
 
 function chunkKey(id: string, sequence: number): string {
@@ -100,7 +149,16 @@ function openDatabase(): Promise<IDBDatabase> {
 
 /** IndexedDB-backed storage. One shared database serves every task. */
 export class IndexedDbDownloadStorage implements DownloadStorage {
+  private readonly scopeKey: string | undefined
   private database: Promise<IDBDatabase> | undefined
+
+  /**
+   * @param scope - account whose tasks this adapter reads and writes; omitted
+   * keeps the legacy unscoped behaviour.
+   */
+  constructor(scope?: DownloadStorageScope) {
+    this.scopeKey = downloadStorageScopeKey(scope)
+  }
 
   private open(): Promise<IDBDatabase> {
     this.database ??= openDatabase()
@@ -110,8 +168,11 @@ export class IndexedDbDownloadStorage implements DownloadStorage {
   async list(): Promise<DownloadTask[]> {
     const database = await this.open()
     const transaction = database.transaction(TASK_STORE, 'readonly')
-    return requestResult(
-      transaction.objectStore(TASK_STORE).getAll() as unknown as IDBRequest<DownloadTask[]>,
+    const records = await requestResult(
+      transaction.objectStore(TASK_STORE).getAll() as unknown as IDBRequest<StoredTaskRecord[]>,
+    )
+    return records.filter((record) =>
+      downloadStorageRecordMatchesScope(record.storageScope, this.scopeKey),
     )
   }
 
@@ -119,7 +180,11 @@ export class IndexedDbDownloadStorage implements DownloadStorage {
     const database = await this.open()
     const transaction = database.transaction(TASK_STORE, 'readwrite')
     const done = transactionDone(transaction)
-    transaction.objectStore(TASK_STORE).put(cloneTask(task))
+    const record: StoredTaskRecord =
+      this.scopeKey === undefined
+        ? cloneTask(task)
+        : { ...cloneTask(task), storageScope: this.scopeKey }
+    transaction.objectStore(TASK_STORE).put(record)
     await done
   }
 
@@ -194,17 +259,33 @@ export class IndexedDbDownloadStorage implements DownloadStorage {
 export class MemoryDownloadStorage implements DownloadStorage {
   private readonly tasks = new Map<string, DownloadTask>()
   private readonly chunks = new Map<string, ArrayBuffer[]>()
+  private readonly taskScopes = new Map<string, string | undefined>()
+  private readonly scopeKey: string | undefined
+
+  /**
+   * @param scope - account whose tasks this adapter keeps; omitted keeps the
+   * legacy unscoped behaviour.
+   */
+  constructor(scope?: DownloadStorageScope) {
+    this.scopeKey = downloadStorageScopeKey(scope)
+  }
 
   async list(): Promise<DownloadTask[]> {
-    return Array.from(this.tasks.values()).map(cloneTask)
+    return Array.from(this.tasks.entries())
+      .filter(([id]) =>
+        downloadStorageRecordMatchesScope(this.taskScopes.get(id), this.scopeKey),
+      )
+      .map(([, task]) => cloneTask(task))
   }
 
   async save(task: DownloadTask): Promise<void> {
     this.tasks.set(task.id, cloneTask(task))
+    this.taskScopes.set(task.id, this.scopeKey)
   }
 
   async delete(id: string): Promise<void> {
     this.tasks.delete(id)
+    this.taskScopes.delete(id)
     this.chunks.delete(id)
   }
 
@@ -243,4 +324,20 @@ export function createDefaultDownloadStorage(): DownloadStorage {
     return new MemoryDownloadStorage()
   }
   return new IndexedDbDownloadStorage()
+}
+
+/**
+ * Pick account-scoped storage.
+ *
+ * The storefront must use this instead of {@link createDefaultDownloadStorage}
+ * so a signed-out or different account never lists the previous account's
+ * installer tasks.
+ * @param scope - tenant/user owning the tasks.
+ * @returns scoped IndexedDB storage in a browser, scoped memory storage otherwise.
+ */
+export function createScopedDownloadStorage(scope: DownloadStorageScope): DownloadStorage {
+  if (typeof indexedDB === 'undefined') {
+    return new MemoryDownloadStorage(scope)
+  }
+  return new IndexedDbDownloadStorage(scope)
 }

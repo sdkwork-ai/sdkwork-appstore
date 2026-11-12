@@ -314,7 +314,7 @@ export function AppstoreMarketsSurface(props: AppstoreMarketsSurfaceProps) {
               <Route
                 path="/app/:id"
                 element={
-                  <InstallProvider>
+                  <InstallProvider session={runtime.session}>
                     <ScrollToTop>
                       <AppDetailPage />
                     </ScrollToTop>

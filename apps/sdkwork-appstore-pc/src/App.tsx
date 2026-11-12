@@ -33,7 +33,7 @@ export default function App() {
     // explicitly to the provider's expected type.
     <I18nextProvider i18n={i18n as unknown as ComponentProps<typeof I18nextProvider>['i18n']}>
       <ThemeProvider>
-        <InstallProvider>
+        <InstallProvider session={runtime.session}>
           <BrowserRouter>
             <AppstorePcRoutes runtime={runtime} />
           </BrowserRouter>

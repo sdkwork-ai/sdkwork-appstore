@@ -332,7 +332,7 @@ export function AppstorePcHost(props: AppstorePcHostProps = {}) {
         resolveHostColorScheme={props.resolveHostColorScheme}
         subscribeHostColorScheme={props.subscribeHostColorScheme}
       >
-        <InstallProvider>
+        <InstallProvider session={runtime.session}>
           <MemoryRouter initialEntries={[props.initialPath ?? '/']}>
             <PathObserver onPathChange={props.onPathChange} />
             <AppstorePcRoutes

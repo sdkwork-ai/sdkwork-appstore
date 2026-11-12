@@ -1,7 +1,8 @@
-import React, { useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AppstoreInstallContext, useInstall } from '@sdkwork/appstore-pc-commons';
 import {
+  createScopedDownloadStorage,
   DownloadCenter,
   beginPaidListingCheckoutForApp,
   desktopInstallCodes,
@@ -15,37 +16,34 @@ import {
   selectInstallVariant,
   type AppPlatformGroupKey,
   type DesktopOs,
+  type DownloadStorageScope,
   type DownloadTask,
   type DownloadTaskStatus,
   type InstallSelection,
   type InstallVariant,
   type ListingArtifact,
 } from '@sdkwork/appstore-pc-core';
+import type {
+  AppstorePcSessionSnapshot,
+  AppstorePcSessionStore,
+} from '@sdkwork/appstore-pc-runtime/session';
 import { AppItem } from '../types';
 import { AnimatePresence } from 'motion/react';
 import { InstallModal, type InstallModalState } from '../components/install/InstallModal';
 import { QrCodeModal } from '../components/install/QrCodeModal';
 import { InstallService } from '../services/api';
 import { architectureLabelKey } from '../lib/installVariant';
+import { installAccountKey, resolveInstallAccountScope } from './installAccountScope';
 import { useHostPlatform } from './useHostPlatform';
 
 export { useInstall };
 
-function readLocalInstalledApps(): Set<string> {
-  try {
-    const saved = localStorage.getItem('sdkwork_installed_apps');
-    return saved ? new Set(JSON.parse(saved)) : new Set<string>();
-  } catch {
-    return new Set<string>();
-  }
-}
+const ANONYMOUS_SESSION_SNAPSHOT: AppstorePcSessionSnapshot = {};
 
-function persistInstalledApps(next: Set<string>): void {
-  try {
-    localStorage.setItem('sdkwork_installed_apps', JSON.stringify(Array.from(next)));
-  } catch {
-    // A full or disabled localStorage must not break the installed set.
-  }
+function subscribeToNothing(): () => void {
+  return () => {
+    // No session store was supplied; nothing can change the account.
+  };
 }
 
 function readExpectedBytes(...values: Array<string | null | undefined>): number | null {
@@ -102,8 +100,12 @@ function modalStateFor(status: DownloadTaskStatus): InstallModalState {
   }
 }
 
-function createInstallDownloadCenter(): DownloadCenter {
+function createInstallDownloadCenter(scope: DownloadStorageScope): DownloadCenter {
   return new DownloadCenter({
+    // Every account owns its own task records: a signed-out visitor or a
+    // different account never lists the previous account's installers, their
+    // presigned URLs, or their install records.
+    storage: createScopedDownloadStorage(scope),
     // A presigned installer URL expires; when storage rejects the stale one the
     // center asks the install port for a fresh grant and continues from the
     // same persisted byte offset.
@@ -119,10 +121,43 @@ function createInstallDownloadCenter(): DownloadCenter {
   });
 }
 
-export function InstallProvider({ children }: { children: React.ReactNode }) {
+export interface InstallProviderProps {
+  children: React.ReactNode;
+  /**
+   * Session of the signed-in storefront user. Downloads and the installed set
+   * are scoped to its tenant/user and reset whenever the identity changes;
+   * without a session the provider uses the anonymous scope only.
+   */
+  session?: AppstorePcSessionStore;
+}
+
+export function InstallProvider({ children, session }: InstallProviderProps) {
   const { t } = useTranslation();
   const host = useHostPlatform();
-  const [downloadCenter] = useState(createInstallDownloadCenter);
+  const subscribeSession = useCallback(
+    (listener: () => void) => (session ? session.subscribe(listener) : subscribeToNothing()),
+    [session],
+  );
+  const getSessionSnapshot = useCallback(
+    () => session?.getSnapshot() ?? ANONYMOUS_SESSION_SNAPSHOT,
+    [session],
+  );
+  const sessionSnapshot = useSyncExternalStore(
+    subscribeSession,
+    getSessionSnapshot,
+    getSessionSnapshot,
+  );
+  const accountScope = useMemo(
+    () => resolveInstallAccountScope(sessionSnapshot),
+    [sessionSnapshot],
+  );
+  const accountKey = installAccountKey(accountScope);
+  // The scope object is rebuilt on unrelated session refreshes; only an actual
+  // identity change may replace the center.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const downloadCenter = useMemo(() => createInstallDownloadCenter(accountScope), [accountKey]);
+  const accountKeyRef = useRef(accountKey);
+  accountKeyRef.current = accountKey;
   const downloadSnapshot = useSyncExternalStore(
     downloadCenter.subscribe,
     downloadCenter.getSnapshot,
@@ -134,7 +169,10 @@ export function InstallProvider({ children }: { children: React.ReactNode }) {
   const [activeTaskId, setActiveTaskId] = useState<string | null>(null);
   const [startingInstall, setStartingInstall] = useState(false);
   const [installError, setInstallError] = useState<string | null>(null);
-  const [installedAppIds, setInstalledAppIds] = useState<Set<string>>(readLocalInstalledApps);
+  // Installed apps are a server-backed view scoped to the current account; the
+  // local set is only a render cache and is rebuilt (never inherited) when the
+  // account changes.
+  const [installedAppIds, setInstalledAppIds] = useState<Set<string>>(() => new Set());
   const [qrTarget, setQrTarget] = useState<{ app: AppItem; group?: AppPlatformGroupKey } | null>(
     null,
   );
@@ -162,11 +200,36 @@ export function InstallProvider({ children }: { children: React.ReactNode }) {
     }
   }, [downloadCenter]);
 
-  // Hydrate the installed set from the server-backed library. The server
-  // response is authoritative — an empty library renders an empty state, no
-  // demo apps are ever injected.
+  // An account switch replaces the center; stop the previous account's
+  // transfers instead of letting them keep running behind the new session.
+  useEffect(() => {
+    return () => {
+      void downloadCenter.pauseAll();
+    };
+  }, [downloadCenter]);
+
+  // Hydrate the installed set from the server-backed library for the current
+  // account. The server response is authoritative — an empty library renders
+  // an empty state, no demo apps are ever injected. A new account starts from
+  // an empty set so the previous account's installs never flash or persist.
   useEffect(() => {
     let cancelled = false;
+    setInstalledAppIds(new Set());
+    setAppToInstall(null);
+    setActiveTaskId(null);
+    setNotice(null);
+    setInstallError(null);
+    setStartingInstall(false);
+    startingRef.current = false;
+    installAttempt.current += 1;
+    handledTaskIds.current.clear();
+    // Retire the pre-scoping cross-account cache; the server-backed library for
+    // the current account is the only source from now on.
+    try {
+      localStorage.removeItem('sdkwork_installed_apps');
+    } catch {
+      // Storage can be unavailable in private or restricted contexts.
+    }
     InstallService.getInstalledAppIds()
       .then((ids) => {
         if (!cancelled) {
@@ -174,12 +237,12 @@ export function InstallProvider({ children }: { children: React.ReactNode }) {
         }
       })
       .catch(() => {
-        // keep the local cache when the library endpoint is unavailable
+        // keep the empty set when the library endpoint is unavailable
       });
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [accountKey]);
 
   // The install plan is the single source of truth for both the call to action
   // and the confirmation dialog: both resolve the same recommended build.
@@ -231,7 +294,6 @@ export function InstallProvider({ children }: { children: React.ReactNode }) {
       if (prev.has(appId)) return prev;
       const next = new Set(prev);
       next.add(appId);
-      persistInstalledApps(next);
       return next;
     });
   };
@@ -242,6 +304,7 @@ export function InstallProvider({ children }: { children: React.ReactNode }) {
    * not save a duplicate file or create a second library record.
    */
   useEffect(() => {
+    const settleAccountKey = accountKeyRef.current;
     const settle = async (task: DownloadTask): Promise<void> => {
       let savedToDisk = task.savedAt !== null;
       if (!savedToDisk) {
@@ -275,6 +338,7 @@ export function InstallProvider({ children }: { children: React.ReactNode }) {
         try {
           await InstallService.installApp(task.appId, task.platform, task.architecture ?? undefined);
           await downloadCenter.markInstallRecorded(task.id);
+          if (accountKeyRef.current !== settleAccountKey) return;
           recordInstalled(task.appId);
           if (appToInstallRef.current?.id === task.appId) {
             if (closeTimer.current !== null) clearTimeout(closeTimer.current);
@@ -390,7 +454,6 @@ export function InstallProvider({ children }: { children: React.ReactNode }) {
     setInstalledAppIds((prev) => {
       const next = new Set(prev);
       next.delete(appId);
-      persistInstalledApps(next);
       return next;
     });
     // Record the uninstall on the server-backed library; the local state
