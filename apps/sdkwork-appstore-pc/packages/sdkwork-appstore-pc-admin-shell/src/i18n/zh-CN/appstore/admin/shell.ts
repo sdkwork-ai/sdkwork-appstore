@@ -11,6 +11,7 @@ export const adminShell = {
   },
   nav: {
     group: {
+      application: '应用中心',
       insight: '数据分析',
       governance: '平台治理',
       operations: '目录运营',

@@ -21,6 +21,7 @@ export interface AdminSidebarProps {
 }
 
 const GROUP_ORDER: readonly AppstoreAdminNavGroup[] = [
+  'application',
   'insight',
   'governance',
   'operations',

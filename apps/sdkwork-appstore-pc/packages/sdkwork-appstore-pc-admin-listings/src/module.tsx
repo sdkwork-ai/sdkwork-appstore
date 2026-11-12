@@ -19,8 +19,8 @@ const routes: readonly AppstoreAdminRouteDescriptor[] = [
     nav: {
       labelKey: 'adminListings.list.title',
       icon: 'package',
-      group: 'governance',
-      order: 30,
+      group: 'application',
+      order: 10,
     },
   },
   {

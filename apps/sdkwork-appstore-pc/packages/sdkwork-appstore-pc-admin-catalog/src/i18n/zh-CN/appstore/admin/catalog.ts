@@ -16,7 +16,21 @@ export const adminCatalog = {
     browse: {
       title: '已有分类',
       empty: '还没有任何分类。',
+      emptyFiltered: '没有匹配当前筛选条件的分类。',
       pick: '选入更新',
+      filters: {
+        status: '分类状态',
+        statusAll: '全部状态',
+        keyword: '关键字',
+        keywordPlaceholder: '搜索分类名称、编码或编号',
+        reset: '重置筛选',
+      },
+      lifecycle: {
+        activate: '启用',
+        archive: '归档',
+        applying: '处理中…',
+        updated: '分类状态已更新。',
+      },
       columns: {
         category: '分类',
         status: '状态',

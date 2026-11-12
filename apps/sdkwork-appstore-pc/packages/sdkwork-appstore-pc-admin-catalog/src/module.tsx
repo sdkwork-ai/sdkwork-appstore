@@ -20,8 +20,8 @@ const routes: readonly AppstoreAdminRouteDescriptor[] = [
     nav: {
       labelKey: 'adminCatalog.categories.title',
       icon: 'tags',
-      group: 'operations',
-      order: 10,
+      group: 'application',
+      order: 20,
     },
   },
   {

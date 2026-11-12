@@ -36,6 +36,7 @@ export interface AppstoreAdminModuleRegistry {
 }
 
 const NAV_GROUP_ORDER: readonly AppstoreAdminNavGroup[] = [
+  'application',
   'insight',
   'governance',
   'operations',

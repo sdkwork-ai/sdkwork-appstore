@@ -16,6 +16,7 @@ export const adminListings = {
       listingCode: 'Listing code',
       status: 'Status',
       visibility: 'Visibility',
+      quickVisibility: 'Quick change',
       publisher: 'Publisher',
       updatedAt: 'Updated',
       actions: 'Actions',
@@ -23,6 +24,16 @@ export const adminListings = {
     empty: 'No listings match the current filter.',
     loadFailed: 'Failed to load listings.',
     detail: 'View details',
+    quickVisibility: {
+      label: 'Change the storefront visibility of "{{name}}"',
+      reason: 'Reason (optional)',
+      reasonHint:
+        'Journals why the change was made; the reason is sent with every visibility change made from this page.',
+      reasonPlaceholder: 'For example: compliance review passed',
+      apply: 'Apply',
+      applying: 'Submitting…',
+      updated: 'Storefront visibility updated.',
+    },
   },
   detail: {
     title: 'Listing detail',

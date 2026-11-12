@@ -8,6 +8,7 @@ import type { ReactNode } from 'react';
  * without knowing which packages exist.
  */
 export type AppstoreAdminNavGroup =
+  | 'application'
   | 'insight'
   | 'governance'
   | 'operations'

@@ -16,6 +16,7 @@ export const adminListings = {
       listingCode: '应用编码',
       status: '上架状态',
       visibility: '商店可见性',
+      quickVisibility: '快速变更',
       publisher: '开发者',
       updatedAt: '更新时间',
       actions: '操作',
@@ -23,6 +24,15 @@ export const adminListings = {
     empty: '当前筛选条件下没有应用。',
     loadFailed: '应用列表加载失败。',
     detail: '查看详情',
+    quickVisibility: {
+      label: '变更「{{name}}」的商店可见性',
+      reason: '变更原因（可选）',
+      reasonHint: '记录本次变更依据，便于审计；该原因随本次页面内的可见性变更一并提交。',
+      reasonPlaceholder: '例如：合规复审通过',
+      apply: '应用',
+      applying: '提交中…',
+      updated: '商店可见性已更新。',
+    },
   },
   detail: {
     title: '应用详情',

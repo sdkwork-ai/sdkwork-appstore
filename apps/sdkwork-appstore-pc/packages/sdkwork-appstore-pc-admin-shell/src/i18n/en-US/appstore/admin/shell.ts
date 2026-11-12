@@ -11,6 +11,7 @@ export const adminShell = {
   },
   nav: {
     group: {
+      application: 'Application Center',
       insight: 'Analytics',
       governance: 'Platform Governance',
       operations: 'Catalog Operations',

@@ -16,7 +16,21 @@ export const adminCatalog = {
     browse: {
       title: 'Existing categories',
       empty: 'No categories yet.',
+      emptyFiltered: 'No categories match the current filters.',
       pick: 'Pick for update',
+      filters: {
+        status: 'Category status',
+        statusAll: 'All statuses',
+        keyword: 'Keyword',
+        keywordPlaceholder: 'Search name, code, or id',
+        reset: 'Reset filters',
+      },
+      lifecycle: {
+        activate: 'Activate',
+        archive: 'Archive',
+        applying: 'Applying…',
+        updated: 'Category status updated.',
+      },
       columns: {
         category: 'Category',
         status: 'Status',

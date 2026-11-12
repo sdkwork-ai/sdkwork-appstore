@@ -126,6 +126,34 @@ describe('admin module registry', () => {
     ]);
   });
 
+  it('places the application group ahead of every other operator group', () => {
+    const withApplication = createAppstoreAdminModuleRegistry([
+      module('dashboard', 'adminDashboard.title', [
+        {
+          id: 'dashboard.overview',
+          path: 'dashboard',
+          requiredPermissions: [],
+          render: () => null,
+          nav: { labelKey: 'adminDashboard.overview.title', group: 'insight', order: 10 },
+        },
+      ]),
+      module('listings', 'adminListings.title', [
+        {
+          id: 'listings-admin',
+          path: 'listings',
+          requiredPermissions: [],
+          render: () => null,
+          nav: { labelKey: 'adminListings.list.title', group: 'application', order: 10 },
+        },
+      ]),
+    ]);
+
+    expect(withApplication.listNavigation('/admin').map((entry) => entry.group)).toEqual([
+      'application',
+      'insight',
+    ]);
+  });
+
   it('exposes the original modules for composition assertions', () => {
     expect(registry.modules).toEqual(modules);
   });
