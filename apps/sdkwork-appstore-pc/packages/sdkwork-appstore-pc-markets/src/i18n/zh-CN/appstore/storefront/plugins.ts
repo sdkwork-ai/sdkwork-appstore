@@ -71,7 +71,16 @@ export const plugins = {
   },
   status: {
     enabled: '已启用',
-    disabled: '已禁用'
+    disabled: '已禁用',
+    install: '安装',
+    installing: '安装中…',
+    installed: '已安装',
+    installFailed: '安装失败'
+  },
+  source: {
+    git: 'Git 仓库',
+    archive: '压缩包',
+    drive: '云盘目录'
   },
   registerModal: {
     title: '注册自定义扩展插件'

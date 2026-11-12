@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { PluginItem } from '@sdkwork/appstore-pc-core';
+import type { PluginsHost } from '@sdkwork/appstore-pc-core';
 import { ModalShell } from '@sdkwork/appstore-pc-commons';
 import { PluginModalHeader } from './PluginModalHeader';
 import { PluginOverviewTab } from './PluginOverviewTab';
@@ -14,12 +15,15 @@ interface PluginDetailModalProps {
   plugin: PluginItem | null;
   onClose: () => void;
   onToggleEnable: (id: string) => void;
+  /** The embedding host's install port, when it provides one. */
+  pluginsHost?: PluginsHost;
 }
 
 export const PluginDetailModal: React.FC<PluginDetailModalProps> = ({
   plugin,
   onClose,
   onToggleEnable,
+  pluginsHost,
 }) => {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<'overview' | 'schema' | 'sandbox'>('overview');
@@ -103,6 +107,7 @@ export const PluginDetailModal: React.FC<PluginDetailModalProps> = ({
         plugin={plugin}
         onClose={onClose}
         onToggleEnable={onToggleEnable}
+        {...(pluginsHost === undefined ? {} : { pluginsHost })}
       />
     </ModalShell>
   );

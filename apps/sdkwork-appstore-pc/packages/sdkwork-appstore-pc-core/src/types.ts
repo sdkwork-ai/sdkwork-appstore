@@ -138,6 +138,47 @@ export interface PluginItem {
   apiSchemaType: 'OpenAPI' | 'GraphQL' | 'gRPC' | 'REST';
   capabilities: string[];
   docUrl?: string;
+  /**
+   * Where the plugin package comes from: a Git repository (optionally one
+   * directory inside it), an archive, or a sdkwork-drive directory. Absent for
+   * an entry that publishes no installable source.
+   */
+  source?: PluginSourceRef;
+}
+
+/** The three forms a plugin source takes, as the catalog publishes them. */
+export type PluginSourceType = 'git' | 'archive' | 'drive';
+
+/**
+ * One plugin package's provenance. A repository may publish several plugins,
+ * one per directory, so `directory` is part of the identity.
+ */
+export interface PluginSourceRef {
+  type: PluginSourceType;
+  /** The https clone URL, archive URL, or Drive download URL. */
+  url: string;
+  /** A Git branch, tag, or commit. */
+  ref?: string;
+  /** The plugin package's directory inside the source. */
+  directory?: string;
+  /** The archive's expected SHA-256, for `archive`. */
+  sha256?: string;
+  /** The Drive node id, for `drive`. */
+  nodeId?: string;
+}
+
+/**
+ * The embedding host's plugin installation port. A host that provides it
+ * replaces the storefront's server-side enable toggle with a real install of
+ * the entry's source into the host's own plugin tree.
+ */
+export interface PluginsHost {
+  /**
+   * Install one catalog entry.
+   * @param plugin - the entry and its source.
+   * @returns when the host accepted the installation (progress is the host's).
+   */
+  install(plugin: PluginItem): void | Promise<void>;
 }
 
 export interface SkillItem {

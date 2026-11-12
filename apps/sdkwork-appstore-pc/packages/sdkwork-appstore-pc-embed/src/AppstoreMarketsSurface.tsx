@@ -19,6 +19,7 @@ import {
   ThemeProvider,
 } from '@sdkwork/appstore-pc-storefront';
 import type { DemandHallItem } from '@sdkwork/appstore-pc-core';
+import type { PluginsHost } from '@sdkwork/appstore-pc-core';
 import {
   createAppstorePcRuntime,
   resolveAppstorePcRuntimeConfig,
@@ -106,6 +107,12 @@ export interface AppstoreMarketsSurfaceProps {
    * when the host already has that page open on a detail route.
    */
   navigationResetKey?: number
+  /**
+   * The embedding host's plugin install port. The plugins catalog turns each
+   * entry's published source into an install through it; without one the page
+   * keeps the storefront's own enable state.
+   */
+  pluginsHost?: PluginsHost
 }
 
 function resolveMarketsConfig(props: AppstoreMarketsSurfaceProps): AppstorePcRuntimeConfig {
@@ -318,6 +325,11 @@ export function AppstoreMarketsSurface(props: AppstoreMarketsSurfaceProps) {
                   fall back to the catalog instead of a blank column. */}
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
+          ) : props.page === 'plugins' ? (
+            <PluginsPage
+              {...(props.searchQuery === undefined ? {} : { searchQuery: props.searchQuery })}
+              {...(props.pluginsHost === undefined ? {} : { pluginsHost: props.pluginsHost })}
+            />
           ) : (
             <MarketPage
               {...(props.searchQuery === undefined ? {} : { searchQuery: props.searchQuery })}

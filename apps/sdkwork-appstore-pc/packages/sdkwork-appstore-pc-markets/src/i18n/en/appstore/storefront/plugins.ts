@@ -71,7 +71,16 @@ export const plugins = {
   },
   status: {
     enabled: 'Enabled',
-    disabled: 'Disabled'
+    disabled: 'Disabled',
+    install: 'Install',
+    installing: 'Installing…',
+    installed: 'Installed',
+    installFailed: 'Install failed'
+  },
+  source: {
+    git: 'Git repository',
+    archive: 'Archive',
+    drive: 'Drive directory'
   },
   registerModal: {
     title: 'Register Custom Extension Plugin'

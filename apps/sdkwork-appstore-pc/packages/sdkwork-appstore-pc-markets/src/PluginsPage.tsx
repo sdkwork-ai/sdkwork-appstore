@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { PluginItem } from '@sdkwork/appstore-pc-core';
+import type { PluginsHost } from '@sdkwork/appstore-pc-core';
 import { CardGrid } from '@sdkwork/appstore-pc-commons';
 import { PluginCard } from './components/plugins/PluginCard';
 import { PluginFilter } from './components/plugins/PluginFilter';
@@ -18,9 +19,15 @@ export interface PluginsPageProps {
    * Unset filters by the empty string, i.e. the full catalog.
    */
   searchQuery?: string;
+  /**
+   * The embedding host's plugin install port. With it, a catalog entry that
+   * publishes a source installs into the host's own plugin tree; without it
+   * (a standalone storefront) the card keeps the catalog's enable state.
+   */
+  pluginsHost?: PluginsHost;
 }
 
-export function PluginsPage({ searchQuery }: PluginsPageProps = {}) {
+export function PluginsPage({ searchQuery, pluginsHost }: PluginsPageProps = {}) {
   const { t } = useTranslation();
   // The catalog is loaded once and filtered locally: the category chips are
   // derived from the full catalog, so selecting one never hides the others and
@@ -127,6 +134,7 @@ export function PluginsPage({ searchQuery }: PluginsPageProps = {}) {
               plugin={plugin}
               onToggleEnable={handleToggleEnable}
               onSelect={setSelectedPlugin}
+              {...(pluginsHost === undefined ? {} : { pluginsHost })}
             />
           ))}
         </CardGrid>
@@ -139,6 +147,7 @@ export function PluginsPage({ searchQuery }: PluginsPageProps = {}) {
         plugin={selectedPlugin}
         onClose={() => setSelectedPlugin(null)}
         onToggleEnable={handleToggleEnable}
+        {...(pluginsHost === undefined ? {} : { pluginsHost })}
       />
     </div>
   );

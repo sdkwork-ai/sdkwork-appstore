@@ -4,7 +4,7 @@ import {
   type PluginsServicePort,
 } from '@sdkwork/appstore-pc-core';
 
-import type { PluginItem } from '../types';
+import type { PluginItem, PluginSourceRef } from '../types';
 
 const pluginPageSize = 200;
 const pluginType = 'PLUGIN';
@@ -63,6 +63,7 @@ export function createPluginsServicePort(client: AppStoreClient): PluginsService
           docUrl: pluginData.docUrl || '',
           downloadsCount: 1,
           rating: 5.0,
+          ...(pluginData.source === undefined ? {} : { pluginSource: pluginData.source }),
         },
       });
       return mapPluginRecord(template as unknown as Record<string, unknown>);
@@ -86,6 +87,7 @@ function mapPluginRecord(record: Record<string, unknown>): PluginItem {
     readString(record, 'categoryCode', 'category_code') ||
     '代码与开发';
   const visual = categoryVisuals[category] ?? categoryVisuals.default;
+  const source = readPluginSource(meta, record);
   return {
     id,
     name: readString(record, 'templateName', 'template_name'),
@@ -101,7 +103,42 @@ function mapPluginRecord(record: Record<string, unknown>): PluginItem {
     apiSchemaType: (readString(meta, 'apiSchemaType') as PluginItem['apiSchemaType']) || 'OpenAPI',
     capabilities: readStringArray(meta, 'capabilities'),
     docUrl: readString(meta, 'docUrl') || undefined,
+    ...(source === undefined ? {} : { source }),
   };
+}
+
+/**
+ * Read the installable source a catalog record publishes.
+ *
+ * The record's `metadata.pluginSource` is the standard form; a record that only
+ * carries the legacy `gitRepoUrl` column (and optionally a directory) is still
+ * installable, so the catalog does not need a migration before it can list a
+ * plugin. A source with no usable type or URL is dropped rather than guessed.
+ */
+function readPluginSource(
+  meta: Record<string, unknown>,
+  record: Record<string, unknown>,
+): PluginSourceRef | undefined {
+  const declared = meta.pluginSource;
+  if (declared && typeof declared === 'object' && !Array.isArray(declared)) {
+    const source = declared as Record<string, unknown>;
+    const type = readString(source, 'type', 'kind');
+    const url = readString(source, 'url');
+    if ((type === 'git' || type === 'archive' || type === 'drive') && url !== '') {
+      return {
+        type,
+        url,
+        ...(readString(source, 'ref') === '' ? {} : { ref: readString(source, 'ref') }),
+        ...(readString(source, 'directory') === '' ? {} : { directory: readString(source, 'directory') }),
+        ...(readString(source, 'sha256') === '' ? {} : { sha256: readString(source, 'sha256') }),
+        ...(readString(source, 'nodeId') === '' ? {} : { nodeId: readString(source, 'nodeId') }),
+      };
+    }
+  }
+  const url = readString(record, 'gitRepoUrl', 'git_repo_url') || readString(meta, 'repositoryUrl', 'gitUrl');
+  if (url === '') return undefined;
+  const directory = readString(meta, 'pluginDirectory', 'gitRepoDirectory', 'repositoryDirectory');
+  return { type: 'git', url, ...(directory === '' ? {} : { directory }) };
 }
 
 const categoryVisuals: Record<string, { icon: string; color: string }> = {

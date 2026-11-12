@@ -361,3 +361,4 @@ export {
   type AppstoreMarketsSurfaceProps,
   type AppstoreMarketsSurfaceSession,
 } from './AppstoreMarketsSurface'
+export type { PluginItem, PluginSourceRef, PluginsHost } from '@sdkwork/appstore-pc-core'
