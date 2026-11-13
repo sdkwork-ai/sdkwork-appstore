@@ -22,7 +22,11 @@ export {
   type AdminBreadcrumbItem,
   type AdminBreadcrumbProps,
 } from './components/AdminBreadcrumb';
-export { AdminTopbar, type AdminTopbarProps } from './components/AdminTopbar';
+export {
+  AdminTopbar,
+  type AdminHeaderMenuItem,
+  type AdminTopbarProps,
+} from './components/AdminTopbar';
 export { AdminSidebar, type AdminSidebarProps } from './components/AdminSidebar';
 export {
   AdminNavIcon,

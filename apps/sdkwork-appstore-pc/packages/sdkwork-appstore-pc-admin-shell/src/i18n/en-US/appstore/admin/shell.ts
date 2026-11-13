@@ -10,6 +10,7 @@ export const adminShell = {
     subtitle: 'SDKWork App Store',
   },
   nav: {
+    primary: 'Primary navigation',
     group: {
       application: 'Application Center',
       insight: 'Analytics',

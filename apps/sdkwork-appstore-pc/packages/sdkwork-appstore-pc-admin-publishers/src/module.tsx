@@ -21,8 +21,8 @@ const routes: readonly AppstoreAdminRouteDescriptor[] = [
     nav: {
       labelKey: 'adminPublishers.verification.title',
       icon: 'badge-check',
-      group: 'governance',
-      order: 40,
+      group: 'application',
+      order: 70,
     },
   },
   {

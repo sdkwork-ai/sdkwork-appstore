@@ -10,6 +10,7 @@ export const adminShell = {
     subtitle: 'SDKWork 应用商店',
   },
   nav: {
+    primary: '主导航',
     group: {
       application: '应用中心',
       insight: '数据分析',

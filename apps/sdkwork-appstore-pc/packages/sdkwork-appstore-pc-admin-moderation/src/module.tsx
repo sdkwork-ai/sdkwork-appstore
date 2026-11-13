@@ -21,8 +21,8 @@ const routes: readonly AppstoreAdminRouteDescriptor[] = [
     nav: {
       labelKey: 'adminModeration.queue.title',
       icon: 'list-checks',
-      group: 'governance',
-      order: 10,
+      group: 'application',
+      order: 20,
     },
   },
   {
@@ -39,8 +39,8 @@ const routes: readonly AppstoreAdminRouteDescriptor[] = [
     nav: {
       labelKey: 'adminModeration.appeals.title',
       icon: 'file-clock',
-      group: 'governance',
-      order: 20,
+      group: 'application',
+      order: 30,
     },
   },
   {

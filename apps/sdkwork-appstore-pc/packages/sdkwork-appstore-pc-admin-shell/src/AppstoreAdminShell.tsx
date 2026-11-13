@@ -13,7 +13,7 @@ import {
 
 import { AdminAccessDenied } from './components/AdminAccessDenied';
 import { AdminSidebar } from './components/AdminSidebar';
-import { AdminTopbar } from './components/AdminTopbar';
+import { AdminTopbar, type AdminHeaderMenuItem } from './components/AdminTopbar';
 import { AppstoreAdminShellProvider } from './context/AdminShellContext';
 import { AdminRouteTree, resolveAdminAbsolutePath } from './routes/AdminRouteTree';
 
@@ -85,6 +85,25 @@ export function AppstoreAdminShell({
     ...(activeEntry ? [{ label: t(activeEntry.labelKey) }] : []),
   ];
 
+  // One header-menu destination per declared nav group, resolved to that
+  // group's first page. The menu is derived from the same registry the sidebar
+  // renders, so `应用中心` appears in the header as soon as the group exists and
+  // can never drift from the sidebar's copy or order.
+  const headerMenu: AdminHeaderMenuItem[] = [];
+  const seenGroups = new Set<string>();
+  for (const entry of navigation) {
+    if (seenGroups.has(entry.group)) {
+      continue;
+    }
+    seenGroups.add(entry.group);
+    headerMenu.push({
+      id: entry.group,
+      label: t(`adminShell.nav.group.${entry.group}`),
+      path: entry.path,
+      active: activeEntry?.group === entry.group,
+    });
+  }
+
   return (
     <div className="flex min-h-screen bg-store-subtle text-store-ink ">
       <AdminSidebar
@@ -97,6 +116,8 @@ export function AppstoreAdminShell({
       <div className="flex min-w-0 flex-1 flex-col">
         <AdminTopbar
           breadcrumb={breadcrumb}
+          menu={headerMenu}
+          menuLabel={t('adminShell.nav.primary')}
           trailing={
             <span className="rounded-full bg-store-subtle px-2.5 py-0.5 font-mono text-xs uppercase tracking-wide text-store-ink-faint font-medium">
               {platform}

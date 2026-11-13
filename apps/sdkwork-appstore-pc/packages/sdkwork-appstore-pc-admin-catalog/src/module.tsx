@@ -21,7 +21,7 @@ const routes: readonly AppstoreAdminRouteDescriptor[] = [
       labelKey: 'adminCatalog.categories.title',
       icon: 'tags',
       group: 'application',
-      order: 20,
+      order: 40,
     },
   },
   {
@@ -32,8 +32,8 @@ const routes: readonly AppstoreAdminRouteDescriptor[] = [
     nav: {
       labelKey: 'adminCatalog.collections.title',
       icon: 'layers',
-      group: 'operations',
-      order: 20,
+      group: 'application',
+      order: 50,
     },
   },
   {
@@ -44,8 +44,8 @@ const routes: readonly AppstoreAdminRouteDescriptor[] = [
     nav: {
       labelKey: 'adminCatalog.featured.title',
       icon: 'store',
-      group: 'operations',
-      order: 30,
+      group: 'application',
+      order: 60,
     },
   },
 ];
