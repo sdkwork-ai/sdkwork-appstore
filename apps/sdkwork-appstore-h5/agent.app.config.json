@@ -116,6 +116,19 @@
     "domain": "appstore",
     "capability": "store",
     "standardOwner": "sdkwork-appstore",
-    "deploymentConfig": "etc/sdkwork.deployment.config.json"
+    "deploymentConfig": "etc/sdkwork.deployment.config.json",
+    "publishing": {
+      "appIdByTarget": {
+        "cloud.development": "700a4fa3-dbf0-4c36-8959-4fdbbd904883"
+      },
+      "birdcoder": {
+        "appId": "700a4fa3-dbf0-4c36-8959-4fdbbd904883",
+        "appName": "SDKWork App Store",
+        "appSlug": "sdkwork-app-store",
+        "appKey": "sdkwork-appstore-h5",
+        "sourceDirectory": "D:\\sdkwork-space\\sdkwork-appstore\\apps\\sdkwork-appstore-h5",
+        "updatedAt": "2026-11-13T14:33:43.268Z"
+      }
+    }
   }
 }
