@@ -1,12 +1,15 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { McpServerItem } from '@sdkwork/appstore-pc-core';
+import type { McpCategoryOption } from '@sdkwork/appstore-pc-core';
 import { CardGrid } from '@sdkwork/appstore-pc-commons';
 import { McpCard } from './components/mcp/McpCard';
 import { McpConfigModal } from './components/mcp/McpConfigModal';
 import { AddMcpServerModal } from './components/mcp/AddMcpServerModal';
 import { McpEmptyState } from './components/mcp/McpEmptyState';
+import { McpFilter } from './components/mcp/McpFilter';
+import { ALL_CATEGORY, type CategoryOption } from './components/marketCategories';
 import { McpService } from '@sdkwork/appstore-pc-core';
 
 /** Props for the MCP catalog page. */
@@ -23,6 +26,10 @@ export interface McpPageProps {
 export function McpPage({ searchQuery }: McpPageProps = {}) {
   const { t } = useTranslation();
   const [servers, setServers] = useState<McpServerItem[]>([]);
+  // The chip row comes from the MCP module's category registry; when that read
+  // fails the page keeps an "all" chip instead of losing its filter row.
+  const [registryCategories, setRegistryCategories] = useState<McpCategoryOption[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<string>(ALL_CATEGORY);
   const [selectedServer, setSelectedServer] = useState<McpServerItem | null>(null);
   const [loading, setLoading] = useState(true);
   const [isAddOpen, setIsAddOpen] = useState(false);
@@ -42,6 +49,41 @@ export function McpPage({ searchQuery }: McpPageProps = {}) {
   useEffect(() => {
     loadServers();
   }, [searchQuery]);
+
+  useEffect(() => {
+    let cancelled = false;
+    McpService.getMcpCategories()
+      .then((categories) => {
+        if (!cancelled) {
+          setRegistryCategories(categories);
+        }
+      })
+      .catch(() => {
+        // Taxonomy is a presentation enhancement; the catalog still lists.
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const categories = useMemo<CategoryOption[]>(
+    () => [
+      { value: ALL_CATEGORY, label: t('mcp.header.allCategories') },
+      ...registryCategories.map((category) => ({
+        value: category.code,
+        label: category.name,
+      })),
+    ],
+    [registryCategories, t],
+  );
+
+  const visibleServers = useMemo(
+    () =>
+      selectedCategory === ALL_CATEGORY
+        ? servers
+        : servers.filter((server) => server.categoryCode === selectedCategory),
+    [servers, selectedCategory],
+  );
 
   const handleToggleConnect = async (id: string) => {
     setActionError(null);
@@ -97,9 +139,17 @@ export function McpPage({ searchQuery }: McpPageProps = {}) {
 
   return (
     <div className="p-6 md:p-8 w-full max-w-full space-y-6 animate-fade-in @container">
-      {/* Deploy action row — the page's one affordance rides the top; text
-          search belongs to the surrounding chrome. */}
-      <div className="flex md:justify-end">
+      {/* Deploy action row — the page's one affordance rides the top beside the
+          registry category chips; text search belongs to the surrounding
+          chrome. */}
+      <div className="flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between min-w-0 w-full">
+        <div className="flex-1 min-w-0">
+          <McpFilter
+            selectedCategory={selectedCategory}
+            onSelectCategory={setSelectedCategory}
+            categories={categories}
+          />
+        </div>
         <button
           onClick={() => setIsAddOpen(true)}
           className="px-4 py-2 bg-store-brand hover:bg-store-brand-hover text-white rounded-store-control text-xs font-medium transition-all shadow-sm shrink-0 flex items-center justify-center gap-1.5 cursor-pointer"
@@ -119,7 +169,7 @@ export function McpPage({ searchQuery }: McpPageProps = {}) {
         <div className="py-20 text-center text-xs text-store-ink-faint">{t('mcp.loading')}</div>
       ) : (
         <CardGrid>
-          {servers.map((server) => (
+          {visibleServers.map((server) => (
             <McpCard
               key={server.id}
               server={server}
@@ -130,7 +180,7 @@ export function McpPage({ searchQuery }: McpPageProps = {}) {
         </CardGrid>
       )}
 
-      {servers.length === 0 && !loading && <McpEmptyState />}
+      {visibleServers.length === 0 && !loading && <McpEmptyState />}
 
       {/* Config Modal */}
       <McpConfigModal

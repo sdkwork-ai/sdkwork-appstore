@@ -1,12 +1,14 @@
-import type { McpServerRecord, McpAppClient } from '@sdkwork/appstore-pc-core';
+import type { McpServerRecord, McpAppClient, McpServerCategoryRecord } from '@sdkwork/appstore-pc-core';
 import {
   configureMcpServicePort,
+  type McpCategoryOption,
   type McpServicePort,
 } from '@sdkwork/appstore-pc-core';
 
 import type { McpServerItem } from '../types';
 
 const registryPageSize = 48;
+const categoryPageSize = 200;
 
 export function configureAppstorePcMcp(client: McpAppClient): void {
   configureMcpServicePort(createMcpServicePort(client));
@@ -17,7 +19,7 @@ export function createMcpServicePort(client: McpAppClient): McpServicePort {
 
   return {
     async getMcpServers(query = ''): Promise<McpServerItem[]> {
-      const response = await client.mcp.servers.list({
+      const response = await client.mcp.listServers({
         page: 1,
         pageSize: registryPageSize,
         q: query.trim() || undefined,
@@ -28,6 +30,22 @@ export function createMcpServicePort(client: McpAppClient): McpServicePort {
         serversById.set(server.id, server);
       }
       return servers;
+    },
+
+    async getMcpCategories(): Promise<McpCategoryOption[]> {
+      const response = await client.mcp.listCategories({
+        page: 1,
+        pageSize: categoryPageSize,
+      });
+      return readPageItems<McpServerCategoryRecord>(response)
+        .filter((category) => category.lifecycle_status === 'active')
+        .slice()
+        .sort((left, right) => (left.sort_order ?? 0) - (right.sort_order ?? 0))
+        .map((category) => ({
+          code: category.category_code,
+          name: category.name,
+          sortWeight: category.sort_order ?? 0,
+        }));
     },
 
     async getMcpConfigSnippet(serverId: string): Promise<string> {
@@ -79,6 +97,7 @@ function mapMcpServerRecord(record: McpServerRecord): McpServerItem {
     name: record.name,
     protocolVersion: 'MCP',
     publisher: record.category_code ?? 'SDKWork MCP',
+    ...(record.category_code ? { categoryCode: record.category_code } : {}),
     resourcesProvided: [],
     status: mapMcpStatus(record),
     toolsProvided: [],

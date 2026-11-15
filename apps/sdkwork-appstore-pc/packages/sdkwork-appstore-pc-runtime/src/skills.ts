@@ -6,6 +6,7 @@ import type {
 } from '@sdkwork/appstore-pc-core';
 import {
   configureSkillsServicePort,
+  type SkillCategoryOption,
   type SkillsServicePort,
 } from '@sdkwork/appstore-pc-core';
 
@@ -13,6 +14,7 @@ import type { SkillItem } from '../types';
 
 const marketplacePageSize = 48;
 const installationPageSize = 200;
+const categoryPageSize = 200;
 
 export function configureAppstorePcSkills(client: SkillsAppClient): void {
   configureSkillsServicePort(createSkillsServicePort(client));
@@ -54,6 +56,22 @@ export function createSkillsServicePort(
         .map((record) =>
           mapSkillRecord(record, installedSkillIds, installedPackageIds),
         );
+    },
+
+    async getSkillCategories(): Promise<SkillCategoryOption[]> {
+      const response = await client.skills.skillCategories.list({
+        page: 1,
+        pageSize: categoryPageSize,
+      });
+      return response.items
+        .filter((category) => category.visible && category.status === 1)
+        .slice()
+        .sort((left, right) => left.sortWeight - right.sortWeight)
+        .map((category) => ({
+          code: category.code,
+          name: category.name,
+          sortWeight: category.sortWeight,
+        }));
     },
 
     async toggleInstallSkill(id: string): Promise<boolean> {
@@ -130,6 +148,7 @@ function mapSkillRecord(
     activeCount: parseCount(record.installCount),
     author: 'SDKWork Skills',
     category: record.categories[0] ?? 'General',
+    categoryCodes: [...record.categories],
     description: record.summary ?? record.description ?? '',
     icon: 'Zap',
     iconColor: 'bg-store-brand',

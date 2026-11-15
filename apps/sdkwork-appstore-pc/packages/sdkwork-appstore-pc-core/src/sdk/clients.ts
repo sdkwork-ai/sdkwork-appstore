@@ -1,4 +1,4 @@
-import {
+﻿import {
   createAppStoreClient,
   type AppStoreClient,
   type DownloadGrant,
@@ -27,6 +27,7 @@ import {
 import {
   createClient as createMcpAppClient,
   type SdkworkMcpAppClient as McpAppClient,
+  type McpServerCategoryRecord,
   type McpServerRecord,
 } from '@sdkwork/mcp-app-sdk';
 import {
@@ -49,6 +50,7 @@ export type {
   CompanyAppClient,
   DownloadGrant,
   McpAppClient,
+  McpServerCategoryRecord,
   McpServerRecord,
   OrderAppClient,
   SkillArtifactRecord,
@@ -66,7 +68,7 @@ export interface AppstorePcSdkClientInventory {
   mcp: McpAppClient;
   /** Anonymous open-api client (`/store/v3/api`); public share views. */
   open: AppStoreOpenClient;
-  /** Commerce order client: demand claims (抢单) and delivery lifecycle. */
+  /** Commerce order client: demand claims (鎶㈠崟) and delivery lifecycle. */
   order: OrderAppClient;
   sdkFamilies: {
     app: readonly string[];

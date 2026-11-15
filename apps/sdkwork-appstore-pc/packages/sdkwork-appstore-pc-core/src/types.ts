@@ -186,6 +186,13 @@ export interface SkillItem {
   name: string;
   author: string;
   category: string;
+  /**
+   * Every registry category code this skill is filed under.
+   *
+   * A skill may bind several categories, so the catalog's category chips must
+   * filter by membership rather than by the first category alone.
+   */
+  categoryCodes?: string[];
   description: string;
   icon: string;
   iconColor: string;
@@ -200,6 +207,8 @@ export interface SkillItem {
 export interface McpServerItem {
   id: string;
   name: string;
+  /** Registry category code the connector is filed under, when it has one. */
+  categoryCode?: string;
   protocolVersion: string;
   transportType: 'stdio' | 'SSE' | 'WebSocket' | 'sse' | 'http';
   publisher: string;

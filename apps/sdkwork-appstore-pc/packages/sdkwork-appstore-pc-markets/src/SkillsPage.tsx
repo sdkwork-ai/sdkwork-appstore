@@ -9,6 +9,7 @@ import { SkillDetailModal } from './components/skills/SkillDetailModal';
 import { PublishSkillModal } from './components/skills/PublishSkillModal';
 import { SkillsEmptyState } from './components/skills/SkillsEmptyState';
 import { SkillsService } from '@sdkwork/appstore-pc-core';
+import type { SkillCategoryOption } from '@sdkwork/appstore-pc-core';
 import { ALL_CATEGORY, type CategoryOption } from './components/marketCategories';
 
 /** Props for the skills catalog page. */
@@ -24,10 +25,14 @@ export interface SkillsPageProps {
 
 export function SkillsPage({ searchQuery }: SkillsPageProps = {}) {
   const { t } = useTranslation();
-  // The catalog is loaded once and filtered locally: the category chips are
-  // derived from the full catalog, so selecting one never hides the others and
-  // every chip names a category the catalog actually contains.
+  // The catalog is loaded once and filtered locally. The category chips come
+  // from the Skills category registry (the owning module), not from the codes
+  // present in this page: a registry category with nothing filed under it is
+  // still a real filter, and retired categories must not appear. When the
+  // registry is unavailable the chips fall back to the codes the catalog
+  // actually carries, so the page never loses its filter row.
   const [allSkills, setAllSkills] = useState<SkillItem[]>([]);
+  const [registryCategories, setRegistryCategories] = useState<SkillCategoryOption[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>(ALL_CATEGORY);
   const [selectedSkill, setSelectedSkill] = useState<SkillItem | null>(null);
   const [loading, setLoading] = useState(true);
@@ -36,10 +41,16 @@ export function SkillsPage({ searchQuery }: SkillsPageProps = {}) {
 
   useEffect(() => {
     let cancelled = false;
-    SkillsService.getSkills()
-      .then((data) => {
+    Promise.all([
+      SkillsService.getSkills(),
+      // The taxonomy is a presentation enhancement: a failed registry read must
+      // not hide the catalog behind an error banner.
+      SkillsService.getSkillCategories().catch(() => [] as SkillCategoryOption[]),
+    ])
+      .then(([skills, categories]) => {
         if (!cancelled) {
-          setAllSkills(data);
+          setAllSkills(skills);
+          setRegistryCategories(categories);
         }
       })
       .catch((err) => {
@@ -66,6 +77,16 @@ export function SkillsPage({ searchQuery }: SkillsPageProps = {}) {
   ];
 
   const categories = useMemo<CategoryOption[]>(() => {
+    const all = { value: ALL_CATEGORY, label: t('skills.categories.all') };
+    if (registryCategories.length > 0) {
+      return [
+        all,
+        ...registryCategories.map((category) => ({
+          value: category.code,
+          label: category.name,
+        })),
+      ];
+    }
     const values = new Set<string>();
     allSkills.forEach((skill) => {
       if (skill.category) {
@@ -73,18 +94,21 @@ export function SkillsPage({ searchQuery }: SkillsPageProps = {}) {
       }
     });
     return [
-      { value: ALL_CATEGORY, label: t('skills.categories.all') },
+      all,
       ...[...values]
         .sort((left, right) => left.localeCompare(right))
         .map((value) => ({ value, label: value })),
     ];
-  }, [allSkills, t]);
+  }, [allSkills, registryCategories, t]);
 
   const skills = useMemo(() => {
     const query = (searchQuery ?? '').trim().toLocaleLowerCase();
     return allSkills.filter((skill) => {
-      if (selectedCategory !== ALL_CATEGORY && skill.category !== selectedCategory) {
-        return false;
+      if (selectedCategory !== ALL_CATEGORY) {
+        const codes = skill.categoryCodes ?? [skill.category];
+        if (!codes.includes(selectedCategory)) {
+          return false;
+        }
       }
       if (!query) {
         return true;
