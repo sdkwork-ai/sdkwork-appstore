@@ -27,7 +27,7 @@ export const adminCatalog = {
       },
       lifecycle: {
         activate: 'Activate',
-        archive: 'Archive',
+        archive: 'Deactivate',
         applying: 'Applying…',
         updated: 'Category status updated.',
       },
@@ -45,6 +45,10 @@ export const adminCatalog = {
       categoryCode: 'Category code',
       categoryCodePlaceholder: 'For example appstore.games',
       categoryCodeHint: 'Platform-unique category code; immutable after creation.',
+      displayName: 'Display name',
+      displayNamePlaceholder: 'For example Games',
+      displayNameHint: 'Name shown on the storefront; at least one locale is required.',
+      locale: 'Display locale',
       parentCategoryId: 'Parent category id',
       parentCategoryIdPlaceholder: 'Leave empty to create a top-level category',
       submit: 'Create category',
@@ -52,6 +56,7 @@ export const adminCatalog = {
       success: 'Category created.',
       failed: 'Failed to create the category.',
       validationCategoryCodeRequired: 'A category code is required.',
+      validationDisplayNameRequired: 'A display name is required.',
     },
     update: {
       title: 'Update category',
@@ -179,6 +184,8 @@ export const adminCatalog = {
   status: {
     DRAFT: 'Draft',
     ACTIVE: 'Active',
+    INACTIVE: 'Inactive',
+    DELETED: 'Deleted',
     ARCHIVED: 'Archived',
   },
   lifecycleStatus: {

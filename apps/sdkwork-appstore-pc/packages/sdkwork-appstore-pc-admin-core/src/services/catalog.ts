@@ -29,11 +29,21 @@ export const APPSTORE_ADMIN_CATALOG_OPERATIONS = {
 } as const;
 
 /**
- * Lifecycle statuses accepted by category and collection update operations.
- * Kept as an open union: the backend owns the authoritative enum, and the
- * console must not hard-fail when a new status ships server-side.
+ * Lifecycle statuses the operator console offers for catalog rows.
+ *
+ * The backend category contract accepts `active`, `inactive`, and `deleted`
+ * (`CategoryStatus` in `sdkwork-appstore-catalog-service`). The console keeps
+ * its display vocabulary uppercase and normalizes on the wire boundary, so the
+ * badge, filter, and lifecycle action all agree on one token per row.
  */
-export const APPSTORE_ADMIN_CATALOG_STATUSES = ['DRAFT', 'ACTIVE', 'ARCHIVED'] as const;
+export const APPSTORE_ADMIN_CATALOG_STATUSES = ['ACTIVE', 'INACTIVE'] as const;
+
+/** One operator-authored category localization. */
+export interface AppstoreAdminCategoryLocalizationInput {
+  locale: string;
+  displayName: string;
+  description?: string;
+}
 
 /** Collection kinds accepted by the create operation. */
 export const APPSTORE_ADMIN_COLLECTION_TYPES = [
@@ -57,11 +67,50 @@ export const APPSTORE_ADMIN_FEATURED_SLOT_STATUSES = ['SCHEDULED', 'ACTIVE', 'EN
 export interface AppstoreAdminCreateCategoryInput {
   categoryCode: string;
   parentCategoryId?: string;
+  categoryLevel?: number;
+  sortOrder?: number;
+  iconMediaResourceId?: string;
+  localizations?: readonly AppstoreAdminCategoryLocalizationInput[];
 }
 
 export interface AppstoreAdminUpdateCategoryInput {
   categoryStatus?: string;
   sortOrder?: number;
+  parentCategoryId?: string;
+  categoryLevel?: number;
+  iconMediaResourceId?: string;
+  localizations?: readonly AppstoreAdminCategoryLocalizationInput[];
+}
+
+/** Wire status accepted by `appstore.catalog.categories.update`. */
+export type AppstoreAdminCategoryWireStatus = 'active' | 'inactive' | 'deleted';
+
+const CATEGORY_WIRE_STATUS_BY_TOKEN: Record<string, AppstoreAdminCategoryWireStatus> = {
+  ACTIVE: 'active',
+  INACTIVE: 'inactive',
+  DELETED: 'deleted',
+  // `ARCHIVED` was the console's earlier word for a hidden category; the
+  // backend's equivalent state is `inactive`.
+  ARCHIVED: 'inactive',
+};
+
+/**
+ * Map the console lifecycle token to the backend status enum.
+ *
+ * The backend rejects unknown tokens with a validation failure, so the console
+ * fails before dispatch instead of sending a value the service cannot parse.
+ */
+export function toAppstoreAdminCategoryWireStatus(token: string): AppstoreAdminCategoryWireStatus {
+  const normalized = token.trim().toLocaleUpperCase();
+  const status = CATEGORY_WIRE_STATUS_BY_TOKEN[normalized];
+  if (!status) {
+    throw new AppstoreAdminServiceError({
+      kind: 'validation',
+      message: `Unsupported category status: ${token}`,
+      fieldErrors: [{ field: 'categoryStatus' }],
+    });
+  }
+  return status;
 }
 
 export interface AppstoreAdminCreateCollectionInput {
@@ -198,10 +247,21 @@ export function createAppstoreAdminCatalogPort(
 
     async createCategory(input) {
       const categoryCode = requireAdminIdentifier(input.categoryCode, 'categoryCode');
+      const localizations = (input.localizations ?? [])
+        .map((entry) => ({
+          locale: requireAdminIdentifier(entry.locale, 'localizations.locale'),
+          displayName: requireAdminIdentifier(entry.displayName, 'localizations.displayName'),
+          ...(entry.description?.trim() ? { description: entry.description.trim() } : {}),
+        }))
+        .filter((entry) => entry.displayName.length > 0);
       const payload = await executeAdminOperation(operations.createCategory, () =>
         client.catalog.appstore.catalog.categories.create({
           categoryCode,
           ...(input.parentCategoryId?.trim() ? { parentCategoryId: input.parentCategoryId.trim() } : {}),
+          ...(input.categoryLevel === undefined ? {} : { categoryLevel: input.categoryLevel }),
+          ...(input.sortOrder === undefined ? {} : { sortOrder: input.sortOrder }),
+          ...(input.iconMediaResourceId?.trim() ? { iconMediaResourceId: input.iconMediaResourceId.trim() } : {}),
+          ...(localizations.length === 0 ? {} : { localizations }),
         }),
       );
       return readCreatedResourceId(payload);
@@ -209,10 +269,23 @@ export function createAppstoreAdminCatalogPort(
 
     async updateCategory(categoryId, input) {
       const id = requireAdminIdentifier(categoryId, 'categoryId');
+      const localizations = (input.localizations ?? [])
+        .map((entry) => ({
+          locale: requireAdminIdentifier(entry.locale, 'localizations.locale'),
+          displayName: requireAdminIdentifier(entry.displayName, 'localizations.displayName'),
+          ...(entry.description?.trim() ? { description: entry.description.trim() } : {}),
+        }))
+        .filter((entry) => entry.displayName.length > 0);
       await executeAdminOperation(operations.updateCategory, () =>
         client.catalog.appstore.catalog.categories.update(id, {
-          ...(input.categoryStatus?.trim() ? { categoryStatus: input.categoryStatus.trim() } : {}),
+          ...(input.categoryStatus?.trim()
+            ? { status: toAppstoreAdminCategoryWireStatus(input.categoryStatus) }
+            : {}),
+          ...(input.parentCategoryId?.trim() ? { parentCategoryId: input.parentCategoryId.trim() } : {}),
+          ...(input.categoryLevel === undefined ? {} : { categoryLevel: input.categoryLevel }),
           ...(input.sortOrder === undefined ? {} : { sortOrder: input.sortOrder }),
+          ...(input.iconMediaResourceId?.trim() ? { iconMediaResourceId: input.iconMediaResourceId.trim() } : {}),
+          ...(localizations.length === 0 ? {} : { localizations }),
         }),
       );
     },

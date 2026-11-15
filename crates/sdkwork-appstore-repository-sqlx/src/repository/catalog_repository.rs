@@ -133,19 +133,28 @@ impl CatalogRepositoryPort for SqlxCatalogRepository {
         cursor: Option<&str>,
         limit: i32,
     ) -> Result<Vec<Category>, AppstoreServiceError> {
-        let rows = if let Some(cursor_id) = cursor {
+        // Operator `sort_order` is the storefront order, so it leads the cursor
+        // too. The cursor is the opaque `"{sort_order}:{category_id}"` pair
+        // produced by the catalog service; `(sort_order, id)` stays a strict
+        // total order and keeps cursor paging from skipping rows that share an
+        // order value.
+        let rows = if let Some(cursor_value) = cursor {
+            let (cursor_sort_order, cursor_id) = parse_category_cursor(cursor_value);
             self.db
                 .query_as::<CategoryRow>(&format!(
                     r#"
                 SELECT {}
                 FROM appstore_category
-                WHERE tenant_id = ? AND category_status != 'deleted' AND id > ?
-                ORDER BY id ASC
+                WHERE tenant_id = ? AND category_status != 'deleted'
+                  AND (sort_order > ? OR (sort_order = ? AND id > ?))
+                ORDER BY sort_order ASC, id ASC
                 LIMIT ?
                 "#,
                     columns_csv(APPSTORE_CATEGORY_COLUMNS)
                 ))
                 .bind(&context.tenant_id)
+                .bind(cursor_sort_order)
+                .bind(cursor_sort_order)
                 .bind(cursor_id)
                 .bind(limit)
                 .fetch_all(&self.db)
@@ -158,7 +167,7 @@ impl CatalogRepositoryPort for SqlxCatalogRepository {
                 SELECT {}
                 FROM appstore_category
                 WHERE tenant_id = ? AND category_status != 'deleted'
-                ORDER BY id ASC
+                ORDER BY sort_order ASC, id ASC
                 LIMIT ?
                 "#,
                     columns_csv(APPSTORE_CATEGORY_COLUMNS)
@@ -2381,6 +2390,21 @@ fn template_bigint_id(id: &str) -> i64 {
 
 fn cursor_bigint_id(id: &str) -> i64 {
     template_bigint_id(id)
+}
+
+/// Split an opaque category cursor into its `(sort_order, id)` key.
+///
+/// The catalog service emits `"{sort_order}:{category_id}"`. A malformed value
+/// starts from the beginning instead of scanning from an arbitrary key, so an
+/// invalid cursor degrades to the first page rather than hiding rows.
+fn parse_category_cursor(cursor: &str) -> (i32, String) {
+    match cursor.split_once(':') {
+        Some((sort_order, id)) if !id.is_empty() => (
+            sort_order.parse::<i32>().unwrap_or(i32::MIN),
+            id.to_string(),
+        ),
+        _ => (i32::MIN, String::new()),
+    }
 }
 
 fn uuid_v4_hex() -> String {

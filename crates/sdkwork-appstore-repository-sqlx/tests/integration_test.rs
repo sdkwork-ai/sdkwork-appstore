@@ -1123,3 +1123,67 @@ async fn test_app_template_insert_and_platform_round_trip() {
     assert_eq!(row.get::<String, _>("category_code"), "电商应用");
     assert_eq!(row.get::<String, _>("framework"), "Vue 3 + Vant + Vite");
 }
+
+#[tokio::test]
+async fn test_categories_follow_sort_order_with_composite_cursor() {
+    use sqlx::Row;
+
+    let pool = setup_db().await;
+    let repo = SqlxCatalogRepository::new(appstore_db(&pool));
+    let ctx = CatalogRequestContext::tenant_scoped("100001", "req-cursor");
+    let now = Utc::now().to_rfc3339();
+
+    for (id, code, sort_order, status) in [
+        ("cat-z", "zulu", 5, "active"),
+        ("cat-a", "alpha", 10, "active"),
+        ("cat-b", "bravo", 10, "active"),
+        ("cat-c", "charlie", 30, "active"),
+        ("cat-x", "removed", 0, "deleted"),
+    ] {
+        sqlx::query(
+            "INSERT INTO appstore_category \
+             (id, tenant_id, category_code, parent_category_id, category_level, category_status, \
+              sort_order, icon_media_resource_id, created_at, updated_at) \
+             VALUES (?, '100001', ?, NULL, 1, ?, ?, NULL, ?, ?)",
+        )
+        .bind(id)
+        .bind(code)
+        .bind(status)
+        .bind(sort_order)
+        .bind(&now)
+        .bind(&now)
+        .execute(&pool)
+        .await
+        .unwrap();
+    }
+
+    let first_page = repo.find_categories(&ctx, None, 2).await.unwrap();
+    assert_eq!(
+        first_page
+            .iter()
+            .map(|category| category.category_code.as_str())
+            .collect::<Vec<_>>(),
+        vec!["zulu", "alpha"],
+        "sort_order leads ordering and id breaks the 10/10 tie"
+    );
+
+    let cursor = format!("{}:{}", first_page[1].sort_order, first_page[1].id.as_str());
+    let second_page = repo
+        .find_categories(&ctx, Some(cursor.as_str()), 2)
+        .await
+        .unwrap();
+    assert_eq!(
+        second_page
+            .iter()
+            .map(|category| category.category_code.as_str())
+            .collect::<Vec<_>>(),
+        vec!["bravo", "charlie"],
+        "the composite cursor must resume after (sort_order, id)"
+    );
+
+    let row = sqlx::query("SELECT COUNT(*) AS total FROM appstore_category")
+        .fetch_one(&pool)
+        .await
+        .unwrap();
+    assert_eq!(row.get::<i64, _>("total"), 5);
+}

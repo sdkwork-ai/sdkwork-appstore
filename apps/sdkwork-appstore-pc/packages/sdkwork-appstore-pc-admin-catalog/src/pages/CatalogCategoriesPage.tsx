@@ -33,13 +33,14 @@ const CATEGORIES_PAGE_SIZE = 50;
 /**
  * Lifecycle status the row action transitions to.
  *
- * The operator contract exposes `categories.update` only, so deleting a
- * category is modelled as archiving it. An archived category toggles back to
- * `ACTIVE`; every other reported status (draft, unknown) transitions to
- * `ARCHIVED`. The backend stays the authority on whether a transition is legal.
+ * The operator contract exposes `categories.update` only, and the backend
+ * category enum is `active | inactive | deleted`. Deactivating a category is
+ * therefore the reversible "take it off the storefront" action: an inactive
+ * category toggles back to `ACTIVE`; every other reported status transitions to
+ * `INACTIVE`. The backend stays the authority on whether a transition is legal.
  */
-function nextCategoryStatus(status: string | undefined): 'ACTIVE' | 'ARCHIVED' {
-  return normalizeToken(status, '') === 'ARCHIVED' ? 'ACTIVE' : 'ARCHIVED';
+function nextCategoryStatus(status: string | undefined): 'ACTIVE' | 'INACTIVE' {
+  return normalizeToken(status, '') === 'INACTIVE' ? 'ACTIVE' : 'INACTIVE';
 }
 
 /**
@@ -155,7 +156,7 @@ export function CatalogCategoriesPage() {
       align: 'right',
       render: (item) => {
         const busy = busyCategoryId === item.categoryId;
-        const archived = normalizeToken(item.status, '') === 'ARCHIVED';
+        const inactive = normalizeToken(item.status, '') === 'INACTIVE';
         return (
           <div className="flex items-center justify-end gap-1.5">
             <AdminActionButton onClick={() => setSelectedCategoryId(item.categoryId)}>
@@ -170,7 +171,7 @@ export function CatalogCategoriesPage() {
             >
               {busy
                 ? t('adminCatalog.categories.browse.lifecycle.applying')
-                : archived
+                : inactive
                   ? t('adminCatalog.categories.browse.lifecycle.activate')
                   : t('adminCatalog.categories.browse.lifecycle.archive')}
             </AdminActionButton>

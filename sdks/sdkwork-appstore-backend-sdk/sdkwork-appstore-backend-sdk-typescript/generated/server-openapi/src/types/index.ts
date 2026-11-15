@@ -5,6 +5,7 @@ export type { ModerationAppealDecideRequest } from './moderation-appeal-decide-r
 export type { CollectionCreateRequest } from './collection-create-request';
 export type { CollectionUpdateRequest } from './collection-update-request';
 export type { FeaturedSlotUpsertRequest } from './featured-slot-upsert-request';
+export type { CategoryLocalizationInput } from './category-localization-input';
 export type { CategoryCreateRequest } from './category-create-request';
 export type { CategoryUpdateRequest } from './category-update-request';
 export type { MarketChannelCreateRequest } from './market-channel-create-request';

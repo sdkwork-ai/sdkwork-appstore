@@ -988,8 +988,23 @@ components:
           type: string
         endsAt:
           type: string
+    CategoryLocalizationInput:
+      type: object
+      additionalProperties: false
+      required:
+      - locale
+      - displayName
+      properties:
+        locale:
+          type: string
+          description: BCP 47 locale tag, for example zh-CN or en-US.
+        displayName:
+          type: string
+        description:
+          type: string
     CategoryCreateRequest:
       type: object
+      additionalProperties: false
       required:
       - categoryCode
       properties:
@@ -997,13 +1012,43 @@ components:
           type: string
         parentCategoryId:
           type: string
-    CategoryUpdateRequest:
-      type: object
-      properties:
-        categoryStatus:
-          type: string
+        categoryLevel:
+          type: integer
+          format: int32
         sortOrder:
           type: integer
+          format: int32
+        iconMediaResourceId:
+          type: string
+        localizations:
+          type: array
+          items:
+            $ref: '#/components/schemas/CategoryLocalizationInput'
+    CategoryUpdateRequest:
+      type: object
+      additionalProperties: false
+      properties:
+        parentCategoryId:
+          type: string
+        categoryLevel:
+          type: integer
+          format: int32
+        sortOrder:
+          type: integer
+          format: int32
+        iconMediaResourceId:
+          type: string
+        status:
+          type: string
+          enum:
+          - active
+          - inactive
+          - deleted
+          description: Category lifecycle status; deleted is a soft delete.
+        localizations:
+          type: array
+          items:
+            $ref: '#/components/schemas/CategoryLocalizationInput'
     MarketChannelCreateRequest:
       type: object
       required:

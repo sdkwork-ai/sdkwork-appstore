@@ -153,6 +153,7 @@ impl CategoryCreateRequest {
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
+#[serde(rename_all = "camelCase")]
 pub struct CategoryLocalizationInput {
     pub locale: String,
     pub display_name: String,
@@ -328,6 +329,7 @@ impl CollectionCreateRequest {
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
+#[serde(rename_all = "camelCase")]
 pub struct CollectionLocalizationInput {
     pub locale: String,
     pub display_name: String,
@@ -406,6 +408,7 @@ impl CollectionUpdateRequest {
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
+#[serde(rename_all = "camelCase")]
 pub struct CollectionItemInput {
     pub listing_id: String,
     pub sort_order: Option<i32>,
@@ -1124,5 +1127,42 @@ impl FeedbackCreateRequest {
             listing_id: None,
             app_key: None,
         }
+    }
+}
+
+#[cfg(test)]
+mod wire_casing_tests {
+    use super::{CategoryLocalizationInput, CollectionItemInput, CollectionLocalizationInput};
+
+    /// Nested request payloads follow the same camelCase wire convention as
+    /// their OpenAPI schemas. `deny_unknown_fields` means a casing drift fails
+    /// the whole operator request, so this pins the boundary explicitly.
+    #[test]
+    fn category_localization_accepts_camel_case() {
+        let localization: CategoryLocalizationInput =
+            serde_json::from_str(r#"{"locale":"zh-CN","displayName":"游戏","description":"休闲"}"#)
+                .expect("camelCase localization payload must deserialize");
+        assert_eq!(localization.locale, "zh-CN");
+        assert_eq!(localization.display_name, "游戏");
+        assert_eq!(localization.description.as_deref(), Some("休闲"));
+    }
+
+    #[test]
+    fn collection_localization_accepts_camel_case() {
+        let localization: CollectionLocalizationInput =
+            serde_json::from_str(r#"{"locale":"en-US","displayName":"Games"}"#)
+                .expect("camelCase localization payload must deserialize");
+        assert_eq!(localization.display_name, "Games");
+    }
+
+    #[test]
+    fn collection_item_accepts_camel_case() {
+        let item: CollectionItemInput = serde_json::from_str(
+            r#"{"listingId":"listing-1","sortOrder":10,"startsAt":"2026-01-01T00:00:00Z"}"#,
+        )
+        .expect("camelCase collection item payload must deserialize");
+        assert_eq!(item.listing_id, "listing-1");
+        assert_eq!(item.sort_order, Some(10));
+        assert_eq!(item.starts_at.as_deref(), Some("2026-01-01T00:00:00Z"));
     }
 }

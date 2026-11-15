@@ -27,7 +27,7 @@ export const adminCatalog = {
       },
       lifecycle: {
         activate: '启用',
-        archive: '归档',
+        archive: '停用',
         applying: '处理中…',
         updated: '分类状态已更新。',
       },
@@ -45,6 +45,10 @@ export const adminCatalog = {
       categoryCode: '分类编码',
       categoryCodePlaceholder: '例如 appstore.games',
       categoryCodeHint: '平台内唯一的分类编码，创建后不可修改。',
+      displayName: '分类名称',
+      displayNamePlaceholder: '例如 游戏',
+      displayNameHint: '商店前台展示的名称；至少填写一种语言。',
+      locale: '展示语言',
       parentCategoryId: '父分类编号',
       parentCategoryIdPlaceholder: '留空表示创建顶级分类',
       submit: '创建分类',
@@ -52,6 +56,7 @@ export const adminCatalog = {
       success: '分类已创建。',
       failed: '分类创建失败。',
       validationCategoryCodeRequired: '请填写分类编码。',
+      validationDisplayNameRequired: '请填写分类名称。',
     },
     update: {
       title: '更新分类',
@@ -179,6 +184,8 @@ export const adminCatalog = {
   status: {
     DRAFT: '草稿',
     ACTIVE: '生效',
+    INACTIVE: '未启用',
+    DELETED: '已删除',
     ARCHIVED: '已归档',
   },
   lifecycleStatus: {

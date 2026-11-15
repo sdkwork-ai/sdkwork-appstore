@@ -22,25 +22,35 @@ import { CatalogFormNotice } from './CatalogFormNotice';
  * in component state; there is no category read port to re-fetch a record from.
  */
 export function CatalogCategoryCreateForm() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const services = useAppstoreAdminServices();
   const [categoryCode, setCategoryCode] = useState('');
+  const [displayName, setDisplayName] = useState('');
+  const [locale, setLocale] = useState(() =>
+    i18n.language?.toLocaleLowerCase().startsWith('en') ? 'en-US' : 'zh-CN');
   const [parentCategoryId, setParentCategoryId] = useState('');
   const [validationError, setValidationError] = useState('');
+  const [nameError, setNameError] = useState('');
   const [createdId, setCreatedId] = useState('');
   const command = useAdminCommand(APPSTORE_ADMIN_CATALOG_OPERATIONS.createCategory);
 
   const handleSubmit = async () => {
+    setValidationError('');
+    setNameError('');
     if (!categoryCode.trim()) {
       setValidationError(t('adminCatalog.categories.create.validationCategoryCodeRequired'));
       return;
     }
-    setValidationError('');
+    if (!displayName.trim()) {
+      setNameError(t('adminCatalog.categories.create.validationDisplayNameRequired'));
+      return;
+    }
     let newCategoryId = '';
     const succeeded = await command.run(async () => {
       newCategoryId = await services.catalog.createCategory({
         categoryCode: categoryCode.trim(),
         ...(parentCategoryId.trim() ? { parentCategoryId: parentCategoryId.trim() } : {}),
+        localizations: [{ locale, displayName: displayName.trim() }],
       });
     });
     if (succeeded) {
@@ -84,6 +94,35 @@ export function CatalogCategoryCreateForm() {
               value={categoryCode}
               onChange={(event) => setCategoryCode(event.target.value)}
             />
+          </AdminFormField>
+          <AdminFormField
+            error={nameError || undefined}
+            hint={t('adminCatalog.categories.create.displayNameHint')}
+            htmlFor="catalog-category-create-name"
+            label={t('adminCatalog.categories.create.displayName')}
+            required
+          >
+            <input
+              id="catalog-category-create-name"
+              className={ADMIN_INPUT_CLASS}
+              placeholder={t('adminCatalog.categories.create.displayNamePlaceholder')}
+              value={displayName}
+              onChange={(event) => setDisplayName(event.target.value)}
+            />
+          </AdminFormField>
+          <AdminFormField
+            htmlFor="catalog-category-create-locale"
+            label={t('adminCatalog.categories.create.locale')}
+          >
+            <select
+              id="catalog-category-create-locale"
+              className={ADMIN_INPUT_CLASS}
+              value={locale}
+              onChange={(event) => setLocale(event.target.value)}
+            >
+              <option value="zh-CN">简体中文 (zh-CN)</option>
+              <option value="en-US">English (en-US)</option>
+            </select>
           </AdminFormField>
           <AdminFormField
             htmlFor="catalog-category-create-parent"

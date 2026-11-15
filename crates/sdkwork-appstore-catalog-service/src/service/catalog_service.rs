@@ -531,7 +531,9 @@ where
         let has_more = categories.len() > limit as usize;
         let categories: Vec<Category> = categories.into_iter().take(limit as usize).collect();
         let next_cursor = if has_more {
-            categories.last().map(|c| c.id.as_str().to_string())
+            categories
+                .last()
+                .map(|category| format!("{}:{}", category.sort_order, category.id.as_str()))
         } else {
             None
         };
@@ -1110,7 +1112,9 @@ where
         let has_more = categories.len() > limit as usize;
         let categories: Vec<Category> = categories.into_iter().take(limit as usize).collect();
         let next_cursor = if has_more {
-            categories.last().map(|c| c.id.as_str().to_string())
+            categories
+                .last()
+                .map(|category| format!("{}:{}", category.sort_order, category.id.as_str()))
         } else {
             None
         };
