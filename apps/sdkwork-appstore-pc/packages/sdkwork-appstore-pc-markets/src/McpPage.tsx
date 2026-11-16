@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { McpServerItem } from '@sdkwork/appstore-pc-core';
@@ -9,7 +9,7 @@ import { McpConfigModal } from './components/mcp/McpConfigModal';
 import { AddMcpServerModal } from './components/mcp/AddMcpServerModal';
 import { McpEmptyState } from './components/mcp/McpEmptyState';
 import { McpFilter } from './components/mcp/McpFilter';
-import { ALL_CATEGORY, type CategoryOption } from './components/marketCategories';
+import { useCatalogCategoryFilter } from './hooks/useCatalogCategoryFilter';
 import { McpService } from '@sdkwork/appstore-pc-core';
 
 /** Props for the MCP catalog page. */
@@ -27,9 +27,8 @@ export function McpPage({ searchQuery }: McpPageProps = {}) {
   const { t } = useTranslation();
   const [servers, setServers] = useState<McpServerItem[]>([]);
   // The chip row comes from the MCP module's category registry; when that read
-  // fails the page keeps an "all" chip instead of losing its filter row.
+  // fails the shared filter keeps an "all" chip instead of losing its row.
   const [registryCategories, setRegistryCategories] = useState<McpCategoryOption[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<string>(ALL_CATEGORY);
   const [selectedServer, setSelectedServer] = useState<McpServerItem | null>(null);
   const [loading, setLoading] = useState(true);
   const [isAddOpen, setIsAddOpen] = useState(false);
@@ -66,24 +65,18 @@ export function McpPage({ searchQuery }: McpPageProps = {}) {
     };
   }, []);
 
-  const categories = useMemo<CategoryOption[]>(
-    () => [
-      { value: ALL_CATEGORY, label: t('mcp.header.allCategories') },
-      ...registryCategories.map((category) => ({
-        value: category.code,
-        label: category.name,
-      })),
-    ],
-    [registryCategories, t],
+  const matchServerCategory = useCallback(
+    (server: McpServerItem, category: string) => server.categoryCode === category,
+    [],
   );
 
-  const visibleServers = useMemo(
-    () =>
-      selectedCategory === ALL_CATEGORY
-        ? servers
-        : servers.filter((server) => server.categoryCode === selectedCategory),
-    [servers, selectedCategory],
-  );
+  const categoryFilter = useCatalogCategoryFilter<McpServerItem>({
+    registry: registryCategories,
+    allLabel: t('mcp.header.allCategories'),
+    matches: matchServerCategory,
+  });
+
+  const visibleServers = categoryFilter.filter(servers);
 
   const handleToggleConnect = async (id: string) => {
     setActionError(null);
@@ -145,9 +138,9 @@ export function McpPage({ searchQuery }: McpPageProps = {}) {
       <div className="flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between min-w-0 w-full">
         <div className="flex-1 min-w-0">
           <McpFilter
-            selectedCategory={selectedCategory}
-            onSelectCategory={setSelectedCategory}
-            categories={categories}
+            selectedCategory={categoryFilter.selectedCategory}
+            onSelectCategory={categoryFilter.selectCategory}
+            categories={categoryFilter.categories}
           />
         </div>
         <button

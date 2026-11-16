@@ -1,11 +1,12 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ExpertsService } from '@sdkwork/appstore-pc-core';
 import type { ExpertItem } from '@sdkwork/appstore-pc-core';
 import { CardGrid } from '@sdkwork/appstore-pc-commons';
 import { ExpertCard } from './components/experts/ExpertCard';
 import { ExpertsCategoryFilter } from './components/experts/ExpertsCategoryFilter';
-import { ALL_CATEGORY } from './components/marketCategories';
 import { ExpertsEmptyState } from './components/experts/ExpertsEmptyState';
+import { useCatalogCategoryFilter } from './hooks/useCatalogCategoryFilter';
 
 /** Props for the experts catalog page. */
 export interface ExpertsPageProps {
@@ -19,14 +20,15 @@ export interface ExpertsPageProps {
 }
 
 export function ExpertsPage({ searchQuery }: ExpertsPageProps = {}) {
-  // The catalog is loaded once; the category filters and the controlled query
-  // are applied locally. Deriving the category list from the filtered result
-  // would hide every category except the selected one after the first click,
-  // so the roster and the categories stay the full catalog.
+  const { t } = useTranslation();
+  // The catalog is loaded once; the category filter and the controlled query
+  // are applied locally through the shared catalog category filter. Deriving
+  // the category list from the filtered result would hide every category
+  // except the selected one after the first click, so the roster and the
+  // categories stay the full catalog.
   const [allExperts, setAllExperts] = useState<ExpertItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState<string>(ALL_CATEGORY);
 
   useEffect(() => {
     let cancelled = false;
@@ -55,22 +57,22 @@ export function ExpertsPage({ searchQuery }: ExpertsPageProps = {}) {
     };
   }, []);
 
-  const categories = useMemo(() => {
-    const tags = new Set<string>();
-    allExperts.forEach((expert) => {
-      if (expert.filterTag) {
-        tags.add(expert.filterTag);
-      }
-    });
-    return [ALL_CATEGORY, ...Array.from(tags)];
-  }, [allExperts]);
+  const matchExpertCategory = useCallback(
+    (expert: ExpertItem, category: string) => expert.filterTag === category,
+    [],
+  );
+
+  const categoryFilter = useCatalogCategoryFilter<ExpertItem>({
+    allLabel: t('common.actions.all'),
+    fallbackValues: allExperts
+      .map((expert) => expert.filterTag)
+      .filter((tag): tag is string => typeof tag === 'string' && tag.trim().length > 0),
+    matches: matchExpertCategory,
+  });
 
   const experts = useMemo(() => {
     const normalizedQuery = (searchQuery ?? '').trim().toLocaleLowerCase();
-    return allExperts.filter((expert) => {
-      if (selectedCategory !== ALL_CATEGORY && expert.filterTag !== selectedCategory) {
-        return false;
-      }
+    return categoryFilter.filter(allExperts).filter((expert) => {
       if (!normalizedQuery) {
         return true;
       }
@@ -81,15 +83,15 @@ export function ExpertsPage({ searchQuery }: ExpertsPageProps = {}) {
         expert.tags.some((tag) => tag.toLocaleLowerCase().includes(normalizedQuery))
       );
     });
-  }, [allExperts, selectedCategory, searchQuery]);
+  }, [allExperts, categoryFilter, searchQuery]);
 
   return (
     <div className="p-6 md:p-8 w-full max-w-full space-y-6 animate-fade-in @container">
       {/* Categories Horizontal Filter Subcomponent */}
       <ExpertsCategoryFilter
-        categories={categories}
-        selectedCategory={selectedCategory}
-        onSelectCategory={setSelectedCategory}
+        categories={categoryFilter.categories.map((option) => option.value)}
+        selectedCategory={categoryFilter.selectedCategory}
+        onSelectCategory={categoryFilter.selectCategory}
       />
 
       {/* Expert Grid — container-query driven, up to 4 columns on wide screens */}

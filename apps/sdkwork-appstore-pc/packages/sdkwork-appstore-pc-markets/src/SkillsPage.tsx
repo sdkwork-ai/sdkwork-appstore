@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { SkillItem } from '@sdkwork/appstore-pc-core';
@@ -10,7 +10,7 @@ import { PublishSkillModal } from './components/skills/PublishSkillModal';
 import { SkillsEmptyState } from './components/skills/SkillsEmptyState';
 import { SkillsService } from '@sdkwork/appstore-pc-core';
 import type { SkillCategoryOption } from '@sdkwork/appstore-pc-core';
-import { ALL_CATEGORY, type CategoryOption } from './components/marketCategories';
+import { useCatalogCategoryFilter } from './hooks/useCatalogCategoryFilter';
 
 /** Props for the skills catalog page. */
 export interface SkillsPageProps {
@@ -25,15 +25,13 @@ export interface SkillsPageProps {
 
 export function SkillsPage({ searchQuery }: SkillsPageProps = {}) {
   const { t } = useTranslation();
-  // The catalog is loaded once and filtered locally. The category chips come
-  // from the Skills category registry (the owning module), not from the codes
-  // present in this page: a registry category with nothing filed under it is
-  // still a real filter, and retired categories must not appear. When the
-  // registry is unavailable the chips fall back to the codes the catalog
-  // actually carries, so the page never loses its filter row.
+  // The catalog is loaded once and filtered locally through the shared catalog
+  // category filter. Its chips come from the Skills category registry (the
+  // owning module): a registry category with nothing filed under it is still a
+  // real filter, and retired categories never appear. When the registry read
+  // fails the chips fall back to the codes the catalog actually carries.
   const [allSkills, setAllSkills] = useState<SkillItem[]>([]);
   const [registryCategories, setRegistryCategories] = useState<SkillCategoryOption[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<string>(ALL_CATEGORY);
   const [selectedSkill, setSelectedSkill] = useState<SkillItem | null>(null);
   const [loading, setLoading] = useState(true);
   const [isPublishOpen, setIsPublishOpen] = useState(false);
@@ -76,47 +74,29 @@ export function SkillsPage({ searchQuery }: SkillsPageProps = {}) {
     t('skills.categories.nlp')
   ];
 
-  const categories = useMemo<CategoryOption[]>(() => {
-    const all = { value: ALL_CATEGORY, label: t('skills.categories.all') };
-    if (registryCategories.length > 0) {
-      return [
-        all,
-        ...registryCategories.map((category) => ({
-          value: category.code,
-          label: category.name,
-        })),
-      ];
-    }
-    const values = new Set<string>();
-    allSkills.forEach((skill) => {
-      if (skill.category) {
-        values.add(skill.category);
-      }
-    });
-    return [
-      all,
-      ...[...values]
-        .sort((left, right) => left.localeCompare(right))
-        .map((value) => ({ value, label: value })),
-    ];
-  }, [allSkills, registryCategories, t]);
+  const matchSkillCategory = useCallback(
+    (skill: SkillItem, category: string) =>
+      (skill.categoryCodes ?? [skill.category]).includes(category),
+    [],
+  );
+
+  const categoryFilter = useCatalogCategoryFilter<SkillItem>({
+    registry: registryCategories,
+    allLabel: t('skills.categories.all'),
+    fallbackValues: allSkills.map((skill) => skill.category).filter(Boolean),
+    matches: matchSkillCategory,
+  });
 
   const skills = useMemo(() => {
     const query = (searchQuery ?? '').trim().toLocaleLowerCase();
-    return allSkills.filter((skill) => {
-      if (selectedCategory !== ALL_CATEGORY) {
-        const codes = skill.categoryCodes ?? [skill.category];
-        if (!codes.includes(selectedCategory)) {
-          return false;
-        }
-      }
+    return categoryFilter.filter(allSkills).filter((skill) => {
       if (!query) {
         return true;
       }
       return [skill.name, skill.author, skill.description, skill.category, ...skill.triggers]
         .some((text) => text.toLocaleLowerCase().includes(query));
     });
-  }, [allSkills, selectedCategory, searchQuery]);
+  }, [allSkills, categoryFilter, searchQuery]);
 
   const handleToggleInstall = async (id: string) => {
     setActionError(null);
@@ -176,9 +156,9 @@ export function SkillsPage({ searchQuery }: SkillsPageProps = {}) {
       <div className="flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between min-w-0 w-full">
         <div className="flex-1 min-w-0">
           <SkillFilter
-            selectedCategory={selectedCategory}
-            onSelectCategory={setSelectedCategory}
-            categories={categories}
+            selectedCategory={categoryFilter.selectedCategory}
+            onSelectCategory={categoryFilter.selectCategory}
+            categories={categoryFilter.categories}
           />
         </div>
         <button

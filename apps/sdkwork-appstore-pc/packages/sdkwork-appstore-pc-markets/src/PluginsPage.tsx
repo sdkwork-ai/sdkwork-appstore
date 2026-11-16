@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { PluginItem } from '@sdkwork/appstore-pc-core';
 import type { PluginsHost } from '@sdkwork/appstore-pc-core';
@@ -8,7 +8,7 @@ import { PluginFilter } from './components/plugins/PluginFilter';
 import { PluginDetailModal } from './components/plugins/PluginDetailModal';
 import { PluginsEmptyState } from './components/plugins/PluginsEmptyState';
 import { PluginsService } from '@sdkwork/appstore-pc-core';
-import { ALL_CATEGORY, type CategoryOption } from './components/marketCategories';
+import { useCatalogCategoryFilter } from './hooks/useCatalogCategoryFilter';
 
 /** Props for the plugins catalog page. */
 export interface PluginsPageProps {
@@ -29,11 +29,10 @@ export interface PluginsPageProps {
 
 export function PluginsPage({ searchQuery, pluginsHost }: PluginsPageProps = {}) {
   const { t } = useTranslation();
-  // The catalog is loaded once and filtered locally: the category chips are
-  // derived from the full catalog, so selecting one never hides the others and
-  // every chip names a category the catalog actually contains.
+  // The catalog is loaded once and filtered locally through the shared catalog
+  // category filter, so every marketplace page agrees on what "all" means and
+  // on where the chips come from.
   const [allPlugins, setAllPlugins] = useState<PluginItem[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<string>(ALL_CATEGORY);
   const [selectedPlugin, setSelectedPlugin] = useState<PluginItem | null>(null);
   const [loading, setLoading] = useState(true);
   const [actionError, setActionError] = useState<string | null>(null);
@@ -59,34 +58,27 @@ export function PluginsPage({ searchQuery, pluginsHost }: PluginsPageProps = {})
     };
   }, []);
 
-  const categories = useMemo<CategoryOption[]>(() => {
-    const values = new Set<string>();
-    allPlugins.forEach((plugin) => {
-      if (plugin.category) {
-        values.add(plugin.category);
-      }
-    });
-    return [
-      { value: ALL_CATEGORY, label: t('plugins.categories.all') },
-      ...[...values]
-        .sort((left, right) => left.localeCompare(right))
-        .map((value) => ({ value, label: value })),
-    ];
-  }, [allPlugins, t]);
+  const matchPluginCategory = useCallback(
+    (plugin: PluginItem, category: string) => plugin.category === category,
+    [],
+  );
+
+  const categoryFilter = useCatalogCategoryFilter<PluginItem>({
+    allLabel: t('plugins.categories.all'),
+    fallbackValues: allPlugins.map((plugin) => plugin.category).filter(Boolean),
+    matches: matchPluginCategory,
+  });
 
   const plugins = useMemo(() => {
     const query = (searchQuery ?? '').trim().toLocaleLowerCase();
-    return allPlugins.filter((plugin) => {
-      if (selectedCategory !== ALL_CATEGORY && plugin.category !== selectedCategory) {
-        return false;
-      }
+    return categoryFilter.filter(allPlugins).filter((plugin) => {
       if (!query) {
         return true;
       }
       return [plugin.name, plugin.developer, plugin.description, plugin.category, ...plugin.capabilities]
         .some((text) => text.toLocaleLowerCase().includes(query));
     });
-  }, [allPlugins, selectedCategory, searchQuery]);
+  }, [allPlugins, categoryFilter, searchQuery]);
 
   const handleToggleEnable = async (id: string) => {
     setActionError(null);
@@ -110,9 +102,9 @@ export function PluginsPage({ searchQuery, pluginsHost }: PluginsPageProps = {})
       <div className="flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between min-w-0 w-full">
         <div className="flex-1 min-w-0">
           <PluginFilter
-            selectedCategory={selectedCategory}
-            onSelectCategory={setSelectedCategory}
-            categories={categories}
+            selectedCategory={categoryFilter.selectedCategory}
+            onSelectCategory={categoryFilter.selectCategory}
+            categories={categoryFilter.categories}
           />
         </div>
       </div>

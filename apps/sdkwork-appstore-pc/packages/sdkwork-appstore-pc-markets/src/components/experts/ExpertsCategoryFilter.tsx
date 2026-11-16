@@ -1,5 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { CategoryChips } from '../CategoryChips';
 import { ALL_CATEGORY } from '../marketCategories';
 
 interface ExpertsCategoryFilterProps {
@@ -8,6 +9,13 @@ interface ExpertsCategoryFilterProps {
   onSelectCategory: (category: string) => void;
 }
 
+/**
+ * The experts category chip row.
+ *
+ * The experts catalog names its categories by the records' own tag values, so
+ * this adapter keeps the plain `string[]` props its callers use and resolves
+ * the "all" label through the locale dictionary before the shared row renders.
+ */
 export const ExpertsCategoryFilter: React.FC<ExpertsCategoryFilterProps> = ({
   categories,
   selectedCategory,
@@ -15,29 +23,14 @@ export const ExpertsCategoryFilter: React.FC<ExpertsCategoryFilterProps> = ({
 }) => {
   const { t } = useTranslation();
 
-  const getCategoryLabel = (cat: string) => {
-    if (cat === ALL_CATEGORY) {
-      return t('common.actions.all');
-    }
-    return cat;
-  };
-
   return (
-    <div className="flex items-center gap-2 overflow-x-auto pb-1 custom-scrollbar">
-      {categories.map((cat) => (
-        <button
-          key={cat}
-          onClick={() => onSelectCategory(cat)}
-          className={`px-3.5 py-1.5 rounded-store-control text-xs font-medium whitespace-nowrap transition-all cursor-pointer ${
-            selectedCategory === cat
-              ? 'bg-store-brand text-white shadow-sm'
-              : 'bg-store-surface text-store-ink-soft border border-store-line hover:bg-store-subtle '
-          }`}
-        >
-          {getCategoryLabel(cat)}
-        </button>
-      ))}
-    </div>
+    <CategoryChips
+      categories={categories.map((category) => ({
+        value: category,
+        label: category === ALL_CATEGORY ? t('common.actions.all') : category,
+      }))}
+      selectedCategory={selectedCategory}
+      onSelectCategory={onSelectCategory}
+    />
   );
 };
-

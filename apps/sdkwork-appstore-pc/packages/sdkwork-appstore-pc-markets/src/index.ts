@@ -21,6 +21,13 @@ export * from './components/skills';
 export * from './components/experts';
 export * from './components/mcp';
 
+// The shared catalog building blocks: one chip row, one category projection,
+// one filter hook. A host that adds a fifth marketplace page composes these
+// instead of copying a page's category bookkeeping.
+export * from './components/marketCategories';
+export * from './components/CategoryChips';
+export * from './hooks/useCatalogCategoryFilter';
+
 // The experts marketplace renders its catalog through the ExpertsService port
 // singleton from `@sdkwork/appstore-pc-core` (bound to the App Store catalog
 // `templateType=EXPERT` feed by `@sdkwork/appstore-pc-runtime`), like the
