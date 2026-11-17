@@ -107,6 +107,15 @@
 | R6 | webserver 应用降级：身份与发布指向 deploy | 发布链路单一 |
 | R7 | token 切到部署应用 + 数据面 `(tenant_id, app_id)` | 越权用例全绿 |
 
+**R7 现状（2026-11-17 分区核查）**
+
+- token 侧已完成：签发、会话、网关、API key、OAuth 交换、service account、bootstrap 均以部署应用为锚（iam `b918c3ce`、`1277a06d`、`4cbecc54`；cloudrouter `6414f956`、`7def0713`）。
+- 数据面尚未收口。基线 `app_id` 引用分布：deploy 113、iam 46、webserver 14、appstore 12、drive 8、manager 8、cloudrouter 7。
+  列存在不等于查询按 `(tenant_id, app_id)` 过滤，需逐查询审计。
+- 审计原则：只补"读取应用作用域数据却未按 app 过滤"的缺口；市场/模板等非应用作用域数据不加过滤；不得放宽既有作者/租户边界。
+- 若某处必须改表才能隔离，先记录，不擅自加列。
+
+
 ## 7. 每个消费面的验收标准
 
 | 消费面 | 验收 |
