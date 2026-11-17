@@ -167,6 +167,15 @@ impl ReleaseStatus {
             _ => None,
         }
     }
+
+    /// Read policy for one release. The owning publisher (or an admin) sees
+    /// every management state; every other caller sees published releases
+    /// only, so draft/submitted/approved/retired states stay in the publisher
+    /// view. Mirrors the release-list filter so the direct retrieve route
+    /// cannot bypass it.
+    pub fn is_visible_to_caller(&self, publisher_access: bool) -> bool {
+        publisher_access || matches!(self, Self::Published)
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]

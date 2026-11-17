@@ -440,10 +440,35 @@ where
             .await?;
 
         match release {
-            Some(release) => Ok(RetrieveReleaseResult::found(
-                "appstore.releases.retrieve",
-                release,
-            )),
+            Some(release) => {
+                // Same read policy as the release-list route: the owning
+                // publisher (or an admin) sees every management state, any
+                // other tenant caller sees published releases only. A hidden
+                // release answers not-found rather than forbidden so its
+                // existence does not leak.
+                //
+                // Published releases are public, so the (two-query) publisher
+                // membership probe only runs for management states.
+                let visible = release.release_status.is_visible_to_caller(false)
+                    || match self
+                        .ensure_listing_publisher_access(context, &release.listing_id)
+                        .await
+                    {
+                        Ok(_) => true,
+                        Err(AppstoreServiceError::PermissionDenied(_))
+                        | Err(AppstoreServiceError::NotFound(_)) => false,
+                        Err(error) => return Err(error),
+                    };
+                if !visible {
+                    return Ok(RetrieveReleaseResult::not_found(
+                        "appstore.releases.retrieve",
+                    ));
+                }
+                Ok(RetrieveReleaseResult::found(
+                    "appstore.releases.retrieve",
+                    release,
+                ))
+            }
             None => Ok(RetrieveReleaseResult::not_found(
                 "appstore.releases.retrieve",
             )),

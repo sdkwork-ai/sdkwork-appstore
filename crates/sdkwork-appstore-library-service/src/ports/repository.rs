@@ -23,6 +23,10 @@ pub struct ListingCommerceInfo {
     pub pricing_model: String,
     /// Raw platform codes from appstore_application.platforms (JSON array text).
     pub platforms_json: String,
+    /// Listing lifecycle status (`draft` / `active` / `suspended` / `delisted`).
+    pub listing_status: String,
+    /// Storefront visibility (`visible` / `hidden`).
+    pub storefront_visibility: String,
 }
 
 impl ListingCommerceInfo {
@@ -30,6 +34,20 @@ impl ListingCommerceInfo {
     pub fn is_free(&self) -> bool {
         let model = self.pricing_model.trim();
         model.eq_ignore_ascii_case("free") || model.eq_ignore_ascii_case("freemium")
+    }
+
+    /// Whether the listing is live on the storefront. Only a live listing may
+    /// mint download grants through the consumer library surface; hidden and
+    /// non-active listings stay in the publisher preview, so a grant request
+    /// for them is indistinguishable from a missing artifact. The predicate
+    /// matches `Listing::is_visible` (`active` and `visible`/`featured`) and
+    /// is fail-closed: an unknown storefront value is not downloadable.
+    pub fn is_downloadable(&self) -> bool {
+        let status = self.listing_status.trim();
+        let visibility = self.storefront_visibility.trim();
+        status.eq_ignore_ascii_case("active")
+            && (visibility.eq_ignore_ascii_case("visible")
+                || visibility.eq_ignore_ascii_case("featured"))
     }
 
     /// Whether the requested install platform is one the app ships for.

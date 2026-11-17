@@ -718,30 +718,39 @@ where
             )));
         }
 
+        // Only a live storefront listing may mint grants: hidden and
+        // non-active listings stay in the publisher preview, and a deleted or
+        // missing listing is indistinguishable from a missing artifact so
+        // neither surfaces as an existence oracle.
+        let commerce = self
+            .repository
+            .find_listing_commerce_info(context, &listing_id)
+            .await?;
+        let Some(commerce) = commerce.filter(|info| info.is_downloadable()) else {
+            return Err(AppstoreServiceError::NotFound(format!(
+                "Artifact not found: {}",
+                artifact_id
+            )));
+        };
+
         // Paid content requires an active entitlement before a grant can be
         // minted; FREE/FREEMIUM downloads mint the free grant directly. The
         // reason code records which path authorized the download.
-        let grant_reason = match self
-            .repository
-            .find_listing_commerce_info(context, &listing_id)
-            .await?
-        {
-            Some(commerce) if !commerce.is_free() => {
-                let entitled = self
-                    .repository
-                    .find_active_entitlement(context, &commerce.app_id, user_id)
-                    .await?
-                    .map(|entitlement| entitlement.is_active(Utc::now()))
-                    .unwrap_or(false);
-                if !entitled {
-                    return Err(AppstoreServiceError::PermissionDenied(
-                        "An active entitlement is required to download this paid artifact"
-                            .to_string(),
-                    ));
-                }
-                DownloadGrantReason::Purchase
+        let grant_reason = if !commerce.is_free() {
+            let entitled = self
+                .repository
+                .find_active_entitlement(context, &commerce.app_id, user_id)
+                .await?
+                .map(|entitlement| entitlement.is_active(Utc::now()))
+                .unwrap_or(false);
+            if !entitled {
+                return Err(AppstoreServiceError::PermissionDenied(
+                    "An active entitlement is required to download this paid artifact".to_string(),
+                ));
             }
-            _ => DownloadGrantReason::FreeDownload,
+            DownloadGrantReason::Purchase
+        } else {
+            DownloadGrantReason::FreeDownload
         };
 
         let now = Utc::now();

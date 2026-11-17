@@ -685,10 +685,14 @@ impl LibraryRepositoryPort for SqlxLibraryRepository {
         context: &AppstoreRequestContext,
         listing_id: &str,
     ) -> Result<Option<ListingCommerceInfo>, AppstoreServiceError> {
-        let row: Option<(String, String, Option<String>)> = self
+        // The listing lifecycle columns ride along so the consumer library
+        // surface can refuse grants for listings that are not live on the
+        // storefront without a second round-trip.
+        let row: Option<(String, String, Option<String>, String, String)> = self
             .db
-            .query_as::<(String, String, Option<String>)>(
-                "SELECT l.app_id, l.pricing_model, a.platforms::text \
+            .query_as::<(String, String, Option<String>, String, String)>(
+                "SELECT l.app_id, l.pricing_model, a.platforms::text, \
+                        l.listing_status, l.storefront_visibility \
                  FROM appstore_application_listing l \
                  LEFT JOIN appstore_application a ON a.id = l.app_id AND a.deleted_at IS NULL \
                  WHERE l.tenant_id = ? AND l.id = ? AND l.deleted_at IS NULL",
@@ -700,10 +704,14 @@ impl LibraryRepositoryPort for SqlxLibraryRepository {
             .map_err(|e| AppstoreServiceError::Internal(format!("Database error: {}", e)))?;
 
         Ok(row.map(
-            |(app_id, pricing_model, platforms_json)| ListingCommerceInfo {
-                app_id,
-                pricing_model,
-                platforms_json: platforms_json.unwrap_or_else(|| "[]".to_string()),
+            |(app_id, pricing_model, platforms_json, listing_status, storefront_visibility)| {
+                ListingCommerceInfo {
+                    app_id,
+                    pricing_model,
+                    platforms_json: platforms_json.unwrap_or_else(|| "[]".to_string()),
+                    listing_status,
+                    storefront_visibility,
+                }
             },
         ))
     }
