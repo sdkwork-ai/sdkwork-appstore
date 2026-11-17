@@ -61,3 +61,36 @@ SET metadata = metadata || jsonb_build_object('avatarIcon', COALESCE(metadata->>
 WHERE tenant_id = 100001
   AND template_type = 'EXPERT'
   AND COALESCE(metadata->>'avatarIcon', '') = '';
+
+-- R4: mirror the expert rows into their own table. The same copy runs as
+-- migration 0010 for databases seeded before appstore_expert_catalog existed;
+-- this statement covers a fresh install, where seeds run before/after the
+-- migration chain independently. Both are idempotent.
+INSERT INTO appstore_expert_catalog (
+    id, tenant_id, organization_id, expert_code, expert_name, description, category_code,
+    profile_json, expert_status, visibility, featured, sort_weight, owner_user_id, version,
+    published_at, created_at, updated_at
+)
+SELECT
+    t.id::text,
+    t.tenant_id::text,
+    t.organization_id::text,
+    t.template_code,
+    COALESCE(t.template_name, t.template_code),
+    t.description,
+    t.category_code,
+    COALESCE(t.metadata::text, '{}'),
+    CASE WHEN t.publish_status = 1 THEN 'published' ELSE 'draft' END,
+    COALESCE(t.visibility, 0),
+    COALESCE(t.featured, FALSE),
+    COALESCE(t.sort_weight, 0),
+    CASE WHEN t.owner_user_id IS NULL THEN NULL ELSE t.owner_user_id::text END,
+    COALESCE(t.version, 0),
+    CASE WHEN t.publish_status = 1 THEN t.updated_at END,
+    t.created_at,
+    t.updated_at
+FROM appstore_app_template t
+WHERE t.template_type = 'EXPERT'
+  AND t.template_code IS NOT NULL
+  AND t.deleted_at IS NULL
+ON CONFLICT DO NOTHING;
