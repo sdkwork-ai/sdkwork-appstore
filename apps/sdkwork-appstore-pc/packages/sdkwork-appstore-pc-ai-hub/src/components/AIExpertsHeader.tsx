@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation as useI18n } from 'react-i18next';
-import { Search, UserCheck, Bot, Plug, Sparkles } from 'lucide-react';
+import { Search, UserCheck, Bot, Sparkles } from 'lucide-react';
 import { AddDropdown, type AddDropdownItem } from '@sdkwork/appstore-pc-commons';
 
 interface AIExpertsHeaderProps {
@@ -8,8 +8,6 @@ interface AIExpertsHeaderProps {
   onSearchChange: (q: string) => void;
   showOnlyMine: boolean;
   onToggleShowMine: () => void;
-  /** Open the "register custom OpenAPI plugin" modal (reused from the marketplace). */
-  onOpenRegisterPlugin: () => void;
   /** Open the "create & publish Agent Skill" modal (reused from the marketplace). */
   onOpenPublishSkill: () => void;
   /** Open the AI Hub's own "create custom expert" modal. */
@@ -24,7 +22,6 @@ export const AIExpertsHeader: React.FC<AIExpertsHeaderProps> = ({
   onSearchChange,
   showOnlyMine,
   onToggleShowMine,
-  onOpenRegisterPlugin,
   onOpenPublishSkill,
   onOpenCustomModal,
   selectedTag,
@@ -34,8 +31,8 @@ export const AIExpertsHeader: React.FC<AIExpertsHeaderProps> = ({
   const { t } = useI18n();
 
   // The marketplace-style add dropdown: the same trigger + caret + floating
-  // menu design as the marketplace's Plugins/Skills add affordance, with the
-  // marketplace pages' own button copy as the item titles.
+  // menu design as the marketplace's Skills add affordance, with the
+  // marketplace page's own button copy as the item title.
   const addItems: AddDropdownItem[] = [
     {
       key: 'custom-expert',
@@ -43,13 +40,6 @@ export const AIExpertsHeader: React.FC<AIExpertsHeaderProps> = ({
       title: t('experts.add.customExpert.title'),
       desc: t('experts.add.customExpert.desc'),
       onSelect: onOpenCustomModal,
-    },
-    {
-      key: 'register-plugin',
-      icon: Plug,
-      title: t('plugins.header.registerBtn'),
-      desc: t('experts.add.plugin.desc'),
-      onSelect: onOpenRegisterPlugin,
     },
     {
       key: 'publish-skill',

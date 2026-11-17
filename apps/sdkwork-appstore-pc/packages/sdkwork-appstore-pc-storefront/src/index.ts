@@ -16,18 +16,15 @@ export { TourismPage } from '@sdkwork/appstore-pc-tourism'
 export { HealthcarePage } from '@sdkwork/appstore-pc-healthcare'
 export { AIHubPage } from '@sdkwork/appstore-pc-ai-hub'
 export {
-  PluginsPage,
   SkillsPage,
   ExpertsPage,
   McpPage,
 } from '@sdkwork/appstore-pc-markets'
 export { ApiMarketPage, SdkMarketPage } from '@sdkwork/appstore-pc-developer-market'
-export { default as TemplatesPage } from './pages/Templates'
 export { default as DemandsPage } from './pages/Demands'
 export { default as DemandDetailPage } from './pages/DemandDetail'
 export { default as DemandClaimsPage } from './pages/DemandClaims'
 export { default as DemandClaimDetailPage } from './pages/DemandClaimDetail'
-export { default as TemplateDetailPage } from './pages/TemplateDetail'
 export { default as ChartsPage } from './pages/Charts'
 export { default as SearchPage } from './pages/Search'
 export { default as CategoryPage } from './pages/Category'

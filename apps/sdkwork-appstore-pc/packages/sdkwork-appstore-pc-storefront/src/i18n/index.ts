@@ -11,11 +11,9 @@ import { eduExperiment as eduExperimentZh } from './zh-CN/appstore/storefront/ed
 import { tourism as tourismZh } from './zh-CN/appstore/storefront/tourism';
 import { healthcare as healthcareZh } from './zh-CN/appstore/storefront/healthcare';
 import { aihub as aihubZh } from './zh-CN/appstore/storefront/aihub';
-import { pluginsZhCN as pluginsZh } from '@sdkwork/appstore-pc-markets/i18n';
 import { expertsZhCN as expertsZh } from '@sdkwork/appstore-pc-markets/i18n';
 import { skillsZhCN as skillsZh } from '@sdkwork/appstore-pc-markets/i18n';
 import { mcpZhCN as mcpZh } from '@sdkwork/appstore-pc-markets/i18n';
-import { templates as templatesZh } from './zh-CN/appstore/storefront/templates';
 import { demands as demandsZh } from './zh-CN/appstore/storefront/demands';
 import { updates as updatesZh } from './zh-CN/appstore/storefront/updates';
 import { search as searchZh } from './zh-CN/appstore/storefront/search';
@@ -42,11 +40,9 @@ import { eduExperiment as eduExperimentEn } from './en/appstore/storefront/eduEx
 import { tourism as tourismEn } from './en/appstore/storefront/tourism';
 import { healthcare as healthcareEn } from './en/appstore/storefront/healthcare';
 import { aihub as aihubEn } from './en/appstore/storefront/aihub';
-import { pluginsEn as pluginsEn } from '@sdkwork/appstore-pc-markets/i18n';
 import { expertsEn as expertsEn } from '@sdkwork/appstore-pc-markets/i18n';
 import { skillsEn as skillsEn } from '@sdkwork/appstore-pc-markets/i18n';
 import { mcpEn as mcpEn } from '@sdkwork/appstore-pc-markets/i18n';
-import { templates as templatesEn } from './en/appstore/storefront/templates';
 import { demands as demandsEn } from './en/appstore/storefront/demands';
 import { updates as updatesEn } from './en/appstore/storefront/updates';
 import { search as searchEn } from './en/appstore/storefront/search';
@@ -81,10 +77,8 @@ const zhCN = {
   healthcare: healthcareZh,
   aihub: aihubZh,
   experts: expertsZh,
-  plugins: pluginsZh,
   skills: skillsZh,
   mcp: mcpZh,
-  templates: templatesZh,
   demands: demandsZh,
   updates: updatesZh,
   search: searchZh,
@@ -116,10 +110,8 @@ const en = {
   healthcare: healthcareEn,
   aihub: aihubEn,
   experts: expertsEn,
-  plugins: pluginsEn,
   skills: skillsEn,
   mcp: mcpEn,
-  templates: templatesEn,
   demands: demandsEn,
   updates: updatesEn,
   search: searchEn,
@@ -137,11 +129,11 @@ const en = {
 };
 
 // A dedicated instance, not the i18next module singleton: the storefront is
-// inlined into several client bundles (App Store host, template library,
-// demand hall), and every copy running the module-level `init()` against the
-// shared singleton would re-run i18next's init and drop the resources the
-// previous copy registered. Each bundle therefore owns its instance, and the
-// embed surfaces hand it to their components through I18nextProvider.
+// inlined into several client bundles (App Store host, demand hall), and every
+// copy running the module-level `init()` against the shared singleton would
+// re-run i18next's init and drop the resources the previous copy registered.
+// Each bundle therefore owns its instance, and the embed surfaces hand it to
+// their components through I18nextProvider.
 const i18n: I18n = createInstance();
 
 i18n

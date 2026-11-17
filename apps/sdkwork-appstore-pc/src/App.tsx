@@ -14,7 +14,7 @@ import '@sdkwork/appstore-pc-embed/styles.css'
 const runtime = createAppstorePcRuntime(undefined, {
   // The standalone window never hard-redirects on a 401: the storefront
   // AuthGate owns sign-in at route level for protected prefixes, and the
-  // anonymous-browsable marketplace pages (/experts, /templates, ...) must
+  // anonymous-browsable marketplace pages (/experts, /skills, ...) must
   // render their own honest error state instead of bouncing into a
   // login↔page redirect loop when the catalog API rejects the anonymous
   // bootstrap token.

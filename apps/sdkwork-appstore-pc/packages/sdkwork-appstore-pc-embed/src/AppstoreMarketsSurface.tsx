@@ -1,25 +1,19 @@
-import { useEffect, useMemo, useRef, type ReactNode } from 'react';
-import { MemoryRouter, Navigate, Route, Routes, useParams } from 'react-router-dom';
+import { useEffect, useMemo, useRef } from 'react';
+import { MemoryRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { I18nextProvider } from 'react-i18next';
 import {
-  AppDetailPage,
   DemandClaimDetailPage,
   DemandClaimsPage,
   DemandDetailPage,
   DemandsPage,
   ExpertsPage,
-  InstallProvider,
   McpPage,
-  PluginsPage,
   SkillsPage,
-  TemplateDetailPage,
-  TemplatesPage,
   initializeAppstorePcI18n,
   i18n,
   ThemeProvider,
 } from '@sdkwork/appstore-pc-storefront';
 import type { DemandHallItem } from '@sdkwork/appstore-pc-core';
-import type { PluginsHost } from '@sdkwork/appstore-pc-core';
 import {
   createAppstorePcRuntime,
   resolveAppstorePcRuntimeConfig,
@@ -42,14 +36,12 @@ import {
  * `AppstorePcHost` router, so the storefront's catalog pages stay reusable
  * across embedding applications.
  */
-export type AppstoreMarketsPage = 'plugins' | 'experts' | 'skills' | 'mcp' | 'templates' | 'demands';
+export type AppstoreMarketsPage = 'experts' | 'skills' | 'mcp' | 'demands';
 
 const MARKET_PAGE_COMPONENTS = {
-  plugins: PluginsPage,
   experts: ExpertsPage,
   skills: SkillsPage,
   mcp: McpPage,
-  templates: TemplatesPage,
   demands: DemandsPage,
 } as const satisfies Record<AppstoreMarketsPage, unknown>;
 
@@ -95,24 +87,12 @@ export interface AppstoreMarketsSurfaceProps {
    */
   searchQuery?: string
   /**
-   * CSS selector of the host-provided container that receives the templates
-   * page's publish button (a portal target in the host's toolbar row). When
-   * set, the button portals there instead of riding the platform-filter row.
-   */
-  templatesPublishSlotSelector?: string
-  /**
    * Bump this value when the host reopens the page from its global navigation.
    * The embedded router remounts at the page root, so clicking the sidebar's
-   * "Demand Hall" / "Template Library" entry returns to the hall/list even
-   * when the host already has that page open on a detail route.
+   * "Demand Hall" entry returns to the hall/list even when the host already has
+   * that page open on a detail route.
    */
   navigationResetKey?: number
-  /**
-   * The embedding host's plugin install port. The plugins catalog turns each
-   * entry's published source into an install through it; without one the page
-   * keeps the storefront's own enable state.
-   */
-  pluginsHost?: PluginsHost
 }
 
 function resolveMarketsConfig(props: AppstoreMarketsSurfaceProps): AppstorePcRuntimeConfig {
@@ -136,14 +116,13 @@ function resolveMarketsConfig(props: AppstoreMarketsSurfaceProps): AppstorePcRun
 }
 
 /**
- * Render one App Store market page (plugins, experts, skills, MCP, templates,
- * or demands) through its own isolated runtime, i18n provider, and
- * host-managed theme. The surface owns no navigation chrome: the host renders
- * its own header/tabs around it.
+ * Render one App Store market page (experts, skills, MCP, or demands) through
+ * its own isolated runtime, i18n provider, and host-managed theme. The surface
+ * owns no navigation chrome: the host renders its own header/tabs around it.
  *
- * Templates and demands are two-route surfaces inside this embed (catalog at
- * the router root, one entity at `/templates/:id` or `/demands/:id`): selecting
- * a card is a page navigation with a working back stack, not a dialog.
+ * Demands is a two-route surface inside this embed (hall at the router root,
+ * one demand at `/demands/:id`): selecting a card is a page navigation with a
+ * working back stack, not a dialog.
  *
  * The runtime seeds its session before the first render (market pages load
  * data in mount effects ahead of any post-render session apply), the
@@ -286,50 +265,6 @@ export function AppstoreMarketsSurface(props: AppstoreMarketsSurfaceProps) {
                 }
               />
             </Routes>
-          ) : props.page === 'templates' ? (
-            // The template library is the same two-route shape: the catalog
-            // lives at the router root and each template reads at
-            // /templates/:templateId, so selecting a card is a page navigation
-            // (with a working back stack) rather than a dialog.
-            <Routes>
-              <Route
-                path="/"
-                element={
-                  <TemplatesPage
-                    {...(props.searchQuery === undefined ? {} : { searchQuery: props.searchQuery })}
-                    {...(props.templatesPublishSlotSelector === undefined
-                      ? {}
-                      : { publishSlotSelector: props.templatesPublishSlotSelector })}
-                  />
-                }
-              />
-              <Route path="/templates" element={<Navigate to="/" replace />} />
-              <Route path="/templates/:id" element={<TemplateDetailPage />} />
-              {/* Historical detail links from older catalog cards. */}
-              <Route path="/template/:id" element={<LegacyTemplateRedirect />} />
-              {/* A template detail page links to the app built from it. That
-                  surface needs the install provider, mounted on this route only
-                  so the rest of the library stays install-free; the app's own
-                  back button then returns to the template page. */}
-              <Route
-                path="/app/:id"
-                element={
-                  <InstallProvider session={runtime.session}>
-                    <ScrollToTop>
-                      <AppDetailPage />
-                    </ScrollToTop>
-                  </InstallProvider>
-                }
-              />
-              {/* An unknown navigation must not unmount the routed surface:
-                  fall back to the catalog instead of a blank column. */}
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
-          ) : props.page === 'plugins' ? (
-            <PluginsPage
-              {...(props.searchQuery === undefined ? {} : { searchQuery: props.searchQuery })}
-              {...(props.pluginsHost === undefined ? {} : { pluginsHost: props.pluginsHost })}
-            />
           ) : (
             <MarketPage
               {...(props.searchQuery === undefined ? {} : { searchQuery: props.searchQuery })}
@@ -338,38 +273,5 @@ export function AppstoreMarketsSurface(props: AppstoreMarketsSurfaceProps) {
         </MemoryRouter>
       </ThemeProvider>
     </I18nextProvider>
-  )
-}
-
-/** Resolve a historical `/template/:id` link onto the routed detail path. */
-function LegacyTemplateRedirect() {
-  const { id } = useParams<{ id: string }>()
-  return <Navigate to={`/templates/${id ?? ''}`} replace />
-}
-
-/**
- * Open a routed page at its top. The host owns the scroll container (BirdCoder's
- * template library scrolls its own column), so the nearest scrollable ancestor
- * of this wrapper is the one to reset; a page without one falls back to the
- * window.
- */
-function ScrollToTop({ children }: { children: ReactNode }) {
-  const ref = useRef<HTMLDivElement | null>(null)
-  useEffect(() => {
-    let node: HTMLElement | null = ref.current?.parentElement ?? null
-    while (node !== null) {
-      const { overflowY } = window.getComputedStyle(node)
-      if (overflowY === 'auto' || overflowY === 'scroll') {
-        node.scrollTo({ top: 0 })
-        return
-      }
-      node = node.parentElement
-    }
-    window.scrollTo({ top: 0 })
-  }, [])
-  return (
-    <div ref={ref} style={{ display: 'contents' }}>
-      {children}
-    </div>
   )
 }

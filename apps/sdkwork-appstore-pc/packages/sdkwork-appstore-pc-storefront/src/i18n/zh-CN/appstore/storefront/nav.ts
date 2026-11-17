@@ -11,10 +11,8 @@ export const nav = {
     healthcare: '医疗卫生应用',
     aiHub: 'AI 实验室',
     experts: '专家',
-    plugins: '扩展插件',
     skills: '技能中心',
     mcp: 'MCP 服务',
-    templates: '应用模板',
     demands: '需求大厅',
     developerMarket: '开发者市场',
     apiMarket: 'API市场',
@@ -29,7 +27,7 @@ export const nav = {
     admin: '系统监控中心'
   },
   header: {
-    searchPlaceholder: '搜索应用、插件、MCP服务、技能或模板...',
+    searchPlaceholder: '搜索应用、MCP服务或技能...',
     themeToggle: '切换主题',
     languageToggle: '切换语言',
     userRole: '高级开发者',

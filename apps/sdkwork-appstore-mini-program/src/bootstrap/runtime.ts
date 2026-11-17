@@ -632,21 +632,32 @@ function createPageLoaders(getClient: () => AppstoreAppClient) {
     },
 
     /**
-     * App templates (retired capability).
+     * Curated AI expert catalog (`catalog.experts.list`).
      *
-     * Application scaffolds are served by the deploy service
-     * (`/app/v3/api/app_templates`); the appstore catalog no longer exposes a
-     * template surface, so the mini program reports an empty shelf.
+     * The app-template marketplace the experts page used to read through was
+     * retired (application scaffolds live in the deploy service), so the page
+     * reads the expert roster from its own catalog store instead.
      */
-    async templates(
-      _templateType: 'APP' | 'PLUGIN' | 'EXPERT',
-    ): Promise<
-      Array<{ id: string; name: string; author: string; description: string; stars: number }>
+    async experts(): Promise<
+      Array<{ id: string; name: string; developer: string; rating: number }>
     > {
-      console.warn(
-        'The app-template marketplace is retired: application scaffolds are served by the deploy service, not the appstore catalog.',
-      );
-      return [];
+      const page = await getClient().catalog.listExperts({ limit: 100 });
+      return (page.items ?? []).map((expert) => {
+        const profile =
+          expert.profile && typeof expert.profile === 'object'
+            ? (expert.profile as Record<string, unknown>)
+            : {};
+        const nickname = profile.nickname;
+        return {
+          id: expert.id,
+          name: expert.expertName,
+          developer:
+            typeof nickname === 'string' && nickname.trim() !== ''
+              ? nickname
+              : 'SDKWork',
+          rating: Number(profile.rating ?? 0) || 0,
+        };
+      });
     },
     /** Library: installed listings with resolved display names (auth required). */
     async library(): Promise<ListingRow[]> {

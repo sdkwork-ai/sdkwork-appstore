@@ -123,64 +123,6 @@ export interface EventItem {
   ctaLink?: string;
 }
 
-export interface PluginItem {
-  id: string;
-  name: string;
-  version: string;
-  developer: string;
-  category: string;
-  description: string;
-  icon: string;
-  iconColor: string;
-  downloadsCount: number;
-  rating: number;
-  enabled: boolean;
-  apiSchemaType: 'OpenAPI' | 'GraphQL' | 'gRPC' | 'REST';
-  capabilities: string[];
-  docUrl?: string;
-  /**
-   * Where the plugin package comes from: a Git repository (optionally one
-   * directory inside it), an archive, or a sdkwork-drive directory. Absent for
-   * an entry that publishes no installable source.
-   */
-  source?: PluginSourceRef;
-}
-
-/** The three forms a plugin source takes, as the catalog publishes them. */
-export type PluginSourceType = 'git' | 'archive' | 'drive';
-
-/**
- * One plugin package's provenance. A repository may publish several plugins,
- * one per directory, so `directory` is part of the identity.
- */
-export interface PluginSourceRef {
-  type: PluginSourceType;
-  /** The https clone URL, archive URL, or Drive download URL. */
-  url: string;
-  /** A Git branch, tag, or commit. */
-  ref?: string;
-  /** The plugin package's directory inside the source. */
-  directory?: string;
-  /** The archive's expected SHA-256, for `archive`. */
-  sha256?: string;
-  /** The Drive node id, for `drive`. */
-  nodeId?: string;
-}
-
-/**
- * The embedding host's plugin installation port. A host that provides it
- * replaces the storefront's server-side enable toggle with a real install of
- * the entry's source into the host's own plugin tree.
- */
-export interface PluginsHost {
-  /**
-   * Install one catalog entry.
-   * @param plugin - the entry and its source.
-   * @returns when the host accepted the installation (progress is the host's).
-   */
-  install(plugin: PluginItem): void | Promise<void>;
-}
-
 export interface SkillItem {
   id: string;
   name: string;
@@ -221,65 +163,6 @@ export interface McpServerItem {
   configSnippet: string;
   commandOrUrl?: string;
   status: 'active' | 'idle' | 'disconnected' | 'error';
-}
-
-/**
- * Template target-platform codes, in the library filter-row order. Each code is
- * one SDKWork client application architecture (`APP_CLIENT_ARCHITECTURE_ALIGNMENT_SPEC.md`
- * §2), so a template is classified by the app form it scaffolds: PC browser or
- * desktop, tablet, phone-first H5, static web, Flutter mobile, mini program,
- * native Android/iOS/HarmonyOS mobile, uni-app cross-platform, or Unity.
- *
- * `H5`, `PC`, `FLUTTER`, and `MINIPROGRAM` are the original four codes and stay
- * valid; the catalog may still carry other codes, which the UI renders verbatim.
- */
-export const TEMPLATE_PLATFORMS = [
-  'PC',
-  'PAD',
-  'H5',
-  'STATIC_WEB',
-  'FLUTTER',
-  'MINIPROGRAM',
-  'ANDROID',
-  'IOS',
-  'HARMONY',
-  'UNIAPP',
-  'UNITY',
-] as const;
-
-/** One {@link TEMPLATE_PLATFORMS} code. */
-export type TemplatePlatform = (typeof TEMPLATE_PLATFORMS)[number];
-
-export interface TemplateItem {
-  id: string;
-  title: string;
-  author: string;
-  framework: string;
-  category: string;
-  /** Target application form the template scaffolds (H5, PC, ...); absent when undeclared. */
-  platform?: string;
-  description: string;
-  icon: string;
-  iconColor: string;
-  stars: number;
-  forks: number;
-  tags: string[];
-  demoUrl?: string;
-  githubUrl?: string;
-  repoUrl?: string;
-  previewUrl?: string;
-  publishedAt: string;
-  isOfficial?: boolean;
-  previewImage?: string;
-  screenshots?: string[];
-  features?: string[];
-  techStack?: string[];
-  architecture?: string;
-  usageCount?: number;
-  rating?: number;
-  license?: string;
-  overviewMarkdown?: string;
-  relatedAppId?: string;
 }
 
 export interface ExpertItem {

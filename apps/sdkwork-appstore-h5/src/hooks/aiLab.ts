@@ -3,6 +3,13 @@ import { readRecordNumber, readRecordString } from '@sdkwork/appstore-h5-commons
 import { getStoreClient } from '@/services/storeClient';
 import { getAgentsClient, getSkillsClient, getMcpClient } from '@/services/aiLabClients';
 
+/** Read a wire string-array field, dropping non-string entries. */
+function toStringArray(value: unknown): string[] {
+  return Array.isArray(value)
+    ? value.filter((entry): entry is string => typeof entry === 'string')
+    : [];
+}
+
 /** Storefront card for the AI Hub apps tab (catalog listings in AI categories). */
 export interface AiAppCard {
   id: string;
@@ -123,81 +130,6 @@ export async function generateAiCompletion(
     response,
     modelUsed: readRecordString(output, 'model', 'modelId') || modelId,
   };
-}
-
-/** Extension plugin card mapped from the catalog template domain. */
-export interface AiPluginCard {
-  id: string;
-  name: string;
-  developer: string;
-  category: string;
-  description: string;
-  capabilities: string[];
-  enabled: boolean;
-}
-
-function readMetadata(row: Record<string, unknown>): Record<string, unknown> {
-  const raw = row.metadata;
-  if (raw && typeof raw === 'object' && !Array.isArray(raw)) {
-    return raw as Record<string, unknown>;
-  }
-  return {};
-}
-
-function toStringArray(value: unknown): string[] {
-  return Array.isArray(value)
-    ? value.filter((entry): entry is string => typeof entry === 'string')
-    : [];
-}
-
-function toPluginCard(row: Record<string, unknown>): AiPluginCard {
-  const meta = readMetadata(row);
-  return {
-    id: readRecordString(row, 'id'),
-    name: readRecordString(row, 'templateName', 'template_name'),
-    developer: readRecordString(meta, 'authorName') || 'SDKWork',
-    category:
-      readRecordString(meta, 'category') ||
-      readRecordString(row, 'categoryCode', 'category_code') ||
-      '代码与开发',
-    description: readRecordString(row, 'description'),
-    capabilities: toStringArray(meta.capabilities),
-    enabled: false,
-  };
-}
-
-const PLUGIN_CATEGORIES = [
-  '全部',
-  '代码与开发',
-  '数据检索',
-  '文档处理',
-  '数据库应用',
-  '图像处理',
-  '商业应用',
-] as const;
-
-export { PLUGIN_CATEGORIES };
-
-export function usePlugins(category: string, query: string) {
-  return useApi<AiPluginCard[]>(
-    async () => {
-      // Plugin entries were `appstore_app_template` rows with
-      // `template_type = 'PLUGIN'`; that table family is retired, so the shelf
-      // reports empty instead of calling a deleted endpoint.
-      console.warn(
-        'The plugin marketplace is retired: plugin entries lived in the app-template family, which the appstore catalog no longer serves.',
-      );
-      return [];
-    },
-    { refreshKey: `${category}:${query}` },
-  );
-}
-
-/** Toggle plugin enable state (retired capability). */
-export async function togglePluginEnabled(_id: string, _currentlyEnabled: boolean): Promise<boolean> {
-  throw new Error(
-    'Enabling plugins is retired: plugin entries lived in the app-template family, which the appstore catalog no longer serves.',
-  );
 }
 
 /** Skill marketplace card mapped from the skills domain. */

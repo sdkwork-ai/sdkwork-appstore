@@ -41,20 +41,11 @@ const AIHubPage = lazy(() =>
 const ExpertsPage = lazy(() =>
   import('./pages/ai-hub/ExpertsPage').then(m => ({ default: m.ExpertsPage })),
 );
-const PluginsPage = lazy(() =>
-  import('./pages/ai-hub/PluginsPage').then(m => ({ default: m.PluginsPage })),
-);
 const SkillsPage = lazy(() =>
   import('./pages/ai-hub/SkillsPage').then(m => ({ default: m.SkillsPage })),
 );
 const McpPage = lazy(() =>
   import('./pages/ai-hub/McpPage').then(m => ({ default: m.McpPage })),
-);
-const TemplatesPage = lazy(() =>
-  import('./pages/ai-hub/TemplatesPage').then(m => ({ default: m.TemplatesPage })),
-);
-const TemplateDetailPage = lazy(() =>
-  import('./pages/ai-hub/TemplateDetailPage').then(m => ({ default: m.TemplateDetailPage })),
 );
 
 function PageLoader() {
@@ -84,12 +75,8 @@ export default function App() {
           <Route path="/events/:id" element={<EventPage />} />
           <Route path="/ai-hub" element={<AIHubPage />} />
           <Route path="/experts" element={<ExpertsPage />} />
-          <Route path="/plugins" element={<PluginsPage />} />
           <Route path="/skills" element={<SkillsPage />} />
           <Route path="/mcp" element={<McpPage />} />
-          <Route path="/templates" element={<TemplatesPage />} />
-          <Route path="/template/:id" element={<TemplateDetailPage />} />
-          <Route path="/templates/:id" element={<TemplateDetailPage />} />
 
           {/* Authenticated routes */}
           <Route

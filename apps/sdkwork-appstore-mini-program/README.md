@@ -23,7 +23,7 @@ Route ids, package roles, and SDK surface align with the PC root
 | `packages/@sdkwork/appstore-mp-charts` | Charts capability package (routes: `app.store.charts.index`) | frontend-feature |
 | `packages/@sdkwork/appstore-mp-category` | Category capability package (routes: `app.store.category.detail`) | frontend-feature |
 | `packages/@sdkwork/appstore-mp-collection` | Collection capability package (routes: `app.store.collection.detail`) | frontend-feature |
-| `packages/@sdkwork/appstore-mp-ai-hub` | Ai Hub capability package (routes: `app.store.ai-hub.index`, `app.store.ai-hub.experts`, `app.store.ai-hub.plugins`, `app.store.ai-hub.skills`, `app.store.ai-hub.mcp`, `app.store.ai-hub.templates`, `app.store.ai-hub.template-detail`, `app.store.ai-hub.template-detail-alias`) | frontend-feature |
+| `packages/@sdkwork/appstore-mp-ai-hub` | Ai Hub capability package (routes: `app.store.ai-hub.index`, `app.store.ai-hub.experts`, `app.store.ai-hub.skills`, `app.store.ai-hub.mcp`) | frontend-feature |
 | `packages/@sdkwork/appstore-mp-search` | Search capability package (routes: `app.store.search.index`) | frontend-feature |
 | `packages/@sdkwork/appstore-mp-app-detail` | App Detail capability package (routes: `app.store.app-detail.detail`) | frontend-feature |
 | `packages/@sdkwork/appstore-mp-events` | Events capability package (routes: `app.store.events.detail`) | frontend-feature |
@@ -50,12 +50,8 @@ implementations.
 | `app.store.collection.detail` | `/collection/:id` | `collection` |
 | `app.store.ai-hub.index` | `/ai-hub` | `ai-hub` |
 | `app.store.ai-hub.experts` | `/experts` | `ai-hub` |
-| `app.store.ai-hub.plugins` | `/plugins` | `ai-hub` |
 | `app.store.ai-hub.skills` | `/skills` | `ai-hub` |
 | `app.store.ai-hub.mcp` | `/mcp` | `ai-hub` |
-| `app.store.ai-hub.templates` | `/templates` | `ai-hub` |
-| `app.store.ai-hub.template-detail` | `/template/:id` | `ai-hub` |
-| `app.store.ai-hub.template-detail-alias` | `/templates/:id` | `ai-hub` |
 | `app.store.search.index` | `/search` | `search` |
 | `app.store.app-detail.detail` | `/app/:id` | `app-detail` |
 | `app.store.events.detail` | `/events/:id` | `events` |

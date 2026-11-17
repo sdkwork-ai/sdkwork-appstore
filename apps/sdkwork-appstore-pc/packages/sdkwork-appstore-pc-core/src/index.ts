@@ -8,6 +8,5 @@ export * from './runtime';
 export * from './sdk';
 export * from './session';
 export * from './services';
-export * from './templateAppTypes';
 export * from './types';
 export * from './upload-declaration';

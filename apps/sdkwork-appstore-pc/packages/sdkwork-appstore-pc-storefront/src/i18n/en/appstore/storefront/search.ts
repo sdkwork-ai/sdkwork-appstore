@@ -21,10 +21,8 @@ export const search = {
     miniGames: 'WeChat Mini Games',
     utilities: 'Utilities',
     ai: 'AI Tools',
-    plugins: 'Plugins',
     skills: 'AI Skills',
-    mcp: 'MCP Servers',
-    templates: 'Templates'
+    mcp: 'MCP Servers'
   },
   empty: {
     title: 'No Results Found',

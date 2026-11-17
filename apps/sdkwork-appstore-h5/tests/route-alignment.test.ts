@@ -16,7 +16,7 @@ describe('H5 canonical route alignment', () => {
   const routes = listAppstoreRouteIdentities();
 
   it('exposes the canonical route table', () => {
-    expect(routes.length).toBeGreaterThanOrEqual(26);
+    expect(routes.length).toBeGreaterThanOrEqual(22);
   });
 
   it('mounts every canonical route explicitly or through an override', () => {

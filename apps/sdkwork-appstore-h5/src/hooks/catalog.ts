@@ -186,69 +186,6 @@ export function useCatalogEvent(eventId: string) {
   );
 }
 
-export interface AppTemplateCard {
-  id: string;
-  templateCode: string;
-  name: string;
-  description: string;
-  categoryCode: string;
-  author: string;
-  stars: number;
-  forks: number;
-  framework: string;
-  language: string;
-}
-
-function toTemplateCard(row: Record<string, unknown>): AppTemplateCard {
-  const metadata =
-    row.metadata && typeof row.metadata === 'object' && !Array.isArray(row.metadata)
-      ? (row.metadata as Record<string, unknown>)
-      : {};
-  return {
-    id: String(row.id ?? ''),
-    templateCode: String(row.templateCode ?? ''),
-    name: String(row.templateName ?? row.template_code ?? '模板'),
-    description: String(row.description ?? ''),
-    categoryCode: String(row.categoryCode ?? ''),
-    author: String(metadata.authorName ?? row.authorName ?? 'SDKWork'),
-    stars: Number(metadata.stars ?? row.starCount ?? 0),
-    forks: Number(metadata.forks ?? row.forkCount ?? 0),
-    framework: String(row.framework ?? ''),
-    language: String(row.language ?? ''),
-  };
-}
-
-/**
- * The app-template marketplace is retired: application scaffolds are served by
- * the deploy service (`/app/v3/api/app_templates`), and the appstore catalog no
- * longer exposes a template surface. The hook keeps its shape so the page still
- * renders, and reports an empty shelf instead of calling a deleted endpoint.
- */
-const retiredTemplateMessage =
-  'The app-template marketplace is retired: application scaffolds are served by the deploy service, not the appstore catalog.';
-
-/** App template marketplace list (retired capability; always empty). */
-export function useTemplates(_templateType: 'APP' | 'PLUGIN', query: string) {
-  return useApi<AppTemplateCard[]>(
-    async () => {
-      console.warn(retiredTemplateMessage);
-      return [];
-    },
-    { refreshKey: `templates:${query}` },
-  );
-}
-
-/** One template detail by id (retired capability; always null). */
-export function useTemplate(templateId: string) {
-  return useApi<AppTemplateCard | null>(
-    async () => {
-      console.warn(retiredTemplateMessage);
-      return null;
-    },
-    { refreshKey: templateId },
-  );
-}
-
 /** Curated AI expert card rendered by the 专家 surfaces (catalog.experts.*). */
 export interface ExpertCatalogCard {
   id: string;

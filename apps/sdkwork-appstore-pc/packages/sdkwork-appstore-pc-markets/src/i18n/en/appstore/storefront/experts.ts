@@ -13,14 +13,10 @@ export const experts = {
   },
   add: {
     label: 'Add',
-    aria: 'Add a plugin, a skill, or a custom expert',
+    aria: 'Add a skill or a custom expert',
     customExpert: {
       title: 'Custom Expert',
       desc: 'Create a dedicated domain Copilot with a built-in system prompt'
-    },
-    plugin: {
-      title: 'Register Custom OpenAPI Plugin',
-      desc: 'Register internal corporate API plugin components via OpenAPI / Swagger specifications'
     },
     skill: {
       title: 'Create & Publish Agent Skill',

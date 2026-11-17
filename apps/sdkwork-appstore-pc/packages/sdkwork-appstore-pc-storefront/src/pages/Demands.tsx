@@ -15,7 +15,7 @@ import { PublishDemandModal } from '../components/demands/PublishDemandModal';
 
 /**
  * 需求大厅 (demand hall) — the AI Lab demand publishing and claiming page.
- * Mirrors the 应用模板 page layout (toolbar row, category filter, card grid,
+ * Mirrors the 技能中心 page layout (toolbar row, category filter, card grid,
  * empty state) per the AI Lab composition standard. Demand data is owned by
  * the company domain and consumed through the pc-core demand hall service
  * port.
@@ -155,7 +155,7 @@ export function DemandsPage({ searchQuery }: DemandsPageProps = {}) {
         </div>
       ) : null}
 
-      {/* Demand Grid — mirrors the 应用模板 card grid */}
+      {/* Demand Grid — mirrors the 技能中心 card grid */}
       {loading ? (
         <div className="py-20 text-center text-xs text-store-ink-faint">{t('demands.loading')}</div>
       ) : (

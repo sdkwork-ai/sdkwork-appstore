@@ -1,28 +1,26 @@
 /**
  * AI Lab marketplace pages package.
  *
- * Self-contained implementation of the four AI Lab storefront marketplaces:
- * plugins (扩展插件), skills (技能), MCP servers (MCP 服务) and experts (专家).
+ * Self-contained implementation of the three AI Lab storefront marketplaces:
+ * skills (技能), MCP servers (MCP 服务) and experts (专家).
  *
  * Each page consumes its service through the port singletons re-exported by
- * `@sdkwork/appstore-pc-core` (PluginsService / SkillsService / McpService),
+ * `@sdkwork/appstore-pc-core` (SkillsService / McpService / ExpertsService),
  * which hosts bind to a real SDK-backed implementation during bootstrap via
  * `@sdkwork/appstore-pc-runtime`. This keeps the pages portable: any host app
  * can mount them by providing the port bindings and the i18n resources from
  * the `./i18n` subpath export.
  */
-export { default as PluginsPage } from './PluginsPage';
 export { default as SkillsPage } from './SkillsPage';
 export { default as ExpertsPage } from './ExpertsPage';
 export { default as McpPage } from './McpPage';
 
-export * from './components/plugins';
 export * from './components/skills';
 export * from './components/experts';
 export * from './components/mcp';
 
 // The shared catalog building blocks: one chip row, one category projection,
-// one filter hook. A host that adds a fifth marketplace page composes these
+// one filter hook. A host that adds a further marketplace page composes these
 // instead of copying a page's category bookkeeping.
 export * from './components/marketCategories';
 export * from './components/CategoryChips';
@@ -30,14 +28,8 @@ export * from './hooks/useCatalogCategoryFilter';
 
 // The experts marketplace renders its catalog through the ExpertsService port
 // singleton from `@sdkwork/appstore-pc-core` (bound to the App Store catalog
-// `templateType=EXPERT` feed by `@sdkwork/appstore-pc-runtime`), like the
-// other three markets. No page-level content data lives in this package.
-
-export const pluginsRoute = {
-  path: '/plugins',
-  title: '扩展插件',
-  id: 'plugins'
-};
+// `catalog.listExperts` feed by `@sdkwork/appstore-pc-runtime`), like the
+// other markets. No page-level content data lives in this package.
 
 export const skillsRoute = {
   path: '/skills',

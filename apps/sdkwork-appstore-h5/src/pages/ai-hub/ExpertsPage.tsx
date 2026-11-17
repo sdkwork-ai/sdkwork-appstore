@@ -4,10 +4,10 @@ import { useExperts } from '@/hooks/catalog';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 
 /**
- * 专家页（/experts，AI Lab 独立页面，布局镜像应用模板页：
+ * 专家页（/experts，AI Lab 独立页面，布局镜像技能中心页：
  * 头部横幅 + 搜索 + 分类筛选 + 卡片列表 + 空态，
  * `specs/AGENTS_DEPENDENCY_BOUNDARY_SPEC.md` section 4）。
- * 目录数据来自 App Store 目录 EXPERT 模板行（useExperts）。
+ * 目录数据来自 App Store 目录的专家花名册（useExperts，catalog.listExperts）。
  */
 export function ExpertsPage() {
   const [query, setQuery] = useState('');

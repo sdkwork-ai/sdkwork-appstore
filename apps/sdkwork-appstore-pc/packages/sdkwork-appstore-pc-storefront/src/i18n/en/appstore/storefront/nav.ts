@@ -11,10 +11,8 @@ export const nav = {
     healthcare: 'Healthcare Apps',
     aiHub: 'AI Hub',
     experts: 'Experts',
-    plugins: 'Plugins',
     skills: 'Skills',
     mcp: 'MCP Servers',
-    templates: 'Templates',
     demands: 'Demand Hall',
     developerMarket: 'Developer Market',
     apiMarket: 'API Market',
@@ -29,7 +27,7 @@ export const nav = {
     admin: 'System Monitor'
   },
   header: {
-    searchPlaceholder: 'Search apps, plugins, MCP servers, skills, or templates...',
+    searchPlaceholder: 'Search apps, MCP servers, or skills...',
     themeToggle: 'Toggle Theme',
     languageToggle: 'Language',
     userRole: 'Senior Developer',

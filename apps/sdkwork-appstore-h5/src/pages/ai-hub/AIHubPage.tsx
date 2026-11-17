@@ -63,10 +63,6 @@ export function AIHubPage() {
           <Users className="h-4 w-4 text-violet-500" />
           专家
         </Link>
-        <Link to="/plugins" className="card card-press flex items-center gap-2 p-3.5 text-sm font-medium text-[var(--text-primary)]">
-          <Sparkles className="h-4 w-4 text-emerald-500" />
-          扩展插件
-        </Link>
         <Link to="/skills" className="card card-press flex items-center gap-2 p-3.5 text-sm font-medium text-[var(--text-primary)]">
           <Sparkles className="h-4 w-4 text-amber-500" />
           技能中心
@@ -74,10 +70,6 @@ export function AIHubPage() {
         <Link to="/mcp" className="card card-press flex items-center gap-2 p-3.5 text-sm font-medium text-[var(--text-primary)]">
           <ServerIcon />
           MCP 服务
-        </Link>
-        <Link to="/templates" className="card card-press col-span-2 flex items-center gap-2 p-3.5 text-sm font-medium text-[var(--text-primary)]">
-          <Sparkles className="h-4 w-4 text-indigo-500" />
-          应用模板
         </Link>
       </div>
     </div>

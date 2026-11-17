@@ -13,14 +13,10 @@ export const experts = {
   },
   add: {
     label: '添加',
-    aria: '添加插件、技能或自定义专家',
+    aria: '添加技能或自定义专家',
     customExpert: {
       title: '自定义专家',
       desc: '创建专属行业 Copilot，内置系统提示词'
-    },
-    plugin: {
-      title: '注册自定义 OpenAPI 插件',
-      desc: '通过 OpenAPI / Swagger 规范录入企业内部 API 插件组件'
     },
     skill: {
       title: '创建并发布 Agent Skill',

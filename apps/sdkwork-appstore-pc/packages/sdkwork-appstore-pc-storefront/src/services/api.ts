@@ -1,10 +1,8 @@
 export {
   AppStoreService,
   AIHubService,
-  PluginsService,
   SkillsService,
   McpService,
-  TemplatesService,
   CompanyDemandsService,
   DemandClaimsService,
   ConsoleService,
@@ -15,10 +13,8 @@ export {
 export type {
   IAppStoreSDK,
   IAIHubSDK,
-  IPluginsSDK,
   ISkillsSDK,
   IMcpSDK,
-  ITemplatesSDK,
   IConsoleSDK,
   IInstallSDK,
   IUserStoreSDK,

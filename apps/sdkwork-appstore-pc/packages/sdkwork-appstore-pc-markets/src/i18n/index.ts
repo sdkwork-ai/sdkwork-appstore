@@ -5,7 +5,6 @@
  *
  * ```ts
  * import {
- *   pluginsZhCN, pluginsEn,
  *   skillsZhCN, skillsEn,
  *   expertsZhCN, expertsEn,
  *   mcpZhCN, mcpEn,
@@ -13,14 +12,12 @@
  *
  * i18n.init({
  *   resources: {
- *     'zh-CN': { translation: { plugins: pluginsZhCN, skills: skillsZhCN, experts: expertsZhCN, mcp: mcpZhCN } },
- *     en: { translation: { plugins: pluginsEn, skills: skillsEn, experts: expertsEn, mcp: mcpEn } },
+ *     'zh-CN': { translation: { skills: skillsZhCN, experts: expertsZhCN, mcp: mcpZhCN } },
+ *     en: { translation: { skills: skillsEn, experts: expertsEn, mcp: mcpEn } },
  *   },
  * });
  * ```
  */
-export { plugins as pluginsZhCN } from './zh-CN/appstore/storefront/plugins';
-export { plugins as pluginsEn } from './en/appstore/storefront/plugins';
 export { skills as skillsZhCN } from './zh-CN/appstore/storefront/skills';
 export { skills as skillsEn } from './en/appstore/storefront/skills';
 export { experts as expertsZhCN } from './zh-CN/appstore/storefront/experts';

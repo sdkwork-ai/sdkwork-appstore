@@ -4,19 +4,15 @@ import {
   AIHubService,
   AppStoreService,
   ExpertsService,
-  PluginsService,
   SkillsService,
 } from '@sdkwork/appstore-pc-core';
 import { AppItem, ExpertItem } from '@sdkwork/appstore-pc-core';
 import { LoadingSpinner } from '@sdkwork/appstore-pc-commons';
 // Marketplace add flows, reused so the AI Lab's add dropdown opens the exact
-// same modals (and copy) as the marketplace's Plugins/Skills pages. Expert
-// content itself comes from the ExpertsService port (catalog EXPERT feed),
-// shared with the marketplace's Experts page.
-import {
-  PublishSkillModal,
-  RegisterPluginModal,
-} from '@sdkwork/appstore-pc-markets';
+// same modal (and copy) as the marketplace's Skills page. Expert content itself
+// comes from the ExpertsService port (catalog expert feed), shared with the
+// marketplace's Experts page.
+import { PublishSkillModal } from '@sdkwork/appstore-pc-markets';
 import { AIExpertsHeader } from './components/AIExpertsHeader';
 import { AISandboxAssistant } from './components/AISandboxAssistant';
 import { AIAppsGrid } from './components/AIAppsGrid';
@@ -40,9 +36,8 @@ export default function AIHubPage() {
 
   // Modal State
   const [isCustomModalOpen, setIsCustomModalOpen] = useState(false);
-  // Marketplace add flows, reused from the Plugins/Skills marketplace pages:
-  // the header's add dropdown opens these same modals with the same copy.
-  const [isRegisterPluginOpen, setIsRegisterPluginOpen] = useState(false);
+  // Marketplace add flow, reused from the Skills marketplace page: the header's
+  // add dropdown opens the same modal with the same copy.
   const [isPublishSkillOpen, setIsPublishSkillOpen] = useState(false);
   const [marketActionError, setMarketActionError] = useState<string | null>(null);
 
@@ -137,18 +132,9 @@ export default function AIHubPage() {
     }
   };
 
-  // Marketplace-shared submit handlers: identical payloads and service calls
-  // to the marketplace's PluginsPage.handleRegisterSubmit and
-  // SkillsPage.handlePublishSubmit, so both surfaces behave the same.
-  const PLUGIN_CATEGORIES = [
-    t('plugins.categories.all'),
-    t('plugins.categories.codeDev'),
-    t('plugins.categories.dataRetrieval'),
-    t('plugins.categories.docProcessing'),
-    t('plugins.categories.databaseApps'),
-    t('plugins.categories.imageProcessing'),
-    t('plugins.categories.business')
-  ];
+  // Marketplace-shared submit handler: identical payload and service call to
+  // the marketplace's SkillsPage.handlePublishSubmit, so both surfaces behave
+  // the same.
   const SKILL_CATEGORIES = [
     t('skills.categories.all'),
     t('skills.categories.dataScience'),
@@ -157,22 +143,6 @@ export default function AIHubPage() {
     t('skills.categories.codeRefactor'),
     t('skills.categories.nlp')
   ];
-
-  const handleRegisterPluginSubmit = async (pluginData: {
-    name: string;
-    category: string;
-    apiSchemaType: 'OpenAPI' | 'GraphQL' | 'gRPC' | 'REST';
-    description: string;
-    capabilities: string[];
-  }) => {
-    setMarketActionError(null);
-    try {
-      await PluginsService.registerPlugin(pluginData);
-      setIsRegisterPluginOpen(false);
-    } catch (error) {
-      setMarketActionError(error instanceof Error ? error.message : 'Plugin registration failed.');
-    }
-  };
 
   const handlePublishSkillSubmit = async (skillData: {
     name: string;
@@ -214,7 +184,6 @@ export default function AIHubPage() {
             showOnlyMine={showOnlyMine}
             onToggleShowMine={() => setShowOnlyMine(prev => !prev)}
             onOpenCustomModal={() => setIsCustomModalOpen(true)}
-            onOpenRegisterPlugin={() => setIsRegisterPluginOpen(true)}
             onOpenPublishSkill={() => setIsPublishSkillOpen(true)}
             selectedTag={''}
             onSelectTag={() => {}}
@@ -263,13 +232,7 @@ export default function AIHubPage() {
         onCreateExpert={handleCreateCustomExpert}
       />
 
-      {/* Marketplace modals, reused verbatim from the Plugins/Skills pages */}
-      <RegisterPluginModal
-        isOpen={isRegisterPluginOpen}
-        onClose={() => setIsRegisterPluginOpen(false)}
-        onSubmit={handleRegisterPluginSubmit}
-        categories={PLUGIN_CATEGORIES}
-      />
+      {/* Marketplace modal, reused verbatim from the Skills page */}
       <PublishSkillModal
         isOpen={isPublishSkillOpen}
         onClose={() => setIsPublishSkillOpen(false)}

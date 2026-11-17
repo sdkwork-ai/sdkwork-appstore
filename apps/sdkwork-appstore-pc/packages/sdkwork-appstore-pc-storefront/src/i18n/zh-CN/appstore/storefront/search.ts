@@ -21,10 +21,8 @@ export const search = {
     miniGames: '微信小游戏',
     utilities: '实用程序与工具',
     ai: 'AI 智能',
-    plugins: '扩展插件',
     skills: 'AI 技能',
-    mcp: 'MCP 服务',
-    templates: '工程模板'
+    mcp: 'MCP 服务'
   },
   empty: {
     title: '未找到相关结果',

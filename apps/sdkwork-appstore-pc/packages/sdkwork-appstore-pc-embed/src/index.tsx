@@ -25,15 +25,12 @@ import {
   Layout,
   LibraryPage,
   McpPage,
-  PluginsPage,
   PublisherAppManagePage,
   PublisherCreateAppPage,
   PublisherOverviewPage,
   SdkMarketPage,
   SearchPage,
   SkillsPage,
-  TemplateDetailPage,
-  TemplatesPage,
   DemandsPage,
   ThemeProvider,
   UpdatesPage,
@@ -132,16 +129,12 @@ export function AppstorePcRoutes({
                 pages render under a controlled empty query — no per-page
                 search input duplicates the header field. */}
             <Route path="experts" element={<ExpertsPage searchQuery="" />} />
-            <Route path="plugins" element={<PluginsPage searchQuery="" />} />
             <Route path="skills" element={<SkillsPage searchQuery="" />} />
             <Route path="mcp" element={<McpPage searchQuery="" />} />
-            <Route path="templates" element={<TemplatesPage searchQuery="" />} />
             <Route path="demands" element={<DemandsPage searchQuery="" />} />
             <Route path="demands/my-claims" element={<DemandClaimsPage />} />
             <Route path="demands/my-claims/:claimId" element={<DemandClaimDetailPage />} />
             <Route path="demands/:demandId" element={<DemandDetailPage />} />
-            <Route path="template/:id" element={<TemplateDetailPage />} />
-            <Route path="templates/:id" element={<TemplateDetailPage />} />
             <Route path="api-market" element={<ApiMarketPage />} />
             <Route path="sdk-market" element={<SdkMarketPage />} />
             <Route path="charts" element={<ChartsPage />} />
@@ -361,4 +354,3 @@ export {
   type AppstoreMarketsSurfaceProps,
   type AppstoreMarketsSurfaceSession,
 } from './AppstoreMarketsSurface'
-export type { PluginItem, PluginSourceRef, PluginsHost } from '@sdkwork/appstore-pc-core'

@@ -12,10 +12,8 @@ import {
   Trophy,
   Search,
   Bot,
-  Plug,
   Zap,
   Network,
-  Boxes,
   Sliders,
   Activity,
   Download,
@@ -53,10 +51,8 @@ export function DesktopSidebar() {
 
   const aiTabs: SidebarNavItem[] = [
     { name: t('nav.menu.experts'), path: '/experts', icon: Bot },
-    { name: t('nav.menu.plugins'), path: '/plugins', icon: Plug },
     { name: t('nav.menu.skills'), path: '/skills', icon: Zap },
     { name: t('nav.menu.mcp'), path: '/mcp', icon: Network },
-    { name: t('nav.menu.templates'), path: '/templates', icon: Boxes },
     { name: t('nav.menu.demands'), path: '/demands', icon: Megaphone },
   ];
 
