@@ -231,3 +231,6 @@ tables:
   - name: appstore_application_deployment_binding
     lifecycle_status: active
     owner: appstore-platform
+  - name: appstore_application_version
+    lifecycle_status: active
+    owner: appstore-platform
