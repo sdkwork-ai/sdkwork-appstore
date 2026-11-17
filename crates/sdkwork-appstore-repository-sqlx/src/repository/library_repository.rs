@@ -467,8 +467,8 @@ impl LibraryRepositoryPort for SqlxLibraryRepository {
             .db
             .query_as::<(String, String, String)>(
                 r#"SELECT r.listing_id, r.id, a.artifact_status
-                FROM appstore_release_artifact a
-                JOIN appstore_release r
+                FROM appstore_application_release_artifact a
+                JOIN appstore_application_release r
                     ON r.id = a.release_id AND r.tenant_id = a.tenant_id
                 WHERE a.id = ? AND a.tenant_id = ?
                 LIMIT 1"#,
@@ -491,7 +491,7 @@ impl LibraryRepositoryPort for SqlxLibraryRepository {
             .db
             .query_as::<ArtifactDeliveryRow>(
                 r#"SELECT a.drive_node_id, a.platform, a.architecture, a.package_format, a.file_size_bytes
-                FROM appstore_release_artifact a
+                FROM appstore_application_release_artifact a
                 WHERE a.id = ? AND a.tenant_id = ?
                 LIMIT 1"#,
             )
@@ -560,7 +560,7 @@ impl LibraryRepositoryPort for SqlxLibraryRepository {
                 version_name, version_code, build_number, release_status, minimum_os_version,
                 release_notes_default_locale, manifest_snapshot_json, submitted_at, approved_at,
                 published_at, retired_at, version, created_at, updated_at
-            FROM appstore_release
+            FROM appstore_application_release
             WHERE tenant_id = ? AND listing_id = ? AND release_status = 'published'
             ORDER BY published_at DESC LIMIT 1"#
             ))
@@ -592,7 +592,7 @@ impl LibraryRepositoryPort for SqlxLibraryRepository {
             .query_as(&self.db.adapt_sql(
                 r#"
                 SELECT release_notes
-                FROM appstore_release_note_localization
+                FROM appstore_application_release_note_localization
                 WHERE tenant_id = ? AND release_id = ? AND locale = ?
                 ORDER BY created_at DESC
                 LIMIT 1
@@ -622,7 +622,7 @@ impl LibraryRepositoryPort for SqlxLibraryRepository {
                     media_resource_id, file_size_bytes, content_type, checksum_sha256,
                     signature_snapshot_json, sbom_ref, provenance_ref, min_os_version,
                     created_at, updated_at
-                FROM appstore_release_artifact
+                FROM appstore_application_release_artifact
                 WHERE tenant_id = ? AND release_id = ? AND platform = ? AND architecture = ?
                     AND artifact_status = 'verified'
                 ORDER BY created_at DESC LIMIT 1"#
@@ -642,7 +642,7 @@ impl LibraryRepositoryPort for SqlxLibraryRepository {
                     media_resource_id, file_size_bytes, content_type, checksum_sha256,
                     signature_snapshot_json, sbom_ref, provenance_ref, min_os_version,
                     created_at, updated_at
-                FROM appstore_release_artifact
+                FROM appstore_application_release_artifact
                 WHERE tenant_id = ? AND release_id = ? AND platform = ?
                     AND artifact_status = 'verified'
                 ORDER BY created_at DESC LIMIT 1"#
@@ -669,7 +669,7 @@ impl LibraryRepositoryPort for SqlxLibraryRepository {
         let row: Option<(String,)> = self
             .db
             .query_as::<(String,)>(
-                "SELECT app_key FROM appstore_listing WHERE tenant_id = ? AND id = ? AND deleted_at IS NULL",
+                "SELECT app_key FROM appstore_application_listing WHERE tenant_id = ? AND id = ? AND deleted_at IS NULL",
             )
             .bind(&context.tenant_id)
             .bind(listing_id)
@@ -689,8 +689,8 @@ impl LibraryRepositoryPort for SqlxLibraryRepository {
             .db
             .query_as::<(String, String, Option<String>)>(
                 "SELECT l.app_id, l.pricing_model, a.platforms::text \
-                 FROM appstore_listing l \
-                 LEFT JOIN appstore_app a ON a.id = l.app_id AND a.deleted_at IS NULL \
+                 FROM appstore_application_listing l \
+                 LEFT JOIN appstore_application a ON a.id = l.app_id AND a.deleted_at IS NULL \
                  WHERE l.tenant_id = ? AND l.id = ? AND l.deleted_at IS NULL",
             )
             .bind(&context.tenant_id)

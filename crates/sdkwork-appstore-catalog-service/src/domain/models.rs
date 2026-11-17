@@ -376,19 +376,19 @@ pub struct ListingSummary {
     pub released_at: Option<String>,
     pub average_rating: Option<String>,
     pub rating_count: i32,
-    /// Raw platform codes from `appstore_app.platforms` (see
+    /// Raw platform codes from `appstore_application.platforms` (see
     /// `appstore_platform_dictionary`): android, ios, harmonyos, windows,
     /// macos, linux, web, h5, miniprogram-*, browser-extension-*.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub platforms: Vec<String>,
-    /// `appstore_app.app_type` (for example `app`, `game`, `plugin`).
+    /// `appstore_application.app_type` (for example `app`, `game`, `plugin`).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub app_type: Option<String>,
-    /// `appstore_app.access_url`: the direct-open URL for web/H5
+    /// `appstore_application.access_url`: the direct-open URL for web/H5
     /// distributions; the scan target encoded into distribution QR codes.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub access_url: Option<String>,
-    /// Per-platform scan/delivery links from `appstore_app_platform`
+    /// Per-platform scan/delivery links from `appstore_application_platform`
     /// (`platform code -> qrUrl`), preferred by QR distributions.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub platform_links: Option<std::collections::BTreeMap<String, String>>,

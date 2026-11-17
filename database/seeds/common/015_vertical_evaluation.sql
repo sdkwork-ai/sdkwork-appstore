@@ -28,7 +28,7 @@ ON CONFLICT (id) DO UPDATE SET
     description = EXCLUDED.description,
     updated_at = EXCLUDED.updated_at;
 
-INSERT INTO appstore_app
+INSERT INTO appstore_application
     (id, tenant_id, organization_id, publisher_id, app_no, app_key, app_slug, display_name, default_locale, app_type, runtime_family, runtime_framework, app_status, distribution_status, review_status, monetization_mode, primary_category_id, age_rating_code, created_at, updated_at)
 VALUES
     ('app-edu-k12-virtual-lab', '100001', '0', 'appstore-publisher-default-0', 'app-app-edu-k12-virtual-lab', 'app-edu-k12-virtual-lab', 'app-edu-k12-virtual-lab', 'K12 虚拟实验测评', 'zh-CN', 'app', 'PC', 'React', 'active', 'active', 'approved', 'FREE', 'cat-edu-experiment', '4+', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
@@ -42,7 +42,7 @@ VALUES
     ('app-health-health-education', '100001', '0', 'appstore-publisher-default-0', 'app-app-health-health-education', 'app-health-health-education', 'app-health-health-education', '健康宣教测评', 'zh-CN', 'app', 'PC', 'React', 'active', 'active', 'approved', 'FREE', 'cat-healthcare', '4+', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
 ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO appstore_listing
+INSERT INTO appstore_application_listing
     (id, tenant_id, organization_id, publisher_id, listing_no, app_id, app_key, listing_slug, listing_type, pricing_model, listing_status, storefront_visibility, review_status, primary_category_id, default_locale, age_rating_code, comments_thread_id, featured_score, download_count, average_rating, rating_count, submitted_at, published_at, created_at, updated_at)
 VALUES
     ('app-edu-k12-virtual-lab', '100001', '0', 'appstore-publisher-default-0', 'L-app-edu-k12-virtual-lab', 'app-edu-k12-virtual-lab', 'app-edu-k12-virtual-lab', 'app-edu-k12-virtual-lab', 'APP', 'FREE', 'active', 'visible', 'approved', 'cat-edu-experiment', 'zh-CN', '4+', 'thread-app-edu-k12-virtual-lab', 0, 4200, '4.6', 42000, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
@@ -56,7 +56,7 @@ VALUES
     ('app-health-health-education', '100001', '0', 'appstore-publisher-default-0', 'L-app-health-health-education', 'app-health-health-education', 'app-health-health-education', 'app-health-health-education', 'APP', 'FREE', 'active', 'visible', 'approved', 'cat-healthcare', 'zh-CN', '4+', 'thread-app-health-health-education', 0, 3200, '4.6', 32000, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
 ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO appstore_listing_media
+INSERT INTO appstore_application_listing_media
     (id, tenant_id, organization_id, listing_id, media_role, media_resource_id, drive_node_id, platform_scope, sort_order, locale, created_at, updated_at)
 VALUES
     ('media-app-edu-k12-virtual-lab-icon', '100001', '0', 'app-edu-k12-virtual-lab', 'ICON', 'mr-app-edu-k12-virtual-lab-icon', 'drive://appstore/app-edu-k12-virtual-lab/icon', 'ALL', 0, 'zh-CN', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),

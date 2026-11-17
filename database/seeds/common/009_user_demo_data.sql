@@ -32,7 +32,7 @@ ON CONFLICT (id) DO UPDATE SET
     wishlist_status = EXCLUDED.wishlist_status,
     updated_at = EXCLUDED.updated_at;
 
-INSERT INTO appstore_listing_rating
+INSERT INTO appstore_application_listing_rating
     (id, tenant_id, organization_id, listing_id, user_id, rating, title, created_at, updated_at)
 VALUES
     ('rating-1', '100001', '0', 'app-qwen', '1', 5, '非常好用的 AI 助手', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),

@@ -1,6 +1,6 @@
 -- zh-CN release notes for storefront releases (tenant 100001).
 
-INSERT INTO appstore_release_note_localization
+INSERT INTO appstore_application_release_note_localization
     (id, tenant_id, organization_id, release_id, locale, release_notes, created_at, updated_at)
 VALUES
     ('note-app-qwen-320', '100001', '0', 'rel-app-qwen-320', 'zh-CN', '• 新增 AI 深度思考推理模式

@@ -1,7 +1,7 @@
 -- zh-CN listing localizations for the industry-standard AI benchmark evaluation
 -- apps seeded in common/017_ai_model_benchmark_apps.sql (tenant 100001).
 
-INSERT INTO appstore_listing_localization
+INSERT INTO appstore_application_listing_localization
     (id, tenant_id, organization_id, listing_id, locale, display_name, subtitle, short_description, full_description, whats_new_summary, keywords_json, created_at, updated_at)
 VALUES
     ('loc-app-eval-chinese-eval', '100001', '0', 'app-eval-chinese-eval', 'zh-CN', '中文知识测评（C-Eval）', '52 学科中文知识基准', '基于 C-Eval 与 CMMLU 的 52 个学科、四档难度，测评模型的中文知识与学科推理能力。', '中文知识测评覆盖 C-Eval（13948 道多选、52 个学科、四档难度）与 CMMLU 的学科题目，按人文、社科、STEM 与专业考试分层统计准确率，对比 DeepSeek-V3.2、GLM-4.7、Qwen3-Max、Kimi K2、Doubao-1.6、GPT-5、Claude Sonnet 4.5 的中文知识掌握度，每个规格独立评分与评论。', '• 首发 C-Eval 与 CMMLU 双题库', '["中文知识测评","C-Eval","AI模型测评"]', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),

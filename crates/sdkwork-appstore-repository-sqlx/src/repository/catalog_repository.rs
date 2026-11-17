@@ -57,7 +57,7 @@ impl SqlxCatalogRepository {
     }
 
     /// Per-platform scan/delivery links for the given listing apps, keyed by
-    /// app id and platform code (appstore_app_platform rows carrying a
+    /// app id and platform code (appstore_application_platform rows carrying a
     /// `qrUrl` in their config). QR distributions prefer these over the
     /// listing's generic access URL.
     async fn find_platform_links(
@@ -74,7 +74,7 @@ impl SqlxCatalogRepository {
         let placeholders = app_ids.iter().map(|_| "?").collect::<Vec<_>>().join(", ");
         let sql = format!(
             r#"SELECT app_id, platform_code, config_json->>'qrUrl' AS qr_url
-            FROM appstore_app_platform
+            FROM appstore_application_platform
             WHERE tenant_id = ? AND app_id IN ({placeholders})
               AND platform_status = 'active'
               AND config_json->>'qrUrl' IS NOT NULL
@@ -905,18 +905,18 @@ impl CatalogRepositoryPort for SqlxCatalogRepository {
         let mut sql = String::from(
             r#"
             SELECT l.id, l.app_id, l.app_key, COALESCE(ll.display_name,
-                       (SELECT lld.display_name FROM appstore_listing_localization lld
+                       (SELECT lld.display_name FROM appstore_application_listing_localization lld
                         WHERE lld.listing_id = l.id AND lld.tenant_id = l.tenant_id
                         ORDER BY (lld.locale = l.default_locale) DESC, lld.id ASC LIMIT 1),
                        l.app_key) AS display_name, ll.subtitle,
                    l.listing_slug, l.pricing_model,
-                   (SELECT m.media_resource_id FROM appstore_listing_media m
+                   (SELECT m.media_resource_id FROM appstore_application_listing_media m
                     WHERE m.listing_id = l.id AND m.media_role = 'ICON' AND m.tenant_id = l.tenant_id
                     ORDER BY m.sort_order ASC, m.id ASC LIMIT 1) AS icon_media_resource_id,
                    p.display_name AS developer_name,
                    COALESCE(ll.full_description, ll.short_description) AS description,
                    r.version_name AS current_version,
-                   (SELECT art.file_size_bytes FROM appstore_release_artifact art
+                   (SELECT art.file_size_bytes FROM appstore_application_release_artifact art
                     WHERE art.release_id = r.id AND art.artifact_status = 'verified'
                     ORDER BY art.id ASC LIMIT 1) AS file_size_bytes,
                    ll.whats_new_summary AS whats_new_summary,
@@ -925,14 +925,14 @@ impl CatalogRepositoryPort for SqlxCatalogRepository {
                    a.platforms::text AS app_platforms,
                    a.app_type AS app_type,
                    a.access_url AS access_url
-            FROM appstore_listing l
-            LEFT JOIN appstore_listing_localization ll
+            FROM appstore_application_listing l
+            LEFT JOIN appstore_application_listing_localization ll
                 ON ll.listing_id = l.id AND ll.locale = l.default_locale AND ll.tenant_id = l.tenant_id
             LEFT JOIN appstore_publisher p
                 ON p.id = l.publisher_id AND p.tenant_id = l.tenant_id
-            LEFT JOIN appstore_release r
+            LEFT JOIN appstore_application_release r
                 ON r.id = l.current_release_id
-            LEFT JOIN appstore_app a
+            LEFT JOIN appstore_application a
                 ON a.id = l.app_id AND a.tenant_id = l.tenant_id
             WHERE l.tenant_id = ?
               AND l.listing_status = 'active'
@@ -1010,7 +1010,7 @@ impl CatalogRepositoryPort for SqlxCatalogRepository {
         let mut sql = format!(
             r#"
             SELECT {}
-            FROM appstore_listing_metric_snapshot
+            FROM appstore_application_listing_metric_snapshot
             WHERE listing_id = ? AND tenant_id = ?
             "#,
             columns_csv(APPSTORE_LISTING_METRIC_SNAPSHOT_COLUMNS)
@@ -1067,18 +1067,18 @@ impl CatalogRepositoryPort for SqlxCatalogRepository {
         let sql = format!(
             r#"
             SELECT l.id, l.app_id, l.app_key, COALESCE(ll.display_name,
-                       (SELECT lld.display_name FROM appstore_listing_localization lld
+                       (SELECT lld.display_name FROM appstore_application_listing_localization lld
                         WHERE lld.listing_id = l.id AND lld.tenant_id = l.tenant_id
                         ORDER BY (lld.locale = l.default_locale) DESC, lld.id ASC LIMIT 1),
                        l.app_key) AS display_name, ll.subtitle,
                    l.listing_slug, l.pricing_model,
-                   (SELECT m.media_resource_id FROM appstore_listing_media m
+                   (SELECT m.media_resource_id FROM appstore_application_listing_media m
                     WHERE m.listing_id = l.id AND m.media_role = 'ICON' AND m.tenant_id = l.tenant_id
                     ORDER BY m.sort_order ASC, m.id ASC LIMIT 1) AS icon_media_resource_id,
                    p.display_name AS developer_name,
                    COALESCE(ll.full_description, ll.short_description) AS description,
                    r.version_name AS current_version,
-                   (SELECT art.file_size_bytes FROM appstore_release_artifact art
+                   (SELECT art.file_size_bytes FROM appstore_application_release_artifact art
                     WHERE art.release_id = r.id AND art.artifact_status = 'verified'
                     ORDER BY art.id ASC LIMIT 1) AS file_size_bytes,
                    ll.whats_new_summary AS whats_new_summary,
@@ -1087,16 +1087,16 @@ impl CatalogRepositoryPort for SqlxCatalogRepository {
                    a.platforms::text AS app_platforms,
                    a.app_type AS app_type,
                    a.access_url AS access_url
-            FROM appstore_listing l
-            LEFT JOIN appstore_listing_localization ll
+            FROM appstore_application_listing l
+            LEFT JOIN appstore_application_listing_localization ll
                 ON ll.listing_id = l.id
                AND ll.locale = ?
                AND ll.tenant_id = l.tenant_id
             LEFT JOIN appstore_publisher p
                 ON p.id = l.publisher_id AND p.tenant_id = l.tenant_id
-            LEFT JOIN appstore_release r
+            LEFT JOIN appstore_application_release r
                 ON r.id = l.current_release_id
-            LEFT JOIN appstore_app a
+            LEFT JOIN appstore_application a
                 ON a.id = l.app_id AND a.tenant_id = l.tenant_id
             WHERE l.tenant_id = ?
               AND l.id IN ({placeholders})
@@ -1138,18 +1138,18 @@ impl CatalogRepositoryPort for SqlxCatalogRepository {
         let mut sql = String::from(
             r#"
             SELECT l.id, l.app_id, l.app_key, COALESCE(ll.display_name,
-                       (SELECT lld.display_name FROM appstore_listing_localization lld
+                       (SELECT lld.display_name FROM appstore_application_listing_localization lld
                         WHERE lld.listing_id = l.id AND lld.tenant_id = l.tenant_id
                         ORDER BY (lld.locale = l.default_locale) DESC, lld.id ASC LIMIT 1),
                        l.app_key) AS display_name, ll.subtitle,
                    l.listing_slug, l.pricing_model,
-                   (SELECT m.media_resource_id FROM appstore_listing_media m
+                   (SELECT m.media_resource_id FROM appstore_application_listing_media m
                     WHERE m.listing_id = l.id AND m.media_role = 'ICON' AND m.tenant_id = l.tenant_id
                     ORDER BY m.sort_order ASC, m.id ASC LIMIT 1) AS icon_media_resource_id,
                    p.display_name AS developer_name,
                    COALESCE(ll.full_description, ll.short_description) AS description,
                    r.version_name AS current_version,
-                   (SELECT art.file_size_bytes FROM appstore_release_artifact art
+                   (SELECT art.file_size_bytes FROM appstore_application_release_artifact art
                     WHERE art.release_id = r.id AND art.artifact_status = 'verified'
                     ORDER BY art.id ASC LIMIT 1) AS file_size_bytes,
                    ll.whats_new_summary AS whats_new_summary,
@@ -1158,16 +1158,16 @@ impl CatalogRepositoryPort for SqlxCatalogRepository {
                    a.platforms::text AS app_platforms,
                    a.app_type AS app_type,
                    a.access_url AS access_url
-            FROM appstore_listing l
-            LEFT JOIN appstore_listing_localization ll
+            FROM appstore_application_listing l
+            LEFT JOIN appstore_application_listing_localization ll
                 ON ll.listing_id = l.id
                AND ll.locale = ?
                AND ll.tenant_id = l.tenant_id
             LEFT JOIN appstore_publisher p
                 ON p.id = l.publisher_id AND p.tenant_id = l.tenant_id
-            LEFT JOIN appstore_release r
+            LEFT JOIN appstore_application_release r
                 ON r.id = l.current_release_id
-            LEFT JOIN appstore_app a
+            LEFT JOIN appstore_application a
                 ON a.id = l.app_id AND a.tenant_id = l.tenant_id
             WHERE l.tenant_id = ?
               AND l.listing_status = 'active'
@@ -1180,9 +1180,9 @@ impl CatalogRepositoryPort for SqlxCatalogRepository {
             sql.push_str(
                 r#"
               AND (
-                l.updated_at < (SELECT updated_at FROM appstore_listing WHERE id = ? AND tenant_id = ?)
+                l.updated_at < (SELECT updated_at FROM appstore_application_listing WHERE id = ? AND tenant_id = ?)
                 OR (
-                  l.updated_at = (SELECT updated_at FROM appstore_listing WHERE id = ? AND tenant_id = ?)
+                  l.updated_at = (SELECT updated_at FROM appstore_application_listing WHERE id = ? AND tenant_id = ?)
                   AND l.id < ?
                 )
               )
@@ -1309,8 +1309,8 @@ impl CatalogRepositoryPort for SqlxCatalogRepository {
             .query_as::<ListingSuggestionRow>(
                 r#"
             SELECT l.id AS listing_id, ll.display_name
-            FROM appstore_listing l
-            INNER JOIN appstore_listing_localization ll
+            FROM appstore_application_listing l
+            INNER JOIN appstore_application_listing_localization ll
                 ON ll.listing_id = l.id
                AND ll.locale = ?
                AND ll.tenant_id = l.tenant_id
@@ -1604,8 +1604,8 @@ impl CatalogRepositoryPort for SqlxCatalogRepository {
               COALESCE(SUM(m.install_count), 0)::bigint AS total_installs,
               COALESCE(SUM(m.uninstall_count), 0)::bigint AS total_uninstalls,
               COALESCE(SUM(m.update_count), 0)::bigint AS total_updates
-            FROM appstore_listing l
-            LEFT JOIN appstore_listing_metric_snapshot m
+            FROM appstore_application_listing l
+            LEFT JOIN appstore_application_listing_metric_snapshot m
               ON m.listing_id = l.id AND m.tenant_id = l.tenant_id
             WHERE l.tenant_id = ? AND l.publisher_id = ? AND l.deleted_at IS NULL
             "#,
@@ -1674,10 +1674,10 @@ impl CatalogRepositoryPort for SqlxCatalogRepository {
               COALESCE(SUM(m.install_count), 0)::bigint AS install_count,
               COALESCE(SUM(m.uninstall_count), 0)::bigint AS uninstall_count,
               COALESCE(SUM(m.update_count), 0)::bigint AS update_count
-            FROM appstore_listing l
-            LEFT JOIN appstore_listing_localization ll
+            FROM appstore_application_listing l
+            LEFT JOIN appstore_application_listing_localization ll
               ON ll.listing_id = l.id AND ll.locale = l.default_locale AND ll.tenant_id = l.tenant_id
-            LEFT JOIN appstore_listing_metric_snapshot m
+            LEFT JOIN appstore_application_listing_metric_snapshot m
               ON m.listing_id = l.id AND m.tenant_id = l.tenant_id
             WHERE l.tenant_id = ? AND l.publisher_id = ? AND l.deleted_at IS NULL
             "#,
@@ -1755,7 +1755,7 @@ impl CatalogRepositoryPort for SqlxCatalogRepository {
         let row: Option<(i64,)> = self
             .db
             .query_as::<(i64,)>(
-                r#"SELECT COUNT(*) FROM appstore_listing
+                r#"SELECT COUNT(*) FROM appstore_application_listing
                WHERE tenant_id = ? AND id = ? AND publisher_id = ? AND deleted_at IS NULL"#,
             )
             .bind(&context.tenant_id)
@@ -1775,7 +1775,7 @@ impl CatalogRepositoryPort for SqlxCatalogRepository {
         let listing_count: (i64,) = self
             .db
             .query_as::<(i64,)>(
-                r#"SELECT COUNT(*) FROM appstore_listing
+                r#"SELECT COUNT(*) FROM appstore_application_listing
                WHERE tenant_id = ? AND deleted_at IS NULL"#,
             )
             .bind(&context.tenant_id)

@@ -4,7 +4,7 @@
 --
 -- Installer matrix authority
 --   A listing ships one installer per operating system it declares in
---   `appstore_app.platforms`, and within one operating system it ships the CPU
+--   `appstore_application.platforms`, and within one operating system it ships the CPU
 --   architectures and package formats of that operating system's distribution
 --   convention (APP_MANIFEST_SPEC.md section 10.1, INSTALL package matrix):
 --     windows  x64, arm64   exe, msi, zip
@@ -36,7 +36,7 @@ DELETE FROM appstore_download_grant
 WHERE tenant_id = '100001'
   AND id LIKE 'grant-%';
 
-DELETE FROM appstore_release_artifact
+DELETE FROM appstore_application_release_artifact
 WHERE tenant_id = '100001'
   AND id LIKE 'artifact-%';
 
@@ -84,11 +84,11 @@ artifact_source AS (
         m.file_extension,
         m.min_os_version,
         'artifact-' || r.id || '-' || m.platform || '-' || m.architecture || '-' || m.package_format AS artifact_id
-    FROM appstore_release r
-    JOIN appstore_listing l
+    FROM appstore_application_release r
+    JOIN appstore_application_listing l
         ON l.id = r.listing_id
        AND l.tenant_id = r.tenant_id
-    JOIN appstore_app a
+    JOIN appstore_application a
         ON a.id = l.app_id
        AND a.tenant_id = l.tenant_id
     CROSS JOIN distribution_matrix m
@@ -101,7 +101,7 @@ artifact_source AS (
           WHERE p.code = m.platform
       )
 )
-INSERT INTO appstore_release_artifact (
+INSERT INTO appstore_application_release_artifact (
     id,
     tenant_id,
     organization_id,
@@ -194,7 +194,7 @@ SELECT
     NULL,
     CURRENT_TIMESTAMP,
     CURRENT_TIMESTAMP
-FROM appstore_listing l
+FROM appstore_application_listing l
 WHERE l.tenant_id = '100001'
   AND l.pricing_model = 'PAID'
 ON CONFLICT (id) DO NOTHING;
@@ -239,11 +239,11 @@ SELECT
     1,
     CURRENT_TIMESTAMP,
     CURRENT_TIMESTAMP
-FROM appstore_release_artifact ar
-JOIN appstore_release r
+FROM appstore_application_release_artifact ar
+JOIN appstore_application_release r
   ON r.id = ar.release_id
  AND r.tenant_id = ar.tenant_id
-JOIN appstore_listing l
+JOIN appstore_application_listing l
   ON l.id = r.listing_id
  AND l.tenant_id = r.tenant_id
 WHERE ar.tenant_id = '100001'
@@ -298,7 +298,7 @@ SELECT
     CURRENT_TIMESTAMP,
     CURRENT_TIMESTAMP
 FROM appstore_download_grant g
-JOIN appstore_release_artifact ar
+JOIN appstore_application_release_artifact ar
   ON ar.id = g.artifact_id
  AND ar.tenant_id = g.tenant_id
 WHERE g.tenant_id = '100001'

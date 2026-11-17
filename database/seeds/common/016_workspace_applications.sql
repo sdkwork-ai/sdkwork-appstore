@@ -7,7 +7,7 @@
 -- enabled client packages of artifacts.installConfig (section 10).
 
 
-INSERT INTO appstore_app
+INSERT INTO appstore_application
     (id, tenant_id, organization_id, publisher_id, app_no, app_key, app_slug, display_name, default_locale, app_type, runtime_family, runtime_framework, app_status, distribution_status, review_status, monetization_mode, primary_category_id, age_rating_code, official_website_url, access_url, platforms, description, created_at, updated_at)
 VALUES
     ('sdkwork-account-pc', '100001', '0', 'appstore-publisher-default-0', 'app-sdkwork-account-pc', 'sdkwork-account-pc', 'sdkwork-account-pc', 'SDKWork Account PC', 'zh-CN', 'APP_REACT', 'web', 'react', 'active', 'active', 'approved', 'FREE', 'appstore-category-productivity', '4+', 'https://sdkwork.com/apps/sdkwork-account', 'https://apps.sdkwork.com/sdkwork-account-pc/', '["web"]', 'SDKWork Account application (bootstrap deploy layout).', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
@@ -158,7 +158,7 @@ ON CONFLICT (id) DO UPDATE SET
     platforms = EXCLUDED.platforms,
     updated_at = EXCLUDED.updated_at;
 
-INSERT INTO appstore_listing
+INSERT INTO appstore_application_listing
     (id, tenant_id, organization_id, publisher_id, listing_no, app_id, app_key, listing_slug, listing_type, pricing_model, listing_status, storefront_visibility, review_status, primary_category_id, default_locale, age_rating_code, comments_thread_id, featured_score, download_count, average_rating, rating_count, submitted_at, published_at, created_at, updated_at)
 VALUES
     ('sdkwork-account-pc', '100001', '0', 'appstore-publisher-default-0', 'L-sdkwork-account-pc', 'sdkwork-account-pc', 'sdkwork-account-pc', 'sdkwork-account-pc', 'APP', 'FREE', 'active', 'visible', 'approved', 'appstore-category-productivity', 'zh-CN', '4+', 'thread-sdkwork-account-pc', 0, 0, NULL, 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
@@ -304,7 +304,7 @@ VALUES
     ('sdkwork-zhiya-pc', '100001', '0', 'appstore-publisher-default-0', 'L-sdkwork-zhiya-pc', 'sdkwork-zhiya-pc', 'sdkwork-zhiya-pc', 'sdkwork-zhiya-pc', 'APP', 'FREE', 'active', 'visible', 'approved', 'appstore-category-education', 'zh-CN', '4+', 'thread-sdkwork-zhiya-pc', 0, 0, NULL, 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
 ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO appstore_listing_media
+INSERT INTO appstore_application_listing_media
     (id, tenant_id, organization_id, listing_id, media_role, media_resource_id, drive_node_id, platform_scope, sort_order, locale, created_at, updated_at)
 VALUES
     ('media-sdkwork-account-pc-icon', '100001', '0', 'sdkwork-account-pc', 'ICON', 'mr-sdkwork-account-pc-icon', 'drive://appstore/sdkwork-account-pc/icon', 'ALL', 0, 'zh-CN', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
@@ -732,7 +732,7 @@ VALUES
     ('media-sdkwork-zhiya-pc-shot2', '100001', '0', 'sdkwork-zhiya-pc', 'SCREENSHOT', 'mr-sdkwork-zhiya-pc-shot2', 'drive://appstore/sdkwork-zhiya-pc/shot2', 'ALL', 2, 'zh-CN', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
 ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO appstore_release
+INSERT INTO appstore_application_release
     (id, tenant_id, organization_id, listing_id, release_no, channel_id, version_name, version_code, build_number, release_status, minimum_os_version, release_notes_default_locale, manifest_snapshot_json, submitted_at, approved_at, published_at, created_at, updated_at)
 VALUES
     ('rel-sdkwork-account-pc-010', '100001', '0', 'sdkwork-account-pc', 'R-sdkwork-account-pc-010', 'ch-prod', '0.1.0', '010', '1', 'published', NULL, 'zh-CN', '{"targets":["web"],"platforms":["web"]}', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
@@ -881,7 +881,7 @@ ON CONFLICT (id) DO UPDATE SET
     manifest_snapshot_json = EXCLUDED.manifest_snapshot_json,
     updated_at = EXCLUDED.updated_at;
 
-INSERT INTO appstore_release_artifact
+INSERT INTO appstore_application_release_artifact
     (id, tenant_id, organization_id, release_id, artifact_no, platform, architecture, package_format, artifact_status, drive_node_id, media_resource_id, file_size_bytes, content_type, checksum_sha256, signature_snapshot_json, sbom_ref, provenance_ref, min_os_version, virus_scan_status, cdn_url, created_at, updated_at)
 VALUES
     ('art-sdkwork-browser-pc-010-windows-x64-zip', '100001', '0', 'rel-sdkwork-browser-pc-010', 'ART-SDKWORKBROWSERPC010WINDOWSX64ZIP', 'windows', 'x64', 'zip', 'verified', 'drive://appstore/sdkwork-browser-pc/releases/010/windows/x64/app.zip', 'mr-art-sdkwork-browser-pc-010-windows-x64-zip', '437695207', 'application/zip', '7b854d35495d224ce4ae5e368a0980242dd3637415e51fb55acc0864fdcf44d8', '{"signer":"sdkwork-appstore-release-service","algorithm":"sha256","keyId":"seed-ed25519-2026","signedAt":"2026-08-03T00:00:00Z"}', 'sbom://appstore/sdkwork-browser-pc/010/windows/x64', 'provenance://appstore/sdkwork-browser-pc/010/windows/x64', '10.0', 'passed', 'https://cdn.sdkwork.com/apps/sdkwork-browser-pc/STABLE/0.1.0/desktop-windows-x64-standalone-zip-0.1.0.zip', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
@@ -912,9 +912,9 @@ VALUES
 ON CONFLICT (id) DO NOTHING;
 
 -- Bind each generated listing to its latest published release.
-UPDATE appstore_listing l
+UPDATE appstore_application_listing l
 SET current_release_id = (
-    SELECT r.id FROM appstore_release r
+    SELECT r.id FROM appstore_application_release r
     WHERE r.listing_id = l.id AND r.release_status = 'published'
     ORDER BY r.published_at DESC LIMIT 1
 )
@@ -1063,13 +1063,13 @@ WHERE l.tenant_id = '100001'
     'sdkwork-zhiya-pc'
 )
   AND EXISTS (
-    SELECT 1 FROM appstore_release r
+    SELECT 1 FROM appstore_application_release r
     WHERE r.listing_id = l.id AND r.release_status = 'published'
   );
 
 -- Primary category bindings for catalog filters (mirrors common/001_bootstrap.sql
 -- but scoped to the generated listings, which use listing_status 'active').
-INSERT INTO appstore_listing_category_binding
+INSERT INTO appstore_application_listing_category_binding
     (id, tenant_id, listing_id, category_id, is_primary, created_at)
 SELECT
     'lcb-' || l.id,
@@ -1078,7 +1078,7 @@ SELECT
     l.primary_category_id,
     1,
     CURRENT_TIMESTAMP
-FROM appstore_listing l
+FROM appstore_application_listing l
 WHERE l.tenant_id = '100001'
   AND l.id IN (
     'sdkwork-account-pc',
@@ -1245,7 +1245,7 @@ SELECT
     CURRENT_TIMESTAMP,
     CURRENT_TIMESTAMP,
     CURRENT_TIMESTAMP
-FROM appstore_listing l
+FROM appstore_application_listing l
 WHERE l.tenant_id = '100001'
   AND l.id IN (
     'sdkwork-account-pc',
@@ -1406,7 +1406,7 @@ SELECT
     NULL,
     CURRENT_TIMESTAMP,
     CURRENT_TIMESTAMP
-FROM appstore_listing l
+FROM appstore_application_listing l
 WHERE l.tenant_id = '100001'
   AND l.id IN (
     'sdkwork-account-pc',
@@ -1567,7 +1567,7 @@ SELECT
     NULL,
     CURRENT_TIMESTAMP,
     CURRENT_TIMESTAMP
-FROM appstore_listing l
+FROM appstore_application_listing l
 WHERE l.tenant_id = '100001'
   AND l.id IN (
     'sdkwork-account-pc',
@@ -1741,8 +1741,8 @@ SELECT
     CURRENT_TIMESTAMP,
     CURRENT_TIMESTAMP,
     CURRENT_TIMESTAMP
-FROM appstore_release r
-JOIN appstore_listing l
+FROM appstore_application_release r
+JOIN appstore_application_listing l
   ON l.id = r.listing_id
  AND l.tenant_id = r.tenant_id
 WHERE r.tenant_id = '100001'

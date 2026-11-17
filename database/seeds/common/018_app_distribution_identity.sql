@@ -4,7 +4,7 @@
 -- the distribution the storefront actually delivers.
 --
 -- Why this seed exists
---   appstore_app.app_type, runtime_family, and runtime_framework were seeded
+--   appstore_application.app_type, runtime_family, and runtime_framework were seeded
 --   with storefront shorthands ('app', 'PC', 'H5', 'FLUTTER', 'React'). None of
 --   those are SDKWork values:
 --     * APP_MANIFEST_SPEC.md section 4: appType is a PlusProjectType value
@@ -12,11 +12,11 @@
 --       APP_REACT, APP_UNITY, APP_HARMONY, VIDEO, POSTER).
 --     * APP_MANIFEST_SPEC.md section 6: runtime.family is one of
 --       web, mobile, desktop, server, cli, mini-program, library, plugin.
---   appstore_app.platforms also carried the code `h5` while the platform
+--   appstore_application.platforms also carried the code `h5` while the platform
 --   dictionary did not declare it.
 --
 -- Derivation authority
---   The delivery matrix is `appstore_app.platforms`, whose codes come from
+--   The delivery matrix is `appstore_application.platforms`, whose codes come from
 --   `appstore_platform_dictionary` (011_platform_dictionary.sql), the same
 --   codes the storefront reads in apps/sdkwork-appstore-pc (platforms.ts).
 --   The identity triple is derived from that matrix with this precedence:
@@ -36,7 +36,7 @@ BEGIN;
 -- Step 1: a client row that predates the distribution seed still has an empty
 -- platform list. Its application family proves it is a client (not a server),
 -- so it is a browser surface. Server rows keep an empty list by design.
-UPDATE appstore_app
+UPDATE appstore_application
 SET
     platforms = '["web"]'::jsonb,
     updated_at = CURRENT_TIMESTAMP
@@ -48,7 +48,7 @@ WHERE tenant_id = '100001'
 -- storefront already normalizes these in its own reader, but the stored matrix
 -- is the authority for the artifact and QR seeds, so it is normalized once
 -- here instead of in every consumer.
-UPDATE appstore_app a
+UPDATE appstore_application a
 SET
     platforms = mapped.normalized,
     updated_at = CURRENT_TIMESTAMP
@@ -59,7 +59,7 @@ FROM (
             jsonb_agg(DISTINCT aliased.code ORDER BY aliased.code),
             '[]'::jsonb
         ) AS normalized
-    FROM appstore_app source
+    FROM appstore_application source
     CROSS JOIN LATERAL jsonb_array_elements_text(source.platforms::jsonb) AS raw(code)
     CROSS JOIN LATERAL (
         SELECT CASE LOWER(TRIM(raw.code))
@@ -84,7 +84,7 @@ WHERE a.id = mapped.id
 -- (015_vertical_evaluation.sql) render inside the storefront and declare no
 -- external site, so their access URL is the storefront listing route of the
 -- app. Without it the "open" distribution action has no target at all.
-UPDATE appstore_app a
+UPDATE appstore_application a
 SET
     access_url = 'https://apps.sdkwork.com/app/' || a.id,
     updated_at = CURRENT_TIMESTAMP
@@ -130,11 +130,11 @@ WITH distribution AS (
             FROM jsonb_array_elements_text(a.platforms::jsonb) AS p(code)
             WHERE p.code LIKE 'miniprogram-%'
         ) AS miniprogram_vendor_count
-    FROM appstore_app a
+    FROM appstore_application a
     WHERE a.tenant_id = '100001'
       AND jsonb_array_length(a.platforms::jsonb) > 0
 )
-UPDATE appstore_app a
+UPDATE appstore_application a
 SET
     app_type = CASE
         WHEN d.has_desktop_installer THEN 'APP_REACT'
@@ -207,11 +207,11 @@ WITH release_distribution AS (
             )
             FROM jsonb_array_elements_text(platform_codes.platforms) AS p(code)
         ) AS operating_system_min_version
-    FROM appstore_release r
-    JOIN appstore_listing l
+    FROM appstore_application_release r
+    JOIN appstore_application_listing l
         ON l.id = r.listing_id
        AND l.tenant_id = r.tenant_id
-    JOIN appstore_app a
+    JOIN appstore_application a
         ON a.id = l.app_id
        AND a.tenant_id = l.tenant_id
     CROSS JOIN LATERAL (
@@ -233,7 +233,7 @@ WITH release_distribution AS (
     ) AS platform_codes
     WHERE r.tenant_id = '100001'
 )
-UPDATE appstore_release r
+UPDATE appstore_application_release r
 SET
     manifest_snapshot_json = (
         CASE

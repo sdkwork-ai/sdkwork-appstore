@@ -1,7 +1,7 @@
 -- en-US listing localizations for the industry-standard AI benchmark evaluation
 -- apps seeded in common/017_ai_model_benchmark_apps.sql (tenant 100001).
 
-INSERT INTO appstore_listing_localization
+INSERT INTO appstore_application_listing_localization
     (id, tenant_id, organization_id, listing_id, locale, display_name, subtitle, short_description, full_description, whats_new_summary, keywords_json, created_at, updated_at)
 VALUES
     ('loc-app-eval-chinese-eval-en', '100001', '0', 'app-eval-chinese-eval', 'en-US', 'Chinese Knowledge (C-Eval)', '52-discipline Chinese knowledge benchmark', 'C-Eval and CMMLU coverage across 52 disciplines and four difficulty levels, measuring Chinese knowledge and subject reasoning.', 'Chinese Knowledge Evaluation draws on C-Eval (13,948 multiple-choice questions across 52 disciplines and four difficulty levels) and CMMLU, scoring accuracy by humanities, social sciences, STEM and professional exams. It compares DeepSeek-V3.2, GLM-4.7, Qwen3-Max, Kimi K2, Doubao-1.6, GPT-5 and Claude Sonnet 4.5, with per-spec ratings and reviews.', 'First release with C-Eval and CMMLU question banks', '["Chinese Knowledge","C-Eval","AI Model Evaluation"]', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),

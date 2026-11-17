@@ -199,10 +199,10 @@ mod tests {
     fn adapt_sql_sqlite_passthrough() {
         assert_eq!(
             adapt_sql(
-                "SELECT * FROM appstore_listing WHERE id = ?",
+                "SELECT * FROM appstore_application_listing WHERE id = ?",
                 AppstoreSqlDialect::Sqlite
             ),
-            "SELECT * FROM appstore_listing WHERE id = ?",
+            "SELECT * FROM appstore_application_listing WHERE id = ?",
         );
     }
 
@@ -210,10 +210,10 @@ mod tests {
     fn adapt_sql_postgres_rewrites_placeholders() {
         assert_eq!(
             adapt_sql(
-                "SELECT * FROM appstore_listing WHERE id = ? AND slug = ?",
+                "SELECT * FROM appstore_application_listing WHERE id = ? AND slug = ?",
                 AppstoreSqlDialect::Postgres,
             ),
-            "SELECT * FROM appstore_listing WHERE id = $1 AND slug = $2",
+            "SELECT * FROM appstore_application_listing WHERE id = $1 AND slug = $2",
         );
     }
 
@@ -277,10 +277,10 @@ mod tests {
     fn sqlite_translates_numeric_rounding() {
         assert_eq!(
             adapt_sql(
-                "SELECT ROUND(AVG(rating)::numeric, 1)::text FROM appstore_listing_rating",
+                "SELECT ROUND(AVG(rating)::numeric, 1)::text FROM appstore_application_listing_rating",
                 AppstoreSqlDialect::Sqlite,
             ),
-            "SELECT CAST(ROUND(AVG(rating), 1) AS TEXT) FROM appstore_listing_rating",
+            "SELECT CAST(ROUND(AVG(rating), 1) AS TEXT) FROM appstore_application_listing_rating",
         );
     }
 
@@ -288,10 +288,10 @@ mod tests {
     fn sqlite_keeps_plain_placeholders() {
         assert_eq!(
             adapt_sql(
-                "SELECT id FROM appstore_listing WHERE tenant_id = ? AND id = ?",
+                "SELECT id FROM appstore_application_listing WHERE tenant_id = ? AND id = ?",
                 AppstoreSqlDialect::Sqlite,
             ),
-            "SELECT id FROM appstore_listing WHERE tenant_id = ? AND id = ?",
+            "SELECT id FROM appstore_application_listing WHERE tenant_id = ? AND id = ?",
         );
     }
 }

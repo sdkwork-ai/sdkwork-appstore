@@ -1,6 +1,6 @@
 -- en-US listing localizations for storefront apps and games (tenant 100001).
 
-INSERT INTO appstore_listing_localization
+INSERT INTO appstore_application_listing_localization
     (id, tenant_id, organization_id, listing_id, locale, display_name, subtitle, short_description, full_description, whats_new_summary, keywords_json, created_at, updated_at)
 VALUES
     ('loc-app-qwen-en', '100001', '0', 'app-qwen', 'en-US', 'Qwen AI', 'Tongyi Qwen desktop client', 'Tongyi Qwen desktop client with deep reasoning, long-context chat, and document analysis.', 'Tongyi Qwen desktop client with deep reasoning, multi-turn chat, long-document understanding, coding, and summarization.', 'Added deep reasoning mode and large document parsing.', '["Qwen AI","AI assistant"]', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
@@ -94,7 +94,7 @@ ON CONFLICT (id) DO UPDATE SET
 -- shipped zh-CN only, plus the vertical evaluation modules
 -- (REQ-2026-0002/0003/0004).
 
-INSERT INTO appstore_listing_localization
+INSERT INTO appstore_application_listing_localization
     (id, tenant_id, organization_id, listing_id, locale, display_name, subtitle, short_description, full_description, whats_new_summary, keywords_json, created_at, updated_at)
 VALUES
     ('loc-app-eval-model-arena-en', '100001', '0', 'app-eval-model-arena', 'en-US', 'LLM Capability Arena', 'Multi-spec LLM arena', 'Multi-spec AI model evaluation covering DeepSeek, GLM, Qwen, GPT, Claude and Gemini model specs, each rated and reviewed separately.', 'LLM Capability Arena benchmarks DeepSeek-V3.2, GLM-4.7, Qwen3-Max, Kimi K2, Doubao-1.6, GPT-5, Claude Sonnet 4.5 and Gemini 2.5 Pro on general reasoning, coding, math, writing and Chinese tasks, with per-spec ratings and reviews.', '• Added per-spec ratings and reviews', '["LLM Capability Arena","AI Model Evaluation"]', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),

@@ -52,7 +52,7 @@ async fn project_listing_metrics_from_install_events() {
     assert_eq!(written, 1);
 
     let row: (i64,) = sqlx::query_as(
-        "SELECT install_count FROM appstore_listing_metric_snapshot WHERE listing_id = ?",
+        "SELECT install_count FROM appstore_application_listing_metric_snapshot WHERE listing_id = ?",
     )
     .bind(listing_id)
     .fetch_one(&pool)

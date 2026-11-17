@@ -33,14 +33,14 @@ fn release_columns_aliased(alias: &str) -> String {
         .join(", ")
 }
 
-const INSERT_RELEASE_SQL: &str = r#"INSERT INTO appstore_release (
+const INSERT_RELEASE_SQL: &str = r#"INSERT INTO appstore_application_release (
     id, tenant_id, organization_id, listing_id, release_no, channel_id,
     version_name, version_code, build_number, release_status, minimum_os_version,
     release_notes_default_locale, manifest_snapshot_json, submitted_at, approved_at,
     published_at, retired_at, version, created_at, updated_at
 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"#;
 
-const INSERT_ARTIFACT_SQL: &str = r#"INSERT INTO appstore_release_artifact (
+const INSERT_ARTIFACT_SQL: &str = r#"INSERT INTO appstore_application_release_artifact (
     id, tenant_id, organization_id, release_id, artifact_no, platform,
     architecture, package_format, artifact_status, drive_node_id, media_resource_id,
     file_size_bytes, content_type, checksum_sha256, signature_snapshot_json,
@@ -66,7 +66,7 @@ impl ReleaseRepositoryPort for SqlxReleaseRepository {
         channel_code: &str,
     ) -> Result<Option<ReleaseChannel>, AppstoreServiceError> {
         let row = self.db.query_as::< ReleaseChannelRow>(&format!(
-            r#"SELECT {} FROM appstore_release_channel WHERE tenant_id = ? AND channel_code = ?"#,
+            r#"SELECT {} FROM appstore_application_release_channel WHERE tenant_id = ? AND channel_code = ?"#,
             columns_csv(APPSTORE_RELEASE_CHANNEL_COLUMNS)
         ))
         .bind(&context.tenant_id)
@@ -88,7 +88,7 @@ impl ReleaseRepositoryPort for SqlxReleaseRepository {
         let row = self
             .db
             .query_as::<ReleaseRow>(&format!(
-                r#"SELECT {} FROM appstore_release WHERE id = ? AND tenant_id = ?"#,
+                r#"SELECT {} FROM appstore_application_release WHERE id = ? AND tenant_id = ?"#,
                 columns_csv(APPSTORE_RELEASE_COLUMNS)
             ))
             .bind(release_id.as_str())
@@ -110,7 +110,7 @@ impl ReleaseRepositoryPort for SqlxReleaseRepository {
         let row = self
             .db
             .query_as::<ReleaseRow>(&format!(
-                r#"SELECT {} FROM appstore_release WHERE tenant_id = ? AND release_no = ?"#,
+                r#"SELECT {} FROM appstore_application_release WHERE tenant_id = ? AND release_no = ?"#,
                 columns_csv(APPSTORE_RELEASE_COLUMNS)
             ))
             .bind(&context.tenant_id)
@@ -131,7 +131,7 @@ impl ReleaseRepositoryPort for SqlxReleaseRepository {
         channel_id: &ReleaseChannelId,
     ) -> Result<Option<Release>, AppstoreServiceError> {
         let row = self.db.query_as::< ReleaseRow>(&format!(
-            r#"SELECT {} FROM appstore_release
+            r#"SELECT {} FROM appstore_application_release
             WHERE tenant_id = ? AND listing_id = ? AND channel_id = ? AND release_status = 'published'
             ORDER BY published_at DESC LIMIT 1"#,
             columns_csv(APPSTORE_RELEASE_COLUMNS)
@@ -157,8 +157,8 @@ impl ReleaseRepositoryPort for SqlxReleaseRepository {
         let row = self
             .db
             .query_as::<ReleaseRow>(&format!(
-                r#"SELECT {} FROM appstore_release r
-            INNER JOIN appstore_release_channel c ON r.channel_id = c.id
+                r#"SELECT {} FROM appstore_application_release r
+            INNER JOIN appstore_application_release_channel c ON r.channel_id = c.id
             WHERE r.tenant_id = ? AND r.listing_id = ? AND c.channel_code = ?
             ORDER BY r.version DESC LIMIT 1"#,
                 release_columns_aliased("r")
@@ -184,8 +184,8 @@ impl ReleaseRepositoryPort for SqlxReleaseRepository {
         let rows = self
             .db
             .query_as::<ReleaseRow>(&format!(
-                r#"SELECT {} FROM appstore_release r
-            INNER JOIN appstore_release_channel c ON r.channel_id = c.id
+                r#"SELECT {} FROM appstore_application_release r
+            INNER JOIN appstore_application_release_channel c ON r.channel_id = c.id
             WHERE r.tenant_id = ? AND r.listing_id = ? AND c.channel_code = ?"#,
                 release_columns_aliased("r")
             ))
@@ -323,7 +323,7 @@ impl ReleaseRepositoryPort for SqlxReleaseRepository {
         let result = self
             .db
             .query(
-                r#"UPDATE appstore_release SET
+                r#"UPDATE appstore_application_release SET
                 listing_id = ?, release_no = ?, channel_id = ?, version_name = ?,
                 version_code = ?, build_number = ?, release_status = ?, minimum_os_version = ?,
                 release_notes_default_locale = ?, manifest_snapshot_json = ?, submitted_at = ?,
@@ -374,7 +374,7 @@ impl ReleaseRepositoryPort for SqlxReleaseRepository {
             .query_as::<ReleaseNoteLocalizationRow>(
                 r#"SELECT id, tenant_id, organization_id, release_id, locale, release_notes,
                 created_at, updated_at
-            FROM appstore_release_note_localization
+            FROM appstore_application_release_note_localization
             WHERE tenant_id = ? AND release_id = ? AND locale = ?"#,
             )
             .bind(&context.tenant_id)
@@ -396,7 +396,7 @@ impl ReleaseRepositoryPort for SqlxReleaseRepository {
     ) -> Result<(), AppstoreServiceError> {
         self.db
             .query(
-                r#"INSERT INTO appstore_release_note_localization (
+                r#"INSERT INTO appstore_application_release_note_localization (
                 id, tenant_id, organization_id, release_id, locale, release_notes,
                 created_at, updated_at
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"#,
@@ -423,7 +423,7 @@ impl ReleaseRepositoryPort for SqlxReleaseRepository {
     ) -> Result<(), AppstoreServiceError> {
         self.db
             .query(
-                r#"UPDATE appstore_release_note_localization
+                r#"UPDATE appstore_application_release_note_localization
             SET release_notes = ?, updated_at = ?
             WHERE id = ? AND tenant_id = ? AND organization_id = ?"#,
             )
@@ -447,7 +447,7 @@ impl ReleaseRepositoryPort for SqlxReleaseRepository {
         let row = self
             .db
             .query_as::<ReleaseArtifactRow>(&format!(
-                r#"SELECT {} FROM appstore_release_artifact WHERE id = ? AND tenant_id = ?"#,
+                r#"SELECT {} FROM appstore_application_release_artifact WHERE id = ? AND tenant_id = ?"#,
                 columns_csv(APPSTORE_RELEASE_ARTIFACT_COLUMNS)
             ))
             .bind(artifact_id.as_str())
@@ -469,7 +469,7 @@ impl ReleaseRepositoryPort for SqlxReleaseRepository {
         let rows = self
             .db
             .query_as::<ReleaseArtifactRow>(&format!(
-                r#"SELECT {} FROM appstore_release_artifact WHERE release_id = ? AND tenant_id = ?"#,
+                r#"SELECT {} FROM appstore_application_release_artifact WHERE release_id = ? AND tenant_id = ?"#,
                 columns_csv(APPSTORE_RELEASE_ARTIFACT_COLUMNS)
             ))
             .bind(release_id.as_str())
@@ -493,7 +493,7 @@ impl ReleaseRepositoryPort for SqlxReleaseRepository {
         package_format: &str,
     ) -> Result<Option<ReleaseArtifact>, AppstoreServiceError> {
         let row = self.db.query_as::< ReleaseArtifactRow>(&format!(
-            r#"SELECT {} FROM appstore_release_artifact
+            r#"SELECT {} FROM appstore_application_release_artifact
             WHERE tenant_id = ? AND release_id = ? AND platform = ? AND architecture = ? AND package_format = ?"#,
             columns_csv(APPSTORE_RELEASE_ARTIFACT_COLUMNS)
         ))
@@ -555,7 +555,7 @@ impl ReleaseRepositoryPort for SqlxReleaseRepository {
         let row = self
             .db
             .query_as::<ReleaseRolloutRow>(&format!(
-                r#"SELECT {} FROM appstore_release_rollout WHERE tenant_id = ? AND release_id = ?"#,
+                r#"SELECT {} FROM appstore_application_release_rollout WHERE tenant_id = ? AND release_id = ?"#,
                 columns_csv(APPSTORE_RELEASE_ROLLOUT_COLUMNS)
             ))
             .bind(&context.tenant_id)
@@ -579,7 +579,7 @@ impl ReleaseRepositoryPort for SqlxReleaseRepository {
 
         self.db
             .query(
-                r#"INSERT INTO appstore_release_rollout (
+                r#"INSERT INTO appstore_application_release_rollout (
                 id, tenant_id, organization_id, release_id, rollout_strategy, rollout_status,
                 target_percentage, current_percentage, region_filter_json, device_filter_json,
                 started_at, completed_at, paused_at, created_at, updated_at
@@ -617,7 +617,7 @@ impl ReleaseRepositoryPort for SqlxReleaseRepository {
 
         self.db
             .query(
-                r#"UPDATE appstore_release_rollout SET
+                r#"UPDATE appstore_application_release_rollout SET
                 rollout_strategy = ?, rollout_status = ?, target_percentage = ?,
                 current_percentage = ?, region_filter_json = ?, device_filter_json = ?,
                 started_at = ?, completed_at = ?, paused_at = ?, updated_at = ?
@@ -786,7 +786,7 @@ impl ReleaseRepositoryPort for SqlxReleaseRepository {
         let row: Option<(String,)> = self
             .db
             .query_as::<(String,)>(
-                r#"SELECT id FROM appstore_listing WHERE tenant_id = ? AND app_key = ? AND deleted_at IS NULL"#,
+                r#"SELECT id FROM appstore_application_listing WHERE tenant_id = ? AND app_key = ? AND deleted_at IS NULL"#,
             )
             .bind(&context.tenant_id)
             .bind(app_key)
@@ -805,7 +805,7 @@ impl ReleaseRepositoryPort for SqlxReleaseRepository {
         let row: Option<(String,)> = self
             .db
             .query_as::<(String,)>(
-                r#"SELECT publisher_id FROM appstore_listing WHERE tenant_id = ? AND id = ? AND deleted_at IS NULL"#,
+                r#"SELECT publisher_id FROM appstore_application_listing WHERE tenant_id = ? AND id = ? AND deleted_at IS NULL"#,
             )
             .bind(&context.tenant_id)
             .bind(listing_id)
@@ -824,7 +824,7 @@ impl ReleaseRepositoryPort for SqlxReleaseRepository {
         let row: Option<(String,)> = self
             .db
             .query_as::<(String,)>(
-                r#"SELECT pricing_model FROM appstore_listing WHERE tenant_id = ? AND id = ? AND deleted_at IS NULL"#,
+                r#"SELECT pricing_model FROM appstore_application_listing WHERE tenant_id = ? AND id = ? AND deleted_at IS NULL"#,
             )
             .bind(&context.tenant_id)
             .bind(listing_id)

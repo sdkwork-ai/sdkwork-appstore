@@ -244,7 +244,7 @@ pub fn map_listing_row_to_domain(row: ListingRow) -> Result<Listing, String> {
         created_at: row.created_at,
         updated_at: row.updated_at,
         // Distribution projection is enriched by the detail read path
-        // (join appstore_app); plain row loads carry none.
+        // (join appstore_application); plain row loads carry none.
         platforms: None,
         access_url: None,
     })
@@ -793,7 +793,7 @@ pub fn map_listing_search_row_to_domain(row: ListingSearchRow) -> ListingSummary
         app_type: row.app_type,
         access_url: row.access_url,
         // Attached post-mapping by the catalog repository from
-        // appstore_app_platform rows; the search row itself carries none.
+        // appstore_application_platform rows; the search row itself carries none.
         platform_links: None,
     }
 }

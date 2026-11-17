@@ -289,7 +289,7 @@ pub struct Listing {
     pub deleted_at: Option<DateTime<Utc>>,
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
-    /// Distribution projection from `appstore_app` (detail reads): raw
+    /// Distribution projection from `appstore_application` (detail reads): raw
     /// platform codes resolving the acquisition mode (web open / installer
     /// / QR). `None` when the read path does not join the app projection.
     #[serde(default, skip_serializing_if = "Option::is_none")]

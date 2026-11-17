@@ -319,7 +319,7 @@ impl sdkwork_appstore_compliance_service::ports::repository::ComplianceRepositor
                 .query_as::<ListingIapItemRow>(&format!(
                     r#"
                 SELECT {}
-                FROM appstore_listing_iap_item
+                FROM appstore_application_listing_iap_item
                 WHERE listing_id = ? AND tenant_id = ? AND id > ?
                 ORDER BY id ASC
                 LIMIT ?
@@ -337,7 +337,7 @@ impl sdkwork_appstore_compliance_service::ports::repository::ComplianceRepositor
                 .query_as::<ListingIapItemRow>(&format!(
                     r#"
                 SELECT {}
-                FROM appstore_listing_iap_item
+                FROM appstore_application_listing_iap_item
                 WHERE listing_id = ? AND tenant_id = ?
                 ORDER BY id ASC
                 LIMIT ?
@@ -383,7 +383,7 @@ impl sdkwork_appstore_compliance_service::ports::repository::ComplianceRepositor
         let row: Option<(String,)> = self
             .db
             .query_as::<(String,)>(
-                r#"SELECT publisher_id FROM appstore_listing WHERE tenant_id = ? AND id = ? AND deleted_at IS NULL"#,
+                r#"SELECT publisher_id FROM appstore_application_listing WHERE tenant_id = ? AND id = ? AND deleted_at IS NULL"#,
             )
             .bind(&context.tenant_id)
             .bind(listing_id)
@@ -402,7 +402,7 @@ impl sdkwork_appstore_compliance_service::ports::repository::ComplianceRepositor
         let row: Option<(String, String)> = self
             .db
             .query_as::<(String, String)>(
-                r#"SELECT listing_status, storefront_visibility FROM appstore_listing WHERE tenant_id = ? AND id = ? AND deleted_at IS NULL"#,
+                r#"SELECT listing_status, storefront_visibility FROM appstore_application_listing WHERE tenant_id = ? AND id = ? AND deleted_at IS NULL"#,
             )
             .bind(&context.tenant_id)
             .bind(listing_id)

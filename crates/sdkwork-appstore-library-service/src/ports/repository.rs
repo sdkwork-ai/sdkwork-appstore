@@ -21,7 +21,7 @@ pub struct ArtifactDelivery {
 pub struct ListingCommerceInfo {
     pub app_id: String,
     pub pricing_model: String,
-    /// Raw platform codes from appstore_app.platforms (JSON array text).
+    /// Raw platform codes from appstore_application.platforms (JSON array text).
     pub platforms_json: String,
 }
 

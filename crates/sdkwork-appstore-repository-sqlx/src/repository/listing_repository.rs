@@ -50,7 +50,7 @@ impl SqlxListingRepository {
             .join(", ");
         let sql = format!(
             r#"SELECT release_id, id, platform, architecture, package_format, file_size_bytes
-            FROM appstore_release_artifact
+            FROM appstore_application_release_artifact
             WHERE tenant_id = ? AND release_id IN ({placeholders}) AND artifact_status = 'verified'
             ORDER BY id ASC"#
         );
@@ -92,7 +92,7 @@ impl ListingRepositoryPort for SqlxListingRepository {
         listing_id: &ListingId,
     ) -> Result<Option<Listing>, AppstoreServiceError> {
         let row = self.db.query_as::< ListingRow>(&format!(
-            r#"SELECT {} FROM appstore_listing WHERE id = ? AND tenant_id = ? AND deleted_at IS NULL"#,
+            r#"SELECT {} FROM appstore_application_listing WHERE id = ? AND tenant_id = ? AND deleted_at IS NULL"#,
             columns_csv(APPSTORE_LISTING_COLUMNS)
         ))
         .bind(listing_id.as_str())
@@ -114,7 +114,7 @@ impl ListingRepositoryPort for SqlxListingRepository {
         let row: Option<(String, Option<String>)> = self
             .db
             .query_as::<(String, Option<String>)>(
-                "SELECT platforms::text, access_url FROM appstore_app \
+                "SELECT platforms::text, access_url FROM appstore_application \
                  WHERE id = ? AND tenant_id = ? AND deleted_at IS NULL",
             )
             .bind(app_id)
@@ -144,7 +144,7 @@ impl ListingRepositoryPort for SqlxListingRepository {
         let result = self
             .db
             .query(
-                r#"UPDATE appstore_release
+                r#"UPDATE appstore_application_release
                    SET release_status = ?, published_at = COALESCE(published_at, ?), updated_at = ?
                    WHERE id = ? AND tenant_id = ? AND release_status <> ?"#,
             )
@@ -168,7 +168,7 @@ impl ListingRepositoryPort for SqlxListingRepository {
         listing_slug: &str,
     ) -> Result<Option<Listing>, AppstoreServiceError> {
         let row = self.db.query_as::< ListingRow>(&format!(
-            r#"SELECT {} FROM appstore_listing WHERE tenant_id = ? AND listing_slug = ? AND deleted_at IS NULL"#,
+            r#"SELECT {} FROM appstore_application_listing WHERE tenant_id = ? AND listing_slug = ? AND deleted_at IS NULL"#,
             columns_csv(APPSTORE_LISTING_COLUMNS)
         ))
         .bind(tenant_id)
@@ -188,7 +188,7 @@ impl ListingRepositoryPort for SqlxListingRepository {
         app_id: &str,
     ) -> Result<Option<Listing>, AppstoreServiceError> {
         let row = self.db.query_as::< ListingRow>(&format!(
-            r#"SELECT {} FROM appstore_listing WHERE tenant_id = ? AND app_id = ? AND deleted_at IS NULL"#,
+            r#"SELECT {} FROM appstore_application_listing WHERE tenant_id = ? AND app_id = ? AND deleted_at IS NULL"#,
             columns_csv(APPSTORE_LISTING_COLUMNS)
         ))
         .bind(&context.tenant_id)
@@ -212,7 +212,7 @@ impl ListingRepositoryPort for SqlxListingRepository {
         let rows = if let Some(cursor_id) = cursor {
             self.db
                 .query_as::<ListingRow>(&format!(
-                    r#"SELECT {} FROM appstore_listing
+                    r#"SELECT {} FROM appstore_application_listing
                 WHERE tenant_id = ? AND publisher_id = ? AND deleted_at IS NULL AND id > ?
                 ORDER BY id ASC LIMIT ?"#,
                     columns_csv(APPSTORE_LISTING_COLUMNS)
@@ -227,7 +227,7 @@ impl ListingRepositoryPort for SqlxListingRepository {
         } else {
             self.db
                 .query_as::<ListingRow>(&format!(
-                    r#"SELECT {} FROM appstore_listing
+                    r#"SELECT {} FROM appstore_application_listing
                 WHERE tenant_id = ? AND publisher_id = ? AND deleted_at IS NULL
                 ORDER BY id ASC LIMIT ?"#,
                     columns_csv(APPSTORE_LISTING_COLUMNS)
@@ -261,7 +261,7 @@ impl ListingRepositoryPort for SqlxListingRepository {
         ) = map_listing_domain_to_row(listing);
 
         self.db.query(
-            r#"INSERT INTO appstore_listing (
+            r#"INSERT INTO appstore_application_listing (
                 id, tenant_id, organization_id, app_id, publisher_id, listing_no,
                 app_key, listing_slug, listing_type, pricing_model,
                 listing_status, storefront_visibility, review_status, primary_category_id,
@@ -330,7 +330,7 @@ impl ListingRepositoryPort for SqlxListingRepository {
         let result = self
             .db
             .query(
-                r#"UPDATE appstore_listing SET
+                r#"UPDATE appstore_application_listing SET
                 listing_no = ?, app_id = ?, app_key = ?,
                 listing_slug = ?, pricing_model = ?, listing_status = ?,
                 storefront_visibility = ?, review_status = ?, primary_category_id = ?,
@@ -399,7 +399,7 @@ impl ListingRepositoryPort for SqlxListingRepository {
                 r#"SELECT id, tenant_id, organization_id, listing_id, locale, display_name,
                 subtitle, short_description, full_description, whats_new_summary,
                 keywords_json, created_at, updated_at
-            FROM appstore_listing_localization
+            FROM appstore_application_listing_localization
             WHERE tenant_id = ? AND listing_id = ? AND locale = ?"#,
             )
             .bind(&context.tenant_id)
@@ -423,7 +423,7 @@ impl ListingRepositoryPort for SqlxListingRepository {
 
         self.db
             .query(
-                r#"INSERT INTO appstore_listing_localization (
+                r#"INSERT INTO appstore_application_listing_localization (
                 id, tenant_id, organization_id, listing_id, locale, display_name,
                 subtitle, short_description, full_description, whats_new_summary,
                 keywords_json, created_at, updated_at
@@ -467,7 +467,7 @@ impl ListingRepositoryPort for SqlxListingRepository {
             .query_as::<ListingMediaRow>(
                 r#"SELECT id, tenant_id, organization_id, listing_id, media_role, media_resource_id,
                 drive_node_id, platform_scope, sort_order, locale, created_at, updated_at
-            FROM appstore_listing_media
+            FROM appstore_application_listing_media
             WHERE tenant_id = ? AND listing_id = ?
             ORDER BY sort_order ASC"#,
             )
@@ -493,7 +493,7 @@ impl ListingRepositoryPort for SqlxListingRepository {
             .query_as::<ListingMediaRow>(
                 r#"SELECT id, tenant_id, organization_id, listing_id, media_role, media_resource_id,
                 drive_node_id, platform_scope, sort_order, locale, created_at, updated_at
-            FROM appstore_listing_media
+            FROM appstore_application_listing_media
             WHERE tenant_id = ? AND id = ?"#,
             )
             .bind(&context.tenant_id)
@@ -516,7 +516,7 @@ impl ListingRepositoryPort for SqlxListingRepository {
 
         self.db
             .query(
-                r#"INSERT INTO appstore_listing_media (
+                r#"INSERT INTO appstore_application_listing_media (
                 id, tenant_id, organization_id, listing_id, media_role, media_resource_id,
                 drive_node_id, platform_scope, sort_order, locale, created_at, updated_at
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"#,
@@ -546,7 +546,7 @@ impl ListingRepositoryPort for SqlxListingRepository {
         media_id: &str,
     ) -> Result<(), AppstoreServiceError> {
         self.db
-            .query(r#"DELETE FROM appstore_listing_media WHERE tenant_id = ? AND organization_id = ? AND id = ?"#)
+            .query(r#"DELETE FROM appstore_application_listing_media WHERE tenant_id = ? AND organization_id = ? AND id = ?"#)
             .bind(&context.tenant_id)
             .bind(&context.organization_id)
             .bind(media_id)
@@ -566,7 +566,7 @@ impl ListingRepositoryPort for SqlxListingRepository {
             .db
             .query_as::<ListingCategoryBindingRow>(
                 r#"SELECT id, tenant_id, listing_id, category_id, is_primary, created_at
-            FROM appstore_listing_category_binding
+            FROM appstore_application_listing_category_binding
             WHERE tenant_id = ? AND listing_id = ?"#,
             )
             .bind(&context.tenant_id)
@@ -594,7 +594,7 @@ impl ListingRepositoryPort for SqlxListingRepository {
             .map_err(|e| AppstoreServiceError::Internal(format!("Database error: {}", e)))?;
 
         self.db.query(
-            r#"DELETE FROM appstore_listing_category_binding WHERE tenant_id = ? AND listing_id = ?"#,
+            r#"DELETE FROM appstore_application_listing_category_binding WHERE tenant_id = ? AND listing_id = ?"#,
         )
         .bind(&context.tenant_id)
         .bind(listing_id.as_str())
@@ -605,7 +605,7 @@ impl ListingRepositoryPort for SqlxListingRepository {
         for binding in bindings {
             self.db
                 .query(
-                    r#"INSERT INTO appstore_listing_category_binding
+                    r#"INSERT INTO appstore_application_listing_category_binding
                 (id, tenant_id, listing_id, category_id, is_primary, created_at)
                 VALUES (?, ?, ?, ?, ?, ?)"#,
                 )
@@ -727,7 +727,7 @@ impl ListingRepositoryPort for SqlxListingRepository {
         let rows = if let Some(cursor_id) = cursor {
             self.db
                 .query_as::<ReleaseRow>(&format!(
-                    r#"SELECT {} FROM appstore_release
+                    r#"SELECT {} FROM appstore_application_release
                 WHERE tenant_id = ? AND listing_id = ? AND id > ?{}"#,
                     release_cols, status_filter
                 ))
@@ -741,7 +741,7 @@ impl ListingRepositoryPort for SqlxListingRepository {
         } else {
             self.db
                 .query_as::<ReleaseRow>(&format!(
-                    r#"SELECT {} FROM appstore_release
+                    r#"SELECT {} FROM appstore_application_release
                 WHERE tenant_id = ? AND listing_id = ?{}"#,
                     release_cols, status_filter
                 ))
@@ -794,7 +794,7 @@ impl ListingRepositoryPort for SqlxListingRepository {
 
         self.db
             .query(
-                r#"INSERT INTO appstore_listing_submission (
+                r#"INSERT INTO appstore_application_listing_submission (
                 id, tenant_id, organization_id, listing_id, release_id, submission_no,
                 submission_type, submission_status, submitted_by, submitted_at,
                 payload_snapshot_json, idempotency_key, created_at, updated_at
@@ -832,7 +832,7 @@ impl ListingRepositoryPort for SqlxListingRepository {
                 r#"SELECT id, tenant_id, organization_id, listing_id, release_id, submission_no,
                 submission_type, submission_status, submitted_by, submitted_at,
                 payload_snapshot_json, idempotency_key, created_at, updated_at
-            FROM appstore_listing_submission
+            FROM appstore_application_listing_submission
             WHERE tenant_id = ? AND id = ?"#,
             )
             .bind(&context.tenant_id)
@@ -856,7 +856,7 @@ impl ListingRepositoryPort for SqlxListingRepository {
 
         self.db
             .query(
-                r#"UPDATE appstore_listing_submission
+                r#"UPDATE appstore_application_listing_submission
             SET release_id = ?, submission_type = ?, submission_status = ?, submitted_by = ?,
                 submitted_at = ?, payload_snapshot_json = ?, idempotency_key = ?, updated_at = ?
             WHERE tenant_id = ? AND organization_id = ? AND id = ?"#,
@@ -890,7 +890,7 @@ impl ListingRepositoryPort for SqlxListingRepository {
                 r#"SELECT id, tenant_id, organization_id, listing_id, release_id, submission_no,
                 submission_type, submission_status, submitted_by, submitted_at,
                 payload_snapshot_json, idempotency_key, created_at, updated_at
-            FROM appstore_listing_submission
+            FROM appstore_application_listing_submission
             WHERE tenant_id = ? AND listing_id = ?
             ORDER BY created_at DESC"#,
             )
@@ -916,7 +916,7 @@ impl ListingRepositoryPort for SqlxListingRepository {
         limit: i32,
     ) -> Result<Vec<Listing>, AppstoreServiceError> {
         let mut sql = format!(
-            r#"SELECT {} FROM appstore_listing WHERE tenant_id = ? AND deleted_at IS NULL"#,
+            r#"SELECT {} FROM appstore_application_listing WHERE tenant_id = ? AND deleted_at IS NULL"#,
             columns_csv(APPSTORE_LISTING_COLUMNS)
         );
 
@@ -989,7 +989,7 @@ impl ListingRepositoryPort for SqlxListingRepository {
                 r#"SELECT id, tenant_id, organization_id, publisher_id, app_no, app_key, app_slug,
                 display_name, default_locale, app_type, app_status, distribution_status,
                 review_status, current_listing_id, created_at, updated_at
-            FROM appstore_app
+            FROM appstore_application
             WHERE tenant_id = ? AND app_key = ? AND deleted_at IS NULL
             LIMIT 1"#,
             )
@@ -1063,7 +1063,7 @@ impl ListingRepositoryPort for SqlxListingRepository {
 
         self.db
             .query(
-                r#"INSERT INTO appstore_app (
+                r#"INSERT INTO appstore_application (
                 id, tenant_id, organization_id, publisher_id, app_no, app_key, app_slug,
                 display_name, default_locale, app_type, runtime_family, runtime_framework,
                 app_status, distribution_status, review_status, monetization_mode,
@@ -1103,7 +1103,7 @@ impl ListingRepositoryPort for SqlxListingRepository {
             .map_err(|e| AppstoreServiceError::Internal(format!("Database error: {e}")))?;
 
         self.db.query(
-            r#"INSERT INTO appstore_listing (
+            r#"INSERT INTO appstore_application_listing (
                 id, tenant_id, organization_id, app_id, publisher_id, listing_no,
                 app_key, listing_slug, listing_type, pricing_model,
                 listing_status, storefront_visibility, review_status, primary_category_id,
@@ -1173,15 +1173,15 @@ impl ListingRepositoryPort for SqlxListingRepository {
 
         let rows = if let Some(cursor_id) = cursor {
             self.db.query_as::< ReleaseRow>(&format!(
-                r#"SELECT {release_cols} FROM appstore_release r
+                r#"SELECT {release_cols} FROM appstore_application_release r
                 WHERE r.tenant_id = ? AND r.listing_id = ?
                   AND (
                     CAST(r.version_code AS INTEGER) < (
-                        SELECT CAST(version_code AS INTEGER) FROM appstore_release WHERE id = ? AND tenant_id = ?
+                        SELECT CAST(version_code AS INTEGER) FROM appstore_application_release WHERE id = ? AND tenant_id = ?
                     )
                     OR (
                         CAST(r.version_code AS INTEGER) = (
-                            SELECT CAST(version_code AS INTEGER) FROM appstore_release WHERE id = ? AND tenant_id = ?
+                            SELECT CAST(version_code AS INTEGER) FROM appstore_application_release WHERE id = ? AND tenant_id = ?
                         )
                         AND r.id < ?
                     )
@@ -1203,7 +1203,7 @@ impl ListingRepositoryPort for SqlxListingRepository {
         } else {
             self.db
                 .query_as::<ReleaseRow>(&format!(
-                    r#"SELECT {release_cols} FROM appstore_release
+                    r#"SELECT {release_cols} FROM appstore_application_release
                 WHERE tenant_id = ? AND listing_id = ?
                 ORDER BY CAST(version_code AS INTEGER) DESC, id DESC
                 LIMIT ?"#
@@ -1273,7 +1273,7 @@ impl ListingRepositoryPort for SqlxListingRepository {
         let rows = if let Some(cursor_id) = cursor {
             self.db
                 .query_as::<ListingRow>(&format!(
-                    r#"SELECT {} FROM appstore_listing
+                    r#"SELECT {} FROM appstore_application_listing
                 WHERE tenant_id = ? AND primary_category_id = ? AND id != ?
                   AND {visible_filter} AND id > ?
                 ORDER BY id ASC
@@ -1291,7 +1291,7 @@ impl ListingRepositoryPort for SqlxListingRepository {
         } else {
             self.db
                 .query_as::<ListingRow>(&format!(
-                    r#"SELECT {} FROM appstore_listing
+                    r#"SELECT {} FROM appstore_application_listing
                 WHERE tenant_id = ? AND primary_category_id = ? AND id != ?
                   AND {visible_filter}
                 ORDER BY id ASC
@@ -1328,7 +1328,7 @@ impl ListingRepositoryPort for SqlxListingRepository {
         let rows = if let Some(cursor_id) = cursor {
             self.db
                 .query_as::<ListingRow>(&format!(
-                    r#"SELECT {} FROM appstore_listing
+                    r#"SELECT {} FROM appstore_application_listing
                 WHERE tenant_id = ? AND publisher_id = ? AND id != ?
                   AND {visible_filter} AND id > ?
                 ORDER BY id ASC
@@ -1346,7 +1346,7 @@ impl ListingRepositoryPort for SqlxListingRepository {
         } else {
             self.db
                 .query_as::<ListingRow>(&format!(
-                    r#"SELECT {} FROM appstore_listing
+                    r#"SELECT {} FROM appstore_application_listing
                 WHERE tenant_id = ? AND publisher_id = ? AND id != ?
                   AND {visible_filter}
                 ORDER BY id ASC
@@ -1441,13 +1441,13 @@ impl ListingRepositoryPort for SqlxListingRepository {
             r#"
             SELECT id, tenant_id, organization_id, listing_id, user_id, rating, title,
                    created_at, updated_at
-            FROM appstore_listing_rating
+            FROM appstore_application_listing_rating
             WHERE tenant_id = ? AND listing_id = ?
             "#,
         );
         if cursor.is_some() {
             sql.push_str(
-                "  AND (created_at, id) < (SELECT created_at, id FROM appstore_listing_rating WHERE id = ? AND tenant_id = ?)
+                "  AND (created_at, id) < (SELECT created_at, id FROM appstore_application_listing_rating WHERE id = ? AND tenant_id = ?)
 ",
             );
         }
@@ -1489,7 +1489,7 @@ impl ListingRepositoryPort for SqlxListingRepository {
         self.db
             .query(&self.db.adapt_sql(
                 r#"
-                INSERT INTO appstore_listing_rating (
+                INSERT INTO appstore_application_listing_rating (
                     id, tenant_id, organization_id, listing_id, user_id, rating, title,
                     created_at, updated_at
                 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -1522,15 +1522,15 @@ impl ListingRepositoryPort for SqlxListingRepository {
         self.db
             .query(&self.db.adapt_sql(
                 r#"
-                UPDATE appstore_listing
+                UPDATE appstore_application_listing
                 SET average_rating = (
                         SELECT ROUND(AVG(rating)::numeric, 1)::text
-                        FROM appstore_listing_rating
+                        FROM appstore_application_listing_rating
                         WHERE tenant_id = ? AND listing_id = ?
                     ),
                     rating_count = (
                         SELECT COUNT(*)
-                        FROM appstore_listing_rating
+                        FROM appstore_application_listing_rating
                         WHERE tenant_id = ? AND listing_id = ?
                     ),
                     updated_at = ?

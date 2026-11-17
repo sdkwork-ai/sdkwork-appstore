@@ -33,7 +33,7 @@ impl AnalyticsProjectionRepository {
             UNION
             SELECT DISTINCT tenant_id FROM appstore_catalog_search_history
             UNION
-            SELECT DISTINCT tenant_id FROM appstore_listing_metric_snapshot
+            SELECT DISTINCT tenant_id FROM appstore_application_listing_metric_snapshot
             ORDER BY tenant_id
             "#,
             )
@@ -81,7 +81,7 @@ impl AnalyticsProjectionRepository {
             self.database
                 .query(
                     r#"
-                INSERT INTO appstore_listing_metric_snapshot (
+                INSERT INTO appstore_application_listing_metric_snapshot (
                   id, tenant_id, listing_id, snapshot_date,
                   impression_count, detail_view_count, install_count,
                   uninstall_count, update_count, conversion_rate, created_at
@@ -128,7 +128,7 @@ impl AnalyticsProjectionRepository {
             .query_as::<(String, i64)>(
                 r#"
             SELECT listing_id, install_count
-            FROM appstore_listing_metric_snapshot
+            FROM appstore_application_listing_metric_snapshot
             WHERE tenant_id = ? AND snapshot_date = ?
             ORDER BY install_count DESC, listing_id ASC
             LIMIT ?

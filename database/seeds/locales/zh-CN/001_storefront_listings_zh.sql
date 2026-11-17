@@ -1,7 +1,7 @@
 -- zh-CN listing localizations for storefront apps and games (tenant 100001).
 -- Locale seed pipeline reinforcement aligned with common/005_storefront_listings.sql.
 
-INSERT INTO appstore_listing_localization
+INSERT INTO appstore_application_listing_localization
     (id, tenant_id, organization_id, listing_id, locale, display_name, subtitle, short_description, full_description, whats_new_summary, keywords_json, created_at, updated_at)
 VALUES
     ('loc-app-qwen', '100001', '0', 'app-qwen', 'zh-CN', '千问 AI', '通义千问桌面客户端', '通义千问桌面客户端，支持深度思考、多轮对话与长文档解析。', '通义千问桌面客户端，支持深度思考、多轮对话、长文档理解、代码辅助与文档总结。', '新增 AI 深度思考推理模式与大文档解析能力。', '["千问 AI","AI 助手与对话"]', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
@@ -100,7 +100,7 @@ ON CONFLICT (id) DO UPDATE SET
 -- Vertical evaluation modules (REQ-2026-0002/0003/0004): education experiment,
 -- culture & tourism, and healthcare listing localizations (zh-CN).
 
-INSERT INTO appstore_listing_localization
+INSERT INTO appstore_application_listing_localization
     (id, tenant_id, organization_id, listing_id, locale, display_name, subtitle, short_description, full_description, whats_new_summary, keywords_json, created_at, updated_at)
 VALUES
     ('loc-app-edu-k12-virtual-lab', '100001', '0', 'app-edu-k12-virtual-lab', 'zh-CN', 'K12 虚拟实验测评', '小学至高中实验任务基准', '覆盖小学科学、初中物理化学生物与高中实验任务的 K12 虚拟实验测评，每个 AI 规格独立评分与评论。', 'K12 虚拟实验测评以课标对齐的虚拟实验任务覆盖小学科学、初中物理、化学、生物与高中理化生实验，考察实验操作仿真、实验报告批改、实验设计辅导、学科知识问答与安全规范提示，每个 AI 规格独立评分与评论。', '• 首发课标对齐的 K12 实验任务基准', '["K12 虚拟实验测评","教育实验应用"]', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),

@@ -357,17 +357,17 @@ async fn test_database_schema_integrity() {
     assert!(table_names.contains(&"appstore_publisher"));
     assert!(table_names.contains(&"appstore_publisher_member"));
     assert!(table_names.contains(&"appstore_publisher_verification"));
-    assert!(table_names.contains(&"appstore_listing"));
-    assert!(table_names.contains(&"appstore_listing_localization"));
-    assert!(table_names.contains(&"appstore_listing_media"));
-    assert!(table_names.contains(&"appstore_listing_category_binding"));
-    assert!(table_names.contains(&"appstore_listing_submission"));
+    assert!(table_names.contains(&"appstore_application_listing"));
+    assert!(table_names.contains(&"appstore_application_listing_localization"));
+    assert!(table_names.contains(&"appstore_application_listing_media"));
+    assert!(table_names.contains(&"appstore_application_listing_category_binding"));
+    assert!(table_names.contains(&"appstore_application_listing_submission"));
     assert!(table_names.contains(&"appstore_category"));
     assert!(table_names.contains(&"appstore_category_localization"));
-    assert!(table_names.contains(&"appstore_release"));
-    assert!(table_names.contains(&"appstore_release_channel"));
-    assert!(table_names.contains(&"appstore_release_artifact"));
-    assert!(table_names.contains(&"appstore_release_rollout"));
+    assert!(table_names.contains(&"appstore_application_release"));
+    assert!(table_names.contains(&"appstore_application_release_channel"));
+    assert!(table_names.contains(&"appstore_application_release_artifact"));
+    assert!(table_names.contains(&"appstore_application_release_rollout"));
     assert!(table_names.contains(&"appstore_compliance_profile"));
     assert!(table_names.contains(&"appstore_compliance_permission_disclosure"));
     assert!(table_names.contains(&"appstore_moderation_review"));
@@ -381,7 +381,7 @@ async fn test_database_schema_integrity() {
     assert!(table_names.contains(&"appstore_install_event"));
     assert!(table_names.contains(&"appstore_market_channel"));
     assert!(table_names.contains(&"appstore_market_release"));
-    assert!(table_names.contains(&"appstore_listing_metric_snapshot"));
+    assert!(table_names.contains(&"appstore_application_listing_metric_snapshot"));
 }
 
 #[tokio::test]
@@ -480,7 +480,7 @@ async fn test_listing_raw_sql_operations() {
 
     let now = Utc::now();
     sqlx::query(
-        r#"INSERT INTO appstore_listing (
+        r#"INSERT INTO appstore_application_listing (
             id, tenant_id, organization_id, publisher_id, listing_no, app_id, app_key,
             listing_slug, listing_type, pricing_model, listing_status, storefront_visibility,
             review_status, default_locale, content_rating_json, featured_score, download_count,
@@ -513,7 +513,7 @@ async fn test_listing_raw_sql_operations() {
     .unwrap();
 
     let row: (String, String, String) = sqlx::query_as(
-        "SELECT id, listing_status, listing_slug FROM appstore_listing WHERE id = ?",
+        "SELECT id, listing_status, listing_slug FROM appstore_application_listing WHERE id = ?",
     )
     .bind("listing-1")
     .fetch_one(&pool)
@@ -591,7 +591,7 @@ async fn test_release_raw_sql_operations() {
 
     let now = Utc::now();
     sqlx::query(
-        r#"INSERT INTO appstore_release_channel (
+        r#"INSERT INTO appstore_application_release_channel (
             id, tenant_id, channel_code, channel_type, channel_status, audience_scope, created_at, updated_at
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"#
     )
@@ -608,7 +608,7 @@ async fn test_release_raw_sql_operations() {
     .unwrap();
 
     sqlx::query(
-        r#"INSERT INTO appstore_release (
+        r#"INSERT INTO appstore_application_release (
             id, tenant_id, organization_id, listing_id, release_no, channel_id,
             version_name, version_code, release_status, manifest_snapshot_json,
             version, created_at, updated_at
@@ -632,7 +632,7 @@ async fn test_release_raw_sql_operations() {
     .unwrap();
 
     let row: (String, String, String) = sqlx::query_as(
-        "SELECT release_no, version_name, release_status FROM appstore_release WHERE id = ?",
+        "SELECT release_no, version_name, release_status FROM appstore_application_release WHERE id = ?",
     )
     .bind("release-1")
     .fetch_one(&pool)
@@ -711,13 +711,13 @@ async fn test_release_with_artifacts_rolls_back_as_one_unit() {
 
     assert!(result.is_err());
     let release_count: i64 =
-        sqlx::query_scalar("SELECT COUNT(*) FROM appstore_release WHERE id = ?")
+        sqlx::query_scalar("SELECT COUNT(*) FROM appstore_application_release WHERE id = ?")
             .bind(release.id.as_str())
             .fetch_one(&pool)
             .await
             .unwrap();
     let artifact_count: i64 =
-        sqlx::query_scalar("SELECT COUNT(*) FROM appstore_release_artifact WHERE release_id = ?")
+        sqlx::query_scalar("SELECT COUNT(*) FROM appstore_application_release_artifact WHERE release_id = ?")
             .bind(release.id.as_str())
             .fetch_one(&pool)
             .await

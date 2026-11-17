@@ -2,7 +2,7 @@
 -- Source: sibling repositories’ `apps/*/agent.app.config.json`; partner file of
 -- common/016_workspace_applications.sql. Do not hand-edit.
 
-INSERT INTO appstore_listing_localization
+INSERT INTO appstore_application_listing_localization
     (id, tenant_id, organization_id, listing_id, locale, display_name, subtitle, short_description, full_description, whats_new_summary, keywords_json, created_at, updated_at)
 VALUES
     ('loc-sdkwork-account-pc', '100001', '0', 'sdkwork-account-pc', 'zh-CN', 'SDKWork Account PC', 'SDKWork Account · PC 端', 'SDKWork Account（sdkwork-account 模块）的 PC 端应用，由 SDKWork 应用商店统一分发。', 'SDKWork Account（sdkwork-account 模块）的 PC 端应用，随 SDKWork 工作区统一构建与发布。SDKWork Account application (bootstrap deploy layout).', '• 0.1.0 初始上架。', '["SDKWork Account PC","SDKWork Account","SDKWork"]', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
@@ -147,7 +147,7 @@ VALUES
     ('loc-sdkwork-zhiya-mini-program', '100001', '0', 'sdkwork-zhiya-mini-program', 'zh-CN', '知鸭 Zhiya 小程序', '知鸭 Zhiya · 小程序端', '知鸭 Zhiya（sdkwork-zhiya 模块）的 小程序端应用，由 SDKWork 应用商店统一分发。', '知鸭 Zhiya（sdkwork-zhiya 模块）的 小程序端应用，随 SDKWork 工作区统一构建与发布。Zhiya (知鸭) — AI 时代的家庭教育与活动平台: family/child profiles, activity discovery, registration, payment, check-in, reviews, coupons, messages, org workspace, and the 问知鸭 AI assistant.', '• 0.1.0 初始上架。', '["知鸭 Zhiya 小程序","知鸭 Zhiya","SDKWork"]', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
     ('loc-sdkwork-zhiya-pc', '100001', '0', 'sdkwork-zhiya-pc', 'zh-CN', '知鸭 Zhiya — PC', '知鸭 Zhiya · PC 端', '知鸭 Zhiya（sdkwork-zhiya 模块）的 PC 端应用，由 SDKWork 应用商店统一分发。', '知鸭 Zhiya（sdkwork-zhiya 模块）的 PC 端应用，随 SDKWork 工作区统一构建与发布。Zhiya (知鸭) — AI 时代的家庭教育与活动平台: family/child profiles, activity discovery, registration, payment, check-in, reviews, coupons, messages, org workspace, and the 问知鸭 AI assistant.', '• 0.1.0 初始上架。', '["知鸭 Zhiya — PC","知鸭 Zhiya","SDKWork"]', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
 ON CONFLICT (tenant_id, listing_id, locale) DO NOTHING;
-INSERT INTO appstore_release_note_localization
+INSERT INTO appstore_application_release_note_localization
     (id, tenant_id, organization_id, release_id, locale, release_notes, created_at, updated_at)
 VALUES
     ('note-sdkwork-account-pc', '100001', '0', 'rel-sdkwork-account-pc-010', 'zh-CN', '• 0.1.0 初始上架。', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),

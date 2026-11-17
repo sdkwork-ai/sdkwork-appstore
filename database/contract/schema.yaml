@@ -21,12 +21,6 @@ tables:
   - name: appstore_publisher_verification
     lifecycle_status: active
     owner: appstore-platform
-  - name: appstore_app
-    lifecycle_status: active
-    owner: appstore-platform
-  - name: appstore_app_dependency
-    lifecycle_status: active
-    owner: appstore-platform
   - name: appstore_category
     lifecycle_status: active
     owner: appstore-platform
@@ -39,21 +33,6 @@ tables:
   - name: appstore_tag_localization
     lifecycle_status: active
     owner: appstore-platform
-  - name: appstore_listing
-    lifecycle_status: active
-    owner: appstore-platform
-  - name: appstore_listing_localization
-    lifecycle_status: active
-    owner: appstore-platform
-  - name: appstore_listing_media
-    lifecycle_status: active
-    owner: appstore-platform
-  - name: appstore_listing_category_binding
-    lifecycle_status: active
-    owner: appstore-platform
-  - name: appstore_listing_tag_binding
-    lifecycle_status: active
-    owner: appstore-platform
   - name: appstore_regional_availability
     lifecycle_status: active
     owner: appstore-platform
@@ -63,28 +42,10 @@ tables:
   - name: appstore_compliance_permission_disclosure
     lifecycle_status: active
     owner: appstore-platform
-  - name: appstore_release_channel
-    lifecycle_status: active
-    owner: appstore-platform
-  - name: appstore_release
-    lifecycle_status: active
-    owner: appstore-platform
-  - name: appstore_release_note_localization
-    lifecycle_status: active
-    owner: appstore-platform
-  - name: appstore_release_artifact
-    lifecycle_status: active
-    owner: appstore-platform
-  - name: appstore_release_rollout
-    lifecycle_status: active
-    owner: appstore-platform
   - name: appstore_market_channel
     lifecycle_status: active
     owner: appstore-platform
   - name: appstore_market_release
-    lifecycle_status: active
-    owner: appstore-platform
-  - name: appstore_listing_submission
     lifecycle_status: active
     owner: appstore-platform
   - name: appstore_moderation_review
@@ -123,9 +84,6 @@ tables:
   - name: appstore_install_event
     lifecycle_status: active
     owner: appstore-platform
-  - name: appstore_listing_metric_snapshot
-    lifecycle_status: active
-    owner: appstore-platform
   - name: appstore_app_template
     lifecycle_status: active
     owner: appstore-platform
@@ -133,9 +91,6 @@ tables:
     lifecycle_status: active
     owner: appstore-platform
   - name: appstore_app_template_usage
-    lifecycle_status: active
-    owner: appstore-platform
-  - name: appstore_listing_iap_item
     lifecycle_status: active
     owner: appstore-platform
   - name: appstore_catalog_search_history
@@ -147,52 +102,22 @@ tables:
   - name: appstore_moderation_appeal
     lifecycle_status: active
     owner: appstore-platform
-  - name: appstore_release_beta_invite
-    lifecycle_status: active
-    owner: appstore-platform
-  - name: appstore_listing_rating
-    lifecycle_status: active
-    owner: appstore-platform
   - name: appstore_feedback
     lifecycle_status: active
     owner: appstore-platform
   - name: appstore_platform_dictionary
     lifecycle_status: active
     owner: appstore-platform
-  - name: appstore_app_platform
-    lifecycle_status: active
-    owner: appstore-platform
-  - name: appstore_platform_release
-    lifecycle_status: active
-    owner: appstore-platform
   - name: appstore_signing_credential
     lifecycle_status: active
     owner: appstore-platform
-  - name: appstore_listing_review
-    lifecycle_status: active
-    owner: appstore-platform
-  - name: appstore_listing_review_vote
-    lifecycle_status: active
-    owner: appstore-platform
-  - name: appstore_listing_review_report
-    lifecycle_status: active
-    owner: appstore-platform
   - name: appstore_rating_distribution_snapshot
-    lifecycle_status: active
-    owner: appstore-platform
-  - name: appstore_listing_price
     lifecycle_status: active
     owner: appstore-platform
   - name: appstore_promo_code_batch
     lifecycle_status: active
     owner: appstore-platform
   - name: appstore_promo_code
-    lifecycle_status: active
-    owner: appstore-platform
-  - name: appstore_release_tester_group
-    lifecycle_status: active
-    owner: appstore-platform
-  - name: appstore_release_tester_group_member
     lifecycle_status: active
     owner: appstore-platform
   - name: appstore_catalog_search_doc
@@ -210,24 +135,99 @@ tables:
   - name: appstore_user_store_share
     lifecycle_status: active
     owner: appstore-user-store
-  - name: appstore_app_sku
-    lifecycle_status: active
-    owner: appstore-platform
-  - name: appstore_app_sku_attribute
-    lifecycle_status: active
-    owner: appstore-platform
-  - name: appstore_app_sku_model
-    lifecycle_status: active
-    owner: appstore-platform
-  - name: appstore_app_sku_contributor
-    lifecycle_status: active
-    owner: appstore-platform
-  - name: appstore_app_deployment_binding
-    lifecycle_status: active
-    owner: appstore-platform
   - name: appstore_web_rate_limit_bucket
     lifecycle_status: active
     owner: appstore-platform
   - name: appstore_web_idempotency_entry
+    lifecycle_status: active
+    owner: appstore-platform
+  - name: appstore_application
+    lifecycle_status: active
+    owner: appstore-platform
+  - name: appstore_application_dependency
+    lifecycle_status: active
+    owner: appstore-platform
+  - name: appstore_application_listing
+    lifecycle_status: active
+    owner: appstore-platform
+  - name: appstore_application_listing_localization
+    lifecycle_status: active
+    owner: appstore-platform
+  - name: appstore_application_listing_media
+    lifecycle_status: active
+    owner: appstore-platform
+  - name: appstore_application_listing_category_binding
+    lifecycle_status: active
+    owner: appstore-platform
+  - name: appstore_application_listing_tag_binding
+    lifecycle_status: active
+    owner: appstore-platform
+  - name: appstore_application_release_channel
+    lifecycle_status: active
+    owner: appstore-platform
+  - name: appstore_application_release
+    lifecycle_status: active
+    owner: appstore-platform
+  - name: appstore_application_release_note_localization
+    lifecycle_status: active
+    owner: appstore-platform
+  - name: appstore_application_release_artifact
+    lifecycle_status: active
+    owner: appstore-platform
+  - name: appstore_application_release_rollout
+    lifecycle_status: active
+    owner: appstore-platform
+  - name: appstore_application_listing_submission
+    lifecycle_status: active
+    owner: appstore-platform
+  - name: appstore_application_listing_metric_snapshot
+    lifecycle_status: active
+    owner: appstore-platform
+  - name: appstore_application_listing_iap_item
+    lifecycle_status: active
+    owner: appstore-platform
+  - name: appstore_application_release_beta_invite
+    lifecycle_status: active
+    owner: appstore-platform
+  - name: appstore_application_listing_rating
+    lifecycle_status: active
+    owner: appstore-platform
+  - name: appstore_application_platform
+    lifecycle_status: active
+    owner: appstore-platform
+  - name: appstore_application_platform_release
+    lifecycle_status: active
+    owner: appstore-platform
+  - name: appstore_application_listing_review
+    lifecycle_status: active
+    owner: appstore-platform
+  - name: appstore_application_listing_review_vote
+    lifecycle_status: active
+    owner: appstore-platform
+  - name: appstore_application_listing_review_report
+    lifecycle_status: active
+    owner: appstore-platform
+  - name: appstore_application_listing_price
+    lifecycle_status: active
+    owner: appstore-platform
+  - name: appstore_application_release_tester_group
+    lifecycle_status: active
+    owner: appstore-platform
+  - name: appstore_application_release_tester_group_member
+    lifecycle_status: active
+    owner: appstore-platform
+  - name: appstore_application_sku
+    lifecycle_status: active
+    owner: appstore-platform
+  - name: appstore_application_sku_attribute
+    lifecycle_status: active
+    owner: appstore-platform
+  - name: appstore_application_sku_model
+    lifecycle_status: active
+    owner: appstore-platform
+  - name: appstore_application_sku_contributor
+    lifecycle_status: active
+    owner: appstore-platform
+  - name: appstore_application_deployment_binding
     lifecycle_status: active
     owner: appstore-platform

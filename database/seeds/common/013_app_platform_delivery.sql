@@ -1,7 +1,7 @@
 -- 013_app_platform_delivery.sql — per-platform scan/preview delivery rows
 -- (locale-neutral).
 --
--- Owns the seeded `appstore_app_platform` matrix. Every application platform a
+-- Owns the seeded `appstore_application_platform` matrix. Every application platform a
 -- listing ships that is reached by scanning a code gets exactly one row:
 --   * mobile store lanes (android/ios/ipados/harmonyos) — install landing page
 --   * H5 mobile web (h5) — mobile preview of the same app, scanned from the PC
@@ -22,8 +22,8 @@
 -- a platform the listing stopped shipping does not keep a stale scan target.
 BEGIN;
 
-DELETE FROM appstore_app_platform p
-USING appstore_app a
+DELETE FROM appstore_application_platform p
+USING appstore_application a
 WHERE p.tenant_id = '100001'
   AND a.tenant_id = '100001'
   AND p.app_id = a.id
@@ -34,7 +34,7 @@ WHERE p.tenant_id = '100001'
       OR p.platform_code LIKE 'browser-extension-%'
   );
 
-INSERT INTO appstore_app_platform (
+INSERT INTO appstore_application_platform (
     id, tenant_id, organization_id, app_id, platform_code, platform_status,
     package_identity, min_os_version, supported_architectures, device_families,
     distribution_mode, config_json, created_at, updated_at
@@ -123,7 +123,7 @@ SELECT
     ),
     CURRENT_TIMESTAMP,
     CURRENT_TIMESTAMP
-FROM appstore_app a
+FROM appstore_application a
 CROSS JOIN LATERAL jsonb_array_elements_text(a.platforms::jsonb) AS p(code)
 WHERE a.tenant_id = '100001'
   AND jsonb_array_length(a.platforms::jsonb) > 0

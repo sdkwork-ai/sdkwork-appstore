@@ -1,7 +1,7 @@
 pub const APPSTORE_INDEXES: &[(&str, &str, &[&str])] = &[
     (
         "idx_appstore_listing_catalog",
-        "appstore_listing",
+        "appstore_application_listing",
         &[
             "tenant_id",
             "listing_status",
@@ -11,7 +11,7 @@ pub const APPSTORE_INDEXES: &[(&str, &str, &[&str])] = &[
     ),
     (
         "idx_appstore_app_status",
-        "appstore_app",
+        "appstore_application",
         &[
             "tenant_id",
             "organization_id",
@@ -22,17 +22,17 @@ pub const APPSTORE_INDEXES: &[(&str, &str, &[&str])] = &[
     ),
     (
         "idx_appstore_listing_publisher",
-        "appstore_listing",
+        "appstore_application_listing",
         &["tenant_id", "publisher_id", "listing_status", "updated_at"],
     ),
     (
         "idx_appstore_release_update_check",
-        "appstore_release",
+        "appstore_application_release",
         &["tenant_id", "listing_id", "release_status", "published_at"],
     ),
     (
         "idx_appstore_release_artifact_lookup",
-        "appstore_release_artifact",
+        "appstore_application_release_artifact",
         &[
             "tenant_id",
             "release_id",

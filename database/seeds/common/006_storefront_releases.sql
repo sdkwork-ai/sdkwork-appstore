@@ -1,12 +1,12 @@
 -- 006_storefront_releases.sql — storefront release channels and published releases.
 
-INSERT INTO appstore_release_channel
+INSERT INTO appstore_application_release_channel
     (id, tenant_id, channel_code, channel_type, channel_status, audience_scope, created_at, updated_at)
 VALUES
     ('ch-prod', '100001', 'production', 'stable', 'active', 'public', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
 ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO appstore_release
+INSERT INTO appstore_application_release
     (id, tenant_id, organization_id, listing_id, release_no, channel_id, version_name, version_code, build_number, release_status, minimum_os_version, release_notes_default_locale, manifest_snapshot_json, submitted_at, approved_at, published_at, created_at, updated_at)
 VALUES
     ('rel-app-qwen-320', '100001', '0', 'app-qwen', 'R-app-qwen-320', 'ch-prod', '3.2.0', '320', '1', 'published', '10.0', 'zh-CN', '{"targets": ["pc"]}', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
@@ -108,16 +108,16 @@ ON CONFLICT (id) DO NOTHING;
 
 
 -- Bind each listing to its latest published release for storefront version display.
-UPDATE appstore_listing l
+UPDATE appstore_application_listing l
 SET current_release_id = (
     SELECT r.id
-    FROM appstore_release r
+    FROM appstore_application_release r
     WHERE r.listing_id = l.id AND r.release_status = 'published'
     ORDER BY r.published_at DESC
     LIMIT 1
 )
 WHERE l.tenant_id = '100001'
   AND EXISTS (
-    SELECT 1 FROM appstore_release r
+    SELECT 1 FROM appstore_application_release r
     WHERE r.listing_id = l.id AND r.release_status = 'published'
   );

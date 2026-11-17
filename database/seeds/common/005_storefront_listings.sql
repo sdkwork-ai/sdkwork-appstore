@@ -1,6 +1,6 @@
 -- 005_storefront_listings.sql — storefront apps, listings and media references (locale-neutral).
 
-INSERT INTO appstore_app
+INSERT INTO appstore_application
     (id, tenant_id, organization_id, publisher_id, app_no, app_key, app_slug, display_name, default_locale, app_type, runtime_family, runtime_framework, app_status, distribution_status, review_status, monetization_mode, primary_category_id, age_rating_code, created_at, updated_at)
 VALUES
     ('app-qwen', '100001', '0', 'appstore-publisher-default-0', 'app-app-qwen', 'app-qwen', 'app-qwen', '千问 AI', 'zh-CN', 'app', 'PC', 'React', 'active', 'active', 'approved', 'FREE', 'cat-ai-assistants', '4+', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
@@ -89,7 +89,7 @@ VALUES
     ('app-eval-tools-arena', '100001', '0', 'appstore-publisher-default-0', 'app-app-eval-tools-arena', 'app-eval-tools-arena', 'app-eval-tools-arena', '工具调用评测', 'zh-CN', 'app', 'PC', 'React', 'active', 'active', 'approved', 'FREE', 'cat-ai-model-eval', '4+', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
 ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO appstore_listing
+INSERT INTO appstore_application_listing
     (id, tenant_id, organization_id, publisher_id, listing_no, app_id, app_key, listing_slug, listing_type, pricing_model, listing_status, storefront_visibility, review_status, primary_category_id, default_locale, age_rating_code, comments_thread_id, featured_score, download_count, average_rating, rating_count, submitted_at, published_at, created_at, updated_at)
 VALUES
     ('app-qwen', '100001', '0', 'appstore-publisher-default-0', 'L-app-qwen', 'app-qwen', 'app-qwen', 'app-qwen', 'APP', 'FREE', 'active', 'visible', 'approved', 'cat-ai-assistants', 'zh-CN', '4+', 'thread-app-qwen', 100, 15800, '4.9', 158000, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
@@ -181,7 +181,7 @@ ON CONFLICT (id) DO NOTHING;
 -- zh-CN listing copy: locales/zh-CN/001_storefront_listings_zh.sql
 
 
-INSERT INTO appstore_listing_media
+INSERT INTO appstore_application_listing_media
     (id, tenant_id, organization_id, listing_id, media_role, media_resource_id, drive_node_id, platform_scope, sort_order, locale, created_at, updated_at)
 VALUES
     ('media-app-qwen-icon', '100001', '0', 'app-qwen', 'ICON', 'mr-app-qwen-icon', 'drive://appstore/app-qwen/icon', 'ALL', 0, 'zh-CN', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
@@ -346,7 +346,7 @@ VALUES
 ON CONFLICT (id) DO NOTHING;
 
 -- Bind each published listing to a review thread for comments integration.
-UPDATE appstore_listing
+UPDATE appstore_application_listing
 SET comments_thread_id = 'thread-' || id
 WHERE tenant_id = '100001'
   AND (comments_thread_id IS NULL OR comments_thread_id = '');
@@ -356,7 +356,7 @@ WHERE tenant_id = '100001'
 -- listing repository writes and ListingStatus parses), so rows still stored as
 -- 'published' were invisible on a database seeded from that revision. Runs
 -- after the inserts above and is a no-op once every row is normalized.
-UPDATE appstore_listing
+UPDATE appstore_application_listing
 SET listing_status = 'active'
 WHERE tenant_id = '100001'
   AND listing_status = 'published';

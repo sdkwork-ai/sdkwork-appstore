@@ -2,7 +2,7 @@
 -- Source: sibling repositories’ `apps/*/agent.app.config.json`; partner file of
 -- common/016_workspace_applications.sql. Do not hand-edit.
 
-INSERT INTO appstore_listing_localization
+INSERT INTO appstore_application_listing_localization
     (id, tenant_id, organization_id, listing_id, locale, display_name, subtitle, short_description, full_description, whats_new_summary, keywords_json, created_at, updated_at)
 VALUES
     ('loc-sdkwork-account-pc-en', '100001', '0', 'sdkwork-account-pc', 'en-US', 'SDKWork Account PC', 'SDKWork Account · PC (desktop web)', 'The PC (desktop web) application of SDKWork Account (module sdkwork-account), distributed through the SDKWork App Store.', 'The PC (desktop web) application of SDKWork Account (module sdkwork-account), built and released with the SDKWork workspace. SDKWork Account application (bootstrap deploy layout).', '• Initial store release 0.1.0.', '["SDKWork Account PC","SDKWork Account","SDKWork"]', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
@@ -147,7 +147,7 @@ VALUES
     ('loc-sdkwork-zhiya-mini-program-en', '100001', '0', 'sdkwork-zhiya-mini-program', 'en-US', '知鸭 Zhiya 小程序', '知鸭 Zhiya · mini program', 'The mini program application of 知鸭 Zhiya (module sdkwork-zhiya), distributed through the SDKWork App Store.', 'The mini program application of 知鸭 Zhiya (module sdkwork-zhiya), built and released with the SDKWork workspace. Zhiya (知鸭) — AI 时代的家庭教育与活动平台: family/child profiles, activity discovery, registration, payment, check-in, reviews, coupons, messages, org workspace, and the 问知鸭 AI assistant.', '• Initial store release 0.1.0.', '["知鸭 Zhiya 小程序","知鸭 Zhiya","SDKWork"]', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
     ('loc-sdkwork-zhiya-pc-en', '100001', '0', 'sdkwork-zhiya-pc', 'en-US', '知鸭 Zhiya — PC', '知鸭 Zhiya · PC (desktop web)', 'The PC (desktop web) application of 知鸭 Zhiya (module sdkwork-zhiya), distributed through the SDKWork App Store.', 'The PC (desktop web) application of 知鸭 Zhiya (module sdkwork-zhiya), built and released with the SDKWork workspace. Zhiya (知鸭) — AI 时代的家庭教育与活动平台: family/child profiles, activity discovery, registration, payment, check-in, reviews, coupons, messages, org workspace, and the 问知鸭 AI assistant.', '• Initial store release 0.1.0.', '["知鸭 Zhiya — PC","知鸭 Zhiya","SDKWork"]', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
 ON CONFLICT (tenant_id, listing_id, locale) DO NOTHING;
-INSERT INTO appstore_release_note_localization
+INSERT INTO appstore_application_release_note_localization
     (id, tenant_id, organization_id, release_id, locale, release_notes, created_at, updated_at)
 VALUES
     ('note-sdkwork-account-pc-en', '100001', '0', 'rel-sdkwork-account-pc-010', 'en-US', '• Initial store release 0.1.0.', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),

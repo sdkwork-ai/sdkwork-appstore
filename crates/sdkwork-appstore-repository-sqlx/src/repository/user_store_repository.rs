@@ -683,7 +683,7 @@ impl UserStoreRepositoryPort for SqlxUserStoreRepository {
 }
 
 /// Production listing-card provider: resolves storefront cards directly from
-/// `appstore_listing`, enforcing the storefront visibility gate so revoked
+/// `appstore_application_listing`, enforcing the storefront visibility gate so revoked
 /// content disappears from public user-store shares.
 pub struct SqlxListingCardProvider {
     db: AppstoreSqlxDb,
@@ -723,7 +723,7 @@ impl ListingCardProviderPort for SqlxListingCardProvider {
             .join(", ");
         let sql = format!(
             r#"SELECT id, display_name, average_rating, download_count
-            FROM appstore_listing
+            FROM appstore_application_listing
             WHERE tenant_id = ? AND id IN ({placeholders})
               AND listing_status = 'active'
               AND storefront_visibility = 'visible'

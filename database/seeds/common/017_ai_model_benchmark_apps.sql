@@ -27,7 +27,7 @@ ON CONFLICT (id) DO UPDATE SET
     description = EXCLUDED.description,
     updated_at = EXCLUDED.updated_at;
 
-INSERT INTO appstore_app
+INSERT INTO appstore_application
     (id, tenant_id, organization_id, publisher_id, app_no, app_key, app_slug, display_name, default_locale, app_type, runtime_family, runtime_framework, app_status, distribution_status, review_status, monetization_mode, primary_category_id, age_rating_code, created_at, updated_at)
 VALUES
     ('app-eval-chinese-eval', '100001', '0', 'appstore-publisher-default-0', 'app-app-eval-chinese-eval', 'app-eval-chinese-eval', 'app-eval-chinese-eval', '中文知识测评（C-Eval）', 'zh-CN', 'app', 'PC', 'React', 'active', 'active', 'approved', 'FREE', 'cat-ai-model-eval', '4+', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
@@ -42,7 +42,7 @@ VALUES
     ('app-eval-hallucination', '100001', '0', 'appstore-publisher-default-0', 'app-app-eval-hallucination', 'app-eval-hallucination', 'app-eval-hallucination', '事实性幻觉测评', 'zh-CN', 'app', 'PC', 'React', 'active', 'active', 'approved', 'FREE', 'cat-ai-model-eval', '4+', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
 ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO appstore_listing
+INSERT INTO appstore_application_listing
     (id, tenant_id, organization_id, publisher_id, listing_no, app_id, app_key, listing_slug, listing_type, pricing_model, listing_status, storefront_visibility, review_status, primary_category_id, default_locale, age_rating_code, comments_thread_id, featured_score, download_count, average_rating, rating_count, submitted_at, published_at, created_at, updated_at)
 VALUES
     ('app-eval-chinese-eval', '100001', '0', 'appstore-publisher-default-0', 'L-app-eval-chinese-eval', 'app-eval-chinese-eval', 'app-eval-chinese-eval', 'app-eval-chinese-eval', 'APP', 'FREE', 'active', 'visible', 'approved', 'cat-ai-model-eval', 'zh-CN', '4+', 'thread-app-eval-chinese-eval', 0, 12800, '4.8', 128000, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
@@ -57,7 +57,7 @@ VALUES
     ('app-eval-hallucination', '100001', '0', 'appstore-publisher-default-0', 'L-app-eval-hallucination', 'app-eval-hallucination', 'app-eval-hallucination', 'app-eval-hallucination', 'APP', 'FREE', 'active', 'visible', 'approved', 'cat-ai-model-eval', 'zh-CN', '4+', 'thread-app-eval-hallucination', 0, 8100, '4.6', 81000, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
 ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO appstore_listing_media
+INSERT INTO appstore_application_listing_media
     (id, tenant_id, organization_id, listing_id, media_role, media_resource_id, drive_node_id, platform_scope, sort_order, locale, created_at, updated_at)
 VALUES
     ('media-app-eval-chinese-eval-icon', '100001', '0', 'app-eval-chinese-eval', 'ICON', 'mr-app-eval-chinese-eval-icon', 'drive://appstore/app-eval-chinese-eval/icon', 'ALL', 0, 'zh-CN', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
@@ -97,7 +97,7 @@ ON CONFLICT (id) DO NOTHING;
 -- 'active' rows. Rows already present in long-lived databases were normalized
 -- by earlier deliveries; a seed replay re-inserts the evaluation listings as
 -- 'published', so normalize them here to keep the category reachable.
-UPDATE appstore_listing
+UPDATE appstore_application_listing
 SET listing_status = 'active',
     storefront_visibility = 'visible',
     updated_at = CURRENT_TIMESTAMP

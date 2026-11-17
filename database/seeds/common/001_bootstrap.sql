@@ -38,7 +38,7 @@ ON CONFLICT (id) DO UPDATE SET
     updated_at = EXCLUDED.updated_at;
 
 -- Bind each listing to its primary category for catalog filters.
-INSERT INTO appstore_listing_category_binding
+INSERT INTO appstore_application_listing_category_binding
     (id, tenant_id, listing_id, category_id, is_primary, created_at)
 SELECT
     'lcb-' || l.id,
@@ -47,7 +47,7 @@ SELECT
     l.primary_category_id,
     1,
     CURRENT_TIMESTAMP
-FROM appstore_listing l
+FROM appstore_application_listing l
 WHERE l.tenant_id = '100001'
   AND l.primary_category_id IS NOT NULL
   AND l.primary_category_id <> ''
@@ -73,7 +73,7 @@ SELECT
     CURRENT_TIMESTAMP,
     CURRENT_TIMESTAMP,
     CURRENT_TIMESTAMP
-FROM appstore_listing l
+FROM appstore_application_listing l
 WHERE l.tenant_id = '100001'
   AND l.listing_status IN ('active', 'published')
 -- One compliance profile per (tenant, listing, version); other writers may
@@ -94,7 +94,7 @@ SELECT
     NULL,
     CURRENT_TIMESTAMP,
     CURRENT_TIMESTAMP
-FROM appstore_listing l
+FROM appstore_application_listing l
 WHERE l.tenant_id = '100001'
   AND l.listing_status IN ('active', 'published')
 -- One availability row per (tenant, listing, region).
@@ -113,7 +113,7 @@ SELECT
     NULL,
     CURRENT_TIMESTAMP,
     CURRENT_TIMESTAMP
-FROM appstore_listing l
+FROM appstore_application_listing l
 WHERE l.tenant_id = '100001'
   AND l.listing_status IN ('active', 'published')
 -- One availability row per (tenant, listing, region).
@@ -146,8 +146,8 @@ SELECT
     CURRENT_TIMESTAMP,
     CURRENT_TIMESTAMP,
     CURRENT_TIMESTAMP
-FROM appstore_release r
-JOIN appstore_listing l
+FROM appstore_application_release r
+JOIN appstore_application_listing l
   ON l.id = r.listing_id
  AND l.tenant_id = r.tenant_id
 WHERE r.tenant_id = '100001'
@@ -157,7 +157,7 @@ WHERE r.tenant_id = '100001'
 ON CONFLICT (tenant_id, market_release_no) DO NOTHING;
 
 -- Ensure review threads and media references are populated for storefront listings.
-UPDATE appstore_listing
+UPDATE appstore_application_listing
 SET comments_thread_id = 'thread-' || id
 WHERE tenant_id = '100001'
   AND (comments_thread_id IS NULL OR comments_thread_id = '');
