@@ -21,9 +21,9 @@
 | --- | --- | --- |
 | 新增 | 3 | 环境身份、安装凭据、资源绑定 |
 | 删除 | 5 | iam 模板 2 张、appstore 模板 3 张 |
-| 变更（改名或改列/约束） | 18 | 核心语义表 |
+| 变更（改名或改列/约束） | 20 | 核心语义表 |
 | 仅改名（命名一致性） | 29 | deploy 子表 14、appstore 系列 15 |
-| 保留不变 | 153 | 认证、RBAC、部署运行时、证书、商城运营等 |
+| 保留不变 | 151 | 认证、RBAC、部署运行时、证书、商城运营等 |
 | **合计** | **208** | |
 
 ## 2. 新增表（3）
@@ -104,7 +104,7 @@
 
 | 表 | 变更 |
 | --- | --- |
-| `iam_tenant_application` → `iam_application_installation` | 删 `template_id`/`template_version`/`instance_key`/`application_type`/`environment`（下沉子表）；加 `deploy_application_id UNIQUE`、`product_application_id`、`product_version_id`、`tenancy_model`（`pool`/`silo`/`bridge`）、`upgrade_policy`（`pinned`/`auto_minor`/`auto_major`）、`identity_status`（`pending_identity`/`active`/`failed`）、`provision_idempotency_key`；`primary_domain` 迁入 2.1 |
+| `iam_tenant_application` → `iam_application_installation` | 删 `template_id`/`template_version`/`instance_key`/`application_type`/`environment`（下沉子表）；加 `deploy_application_id UNIQUE`、`product_application_id`、`product_version_id`、`tenancy_model`（`pool`/`silo`/`bridge`）、`upgrade_policy`（`pinned`/`auto_minor`/`auto_major`）、`identity_status`（`pending_identity`/`active`/`failed`）、`provision_idempotency_key`、`retired_at`、`retained_until`、`purge_status`；`primary_domain` 迁入 2.1 |
 | `iam_session` | `app_id` 语义改为 deploy 应用身份；加 `installation_id`、`installation_environment_id`；保留 `environment` |
 | `iam_api_key` | `app_id` 语义改为 deploy 应用身份 |
 | `iam_service_account_credential` | `tenant_application_id` → `installation_id`；`app_id` 语义调整 |
@@ -132,6 +132,7 @@
 | `appstore_listing_price` | 加 `application_id`；成为唯一计价权威（含原 deploy 模板价格） |
 | `appstore_entitlement` | 键改为 `(tenant_id, application_id, subject_type, subject_id, entitlement_type)`，并加 `installation_id` 可空列 |
 | `appstore_install_event` | 加 `installation_id`，安装事件与 IAM 安装对齐 |
+| `appstore_publisher` | 加 `publisher_scope`（`personal`/`team`）；`organization_id` 允许 `0`，使个人开发者无需组织即可发布；`owner_user_id` 保持唯一归属人 |
 
 ## 5. 仅改名（29，命名一致性）
 
