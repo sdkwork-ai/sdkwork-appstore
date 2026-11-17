@@ -14,11 +14,6 @@ This document maps each route operation to its generated handler and service met
 | `appstore.catalog.featured.list` | `sdkwork-routes-appstore-catalog-app-api` | `catalog_featured_list` | `sdkwork-appstore-catalog-service` | `catalog_featured_list` | Implemented |
 | `appstore.catalog.charts.retrieve` | `sdkwork-routes-appstore-catalog-app-api` | `catalog_charts_retrieve` | `sdkwork-appstore-catalog-service` | `catalog_charts_retrieve` | Implemented |
 | `appstore.catalog.listings.list` | `sdkwork-routes-appstore-catalog-app-api` | `catalog_listings_search` | `sdkwork-appstore-catalog-service` | `catalog_listings_search` | Implemented |
-| `appstore.catalog.templates.list` | `sdkwork-routes-appstore-catalog-app-api` | `catalog_templates_list` | `sdkwork-appstore-catalog-service` | `templates_list` | Implemented |
-| `appstore.catalog.templates.create` | `sdkwork-routes-appstore-catalog-app-api` | `catalog_template_create` | `sdkwork-appstore-catalog-service` | `template_create` | Implemented |
-| `appstore.catalog.templates.retrieve` | `sdkwork-routes-appstore-catalog-app-api` | `catalog_template_retrieve` | `sdkwork-appstore-catalog-service` | `template_retrieve` | Implemented |
-| `appstore.catalog.templates.usage.create` | `sdkwork-routes-appstore-catalog-app-api` | `catalog_template_usage_create` | `sdkwork-appstore-catalog-service` | `template_usage_create` | Implemented |
-| `appstore.catalog.templates.suggestions.retrieve` | `sdkwork-routes-appstore-catalog-app-api` | `catalog_template_suggestions_retrieve` | `sdkwork-appstore-catalog-service` | `template_suggestions_retrieve` | Implemented |
 | `appstore.catalog.experts.list` | `sdkwork-routes-appstore-catalog-app-api` | `catalog_experts_list` | `sdkwork-appstore-catalog-service` | `experts_list` | Implemented |
 | `appstore.catalog.experts.retrieve` | `sdkwork-routes-appstore-catalog-app-api` | `catalog_expert_retrieve` | `sdkwork-appstore-catalog-service` | `expert_retrieve` | Implemented |
 | `appstore.catalog.feedback.create` | `sdkwork-routes-appstore-catalog-app-api` | `catalog_feedback_create` | `sdkwork-appstore-catalog-service` | `feedback_create` | Implemented |

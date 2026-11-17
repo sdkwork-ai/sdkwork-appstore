@@ -107,36 +107,6 @@ const HTTP_ROUTES: &[HttpRoute] = &[
     ),
     HttpRoute::dual_token_or_anonymous(
         HttpMethod::Get,
-        "/app/v3/api/appstore/catalog/templates",
-        "appstore",
-        "appstore.catalog.templates.list",
-    ),
-    HttpRoute::dual_token_or_anonymous(
-        HttpMethod::Get,
-        "/app/v3/api/appstore/catalog/templates/{templateId}",
-        "appstore",
-        "appstore.catalog.templates.retrieve",
-    ),
-    HttpRoute::dual_token(
-        HttpMethod::Post,
-        "/app/v3/api/appstore/catalog/templates",
-        "appstore",
-        "appstore.catalog.templates.create",
-    ),
-    HttpRoute::dual_token(
-        HttpMethod::Post,
-        "/app/v3/api/appstore/catalog/templates/{templateId}/usage",
-        "appstore",
-        "appstore.catalog.templates.usage.create",
-    ),
-    HttpRoute::dual_token_or_anonymous(
-        HttpMethod::Get,
-        "/app/v3/api/appstore/catalog/templates/{templateId}/suggestions",
-        "appstore",
-        "appstore.catalog.templates.suggestions.retrieve",
-    ),
-    HttpRoute::dual_token_or_anonymous(
-        HttpMethod::Get,
         "/app/v3/api/appstore/catalog/experts",
         "appstore",
         "appstore.catalog.experts.list",

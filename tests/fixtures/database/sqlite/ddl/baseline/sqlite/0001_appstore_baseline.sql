@@ -72,7 +72,7 @@ CREATE TABLE IF NOT EXISTS appstore_publisher_verification (
   UNIQUE (tenant_id, publisher_id, verification_type)
 );
 
-CREATE TABLE IF NOT EXISTS appstore_app (
+CREATE TABLE IF NOT EXISTS appstore_application (
   id TEXT PRIMARY KEY,
   tenant_id TEXT NOT NULL,
   organization_id TEXT NOT NULL,
@@ -138,7 +138,7 @@ CREATE TABLE IF NOT EXISTS appstore_app (
   UNIQUE (tenant_id, app_slug)
 );
 
-CREATE TABLE IF NOT EXISTS appstore_app_dependency (
+CREATE TABLE IF NOT EXISTS appstore_application_dependency (
   id TEXT PRIMARY KEY,
   tenant_id TEXT NOT NULL,
   organization_id TEXT NOT NULL,
@@ -202,7 +202,7 @@ CREATE TABLE IF NOT EXISTS appstore_tag_localization (
   UNIQUE (tenant_id, tag_id, locale)
 );
 
-CREATE TABLE IF NOT EXISTS appstore_listing (
+CREATE TABLE IF NOT EXISTS appstore_application_listing (
   id TEXT PRIMARY KEY,
   tenant_id TEXT NOT NULL,
   organization_id TEXT NOT NULL,
@@ -242,7 +242,7 @@ CREATE TABLE IF NOT EXISTS appstore_listing (
   UNIQUE (tenant_id, listing_slug)
 );
 
-CREATE TABLE IF NOT EXISTS appstore_listing_localization (
+CREATE TABLE IF NOT EXISTS appstore_application_listing_localization (
   id TEXT PRIMARY KEY,
   tenant_id TEXT NOT NULL,
   organization_id TEXT NOT NULL,
@@ -259,7 +259,7 @@ CREATE TABLE IF NOT EXISTS appstore_listing_localization (
   UNIQUE (tenant_id, listing_id, locale)
 );
 
-CREATE TABLE IF NOT EXISTS appstore_listing_media (
+CREATE TABLE IF NOT EXISTS appstore_application_listing_media (
   id TEXT PRIMARY KEY,
   tenant_id TEXT NOT NULL,
   organization_id TEXT NOT NULL,
@@ -275,7 +275,7 @@ CREATE TABLE IF NOT EXISTS appstore_listing_media (
   UNIQUE (tenant_id, listing_id, media_role, sort_order, locale)
 );
 
-CREATE TABLE IF NOT EXISTS appstore_listing_category_binding (
+CREATE TABLE IF NOT EXISTS appstore_application_listing_category_binding (
   id TEXT PRIMARY KEY,
   tenant_id TEXT NOT NULL,
   listing_id TEXT NOT NULL,
@@ -285,7 +285,7 @@ CREATE TABLE IF NOT EXISTS appstore_listing_category_binding (
   UNIQUE (tenant_id, listing_id, category_id)
 );
 
-CREATE TABLE IF NOT EXISTS appstore_listing_tag_binding (
+CREATE TABLE IF NOT EXISTS appstore_application_listing_tag_binding (
   id TEXT PRIMARY KEY,
   tenant_id TEXT NOT NULL,
   listing_id TEXT NOT NULL,
@@ -340,7 +340,7 @@ CREATE TABLE IF NOT EXISTS appstore_compliance_permission_disclosure (
   UNIQUE (tenant_id, listing_id, permission_code)
 );
 
-CREATE TABLE IF NOT EXISTS appstore_release_channel (
+CREATE TABLE IF NOT EXISTS appstore_application_release_channel (
   id TEXT PRIMARY KEY,
   tenant_id TEXT NOT NULL,
   channel_code TEXT NOT NULL,
@@ -352,7 +352,7 @@ CREATE TABLE IF NOT EXISTS appstore_release_channel (
   UNIQUE (tenant_id, channel_code)
 );
 
-CREATE TABLE IF NOT EXISTS appstore_release (
+CREATE TABLE IF NOT EXISTS appstore_application_release (
   id TEXT PRIMARY KEY,
   tenant_id TEXT NOT NULL,
   organization_id TEXT NOT NULL,
@@ -377,7 +377,7 @@ CREATE TABLE IF NOT EXISTS appstore_release (
   UNIQUE (tenant_id, listing_id, channel_id, version_code)
 );
 
-CREATE TABLE IF NOT EXISTS appstore_release_note_localization (
+CREATE TABLE IF NOT EXISTS appstore_application_release_note_localization (
   id TEXT PRIMARY KEY,
   tenant_id TEXT NOT NULL,
   organization_id TEXT NOT NULL,
@@ -389,7 +389,7 @@ CREATE TABLE IF NOT EXISTS appstore_release_note_localization (
   UNIQUE (tenant_id, release_id, locale)
 );
 
-CREATE TABLE IF NOT EXISTS appstore_release_artifact (
+CREATE TABLE IF NOT EXISTS appstore_application_release_artifact (
   id TEXT PRIMARY KEY,
   tenant_id TEXT NOT NULL,
   organization_id TEXT NOT NULL,
@@ -424,7 +424,7 @@ CREATE TABLE IF NOT EXISTS appstore_release_artifact (
   UNIQUE (tenant_id, release_id, platform, architecture, package_format)
 );
 
-CREATE TABLE IF NOT EXISTS appstore_release_rollout (
+CREATE TABLE IF NOT EXISTS appstore_application_release_rollout (
   id TEXT PRIMARY KEY,
   tenant_id TEXT NOT NULL,
   organization_id TEXT NOT NULL,
@@ -487,7 +487,7 @@ CREATE TABLE IF NOT EXISTS appstore_market_release (
   UNIQUE (tenant_id, release_id, channel_id)
 );
 
-CREATE TABLE IF NOT EXISTS appstore_listing_submission (
+CREATE TABLE IF NOT EXISTS appstore_application_listing_submission (
   id TEXT PRIMARY KEY,
   tenant_id TEXT NOT NULL,
   organization_id TEXT NOT NULL,
@@ -708,7 +708,7 @@ CREATE TABLE IF NOT EXISTS appstore_install_event (
   UNIQUE (tenant_id, event_no)
 );
 
-CREATE TABLE IF NOT EXISTS appstore_listing_metric_snapshot (
+CREATE TABLE IF NOT EXISTS appstore_application_listing_metric_snapshot (
   id TEXT PRIMARY KEY,
   tenant_id TEXT NOT NULL,
   listing_id TEXT NOT NULL,
@@ -723,20 +723,20 @@ CREATE TABLE IF NOT EXISTS appstore_listing_metric_snapshot (
   UNIQUE (tenant_id, listing_id, snapshot_date)
 );
 
-CREATE INDEX IF NOT EXISTS idx_appstore_listing_catalog
-  ON appstore_listing (tenant_id, listing_status, storefront_visibility, published_at DESC);
+CREATE INDEX IF NOT EXISTS idx_appstore_application_listing_catalog
+  ON appstore_application_listing (tenant_id, listing_status, storefront_visibility, published_at DESC);
 
-CREATE INDEX IF NOT EXISTS idx_appstore_app_status
-  ON appstore_app (tenant_id, organization_id, distribution_status, review_status, updated_at DESC);
+CREATE INDEX IF NOT EXISTS idx_appstore_application_status
+  ON appstore_application (tenant_id, organization_id, distribution_status, review_status, updated_at DESC);
 
-CREATE INDEX IF NOT EXISTS idx_appstore_listing_publisher
-  ON appstore_listing (tenant_id, publisher_id, listing_status, updated_at DESC);
+CREATE INDEX IF NOT EXISTS idx_appstore_application_listing_publisher
+  ON appstore_application_listing (tenant_id, publisher_id, listing_status, updated_at DESC);
 
-CREATE INDEX IF NOT EXISTS idx_appstore_release_update_check
-  ON appstore_release (tenant_id, listing_id, release_status, published_at DESC);
+CREATE INDEX IF NOT EXISTS idx_appstore_application_release_update_check
+  ON appstore_application_release (tenant_id, listing_id, release_status, published_at DESC);
 
-CREATE INDEX IF NOT EXISTS idx_appstore_release_artifact_lookup
-  ON appstore_release_artifact (tenant_id, release_id, platform, architecture, artifact_status);
+CREATE INDEX IF NOT EXISTS idx_appstore_application_release_artifact_lookup
+  ON appstore_application_release_artifact (tenant_id, release_id, platform, architecture, artifact_status);
 
 CREATE INDEX IF NOT EXISTS idx_appstore_market_release_status
   ON appstore_market_release (tenant_id, channel_id, market_status, updated_at DESC);
@@ -757,7 +757,7 @@ CREATE INDEX IF NOT EXISTS idx_appstore_install_event_listing
   ON appstore_install_event (tenant_id, listing_id, occurred_at DESC);
 
 -- AI expert catalog: migration 0009 adds this table to the live PostgreSQL
--- chain. Experts were previously stored in appstore_app_template with
+-- chain. Experts were previously stored in appstore_application_template with
 -- template_type = 'EXPERT' — the expert page now reads this table only, so the
 -- repository tests need it here.
 CREATE TABLE IF NOT EXISTS appstore_expert_catalog (
@@ -789,7 +789,7 @@ CREATE INDEX IF NOT EXISTS idx_appstore_expert_catalog_listing
   ON appstore_expert_catalog (tenant_id, category_code, sort_weight, id)
   WHERE deleted_at IS NULL;
 
-CREATE TABLE IF NOT EXISTS appstore_app_template (
+CREATE TABLE IF NOT EXISTS appstore_application_template (
   id TEXT PRIMARY KEY,
   uuid TEXT NOT NULL,
   tenant_id TEXT NOT NULL DEFAULT '0',
@@ -838,13 +838,13 @@ CREATE TABLE IF NOT EXISTS appstore_app_template (
   deprecated_at TEXT
 );
 
-CREATE UNIQUE INDEX IF NOT EXISTS uk_appstore_app_template_no ON appstore_app_template (tenant_id, template_no);
-CREATE UNIQUE INDEX IF NOT EXISTS uk_appstore_app_template_code ON appstore_app_template (tenant_id, organization_id, template_code);
-CREATE INDEX IF NOT EXISTS idx_appstore_app_template_scope_status ON appstore_app_template (tenant_id, organization_id, visibility, publish_status, status, updated_at, id);
-CREATE INDEX IF NOT EXISTS idx_appstore_app_template_category ON appstore_app_template (tenant_id, organization_id, category_id, publish_status, sort_weight, id);
-CREATE INDEX IF NOT EXISTS idx_appstore_app_template_platform ON appstore_app_template (tenant_id, organization_id, template_platform, publish_status, id);
+CREATE UNIQUE INDEX IF NOT EXISTS uk_appstore_application_template_no ON appstore_application_template (tenant_id, template_no);
+CREATE UNIQUE INDEX IF NOT EXISTS uk_appstore_application_template_code ON appstore_application_template (tenant_id, organization_id, template_code);
+CREATE INDEX IF NOT EXISTS idx_appstore_application_template_scope_status ON appstore_application_template (tenant_id, organization_id, visibility, publish_status, status, updated_at, id);
+CREATE INDEX IF NOT EXISTS idx_appstore_application_template_category ON appstore_application_template (tenant_id, organization_id, category_id, publish_status, sort_weight, id);
+CREATE INDEX IF NOT EXISTS idx_appstore_application_template_platform ON appstore_application_template (tenant_id, organization_id, template_platform, publish_status, id);
 
-CREATE TABLE IF NOT EXISTS appstore_app_template_version (
+CREATE TABLE IF NOT EXISTS appstore_application_template_version (
   id TEXT PRIMARY KEY,
   uuid TEXT NOT NULL,
   tenant_id TEXT NOT NULL DEFAULT '0',
@@ -872,10 +872,10 @@ CREATE TABLE IF NOT EXISTS appstore_app_template_version (
   deprecated_at TEXT
 );
 
-CREATE UNIQUE INDEX IF NOT EXISTS uk_appstore_app_template_version_no ON appstore_app_template_version (tenant_id, organization_id, template_id, version_no);
-CREATE INDEX IF NOT EXISTS idx_appstore_app_template_version_template ON appstore_app_template_version (tenant_id, organization_id, template_id, publish_status, created_at, id);
+CREATE UNIQUE INDEX IF NOT EXISTS uk_appstore_application_template_version_no ON appstore_application_template_version (tenant_id, organization_id, template_id, version_no);
+CREATE INDEX IF NOT EXISTS idx_appstore_application_template_version_template ON appstore_application_template_version (tenant_id, organization_id, template_id, publish_status, created_at, id);
 
-CREATE TABLE IF NOT EXISTS appstore_app_template_usage (
+CREATE TABLE IF NOT EXISTS appstore_application_template_usage (
   id TEXT PRIMARY KEY,
   uuid TEXT NOT NULL,
   tenant_id TEXT NOT NULL DEFAULT '0',
@@ -898,11 +898,11 @@ CREATE TABLE IF NOT EXISTS appstore_app_template_usage (
   UNIQUE (tenant_id, user_id, template_id, usage_type)
 );
 
-CREATE INDEX IF NOT EXISTS idx_appstore_app_template_usage_template ON appstore_app_template_usage (tenant_id, organization_id, template_id, template_version_id, created_at, id);
-CREATE INDEX IF NOT EXISTS idx_appstore_app_template_usage_target ON appstore_app_template_usage (tenant_id, organization_id, target_app_id, created_at, id);
-CREATE INDEX IF NOT EXISTS idx_appstore_app_template_usage_user ON appstore_app_template_usage (tenant_id, organization_id, user_id, created_at, id);
+CREATE INDEX IF NOT EXISTS idx_appstore_application_template_usage_template ON appstore_application_template_usage (tenant_id, organization_id, template_id, template_version_id, created_at, id);
+CREATE INDEX IF NOT EXISTS idx_appstore_application_template_usage_target ON appstore_application_template_usage (tenant_id, organization_id, target_app_id, created_at, id);
+CREATE INDEX IF NOT EXISTS idx_appstore_application_template_usage_user ON appstore_application_template_usage (tenant_id, organization_id, user_id, created_at, id);
 
-CREATE TABLE IF NOT EXISTS appstore_listing_rating (
+CREATE TABLE IF NOT EXISTS appstore_application_listing_rating (
   id TEXT PRIMARY KEY,
   tenant_id TEXT NOT NULL,
   organization_id TEXT NOT NULL DEFAULT '0',
@@ -953,7 +953,7 @@ CREATE TABLE IF NOT EXISTS appstore_catalog_trending_term (
   UNIQUE (tenant_id, term, locale, snapshot_date)
 );
 
-CREATE TABLE IF NOT EXISTS appstore_listing_iap_item (
+CREATE TABLE IF NOT EXISTS appstore_application_listing_iap_item (
   id TEXT PRIMARY KEY,
   tenant_id TEXT NOT NULL,
   organization_id TEXT NOT NULL,
@@ -991,7 +991,7 @@ CREATE TABLE IF NOT EXISTS appstore_moderation_appeal (
   UNIQUE (tenant_id, appeal_no)
 );
 
-CREATE TABLE IF NOT EXISTS appstore_release_beta_invite (
+CREATE TABLE IF NOT EXISTS appstore_application_release_beta_invite (
   id TEXT PRIMARY KEY,
   tenant_id TEXT NOT NULL,
   organization_id TEXT NOT NULL,
@@ -1032,7 +1032,7 @@ CREATE TABLE IF NOT EXISTS appstore_platform_dictionary (
   UNIQUE (tenant_id, platform_code)
 );
 
-CREATE TABLE IF NOT EXISTS appstore_app_platform (
+CREATE TABLE IF NOT EXISTS appstore_application_platform (
   id TEXT PRIMARY KEY,
   tenant_id TEXT NOT NULL,
   organization_id TEXT NOT NULL DEFAULT '0',
@@ -1055,10 +1055,10 @@ CREATE TABLE IF NOT EXISTS appstore_app_platform (
   UNIQUE (tenant_id, platform_code, package_identity)
 );
 
-CREATE INDEX IF NOT EXISTS idx_appstore_app_platform_status
-  ON appstore_app_platform (tenant_id, app_id, platform_status);
+CREATE INDEX IF NOT EXISTS idx_appstore_application_platform_status
+  ON appstore_application_platform (tenant_id, app_id, platform_status);
 
-CREATE TABLE IF NOT EXISTS appstore_platform_release (
+CREATE TABLE IF NOT EXISTS appstore_application_platform_release (
   id TEXT PRIMARY KEY,
   tenant_id TEXT NOT NULL,
   organization_id TEXT NOT NULL DEFAULT '0',
@@ -1084,8 +1084,8 @@ CREATE TABLE IF NOT EXISTS appstore_platform_release (
   UNIQUE (tenant_id, app_platform_id, channel_id, version_code)
 );
 
-CREATE INDEX IF NOT EXISTS idx_appstore_platform_release_update_check
-  ON appstore_platform_release (tenant_id, app_platform_id, release_status, version_code DESC);
+CREATE INDEX IF NOT EXISTS idx_appstore_application_platform_release_update_check
+  ON appstore_application_platform_release (tenant_id, app_platform_id, release_status, version_code DESC);
 
 CREATE TABLE IF NOT EXISTS appstore_signing_credential (
   id TEXT PRIMARY KEY,
@@ -1110,7 +1110,7 @@ CREATE TABLE IF NOT EXISTS appstore_signing_credential (
 CREATE INDEX IF NOT EXISTS idx_appstore_signing_credential_lookup
   ON appstore_signing_credential (tenant_id, publisher_id, platform_code, credential_status);
 
-CREATE TABLE IF NOT EXISTS appstore_listing_review (
+CREATE TABLE IF NOT EXISTS appstore_application_listing_review (
   id TEXT PRIMARY KEY,
   tenant_id TEXT NOT NULL,
   organization_id TEXT NOT NULL DEFAULT '0',
@@ -1135,13 +1135,13 @@ CREATE TABLE IF NOT EXISTS appstore_listing_review (
   UNIQUE (tenant_id, listing_id, user_id)
 );
 
-CREATE INDEX IF NOT EXISTS idx_appstore_listing_review_listing
-  ON appstore_listing_review (tenant_id, listing_id, review_status, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_appstore_application_listing_review_listing
+  ON appstore_application_listing_review (tenant_id, listing_id, review_status, created_at DESC);
 
-CREATE INDEX IF NOT EXISTS idx_appstore_listing_review_release
-  ON appstore_listing_review (tenant_id, release_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_appstore_application_listing_review_release
+  ON appstore_application_listing_review (tenant_id, release_id, created_at DESC);
 
-CREATE TABLE IF NOT EXISTS appstore_listing_review_vote (
+CREATE TABLE IF NOT EXISTS appstore_application_listing_review_vote (
   id TEXT PRIMARY KEY,
   tenant_id TEXT NOT NULL,
   review_id TEXT NOT NULL,
@@ -1151,7 +1151,7 @@ CREATE TABLE IF NOT EXISTS appstore_listing_review_vote (
   UNIQUE (tenant_id, review_id, user_id)
 );
 
-CREATE TABLE IF NOT EXISTS appstore_listing_review_report (
+CREATE TABLE IF NOT EXISTS appstore_application_listing_review_report (
   id TEXT PRIMARY KEY,
   tenant_id TEXT NOT NULL,
   review_id TEXT NOT NULL,
@@ -1166,8 +1166,8 @@ CREATE TABLE IF NOT EXISTS appstore_listing_review_report (
   UNIQUE (tenant_id, review_id, reporter_user_id)
 );
 
-CREATE INDEX IF NOT EXISTS idx_appstore_listing_review_report_status
-  ON appstore_listing_review_report (tenant_id, report_status, created_at ASC);
+CREATE INDEX IF NOT EXISTS idx_appstore_application_listing_review_report_status
+  ON appstore_application_listing_review_report (tenant_id, report_status, created_at ASC);
 
 CREATE TABLE IF NOT EXISTS appstore_rating_distribution_snapshot (
   id TEXT PRIMARY KEY,
@@ -1185,7 +1185,7 @@ CREATE TABLE IF NOT EXISTS appstore_rating_distribution_snapshot (
   UNIQUE (tenant_id, listing_id, snapshot_date)
 );
 
-CREATE TABLE IF NOT EXISTS appstore_listing_price (
+CREATE TABLE IF NOT EXISTS appstore_application_listing_price (
   id TEXT PRIMARY KEY,
   tenant_id TEXT NOT NULL,
   organization_id TEXT NOT NULL DEFAULT '0',
@@ -1202,8 +1202,8 @@ CREATE TABLE IF NOT EXISTS appstore_listing_price (
   UNIQUE (tenant_id, listing_id, region_code, starts_at)
 );
 
-CREATE INDEX IF NOT EXISTS idx_appstore_listing_price_lookup
-  ON appstore_listing_price (tenant_id, listing_id, region_code, starts_at DESC);
+CREATE INDEX IF NOT EXISTS idx_appstore_application_listing_price_lookup
+  ON appstore_application_listing_price (tenant_id, listing_id, region_code, starts_at DESC);
 
 CREATE TABLE IF NOT EXISTS appstore_promo_code_batch (
   id TEXT PRIMARY KEY,
@@ -1243,7 +1243,7 @@ CREATE TABLE IF NOT EXISTS appstore_promo_code (
 CREATE INDEX IF NOT EXISTS idx_appstore_promo_code_batch_status
   ON appstore_promo_code (tenant_id, batch_id, code_status);
 
-CREATE TABLE IF NOT EXISTS appstore_release_tester_group (
+CREATE TABLE IF NOT EXISTS appstore_application_release_tester_group (
   id TEXT PRIMARY KEY,
   tenant_id TEXT NOT NULL,
   organization_id TEXT NOT NULL DEFAULT '0',
@@ -1259,7 +1259,7 @@ CREATE TABLE IF NOT EXISTS appstore_release_tester_group (
   UNIQUE (tenant_id, group_no)
 );
 
-CREATE TABLE IF NOT EXISTS appstore_release_tester_group_member (
+CREATE TABLE IF NOT EXISTS appstore_application_release_tester_group_member (
   id TEXT PRIMARY KEY,
   tenant_id TEXT NOT NULL,
   group_id TEXT NOT NULL,
@@ -1274,8 +1274,8 @@ CREATE TABLE IF NOT EXISTS appstore_release_tester_group_member (
   UNIQUE (tenant_id, group_id, contact_email)
 );
 
-CREATE INDEX IF NOT EXISTS idx_appstore_release_tester_group_member_lookup
-  ON appstore_release_tester_group_member (tenant_id, group_id, member_status);
+CREATE INDEX IF NOT EXISTS idx_appstore_application_release_tester_group_member_lookup
+  ON appstore_application_release_tester_group_member (tenant_id, group_id, member_status);
 
 CREATE TABLE IF NOT EXISTS appstore_catalog_search_doc (
   id TEXT PRIMARY KEY,

@@ -179,35 +179,25 @@ const PLUGIN_CATEGORIES = [
 export { PLUGIN_CATEGORIES };
 
 export function usePlugins(category: string, query: string) {
-  return useApi(
+  return useApi<AiPluginCard[]>(
     async () => {
-      const page = await getStoreClient().catalog.listTemplates({
-        templateType: 'PLUGIN',
-        q: query.trim() || undefined,
-        limit: 100,
-      });
-      const normalized = category.trim().toLocaleLowerCase();
-      return (page.items as unknown as Record<string, unknown>[])
-        .map(toPluginCard)
-        .filter(
-          (plugin) =>
-            normalized === '' ||
-            normalized === '全部' ||
-            plugin.category.toLocaleLowerCase().includes(normalized),
-        );
+      // Plugin entries were `appstore_app_template` rows with
+      // `template_type = 'PLUGIN'`; that table family is retired, so the shelf
+      // reports empty instead of calling a deleted endpoint.
+      console.warn(
+        'The plugin marketplace is retired: plugin entries lived in the app-template family, which the appstore catalog no longer serves.',
+      );
+      return [];
     },
     { refreshKey: `${category}:${query}` },
   );
 }
 
-/** Toggle plugin enable state through per-user template usage records. */
-export async function togglePluginEnabled(id: string, currentlyEnabled: boolean): Promise<boolean> {
-  const nextEnabled = !currentlyEnabled;
-  await getStoreClient().catalog.recordTemplateUsage(id, {
-    usageType: nextEnabled ? 'ENABLE' : 'DISABLE',
-    metadata: { action: nextEnabled ? 'enable' : 'disable' },
-  });
-  return nextEnabled;
+/** Toggle plugin enable state (retired capability). */
+export async function togglePluginEnabled(_id: string, _currentlyEnabled: boolean): Promise<boolean> {
+  throw new Error(
+    'Enabling plugins is retired: plugin entries lived in the app-template family, which the appstore catalog no longer serves.',
+  );
 }
 
 /** Skill marketplace card mapped from the skills domain. */

@@ -3,11 +3,10 @@
 use serde::{Deserialize, Serialize};
 
 use super::models::{
-    AppTemplate, CatalogChartSnapshot, CatalogCollection, CatalogCollectionItem,
-    CatalogCollectionLocalization, CatalogFeaturedSlot, Category, CategoryLocalization,
-    CategoryWithLocalizations, CollectionWithItems, ExpertCatalogEntry, Feedback,
-    ListingMetricSnapshot, ListingSummary, SearchHistoryEntry, SearchSuggestion,
-    TemplateSuggestions, TrendingTerm,
+    CatalogChartSnapshot, CatalogCollection, CatalogCollectionItem, CatalogCollectionLocalization,
+    CatalogFeaturedSlot, Category, CategoryLocalization, CategoryWithLocalizations,
+    CollectionWithItems, ExpertCatalogEntry, Feedback, ListingMetricSnapshot, ListingSummary,
+    SearchHistoryEntry, SearchSuggestion, TrendingTerm,
 };
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -660,54 +659,6 @@ impl AnalyticsOperatorSearchResult {
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
-pub struct TemplatesListResult {
-    pub operation_id: &'static str,
-    pub templates: Vec<AppTemplate>,
-    pub next_cursor: Option<String>,
-    pub has_more: bool,
-}
-
-impl TemplatesListResult {
-    pub fn new(
-        operation_id: &'static str,
-        templates: Vec<AppTemplate>,
-        next_cursor: Option<String>,
-        has_more: bool,
-    ) -> Self {
-        Self {
-            operation_id,
-            templates,
-            next_cursor,
-            has_more,
-        }
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(deny_unknown_fields)]
-pub struct TemplateRetrieveResult {
-    pub operation_id: &'static str,
-    pub template: Option<AppTemplate>,
-}
-
-impl TemplateRetrieveResult {
-    pub fn found(operation_id: &'static str, template: AppTemplate) -> Self {
-        Self {
-            operation_id,
-            template: Some(template),
-        }
-    }
-
-    pub fn not_found(operation_id: &'static str) -> Self {
-        Self {
-            operation_id,
-            template: None,
-        }
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(deny_unknown_fields)]
 pub struct ExpertsListResult {
     pub operation_id: &'static str,
     pub experts: Vec<ExpertCatalogEntry>,
@@ -750,75 +701,6 @@ impl ExpertRetrieveResult {
         Self {
             operation_id,
             expert: None,
-        }
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(deny_unknown_fields)]
-pub struct TemplateSuggestionsRetrieveResult {
-    pub operation_id: &'static str,
-    pub suggestions: TemplateSuggestions,
-}
-
-impl TemplateSuggestionsRetrieveResult {
-    pub fn new(operation_id: &'static str, suggestions: TemplateSuggestions) -> Self {
-        Self {
-            operation_id,
-            suggestions,
-        }
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(deny_unknown_fields)]
-pub struct TemplateCreateResult {
-    pub operation_id: &'static str,
-    pub template: AppTemplate,
-}
-
-impl TemplateCreateResult {
-    pub fn new(operation_id: &'static str, template: AppTemplate) -> Self {
-        Self {
-            operation_id,
-            template,
-        }
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(deny_unknown_fields)]
-pub struct TemplateUsageCreateResult {
-    pub operation_id: &'static str,
-    pub template_id: String,
-    pub usage_type: String,
-    pub star_count: i64,
-    pub fork_count: i64,
-    pub clone_count: i64,
-    pub is_starred: bool,
-    pub is_enabled: bool,
-}
-
-impl TemplateUsageCreateResult {
-    pub fn new(
-        operation_id: &'static str,
-        template_id: String,
-        usage_type: String,
-        star_count: i64,
-        fork_count: i64,
-        clone_count: i64,
-        is_starred: bool,
-        is_enabled: bool,
-    ) -> Self {
-        Self {
-            operation_id,
-            template_id,
-            usage_type,
-            star_count,
-            fork_count,
-            clone_count,
-            is_starred,
-            is_enabled,
         }
     }
 }

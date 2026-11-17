@@ -686,44 +686,6 @@ pub struct ModerationAppealRow {
     pub updated_at: DateTime<Utc>,
 }
 
-#[derive(Debug, Clone, FromRow)]
-pub struct AppTemplateRow {
-    pub id: i64,
-    pub tenant_id: String,
-    pub organization_id: String,
-    pub template_code: String,
-    pub template_name: String,
-    pub description: Option<String>,
-    pub template_type: String,
-    pub template_platform: Option<String>,
-    pub category_code: Option<String>,
-    pub framework: Option<String>,
-    pub language: Option<String>,
-    pub icon_media_resource_id: Option<String>,
-    pub git_repo_url: Option<String>,
-    pub capability_manifest: String,
-    pub metadata: String,
-    pub star_count: i64,
-    pub fork_count: i64,
-    pub clone_count: i64,
-    pub is_enabled: bool,
-    pub published_at: Option<DateTime<Utc>>,
-    pub created_at: DateTime<Utc>,
-    pub updated_at: DateTime<Utc>,
-}
-
-#[derive(Debug, Clone, FromRow)]
-pub struct AppTemplateUsageRow {
-    pub id: i64,
-    pub tenant_id: String,
-    pub organization_id: String,
-    pub template_id: i64,
-    pub user_id: Option<i64>,
-    pub usage_type: i32,
-    pub metadata: String,
-    pub created_at: DateTime<Utc>,
-}
-
 /// One row of the curated AI expert roster (`appstore_expert_catalog`,
 /// migration 0009). `profile_json` is the presentation payload the storefront
 /// renders; it is TEXT in the catalog store, so it is decoded here rather than

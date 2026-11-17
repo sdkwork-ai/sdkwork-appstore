@@ -4,72 +4,50 @@ import {
   type PluginsServicePort,
 } from '@sdkwork/appstore-pc-core';
 
-import type { PluginItem, PluginSourceRef } from '../types';
+import type { PluginItem } from '../types';
 
-const pluginPageSize = 200;
-const pluginType = 'PLUGIN';
+/**
+ * The plugin marketplace lost its API.
+ *
+ * Plugin entries were stored as `appstore_app_template` rows with
+ * `template_type = 'PLUGIN'`; that table family is retired (migration 0011) and
+ * the appstore catalog serves no plugin or template surface any more. The port
+ * keeps its shape so the marketplace pages still compile: reads degrade to an
+ * empty shelf, and the operations that used to write catalog rows fail loudly.
+ *
+ * Repointing the plugin shelf at a dedicated plugin contract, or retiring its
+ * pages, is a product decision outside this change.
+ */
+const retiredReadMessage =
+  'The plugin marketplace is retired: plugin entries lived in the app-template family, which the appstore catalog no longer serves.';
 
-export function configureAppstorePcPlugins(client: AppStoreClient): void {
-  configurePluginsServicePort(createPluginsServicePort(client));
+const retiredWriteMessage =
+  'Installing, enabling and publishing plugins is retired: plugin entries lived in the app-template family, which the appstore catalog no longer serves.';
+
+export function configureAppstorePcPlugins(_client: AppStoreClient): void {
+  configurePluginsServicePort(createPluginsServicePort());
 }
 
-export function createPluginsServicePort(client: AppStoreClient): PluginsServicePort {
+export function createPluginsServicePort(): PluginsServicePort {
   return {
-    async getPlugins(category = '全部', query = ''): Promise<PluginItem[]> {
-      const response = await client.catalog.listTemplates({
-        templateType: pluginType,
-        limit: pluginPageSize,
-        q: query.trim() || undefined,
-      });
-      const templates = readPageItems<Record<string, unknown>>(response);
-      const filtered = category === '全部' || category === 'All'
-        ? templates
-        : templates.filter((template) => {
-            const meta = readMetadata(template);
-            const pluginCategory = readString(meta, 'category') ||
-              readString(template, 'categoryCode', 'category_code');
-            return pluginCategory.toLocaleLowerCase().includes(category.toLocaleLowerCase());
-          });
-      return filtered.map(mapPluginRecord);
+    async getPlugins(): Promise<PluginItem[]> {
+      console.warn(retiredReadMessage);
+      return [];
     },
 
-    async togglePlugin(id: string): Promise<boolean> {
-      // Plugin enable/disable is recorded as a per-user template usage state.
-      const current = await client.catalog.getTemplate(id);
-      const enabled = readBoolean(
-        current as unknown as Record<string, unknown>,
-        'isEnabled',
-      );
-      const nextEnabled = enabled === false;
-      await client.catalog.recordTemplateUsage(id, {
-        usageType: nextEnabled ? 'ENABLE' : 'DISABLE',
-        metadata: { action: nextEnabled ? 'enable' : 'disable' },
-      });
-      return nextEnabled;
+    async togglePlugin(_id: string): Promise<boolean> {
+      throw new Error(retiredWriteMessage);
     },
 
-    async registerPlugin(pluginData: Partial<PluginItem>): Promise<PluginItem> {
-      const template = await client.catalog.createTemplate({
-        templateName: pluginData.name || '自定义扩展插件',
-        description: pluginData.description,
-        templateType: pluginType,
-        categoryCode: pluginData.category,
-        metadata: {
-          authorName: pluginData.developer || '独立开发者',
-          category: pluginData.category || '代码与开发',
-          apiSchemaType: pluginData.apiSchemaType || 'OpenAPI',
-          capabilities: pluginData.capabilities || ['自定义 API 调用', '数据加工'],
-          version: pluginData.version || '1.0.0',
-          docUrl: pluginData.docUrl || '',
-          downloadsCount: 1,
-          rating: 5.0,
-          ...(pluginData.source === undefined ? {} : { pluginSource: pluginData.source }),
-        },
-      });
-      return mapPluginRecord(template as unknown as Record<string, unknown>);
+    async registerPlugin(_pluginData: Partial<PluginItem>): Promise<PluginItem> {
+      throw new Error(retiredWriteMessage);
     },
 
-    async executePluginApi(): Promise<{ success: boolean; result: string; latencyMs: number }> {
+    async executePluginApi(): Promise<{
+      success: boolean;
+      result: string;
+      latencyMs: number;
+    }> {
       throw new Error('Plugin capability execution is not exposed by the App Store app API.');
     },
 
@@ -77,164 +55,4 @@ export function createPluginsServicePort(client: AppStoreClient): PluginsService
       throw new Error('Plugin API schema execution is not exposed by the App Store app API.');
     },
   };
-}
-
-function mapPluginRecord(record: Record<string, unknown>): PluginItem {
-  const id = readString(record, 'id');
-  const meta = readMetadata(record);
-  const version = readString(meta, 'version') || '1.0.0';
-  const category = readString(meta, 'category') ||
-    readString(record, 'categoryCode', 'category_code') ||
-    '代码与开发';
-  const visual = categoryVisuals[category] ?? categoryVisuals.default;
-  const source = readPluginSource(meta, record);
-  return {
-    id,
-    name: readString(record, 'templateName', 'template_name'),
-    version,
-    developer: readString(meta, 'authorName') || 'SDKWork',
-    category,
-    description: readString(record, 'description') || '',
-    icon: visual.icon,
-    iconColor: visual.color,
-    downloadsCount: readNumber(meta, 'downloadsCount') ?? 0,
-    rating: readNumber(meta, 'rating') ?? 5.0,
-    enabled: false,
-    apiSchemaType: (readString(meta, 'apiSchemaType') as PluginItem['apiSchemaType']) || 'OpenAPI',
-    capabilities: readStringArray(meta, 'capabilities'),
-    docUrl: readString(meta, 'docUrl') || undefined,
-    ...(source === undefined ? {} : { source }),
-  };
-}
-
-/**
- * Read the installable source a catalog record publishes.
- *
- * The record's `metadata.pluginSource` is the standard form; a record that only
- * carries the legacy `gitRepoUrl` column (and optionally a directory) is still
- * installable, so the catalog does not need a migration before it can list a
- * plugin. A source with no usable type or URL is dropped rather than guessed.
- */
-function readPluginSource(
-  meta: Record<string, unknown>,
-  record: Record<string, unknown>,
-): PluginSourceRef | undefined {
-  const declared = meta.pluginSource;
-  if (declared && typeof declared === 'object' && !Array.isArray(declared)) {
-    const source = declared as Record<string, unknown>;
-    const type = readString(source, 'type', 'kind');
-    const url = readString(source, 'url');
-    if ((type === 'git' || type === 'archive' || type === 'drive') && url !== '') {
-      return {
-        type,
-        url,
-        ...(readString(source, 'ref') === '' ? {} : { ref: readString(source, 'ref') }),
-        ...(readString(source, 'directory') === '' ? {} : { directory: readString(source, 'directory') }),
-        ...(readString(source, 'sha256') === '' ? {} : { sha256: readString(source, 'sha256') }),
-        ...(readString(source, 'nodeId') === '' ? {} : { nodeId: readString(source, 'nodeId') }),
-      };
-    }
-  }
-  const url = readString(record, 'gitRepoUrl', 'git_repo_url') || readString(meta, 'repositoryUrl', 'gitUrl');
-  if (url === '') return undefined;
-  const directory = readString(meta, 'pluginDirectory', 'gitRepoDirectory', 'repositoryDirectory');
-  return { type: 'git', url, ...(directory === '' ? {} : { directory }) };
-}
-
-const categoryVisuals: Record<string, { icon: string; color: string }> = {
-  '代码与开发': { icon: 'Terminal', color: 'bg-slate-800' },
-  '搜索与信息': { icon: 'Search', color: 'bg-store-info' },
-  '数据处理': { icon: 'FileJson', color: 'bg-store-success' },
-  '数据与存储': { icon: 'Database', color: 'bg-store-brand' },
-  '图像与识别': { icon: 'ScanText', color: 'bg-violet-600' },
-  '支付与电商': { icon: 'CreditCard', color: 'bg-store-warning' },
-  default: { icon: 'Plug', color: 'bg-slate-600' },
-};
-
-function readMetadata(record: Record<string, unknown>): Record<string, unknown> {
-  const raw = record.metadata;
-  if (raw && typeof raw === 'object' && !Array.isArray(raw)) {
-    return raw as Record<string, unknown>;
-  }
-  if (typeof raw === 'string' && raw) {
-    try {
-      const parsed = JSON.parse(raw);
-      return parsed && typeof parsed === 'object' ? parsed : {};
-    } catch {
-      return {};
-    }
-  }
-  return {};
-}
-
-function readPageItems<T>(value: unknown): T[] {
-  if (!value || typeof value !== 'object' || !Array.isArray((value as Record<string, unknown>).items)) {
-    return [];
-  }
-  return (value as Record<string, unknown>).items as T[];
-}
-
-function readStringArray(record: Record<string, unknown>, key: string): string[] {
-  const value = record[key];
-  if (Array.isArray(value)) {
-    return value.filter((entry): entry is string => typeof entry === 'string');
-  }
-  if (typeof value === 'string' && value.trim()) {
-    return value
-      .split(',')
-      .map((entry) => entry.trim())
-      .filter(Boolean);
-  }
-  return [];
-}
-
-function readString(record: Record<string, unknown> | undefined, ...keys: string[]): string {
-  if (!record) {
-    return '';
-  }
-  for (const key of keys) {
-    const value = record[key];
-    if (typeof value === 'string' && value.trim()) {
-      return value.trim();
-    }
-  }
-  return '';
-}
-
-function readNumber(record: Record<string, unknown> | undefined, ...keys: string[]): number | undefined {
-  if (!record) {
-    return undefined;
-  }
-  for (const key of keys) {
-    const value = record[key];
-    if (typeof value === 'number' && Number.isFinite(value)) {
-      return value;
-    }
-    if (typeof value === 'string' && value.trim()) {
-      const parsed = Number.parseFloat(value);
-      if (Number.isFinite(parsed)) {
-        return parsed;
-      }
-    }
-  }
-  return undefined;
-}
-
-function readBoolean(record: Record<string, unknown> | undefined, ...keys: string[]): boolean | undefined {
-  if (!record) {
-    return undefined;
-  }
-  for (const key of keys) {
-    const value = record[key];
-    if (typeof value === 'boolean') {
-      return value;
-    }
-    if (value === 'true') {
-      return true;
-    }
-    if (value === 'false') {
-      return false;
-    }
-  }
-  return undefined;
 }

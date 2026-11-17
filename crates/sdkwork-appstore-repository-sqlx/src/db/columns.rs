@@ -680,40 +680,6 @@ pub const APPSTORE_LISTING_METRIC_SNAPSHOT_COLUMNS: &[&str] = &[
     "created_at",
 ];
 
-pub const APPSTORE_APP_TEMPLATE_COLUMNS: &[&str] = &[
-    "id",
-    "tenant_id",
-    "template_code",
-    "template_name",
-    "template_kind",
-    "description",
-    "publisher_id",
-    "status",
-    "created_at",
-    "updated_at",
-];
-
-pub const APPSTORE_APP_TEMPLATE_USAGE_COLUMNS: &[&str] = &[
-    "id",
-    "tenant_id",
-    "app_id",
-    "template_id",
-    "usage_context_json",
-    "created_at",
-];
-
-pub const APPSTORE_APP_TEMPLATE_VERSION_COLUMNS: &[&str] = &[
-    "id",
-    "tenant_id",
-    "template_id",
-    "version_label",
-    "manifest_json",
-    "status",
-    "published_at",
-    "created_at",
-    "updated_at",
-];
-
 pub const APPSTORE_CATALOG_SEARCH_HISTORY_COLUMNS: &[&str] = &[
     "id",
     "tenant_id",

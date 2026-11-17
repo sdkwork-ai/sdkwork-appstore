@@ -7,6 +7,8 @@ Canonical lifecycle assets for `sdkwork-appstore` per `DATABASE_FRAMEWORK_SPEC.m
 - tablePrefix: `appstore_`
 - databaseRole: `authoritative-server`
 - engine: PostgreSQL
+- tables: 73 (`database/contract/schema.yaml`; the app-template family retired by
+  migration `0011` is no longer part of the live schema)
 
 ## Initialization state
 
@@ -19,10 +21,10 @@ This module is in **initialization state** for greenfield deployments:
 ## Lifecycle policy
 
 - `lifecycle.seedOnBoot` is `true`: the storefront catalog (categories, apps,
-  listings, releases, templates, collections, dictionary rows and their
-  `zh-CN`/`en-US` localizations) is initialization data, not demo scaffolding
-  that only one environment owns. Every environment — development, test,
-  staging, demo and production — applies the `standard` seed profile on its
+  listings, releases, collections, the curated AI expert roster, dictionary rows
+  and their `zh-CN`/`en-US` localizations) is initialization data, not demo
+  scaffolding that only one environment owns. Every environment — development,
+  test, staging, demo and production — applies the `standard` seed profile on its
   first database bootstrap, so the embedded gateway and the host-native
   installer converge to the same storefront content.
 - `lifecycle.autoMigrate` stays `false`: schema evolution remains an explicit

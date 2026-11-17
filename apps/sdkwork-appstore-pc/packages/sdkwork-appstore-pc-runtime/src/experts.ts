@@ -8,7 +8,6 @@ import {
 import type { ExpertItem } from '../types';
 
 const expertPageSize = 200;
-const expertType = 'EXPERT';
 
 export function configureAppstorePcExperts(client: AppStoreClient): void {
   configureExpertsServicePort(createExpertsServicePort(client));
@@ -17,15 +16,16 @@ export function configureAppstorePcExperts(client: AppStoreClient): void {
 export function createExpertsServicePort(client: AppStoreClient): ExpertsServicePort {
   return {
     async getExperts(category = '', query = ''): Promise<ExpertItem[]> {
-      const response = await client.catalog.listTemplates({
-        templateType: expertType,
+      // The roster is its own catalog store (`appstore_expert_catalog`) served by
+      // `catalog.experts.*`; it no longer rides the retired app-template shelf.
+      const response = await client.catalog.listExperts({
         limit: expertPageSize,
       });
-      const templates = readPageItems<Record<string, unknown>>(response);
+      const experts = readPageItems<Record<string, unknown>>(response);
       {
         const normalizedQuery = query.trim().toLocaleLowerCase();
         const normalizedCategory = category.trim();
-        const mapped = templates.map(mapExpertRecord);
+        const mapped = experts.map(mapExpertRecord);
         const filtered = mapped.filter((expert) => {
           const matchesCategory =
             !normalizedCategory ||
@@ -53,17 +53,18 @@ export function createExpertsServicePort(client: AppStoreClient): ExpertsService
       if (!id.trim()) {
         return null;
       }
-      const template = await client.catalog.getTemplate(id);
-      const record = template as unknown as Record<string, unknown>;
-      if (readString(record, 'templateType', 'template_type') !== expertType) {
+      // `expertRef` accepts the catalog row id or the stable expert code; a
+      // draft, soft-deleted or unknown expert resolves to 404, which is the
+      // "no such expert" answer the modal expects.
+      const expert = await client.catalog.getExpert(id).catch(() => undefined);
+      if (!expert) {
         return null;
       }
-      return mapExpertRecord(record);
+      return mapExpertRecord(expert as unknown as Record<string, unknown>);
     },
 
     async getExpertScenarios() {
-      const experts = await client.catalog.listTemplates({
-        templateType: expertType,
+      const experts = await client.catalog.listExperts({
         limit: expertPageSize,
       });
       return deriveExpertScenarios(
@@ -71,27 +72,14 @@ export function createExpertsServicePort(client: AppStoreClient): ExpertsService
       );
     },
 
-    async createCustomExpert(expertData: Partial<ExpertItem>): Promise<ExpertItem> {
-      const template = await client.catalog.createTemplate({
-        templateName: expertData.name || '自定义专家',
-        description: expertData.description,
-        templateType: expertType,
-        categoryCode: expertData.scenarioCategory,
-        metadata: {
-          authorName: '自定义专家',
-          nickname: expertData.nickname || expertData.name || '自定义专家',
-          filterTag: expertData.filterTag || '我的专家',
-          tags: expertData.tags || [],
-          systemPrompt: expertData.systemPrompt || '',
-          welcomeMessage: `你好，我是${expertData.name || '自定义专家'}。`,
-          avatarIcon: expertData.avatarIcon || 'Bot',
-          popularity: 0,
-          rating: 5.0,
-          isOfficial: false,
-          usageCount: 0,
-        },
-      });
-      return mapExpertRecord(template as unknown as Record<string, unknown>);
+    async createCustomExpert(_expertData: Partial<ExpertItem>): Promise<ExpertItem> {
+      // The expert catalog is a read-only curated roster: it exposes list and
+      // detail operations only. Authoring a new expert needs a dedicated
+      // expert-write contract, which does not exist yet, so this fails loudly
+      // instead of faking a created row.
+      throw new Error(
+        'Creating a custom expert is not exposed by the App Store app API; the expert catalog is a read-only curated roster.',
+      );
     },
   };
 }
@@ -110,31 +98,33 @@ const scenarioVisuals: Record<string, string> = {
   '教育学习': 'bg-store-warning',
 };
 
+/** Maps one `CatalogExpert` wire record onto the storefront expert card. */
 function mapExpertRecord(record: Record<string, unknown>): ExpertItem {
-  const meta = readMetadata(record);
+  const profile = readProfile(record);
   const scenarioCategory =
     readString(record, 'categoryCode', 'category_code') || '综合';
   return {
     id: readString(record, 'id'),
-    name: readString(record, 'templateName', 'template_name'),
-    nickname: readString(meta, 'nickname') || '专家',
+    name: readString(record, 'expertName', 'expert_name'),
+    nickname: readString(profile, 'nickname') || '专家',
     avatarBg: scenarioVisuals[scenarioCategory] ?? 'bg-slate-600',
-    avatarIcon: readString(meta, 'avatarIcon') || 'Bot',
+    avatarIcon: readString(profile, 'avatarIcon') || 'Bot',
     scenarioCategory,
-    filterTag: readString(meta, 'filterTag') || scenarioCategory,
+    filterTag: readString(profile, 'filterTag') || scenarioCategory,
     description: readString(record, 'description'),
-    systemPrompt: readString(meta, 'systemPrompt') || undefined,
-    tags: readStringArray(meta, 'tags'),
-    popularity: readNumber(meta, 'popularity') ?? readNumber(meta, 'usageCount') ?? 0,
-    rating: readNumber(meta, 'rating') ?? 5.0,
-    isFeatured: readBoolean(meta, 'isFeatured') === true,
-    isOfficial: readBoolean(meta, 'isOfficial') === true,
-    badge: readString(meta, 'badge') || undefined,
+    systemPrompt: readString(profile, 'systemPrompt') || undefined,
+    tags: readStringArray(profile, 'tags'),
+    popularity: readNumber(profile, 'popularity') ?? readNumber(profile, 'usageCount') ?? 0,
+    rating: readNumber(profile, 'rating') ?? 5.0,
+    isFeatured: readBoolean(record, 'featured') === true,
+    isOfficial: readBoolean(profile, 'isOfficial') === true,
+    badge: readString(profile, 'badge') || undefined,
   };
 }
 
-function readMetadata(record: Record<string, unknown>): Record<string, unknown> {
-  const raw = record.metadata;
+/** The presentation payload of one expert (`CatalogExpert.profile`). */
+function readProfile(record: Record<string, unknown>): Record<string, unknown> {
+  const raw = record.profile;
   if (raw && typeof raw === 'object' && !Array.isArray(raw)) {
     return raw as Record<string, unknown>;
   }

@@ -631,30 +631,22 @@ function createPageLoaders(getClient: () => AppstoreAppClient) {
       });
     },
 
-    /** App templates (catalog template domain, templateType filterable). */
+    /**
+     * App templates (retired capability).
+     *
+     * Application scaffolds are served by the deploy service
+     * (`/app/v3/api/app_templates`); the appstore catalog no longer exposes a
+     * template surface, so the mini program reports an empty shelf.
+     */
     async templates(
-      templateType: 'APP' | 'PLUGIN' | 'EXPERT',
+      _templateType: 'APP' | 'PLUGIN' | 'EXPERT',
     ): Promise<
       Array<{ id: string; name: string; author: string; description: string; stars: number }>
     > {
-      const page = await getClient().catalog.listTemplates({ templateType, limit: 50 });
-      if (!Array.isArray(page?.items)) {
-        return [];
-      }
-      return page.items.map((item) => {
-        const row = (item ?? {}) as unknown as Record<string, unknown>;
-        const metadata =
-          row.metadata && typeof row.metadata === 'object' && !Array.isArray(row.metadata)
-            ? (row.metadata as Record<string, unknown>)
-            : {};
-        return {
-          id: String(row.id ?? ''),
-          name: String(row.templateName ?? '模板'),
-          author: String(metadata.nickname ?? metadata.authorName ?? 'SDKWork'),
-          description: String(row.description ?? ''),
-          stars: Number(row.starCount ?? 0) || 0,
-        };
-      });
+      console.warn(
+        'The app-template marketplace is retired: application scaffolds are served by the deploy service, not the appstore catalog.',
+      );
+      return [];
     },
     /** Library: installed listings with resolved display names (auth required). */
     async library(): Promise<ListingRow[]> {

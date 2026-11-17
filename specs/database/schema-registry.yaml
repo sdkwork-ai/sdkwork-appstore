@@ -146,15 +146,6 @@ tables:
   - name: appstore_release_beta_invite
     profile: master
     complianceLevel: L2
-  - name: appstore_app_template
-    profile: master
-    complianceLevel: L2
-  - name: appstore_app_template_usage
-    profile: relation
-    complianceLevel: L2
-  - name: appstore_app_template_version
-    profile: master
-    complianceLevel: L2
   - name: appstore_platform_dictionary
     profile: master
     complianceLevel: L2

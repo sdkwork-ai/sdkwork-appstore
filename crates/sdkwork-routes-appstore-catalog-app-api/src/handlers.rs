@@ -6,9 +6,7 @@ use sdkwork_appstore_catalog_service::domain::results::{
     ExpertsListResult, FeaturedListResult, FeedbackCreateResult, HomeRetrieveResult,
     ListingsSearchResult, RecentlyUpdatedListResult, RecommendationsListResult,
     SearchHistoryClearResult, SearchHistoryListResult, SearchHistoryUpsertResult,
-    SearchSuggestionsListResult, SearchTrendingListResult, TemplateCreateResult,
-    TemplateRetrieveResult, TemplateSuggestionsRetrieveResult, TemplateUsageCreateResult,
-    TemplatesListResult,
+    SearchSuggestionsListResult, SearchTrendingListResult,
 };
 use sdkwork_appstore_catalog_service::error::AppstoreServiceError;
 use sdkwork_appstore_catalog_service::CatalogOperations;
@@ -105,31 +103,6 @@ pub const ROUTE_HANDLER_PLANS: &[RouteHandlerPlan] = &[
         operation_id: "appstore.catalog.search.history.delete",
         handler_name: "catalog_search_history_clear",
         service_method: "search_history_clear",
-    },
-    RouteHandlerPlan {
-        operation_id: "appstore.catalog.templates.list",
-        handler_name: "catalog_templates_list",
-        service_method: "list_templates",
-    },
-    RouteHandlerPlan {
-        operation_id: "appstore.catalog.templates.retrieve",
-        handler_name: "catalog_template_retrieve",
-        service_method: "retrieve_template",
-    },
-    RouteHandlerPlan {
-        operation_id: "appstore.catalog.templates.create",
-        handler_name: "catalog_template_create",
-        service_method: "create_template",
-    },
-    RouteHandlerPlan {
-        operation_id: "appstore.catalog.templates.usage.create",
-        handler_name: "catalog_template_usage_create",
-        service_method: "create_template_usage",
-    },
-    RouteHandlerPlan {
-        operation_id: "appstore.catalog.templates.suggestions.retrieve",
-        handler_name: "catalog_template_suggestions_retrieve",
-        service_method: "template_suggestions_retrieve",
     },
     RouteHandlerPlan {
         operation_id: "appstore.catalog.experts.list",
@@ -330,90 +303,6 @@ pub async fn catalog_search_history_clear<S: CatalogOperations>(
 ) -> Result<SearchHistoryClearResult, AppstoreServiceError> {
     let cmd = mapper::request::map_search_history_clear();
     service.search_history_clear(context, cmd).await
-}
-
-pub async fn catalog_templates_list<S: CatalogOperations>(
-    service: &S,
-    context: &AppstoreRequestContext,
-    query: Option<String>,
-    category_code: Option<String>,
-    template_type: Option<String>,
-    template_platform: Option<String>,
-    cursor: Option<String>,
-    page_size: Option<i32>,
-) -> Result<TemplatesListResult, AppstoreServiceError> {
-    let cmd = mapper::request::map_templates_list(
-        query,
-        category_code,
-        template_type,
-        template_platform,
-        cursor,
-        page_size,
-    );
-    service.templates_list(context, cmd).await
-}
-
-pub async fn catalog_template_retrieve<S: CatalogOperations>(
-    service: &S,
-    context: &AppstoreRequestContext,
-    template_id: String,
-) -> Result<TemplateRetrieveResult, AppstoreServiceError> {
-    let cmd = mapper::request::map_template_retrieve(template_id);
-    service.template_retrieve(context, cmd).await
-}
-
-pub async fn catalog_template_suggestions_retrieve<S: CatalogOperations>(
-    service: &S,
-    context: &AppstoreRequestContext,
-    template_id: String,
-    limit: Option<i32>,
-) -> Result<TemplateSuggestionsRetrieveResult, AppstoreServiceError> {
-    let cmd = mapper::request::map_template_suggestions_retrieve(template_id, limit);
-    service.template_suggestions_retrieve(context, cmd).await
-}
-
-pub async fn catalog_template_create<S: CatalogOperations>(
-    service: &S,
-    context: &AppstoreRequestContext,
-    template_code: Option<String>,
-    template_name: String,
-    description: Option<String>,
-    template_type: String,
-    template_platform: Option<String>,
-    category_code: Option<String>,
-    framework: Option<String>,
-    language: Option<String>,
-    icon_media_resource_id: Option<String>,
-    git_repo_url: Option<String>,
-    capability_manifest: Option<serde_json::Value>,
-    metadata: Option<serde_json::Value>,
-) -> Result<TemplateCreateResult, AppstoreServiceError> {
-    let cmd = mapper::request::map_template_create(
-        template_code,
-        template_name,
-        description,
-        template_type,
-        template_platform,
-        category_code,
-        framework,
-        language,
-        icon_media_resource_id,
-        git_repo_url,
-        capability_manifest,
-        metadata,
-    );
-    service.template_create(context, cmd).await
-}
-
-pub async fn catalog_template_usage_create<S: CatalogOperations>(
-    service: &S,
-    context: &AppstoreRequestContext,
-    template_id: String,
-    usage_type: String,
-    metadata: Option<serde_json::Value>,
-) -> Result<TemplateUsageCreateResult, AppstoreServiceError> {
-    let cmd = mapper::request::map_template_usage_create(template_id, usage_type, metadata);
-    service.template_usage_create(context, cmd).await
 }
 
 pub async fn catalog_feedback_create<S: CatalogOperations>(

@@ -6,7 +6,6 @@ use sdkwork_appstore_publisher_service::domain::models::*;
 use sdkwork_appstore_publisher_service::ports::repository::PublisherRepositoryPort;
 
 use sdkwork_appstore_catalog_service::context::AppstoreRequestContext as CatalogRequestContext;
-use sdkwork_appstore_catalog_service::domain::models::AppTemplate;
 use sdkwork_appstore_catalog_service::ports::repository::CatalogRepositoryPort;
 use sdkwork_appstore_release_service::context::AppstoreRequestContext as ReleaseRequestContext;
 use sdkwork_appstore_release_service::domain::models::{
@@ -397,11 +396,11 @@ async fn test_database_indexes() {
 
     let index_names: Vec<&str> = indexes.iter().map(|(name,)| name.as_str()).collect();
 
-    assert!(index_names.contains(&"idx_appstore_listing_catalog"));
-    assert!(index_names.contains(&"idx_appstore_app_status"));
-    assert!(index_names.contains(&"idx_appstore_listing_publisher"));
-    assert!(index_names.contains(&"idx_appstore_release_update_check"));
-    assert!(index_names.contains(&"idx_appstore_release_artifact_lookup"));
+    assert!(index_names.contains(&"idx_appstore_application_listing_catalog"));
+    assert!(index_names.contains(&"idx_appstore_application_status"));
+    assert!(index_names.contains(&"idx_appstore_application_listing_publisher"));
+    assert!(index_names.contains(&"idx_appstore_application_release_update_check"));
+    assert!(index_names.contains(&"idx_appstore_application_release_artifact_lookup"));
     assert!(index_names.contains(&"idx_appstore_market_release_status"));
     assert!(index_names.contains(&"idx_appstore_user_library"));
     assert!(index_names.contains(&"idx_appstore_entitlement_subject"));
@@ -1072,56 +1071,6 @@ async fn test_unique_constraints() {
     .await;
 
     assert!(result.is_err());
-}
-
-#[tokio::test]
-async fn test_app_template_insert_and_platform_round_trip() {
-    let pool = setup_db().await;
-    let repo = SqlxCatalogRepository::new(appstore_db(&pool));
-    let ctx = CatalogRequestContext::tenant_scoped("100001", "req-template-1");
-
-    let now = Utc::now();
-    let template = AppTemplate {
-        id: "524395315516031001".to_string(),
-        tenant_id: ctx.tenant_id.clone(),
-        organization_id: "0".to_string(),
-        template_code: "tpl-h5-retail".to_string(),
-        template_name: "H5 营销活动页模板".to_string(),
-        description: Some("移动端 H5 营销页模板。".to_string()),
-        template_type: "APP".to_string(),
-        template_platform: Some("H5".to_string()),
-        category_code: Some("电商应用".to_string()),
-        framework: Some("Vue 3 + Vant + Vite".to_string()),
-        language: Some("TypeScript".to_string()),
-        icon_media_resource_id: Some("mr-tpl-h5-retail-icon".to_string()),
-        git_repo_url: Some("https://github.com/sdkwork/template-h5-retail".to_string()),
-        author_name: Some("SDKWork Templates".to_string()),
-        capability_manifest: serde_json::json!({ "templateType": "APP", "capabilities": [] }),
-        metadata: serde_json::json!({ "authorName": "SDKWork Templates", "category": "电商应用" }),
-        star_count: 0,
-        fork_count: 0,
-        clone_count: 0,
-        is_enabled: false,
-        published_at: Some(now),
-        created_at: now,
-        updated_at: now,
-    };
-    repo.insert_template(&ctx, &template).await.unwrap();
-
-    // Read the row back with a raw query: the retrieve/list ports join
-    // LATERAL, which is Postgres-shaped, so this test pins the INSERT column
-    // list, slot count, and the platform dimension against SQLite directly.
-    use sqlx::Row;
-    let row = sqlx::query(
-        "SELECT template_type, template_platform, category_code, framework          FROM appstore_app_template WHERE template_code = 'tpl-h5-retail'",
-    )
-    .fetch_one(&pool)
-    .await
-    .unwrap();
-    assert_eq!(row.get::<String, _>("template_type"), "APP");
-    assert_eq!(row.get::<String, _>("template_platform"), "H5");
-    assert_eq!(row.get::<String, _>("category_code"), "电商应用");
-    assert_eq!(row.get::<String, _>("framework"), "Vue 3 + Vant + Vite");
 }
 
 #[tokio::test]

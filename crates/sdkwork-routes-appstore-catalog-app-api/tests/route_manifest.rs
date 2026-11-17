@@ -21,9 +21,9 @@ fn app_route_manifest_matches_route_definitions() {
 #[test]
 fn expert_catalog_reads_are_pathed_and_open_to_the_storefront() {
     // The expert page reads its own catalog store (`appstore_expert_catalog`),
-    // never the template shelf, so these two operations are the contract the
-    // page will call. Both are public storefront reads: an application-scoped
-    // request without a user session must still be admitted.
+    // never an application-scaffold shelf, so these two operations are the
+    // contract the page calls. Both are public storefront reads: an
+    // application-scoped request without a user session must still be admitted.
     for (path, operation_id) in [
         (
             "/app/v3/api/appstore/catalog/experts",
@@ -51,25 +51,16 @@ fn expert_catalog_reads_are_pathed_and_open_to_the_storefront() {
 }
 
 #[test]
-fn template_shelf_reads_admit_anonymous_visitors() {
-    // The expert roster (and the plugin/skill/connector shelves built on the
-    // same templates) must open for an application-scoped request with no user
-    // session. Writes on the same shelf keep the dual-token requirement.
-    for path in [
-        "/app/v3/api/appstore/catalog/templates",
-        "/app/v3/api/appstore/catalog/templates/{templateId}",
-        "/app/v3/api/appstore/catalog/templates/{templateId}/suggestions",
-    ] {
-        let entry = route_definitions()
-            .iter()
-            .find(|entry| entry.method == "GET" && entry.path == path)
-            .unwrap_or_else(|| panic!("missing GET route {path}"));
-        assert_eq!(entry.auth, RouteAuth::DualTokenOrAnonymous, "{path}");
+fn retired_app_template_shelf_is_not_served() {
+    // Application scaffolds moved to the deploy service's
+    // `/app/v3/api/app_templates` surface; the appstore template shelf is gone,
+    // so no route may still expose it.
+    for entry in route_definitions() {
+        assert!(
+            !entry.path.contains("/catalog/templates"),
+            "retired app-template route still registered: {} {}",
+            entry.method,
+            entry.path
+        );
     }
-
-    let usage = route_definitions()
-        .iter()
-        .find(|entry| entry.path == "/app/v3/api/appstore/catalog/templates/{templateId}/usage")
-        .expect("missing template usage route");
-    assert_eq!(usage.auth, RouteAuth::DualToken);
 }

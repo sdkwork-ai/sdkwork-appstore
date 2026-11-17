@@ -5,8 +5,6 @@ use sdkwork_appstore_catalog_service::domain::commands::{
     HomeRetrieveRequest, ListingsSearchRequest, RecentlyUpdatedListRequest,
     RecommendationsListRequest, SearchHistoryClearRequest, SearchHistoryListRequest,
     SearchHistoryUpsertRequest, SearchSuggestionsListRequest, SearchTrendingListRequest,
-    TemplateCreateRequest, TemplateRetrieveRequest, TemplateSuggestionsRetrieveRequest,
-    TemplateUsageCreateRequest, TemplatesListRequest,
 };
 
 pub fn map_home_retrieve(locale: Option<String>, platform: Option<String>) -> HomeRetrieveRequest {
@@ -263,95 +261,6 @@ pub fn map_search_history_upsert(
 
 pub fn map_search_history_clear() -> SearchHistoryClearRequest {
     SearchHistoryClearRequest::new()
-}
-
-pub fn map_templates_list(
-    query: Option<String>,
-    category_code: Option<String>,
-    template_type: Option<String>,
-    template_platform: Option<String>,
-    cursor: Option<String>,
-    page_size: Option<i32>,
-) -> TemplatesListRequest {
-    let mut req = TemplatesListRequest::new();
-    if let Some(v) = query {
-        req = req.with_query(v);
-    }
-    if let Some(v) = category_code {
-        req = req.with_category_code(v);
-    }
-    if let Some(v) = template_type {
-        req = req.with_template_type(v);
-    }
-    if let Some(v) = template_platform {
-        req = req.with_template_platform(v);
-    }
-    if let Some(v) = cursor {
-        req = req.with_cursor(v);
-    }
-    if let Some(v) = page_size {
-        req = req.with_page_size(v);
-    }
-    req
-}
-
-pub fn map_template_retrieve(template_id: String) -> TemplateRetrieveRequest {
-    TemplateRetrieveRequest::new(template_id)
-}
-
-pub fn map_template_suggestions_retrieve(
-    template_id: String,
-    limit: Option<i32>,
-) -> TemplateSuggestionsRetrieveRequest {
-    let mut req = TemplateSuggestionsRetrieveRequest::new(template_id);
-    if let Some(v) = limit {
-        req = req.with_limit(v);
-    }
-    req
-}
-
-pub fn map_template_create(
-    template_code: Option<String>,
-    template_name: String,
-    description: Option<String>,
-    template_type: String,
-    template_platform: Option<String>,
-    category_code: Option<String>,
-    framework: Option<String>,
-    language: Option<String>,
-    icon_media_resource_id: Option<String>,
-    git_repo_url: Option<String>,
-    capability_manifest: Option<serde_json::Value>,
-    metadata: Option<serde_json::Value>,
-) -> TemplateCreateRequest {
-    let mut req = TemplateCreateRequest::new(template_name, template_type);
-    req.template_code = template_code;
-    req.description = description;
-    req.template_platform = template_platform;
-    req.category_code = category_code;
-    req.framework = framework;
-    req.language = language;
-    req.icon_media_resource_id = icon_media_resource_id;
-    req.git_repo_url = git_repo_url;
-    if let Some(v) = capability_manifest {
-        req.capability_manifest = v;
-    }
-    if let Some(v) = metadata {
-        req.metadata = v;
-    }
-    req
-}
-
-pub fn map_template_usage_create(
-    template_id: String,
-    usage_type: String,
-    metadata: Option<serde_json::Value>,
-) -> TemplateUsageCreateRequest {
-    let mut req = TemplateUsageCreateRequest::new(template_id, usage_type);
-    if let Some(v) = metadata {
-        req.metadata = v;
-    }
-    req
 }
 
 pub fn map_feedback_create(

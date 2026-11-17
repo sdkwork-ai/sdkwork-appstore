@@ -50,29 +50,6 @@ pub struct ExpertCatalogQuery<'a> {
     pub limit: i32,
 }
 
-/// Ranking applied to a template discovery feed.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum TemplateFeedOrder {
-    /// Newest first: publication time, then creation time, then id.
-    Latest,
-    /// Most used first: stars, then forks, then publication time.
-    Popular,
-}
-
-/// One template discovery feed lookup: the filters a detail page's rails need
-/// plus the exclusion set that keeps a template out of more than one rail.
-#[derive(Debug, Clone, Copy)]
-pub struct TemplateFeedQuery<'a> {
-    pub template_type: Option<&'a str>,
-    pub template_platform: Option<&'a str>,
-    pub category_code: Option<&'a str>,
-    /// Templates already shown elsewhere on the page; always excluded.
-    pub exclude_ids: &'a [String],
-    pub order: TemplateFeedOrder,
-    pub limit: i32,
-    pub user_id: Option<&'a str>,
-}
-
 #[async_trait::async_trait]
 pub trait CatalogRepositoryPort: Send + Sync {
     async fn find_categories(
@@ -359,60 +336,6 @@ pub trait CatalogRepositoryPort: Send + Sync {
         date_to: Option<&str>,
         limit: i32,
     ) -> AppstoreServiceResult<crate::domain::models::OperatorSearchAnalytics>;
-
-    async fn find_templates(
-        &self,
-        context: &AppstoreRequestContext,
-        query: Option<&str>,
-        category_code: Option<&str>,
-        template_type: Option<&str>,
-        template_platform: Option<&str>,
-        cursor: Option<&str>,
-        limit: i32,
-        user_id: Option<&str>,
-    ) -> AppstoreServiceResult<Vec<crate::domain::models::AppTemplate>>;
-
-    async fn find_template_by_id(
-        &self,
-        context: &AppstoreRequestContext,
-        template_id: &str,
-        user_id: Option<&str>,
-    ) -> AppstoreServiceResult<Option<crate::domain::models::AppTemplate>>;
-
-    /// Ranked, explicitly filtered template feed backing the detail page's
-    /// discovery rails. Ordering and exclusion happen in the store so a rail
-    /// never depends on which slice of the catalog happened to be read.
-    async fn find_template_feed(
-        &self,
-        context: &AppstoreRequestContext,
-        query: TemplateFeedQuery<'_>,
-    ) -> AppstoreServiceResult<Vec<crate::domain::models::AppTemplate>>;
-
-    async fn insert_template(
-        &self,
-        context: &AppstoreRequestContext,
-        template: &crate::domain::models::AppTemplate,
-    ) -> AppstoreServiceResult<()>;
-
-    async fn insert_template_usage(
-        &self,
-        context: &AppstoreRequestContext,
-        usage: &crate::domain::models::AppTemplateUsage,
-    ) -> AppstoreServiceResult<()>;
-
-    async fn find_template_usage_counts(
-        &self,
-        context: &AppstoreRequestContext,
-        template_id: &str,
-    ) -> AppstoreServiceResult<crate::domain::models::AppTemplateUsageCounts>;
-
-    async fn find_latest_template_usage_state(
-        &self,
-        context: &AppstoreRequestContext,
-        template_id: &str,
-        user_id: &str,
-        usage_kind: &crate::domain::models::AppTemplateUsageKind,
-    ) -> AppstoreServiceResult<Option<crate::domain::models::AppTemplateUsage>>;
 
     async fn insert_feedback(
         &self,

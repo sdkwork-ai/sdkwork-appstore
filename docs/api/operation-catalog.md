@@ -8,39 +8,34 @@ Prefix lock:
 - Backend API: `/backend/v3/api`
 - Open API: `/store/v3/api`
 
-## App API �?Catalog
+## App API 锟?Catalog
 
 | operationId | Method | Path | Permission |
 | --- | --- | --- | --- |
-| `appstore.catalog.home.retrieve` | GET | `/app/v3/api/appstore/catalog/home` | — (tier 0 public) |
-| `appstore.catalog.categories.list` | GET | `/app/v3/api/appstore/catalog/categories` | — (tier 0 public) |
-| `appstore.catalog.categories.retrieve` | GET | `/app/v3/api/appstore/catalog/categories/{categoryId}` | — (tier 0 public) |
-| `appstore.catalog.collections.list` | GET | `/app/v3/api/appstore/catalog/collections` | — (tier 0 public) |
-| `appstore.catalog.collections.retrieve` | GET | `/app/v3/api/appstore/catalog/collections/{collectionId}` | — (tier 0 public) |
-| `appstore.catalog.featured.list` | GET | `/app/v3/api/appstore/catalog/featured` | — (tier 0 public) |
-| `appstore.catalog.charts.retrieve` | GET | `/app/v3/api/appstore/catalog/charts/{chartCode}` | — (tier 0 public) |
-| `appstore.catalog.listings.list` | GET | `/app/v3/api/appstore/catalog/listings/search` | — (tier 0 public) |
-| `appstore.catalog.templates.list` | GET | `/app/v3/api/appstore/catalog/templates` | — (tier 0 public) |
-| `appstore.catalog.templates.create` | POST | `/app/v3/api/appstore/catalog/templates` | `appstore.catalog.write` |
-| `appstore.catalog.templates.retrieve` | GET | `/app/v3/api/appstore/catalog/templates/{templateId}` | — (tier 0 public) |
-| `appstore.catalog.templates.usage.create` | POST | `/app/v3/api/appstore/catalog/templates/{templateId}/usage` | `appstore.catalog.write` |
-| `appstore.catalog.templates.suggestions.retrieve` | GET | `/app/v3/api/appstore/catalog/templates/{templateId}/suggestions` | — (tier 0 public) |
-| `appstore.catalog.experts.list` | GET | `/app/v3/api/appstore/catalog/experts` | — (tier 0 public) |
-| `appstore.catalog.experts.retrieve` | GET | `/app/v3/api/appstore/catalog/experts/{expertRef}` | — (tier 0 public) |
+| `appstore.catalog.home.retrieve` | GET | `/app/v3/api/appstore/catalog/home` | 鈥?(tier 0 public) |
+| `appstore.catalog.categories.list` | GET | `/app/v3/api/appstore/catalog/categories` | 鈥?(tier 0 public) |
+| `appstore.catalog.categories.retrieve` | GET | `/app/v3/api/appstore/catalog/categories/{categoryId}` | 鈥?(tier 0 public) |
+| `appstore.catalog.collections.list` | GET | `/app/v3/api/appstore/catalog/collections` | 鈥?(tier 0 public) |
+| `appstore.catalog.collections.retrieve` | GET | `/app/v3/api/appstore/catalog/collections/{collectionId}` | 鈥?(tier 0 public) |
+| `appstore.catalog.featured.list` | GET | `/app/v3/api/appstore/catalog/featured` | 鈥?(tier 0 public) |
+| `appstore.catalog.charts.retrieve` | GET | `/app/v3/api/appstore/catalog/charts/{chartCode}` | 鈥?(tier 0 public) |
+| `appstore.catalog.listings.list` | GET | `/app/v3/api/appstore/catalog/listings/search` | 鈥?(tier 0 public) |
+| `appstore.catalog.experts.list` | GET | `/app/v3/api/appstore/catalog/experts` | 鈥?(tier 0 public) |
+| `appstore.catalog.experts.retrieve` | GET | `/app/v3/api/appstore/catalog/experts/{expertRef}` | 鈥?(tier 0 public) |
 | `appstore.catalog.feedback.create` | POST | `/app/v3/api/appstore/catalog/feedback` | `appstore.catalog.write` |
 | `appstore.listings.ratings.list` | GET | `/app/v3/api/listings/{listingId}/ratings` | `appstore.listings.read` |
 | `appstore.listings.ratings.update` | PUT | `/app/v3/api/listings/{listingId}/ratings/me` | `appstore.listings.write` |
-| `appstore.catalog.recommendations.list` | GET | `/app/v3/api/appstore/catalog/recommendations` | — (tier 0 public) |
-| `appstore.catalog.recentlyUpdated.list` | GET | `/app/v3/api/appstore/catalog/recently_updated` | — (tier 0 public) |
-| `appstore.catalog.events.list` | GET | `/app/v3/api/appstore/catalog/events` | — (tier 0 public) |
-| `appstore.catalog.events.retrieve` | GET | `/app/v3/api/appstore/catalog/events/{eventId}` | — (tier 0 public) |
-| `appstore.catalog.search.suggestions.list` | GET | `/app/v3/api/appstore/catalog/search/suggestions` | — (tier 0 public) |
-| `appstore.catalog.search.trending.list` | GET | `/app/v3/api/appstore/catalog/search/trending` | — (tier 0 public) |
-| `appstore.catalog.search.history.list` | GET | `/app/v3/api/appstore/catalog/search/history` | — (tier 2 ownership) |
-| `appstore.catalog.search.history.update` | PUT | `/app/v3/api/appstore/catalog/search/history` | — (tier 2 ownership) |
-| `appstore.catalog.search.history.delete` | DELETE | `/app/v3/api/appstore/catalog/search/history` | — (tier 2 ownership) |
+| `appstore.catalog.recommendations.list` | GET | `/app/v3/api/appstore/catalog/recommendations` | 鈥?(tier 0 public) |
+| `appstore.catalog.recentlyUpdated.list` | GET | `/app/v3/api/appstore/catalog/recently_updated` | 鈥?(tier 0 public) |
+| `appstore.catalog.events.list` | GET | `/app/v3/api/appstore/catalog/events` | 鈥?(tier 0 public) |
+| `appstore.catalog.events.retrieve` | GET | `/app/v3/api/appstore/catalog/events/{eventId}` | 鈥?(tier 0 public) |
+| `appstore.catalog.search.suggestions.list` | GET | `/app/v3/api/appstore/catalog/search/suggestions` | 鈥?(tier 0 public) |
+| `appstore.catalog.search.trending.list` | GET | `/app/v3/api/appstore/catalog/search/trending` | 鈥?(tier 0 public) |
+| `appstore.catalog.search.history.list` | GET | `/app/v3/api/appstore/catalog/search/history` | 鈥?(tier 2 ownership) |
+| `appstore.catalog.search.history.update` | PUT | `/app/v3/api/appstore/catalog/search/history` | 鈥?(tier 2 ownership) |
+| `appstore.catalog.search.history.delete` | DELETE | `/app/v3/api/appstore/catalog/search/history` | 鈥?(tier 2 ownership) |
 
-## App API �?Listings
+## App API 锟?Listings
 
 | operationId | Method | Path | Permission |
 | --- | --- | --- | --- |
@@ -60,7 +55,7 @@ Prefix lock:
 | `appstore.listings.developerOther.list` | GET | `/app/v3/api/listings/{listingId}/developer_other` | `appstore.listings.read` |
 | `appstore.listings.editorial.retrieve` | GET | `/app/v3/api/listings/{listingId}/editorial` | `appstore.listings.read` |
 
-## App API �?Publishers
+## App API 锟?Publishers
 
 | operationId | Method | Path | Permission |
 | --- | --- | --- | --- |
@@ -73,7 +68,7 @@ Prefix lock:
 | `appstore.publishers.members.create` | POST | `/app/v3/api/publishers/{publisherId}/members` | `appstore.publishers.admin` |
 | `appstore.publishers.verifications.create` | POST | `/app/v3/api/publishers/{publisherId}/verifications` | `appstore.publishers.verify` |
 
-## App API �?Releases
+## App API 锟?Releases
 
 | operationId | Method | Path | Permission |
 | --- | --- | --- | --- |
@@ -85,7 +80,7 @@ Prefix lock:
 | `appstore.releases.rollout.update` | PUT | `/app/v3/api/releases/{releaseId}/rollout` | `appstore.releases.rollout` |
 | `appstore.releases.retire` | POST | `/app/v3/api/releases/{releaseId}/retire` | `appstore.releases.write` |
 
-## App API �?Compliance
+## App API 锟?Compliance
 
 | operationId | Method | Path | Permission |
 | --- | --- | --- | --- |
@@ -94,7 +89,7 @@ Prefix lock:
 | `appstore.compliance.permissions.update` | PUT | `/app/v3/api/listings/{listingId}/compliance/permissions` | `appstore.compliance.write` |
 | `appstore.compliance.iapItems.list` | GET | `/app/v3/api/listings/{listingId}/compliance/iap_items` | `appstore.compliance.read` |
 
-## App API �?Library
+## App API 锟?Library
 
 | operationId | Method | Path | Permission |
 | --- | --- | --- | --- |
@@ -109,26 +104,26 @@ Prefix lock:
 | `appstore.downloadGrants.create` | POST | `/app/v3/api/download_grants` | `appstore.downloads.request` |
 | `appstore.downloadGrants.consume` | POST | `/app/v3/api/download_grants/{grantId}/consume` | `appstore.downloads.consume` |
 
-## App API — User Store
+## App API 鈥?User Store
 
 | operationId | Method | Path | Permission |
 | --- | --- | --- | --- |
-| `appstore.userStore.category.list` | GET | `/app/v3/api/user_store/categories` | — (tier 2 ownership) |
-| `appstore.userStore.category.create` | POST | `/app/v3/api/user_store/categories` | — (tier 2 ownership) |
-| `appstore.userStore.category.retrieve` | GET | `/app/v3/api/user_store/categories/{userCategoryId}` | — (tier 2 ownership) |
-| `appstore.userStore.category.update` | PATCH | `/app/v3/api/user_store/categories/{userCategoryId}` | — (tier 2 ownership) |
-| `appstore.userStore.category.delete` | DELETE | `/app/v3/api/user_store/categories/{userCategoryId}` | — (tier 2 ownership) |
-| `appstore.userStore.item.list` | GET | `/app/v3/api/user_store/categories/{userCategoryId}/items` | — (tier 2 ownership) |
-| `appstore.userStore.item.create` | POST | `/app/v3/api/user_store/categories/{userCategoryId}/items` | — (tier 2 ownership) |
-| `appstore.userStore.item.update` | PATCH | `/app/v3/api/user_store/categories/{userCategoryId}/items` | — (tier 2 ownership) |
-| `appstore.userStore.item.delete` | DELETE | `/app/v3/api/user_store/categories/{userCategoryId}/items/{itemId}` | — (tier 2 ownership) |
-| `appstore.userStore.share.list` | GET | `/app/v3/api/user_store/shares` | — (tier 2 ownership) |
-| `appstore.userStore.share.create` | POST | `/app/v3/api/user_store/shares` | — (tier 2 ownership) |
-| `appstore.userStore.share.update` | PATCH | `/app/v3/api/user_store/shares/{shareId}` | — (tier 2 ownership) |
-| `appstore.userStore.share.delete` | DELETE | `/app/v3/api/user_store/shares/{shareId}` | — (tier 2 ownership) |
-| `appstore.userStore.share.refresh` | POST | `/app/v3/api/user_store/shares/{shareId}/refresh` | — (tier 2 ownership) |
+| `appstore.userStore.category.list` | GET | `/app/v3/api/user_store/categories` | 鈥?(tier 2 ownership) |
+| `appstore.userStore.category.create` | POST | `/app/v3/api/user_store/categories` | 鈥?(tier 2 ownership) |
+| `appstore.userStore.category.retrieve` | GET | `/app/v3/api/user_store/categories/{userCategoryId}` | 鈥?(tier 2 ownership) |
+| `appstore.userStore.category.update` | PATCH | `/app/v3/api/user_store/categories/{userCategoryId}` | 鈥?(tier 2 ownership) |
+| `appstore.userStore.category.delete` | DELETE | `/app/v3/api/user_store/categories/{userCategoryId}` | 鈥?(tier 2 ownership) |
+| `appstore.userStore.item.list` | GET | `/app/v3/api/user_store/categories/{userCategoryId}/items` | 鈥?(tier 2 ownership) |
+| `appstore.userStore.item.create` | POST | `/app/v3/api/user_store/categories/{userCategoryId}/items` | 鈥?(tier 2 ownership) |
+| `appstore.userStore.item.update` | PATCH | `/app/v3/api/user_store/categories/{userCategoryId}/items` | 鈥?(tier 2 ownership) |
+| `appstore.userStore.item.delete` | DELETE | `/app/v3/api/user_store/categories/{userCategoryId}/items/{itemId}` | 鈥?(tier 2 ownership) |
+| `appstore.userStore.share.list` | GET | `/app/v3/api/user_store/shares` | 鈥?(tier 2 ownership) |
+| `appstore.userStore.share.create` | POST | `/app/v3/api/user_store/shares` | 鈥?(tier 2 ownership) |
+| `appstore.userStore.share.update` | PATCH | `/app/v3/api/user_store/shares/{shareId}` | 鈥?(tier 2 ownership) |
+| `appstore.userStore.share.delete` | DELETE | `/app/v3/api/user_store/shares/{shareId}` | 鈥?(tier 2 ownership) |
+| `appstore.userStore.share.refresh` | POST | `/app/v3/api/user_store/shares/{shareId}/refresh` | 鈥?(tier 2 ownership) |
 
-## Backend API �?Moderation
+## Backend API 锟?Moderation
 
 | operationId | Method | Path | Permission |
 | --- | --- | --- | --- |
@@ -141,7 +136,7 @@ Prefix lock:
 | `appstore.moderation.appeals.retrieve` | GET | `/backend/v3/api/moderation/appeals/{appealId}` | `appstore.moderation.read` |
 | `appstore.moderation.appeals.decide` | POST | `/backend/v3/api/moderation/appeals/{appealId}/decide` | `appstore.moderation.decide` |
 
-## Backend API �?Catalog admin
+## Backend API 锟?Catalog admin
 
 | operationId | Method | Path | Permission |
 | --- | --- | --- | --- |
@@ -155,7 +150,7 @@ Prefix lock:
 | `appstore.catalog.categories.create` | POST | `/backend/v3/api/appstore/catalog/categories` | `appstore.catalog.admin` |
 | `appstore.catalog.categories.update` | PATCH | `/backend/v3/api/appstore/catalog/categories/{categoryId}` | `appstore.catalog.admin` |
 
-## Backend API �?Operator listing admin
+## Backend API 锟?Operator listing admin
 
 | operationId | Method | Path | Permission |
 | --- | --- | --- | --- |
@@ -182,7 +177,7 @@ Prefix lock:
 | `appstore.marketReleases.list` | GET | `/backend/v3/api/market_releases` | `appstore.market_releases.read` |
 | `appstore.marketReleases.sync` | POST | `/backend/v3/api/market_releases/{marketReleaseId}/sync` | `appstore.market_releases.sync` |
 
-## Open API �?Distribution
+## Open API 锟?Distribution
 
 | operationId | Method | Path | Auth |
 | --- | --- | --- | --- |
@@ -195,7 +190,7 @@ Prefix lock:
 | `appstore.userStores.public.items.list` | GET | `/store/v3/api/user_stores/{shareToken}/categories/{userCategoryId}/items` | none |
 | `appstore.publish.automation.submissions.create` | POST | `/store/v3/api/automation/submissions` | API key |
 
-## Comments integration (not owned �?client calls comments SDK)
+## Comments integration (not owned 锟?client calls comments SDK)
 
 | Concern | Owner operation | Notes |
 | --- | --- | --- |

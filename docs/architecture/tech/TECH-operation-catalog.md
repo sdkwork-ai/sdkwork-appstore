@@ -11,7 +11,7 @@ Prefix lock:
 - Backend API: `/backend/v3/api`
 - Open API: `/store/v3/api`
 
-## App API — Catalog
+## App API 鈥?Catalog
 
 | operationId | Method | Path | Permission |
 | --- | --- | --- | --- |
@@ -32,16 +32,11 @@ Prefix lock:
 | `appstore.catalog.search.history.update` | PUT | `/app/v3/api/appstore/catalog/search/history` | `appstore.catalog.read` |
 | `appstore.catalog.search.suggestions.list` | GET | `/app/v3/api/appstore/catalog/search/suggestions` | `appstore.catalog.read` |
 | `appstore.catalog.search.trending.list` | GET | `/app/v3/api/appstore/catalog/search/trending` | `appstore.catalog.read` |
-| `appstore.catalog.templates.create` | POST | `/app/v3/api/appstore/catalog/templates` | `appstore.catalog.admin` |
-| `appstore.catalog.templates.list` | GET | `/app/v3/api/appstore/catalog/templates` | `appstore.catalog.read` |
-| `appstore.catalog.templates.retrieve` | GET | `/app/v3/api/appstore/catalog/templates/{templateId}` | `appstore.catalog.read` |
-| `appstore.catalog.templates.usage.create` | POST | `/app/v3/api/appstore/catalog/templates/{templateId}/usage` | none |
-| `appstore.catalog.templates.suggestions.retrieve` | GET | `/app/v3/api/appstore/catalog/templates/{templateId}/suggestions` | `appstore.catalog.read` |
 | `appstore.catalog.experts.list` | GET | `/app/v3/api/appstore/catalog/experts` | `appstore.catalog.read` |
 | `appstore.catalog.experts.retrieve` | GET | `/app/v3/api/appstore/catalog/experts/{expertRef}` | `appstore.catalog.read` |
 | `appstore.catalog.listings.list` | GET | `/app/v3/api/appstore/catalog/listings/search` | `appstore.catalog.read` |
 
-## App API — Listings
+## App API 鈥?Listings
 
 | operationId | Method | Path | Permission |
 | --- | --- | --- | --- |
@@ -63,7 +58,7 @@ Prefix lock:
 | `appstore.listings.similar.list` | GET | `/app/v3/api/listings/{listingId}/similar` | `appstore.listings.read` |
 | `appstore.listings.submissions.create` | POST | `/app/v3/api/listings/{listingId}/submissions` | `appstore.listings.submit` |
 
-## App API — Publishers
+## App API 鈥?Publishers
 
 | operationId | Method | Path | Permission |
 | --- | --- | --- | --- |
@@ -76,7 +71,7 @@ Prefix lock:
 | `appstore.publishers.members.create` | POST | `/app/v3/api/publishers/{publisherId}/members` | `appstore.publishers.admin` |
 | `appstore.publishers.verifications.create` | POST | `/app/v3/api/publishers/{publisherId}/verifications` | `appstore.publishers.verify` |
 
-## App API — Releases
+## App API 鈥?Releases
 
 | operationId | Method | Path | Permission |
 | --- | --- | --- | --- |
@@ -88,7 +83,7 @@ Prefix lock:
 | `appstore.releases.rollout.update` | PUT | `/app/v3/api/releases/{releaseId}/rollout` | `appstore.releases.rollout` |
 | `appstore.releases.retire` | POST | `/app/v3/api/releases/{releaseId}/retire` | `appstore.releases.write` |
 
-## App API — Compliance
+## App API 鈥?Compliance
 
 | operationId | Method | Path | Permission |
 | --- | --- | --- | --- |
@@ -97,7 +92,7 @@ Prefix lock:
 | `appstore.compliance.profile.update` | PUT | `/app/v3/api/listings/{listingId}/compliance` | `appstore.compliance.write` |
 | `appstore.compliance.permissions.update` | PUT | `/app/v3/api/listings/{listingId}/compliance/permissions` | `appstore.compliance.write` |
 
-## App API — Library
+## App API 鈥?Library
 
 | operationId | Method | Path | Permission |
 | --- | --- | --- | --- |
@@ -112,7 +107,7 @@ Prefix lock:
 | `appstore.downloadGrants.create` | POST | `/app/v3/api/download_grants` | `appstore.downloads.request` |
 | `appstore.downloadGrants.consume` | POST | `/app/v3/api/download_grants/{grantId}/consume` | `appstore.downloads.consume` |
 
-## Backend API — Moderation
+## Backend API 鈥?Moderation
 
 | operationId | Method | Path | Permission |
 | --- | --- | --- | --- |
@@ -125,7 +120,7 @@ Prefix lock:
 | `appstore.moderation.reviews.assign` | POST | `/backend/v3/api/moderation/reviews/{reviewId}/assign` | `appstore.moderation.assign` |
 | `appstore.moderation.decisions.create` | POST | `/backend/v3/api/moderation/reviews/{reviewId}/decisions` | `appstore.moderation.decide` |
 
-## App API — User store
+## App API 鈥?User store
 
 | operationId | Method | Path | Permission |
 | --- | --- | --- | --- |
@@ -146,7 +141,7 @@ Prefix lock:
 
 Session-authenticated user-store collection operations; no fine-grained permission scope (gateway IAM enforces login).
 
-## Backend API — Analytics
+## Backend API 鈥?Analytics
 
 | operationId | Method | Path | Permission |
 | --- | --- | --- | --- |
@@ -156,7 +151,7 @@ Session-authenticated user-store collection operations; no fine-grained permissi
 | `appstore.analytics.publisher.listings.retrieve` | GET | `/backend/v3/api/analytics/publisher/listings/{listingId}` | `appstore.metrics.read` |
 | `appstore.analytics.publisher.overview.retrieve` | GET | `/backend/v3/api/analytics/publisher/overview` | `appstore.metrics.read` |
 
-## Backend API — Catalog admin
+## Backend API 鈥?Catalog admin
 
 | operationId | Method | Path | Permission |
 | --- | --- | --- | --- |
@@ -167,7 +162,7 @@ Session-authenticated user-store collection operations; no fine-grained permissi
 | `appstore.catalog.categories.create` | POST | `/backend/v3/api/appstore/catalog/categories` | `appstore.catalog.admin` |
 | `appstore.catalog.categories.update` | PATCH | `/backend/v3/api/appstore/catalog/categories/{categoryId}` | `appstore.catalog.admin` |
 
-## Backend API — Operator listing admin
+## Backend API 鈥?Operator listing admin
 
 | operationId | Method | Path | Permission |
 | --- | --- | --- | --- |
@@ -178,7 +173,7 @@ Session-authenticated user-store collection operations; no fine-grained permissi
 | `appstore.metrics.listings.retrieve` | GET | `/backend/v3/api/metrics/listings/{listingId}` | `appstore.metrics.read` |
 
 
-## Backend API — Market channels
+## Backend API 鈥?Market channels
 
 | operationId | Method | Path | Permission |
 | --- | --- | --- | --- |
@@ -188,7 +183,7 @@ Session-authenticated user-store collection operations; no fine-grained permissi
 | `appstore.marketReleases.list` | GET | `/backend/v3/api/market_releases` | `appstore.market_releases.read` |
 | `appstore.marketReleases.sync` | POST | `/backend/v3/api/market_releases/{marketReleaseId}/sync` | `appstore.market_releases.sync` |
 
-## Open API — Distribution
+## Open API 鈥?Distribution
 
 | operationId | Method | Path | Auth |
 | --- | --- | --- | --- |
@@ -201,7 +196,7 @@ Session-authenticated user-store collection operations; no fine-grained permissi
 | `appstore.catalog.public.featured.list` | GET | `/store/v3/api/catalog/featured` | none |
 | `appstore.publish.automation.submissions.create` | POST | `/store/v3/api/automation/submissions` | API key |
 
-## Comments integration (not owned — client calls comments SDK)
+## Comments integration (not owned 鈥?client calls comments SDK)
 
 | Concern | Owner operation | Notes |
 | --- | --- | --- |

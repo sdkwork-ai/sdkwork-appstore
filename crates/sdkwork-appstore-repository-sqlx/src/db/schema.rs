@@ -2,9 +2,9 @@
 //!
 //! Mirrors the full migration chain (folded baseline `0001_appstore_baseline.sql`
 //! including the folded 0002 platform-evolution and 0005 web-store tables, plus
-//! the 0003 user-store and 0004 SKU migrations, and the 0007 rename plus 0008
-//! application-version migrations) so the registry matches the live schema:
-//! 76 tables total.
+//! the 0003 user-store and 0004 SKU migrations, the 0007 rename plus 0008
+//! application-version migrations, and the 0011 retirement of the app-template
+//! family) so the registry matches the live schema: 73 tables total.
 
 pub const APPSTORE_TABLES: &[&str] = &[
     "appstore_idempotency_key",
@@ -48,9 +48,6 @@ pub const APPSTORE_TABLES: &[&str] = &[
     "appstore_download_grant",
     "appstore_install_event",
     "appstore_application_listing_metric_snapshot",
-    "appstore_app_template",
-    "appstore_app_template_usage",
-    "appstore_app_template_version",
     "appstore_catalog_search_history",
     "appstore_catalog_trending_term",
     "appstore_application_listing_iap_item",

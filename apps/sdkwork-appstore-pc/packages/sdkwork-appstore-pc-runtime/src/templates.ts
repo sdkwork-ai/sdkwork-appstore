@@ -5,303 +5,63 @@ import {
   type TemplatesServicePort,
 } from '@sdkwork/appstore-pc-core';
 
-import { TEMPLATE_PLATFORMS, type TemplatePlatform } from '@sdkwork/appstore-pc-core';
 import type { TemplateItem } from '../types';
 
-const templatePageSize = 200;
-
 /**
- * Narrow a raw platform code to the generated wire union. The catalog's
- * platform set is open-ended while the API contract is an enum, so codes the
- * current contract does not know return undefined and filter client-side.
+ * The application-template marketplace lost its API.
+ *
+ * Application scaffolds are owned by the deploy service
+ * (`/app/v3/api/app_templates`), and the appstore catalog no longer serves a
+ * `catalog.templates` surface, so this runtime port keeps the page contracts
+ * intact while every retired call fails loudly instead of reaching a deleted
+ * endpoint. Reads degrade to an empty shelf so the pages render their empty
+ * state; writes throw because silently dropping a publish/star is worse.
+ *
+ * Repointing these surfaces at the deploy scaffold API (or retiring the pages)
+ * is a product decision outside this change.
  */
-function isTemplatePlatform(value: string | undefined): value is TemplatePlatform {
-  return !!value && (TEMPLATE_PLATFORMS as readonly string[]).includes(value);
+const retiredReadMessage =
+  'The app-template marketplace is retired: application scaffolds are served by the deploy service (/app/v3/api/app_templates), not the appstore catalog.';
+
+const retiredWriteMessage =
+  'Publishing, starring and forking app templates is retired: application scaffolds are served by the deploy service (/app/v3/api/app_templates), not the appstore catalog.';
+
+export function configureAppstorePcTemplates(_client: AppStoreClient): void {
+  configureTemplatesServicePort(createTemplatesServicePort());
 }
 
-function asTemplatePlatform(value: string | undefined): TemplatePlatform | undefined {
-  const code = value?.trim();
-  return code && isTemplatePlatform(code) ? code : undefined;
-}
-
-/** Template metadata keys shared with the storefront template API. */
-const metaKeys = {
-  authorName: 'authorName',
-  category: 'category',
-  demoUrl: 'demoUrl',
-  features: 'features',
-  isOfficial: 'isOfficial',
-  license: 'license',
-  previewImage: 'previewImage',
-  rating: 'rating',
-  relatedAppId: 'relatedAppId',
-  screenshots: 'screenshots',
-  tags: 'tags',
-  techStack: 'techStack',
-  usageCount: 'usageCount',
-  version: 'version',
-};
-
-export function configureAppstorePcTemplates(client: AppStoreClient): void {
-  configureTemplatesServicePort(createTemplatesServicePort(client));
-}
-
-export function createTemplatesServicePort(client: AppStoreClient): TemplatesServicePort {
+export function createTemplatesServicePort(): TemplatesServicePort {
   return {
-    async getTemplates(category = '全部', query = '', platform = ''): Promise<TemplateItem[]> {
-      const requested = asTemplatePlatform(platform);
-      const response = await client.catalog.listTemplates({
-        // The templates marketplace lists application scaffolds only; plugins
-        // (扩展插件) and curated experts (专家) are separate markets with
-        // their own pages, matching the H5 catalog hook behavior.
-        templateType: 'APP',
-        limit: templatePageSize,
-        q: query.trim() || undefined,
-        ...(requested ? { templatePlatform: requested } : {}),
-      });
-      const templates = readPageItems<Record<string, unknown>>(response);
-      const filtered = category === '全部' || category === 'All'
-        ? templates
-        : templates.filter((template) => {
-            const meta = readMetadata(template);
-            const templateCategory = readString(meta, metaKeys.category) ||
-              readString(template, 'categoryCode', 'category_code');
-            return templateCategory.toLocaleLowerCase().includes(category.toLocaleLowerCase());
-          });
-      const mapped = filtered.map(mapTemplateRecord);
-      const raw = platform.trim();
-      return raw && !requested
-        ? mapped.filter((template) => template.platform === raw)
-        : mapped;
+    async getTemplates(): Promise<TemplateItem[]> {
+      console.warn(retiredReadMessage);
+      return [];
     },
 
-    async getTemplateById(id: string): Promise<TemplateItem | null> {
-      const template = await client.catalog.getTemplate(id);
-      return mapTemplateRecord(template as unknown as Record<string, unknown>);
+    async getTemplateById(_id: string): Promise<TemplateItem | null> {
+      console.warn(retiredReadMessage);
+      return null;
     },
 
-    async listTemplateSuggestions(id: string): Promise<TemplateSuggestionSections> {
-      // The endpoint returns one item carrying all three ranked rails, so the
-      // detail page's right column needs a single request.
-      return mapTemplateSuggestionRails(await client.catalog.listTemplateSuggestions(id));
+    async listTemplateSuggestions(_id: string): Promise<TemplateSuggestionSections> {
+      console.warn(retiredReadMessage);
+      return { latest: [], related: [], recommended: [] };
     },
 
-    async publishTemplate(templateData: Partial<TemplateItem>): Promise<TemplateItem> {
-      const template = await client.catalog.createTemplate({
-        templateName: templateData.title || '未命名模板',
-        description: templateData.description,
-        templateType: 'APP',
-        ...(asTemplatePlatform(templateData.platform)
-          ? { templatePlatform: asTemplatePlatform(templateData.platform) }
-          : {}),
-        categoryCode: templateData.category,
-        framework: templateData.framework,
-        gitRepoUrl: templateData.repoUrl || templateData.githubUrl,
-        metadata: {
-          ...(templateData.category ? { category: templateData.category } : {}),
-          ...(templateData.tags?.length ? { tags: templateData.tags } : {}),
-          ...(templateData.isOfficial !== undefined ? { isOfficial: templateData.isOfficial } : {}),
-          ...(templateData.license ? { license: templateData.license } : {}),
-          ...(templateData.demoUrl ? { demoUrl: templateData.demoUrl } : {}),
-          ...(templateData.previewUrl || templateData.previewImage
-            ? { previewImage: templateData.previewUrl || templateData.previewImage }
-            : {}),
-          ...(templateData.screenshots?.length ? { screenshots: templateData.screenshots } : {}),
-          ...(templateData.features?.length ? { features: templateData.features } : {}),
-          ...(templateData.techStack?.length ? { techStack: templateData.techStack } : {}),
-          ...(templateData.architecture ? { architecture: templateData.architecture } : {}),
-          ...(templateData.usageCount !== undefined ? { usageCount: templateData.usageCount } : {}),
-          ...(templateData.rating !== undefined ? { rating: templateData.rating } : {}),
-          ...(templateData.relatedAppId ? { relatedAppId: templateData.relatedAppId } : {}),
-        },
-      });
-      return mapTemplateRecord(template as unknown as Record<string, unknown>);
+    async publishTemplate(_templateData: Partial<TemplateItem>): Promise<TemplateItem> {
+      throw new Error(retiredWriteMessage);
     },
 
-    async starTemplate(id: string): Promise<{ stars: number; isStarred: boolean }> {
-      const result = await client.catalog.recordTemplateUsage(id, { usageType: 'STAR' });
-      return {
-        stars: readNumber(result as unknown as Record<string, unknown>, 'starCount') ?? 0,
-        isStarred: readBoolean(result as unknown as Record<string, unknown>, 'isStarred') ?? true,
-      };
+    async starTemplate(_id: string): Promise<{ stars: number; isStarred: boolean }> {
+      throw new Error(retiredWriteMessage);
     },
 
-    async forkTemplate(id: string): Promise<{ forks: number }> {
-      const result = await client.catalog.recordTemplateUsage(id, { usageType: 'FORK' });
-      return {
-        forks: readNumber(result as unknown as Record<string, unknown>, 'forkCount') ?? 0,
-      };
+    async forkTemplate(_id: string): Promise<{ forks: number }> {
+      throw new Error(retiredWriteMessage);
     },
 
-    async getTemplateCliCommand(id: string): Promise<string> {
-      const template = await client.catalog.getTemplate(id).catch(() => undefined);
-      const code = readString(
-        template as unknown as Record<string, unknown> | undefined,
-        'templateCode',
-        'template_code',
-      );
-      return `npx create-sdkwork-app my-app --template ${code || id}`;
+    async getTemplateCliCommand(_id: string): Promise<string> {
+      console.warn(retiredReadMessage);
+      return 'npx create-sdkwork-app my-app';
     },
   };
-}
-
-/**
- * Map one suggestions payload onto the detail page's three discovery rails.
- * Entries that are not objects are dropped, so a malformed rail degrades to an
- * empty column instead of taking the page down.
- * @param rails - the service payload's three rail arrays.
- * @returns the mapped rails.
- */
-export function mapTemplateSuggestionRails(rails: {
-  latest?: readonly unknown[];
-  related?: readonly unknown[];
-  recommended?: readonly unknown[];
-}): TemplateSuggestionSections {
-  const mapRail = (entries: readonly unknown[] | undefined): TemplateItem[] =>
-    (entries ?? []).filter(isRecord).map(mapTemplateRecord);
-  return {
-    latest: mapRail(rails.latest),
-    related: mapRail(rails.related),
-    recommended: mapRail(rails.recommended),
-  };
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
-}
-
-function mapTemplateRecord(record: Record<string, unknown>): TemplateItem {
-  const id = readString(record, 'id');
-  const meta = readMetadata(record);
-  return {
-    id,
-    title: readString(record, 'templateName', 'template_name'),
-    author: readString(meta, metaKeys.authorName) || 'SDKWork',
-    platform: readString(record, 'templatePlatform', 'template_platform') || undefined,
-    framework: readString(record, 'framework') || 'React + Vite + Tailwind',
-    category: readString(meta, metaKeys.category) ||
-      readString(record, 'categoryCode', 'category_code') ||
-      '开发者工具',
-    description: readString(record, 'description') || '',
-    icon: 'Boxes',
-    iconColor: 'bg-store-brand',
-    stars: readNumber(record, 'starCount', 'star_count') ?? 0,
-    forks: readNumber(record, 'forkCount', 'fork_count') ?? 0,
-    tags: readStringArray(meta, metaKeys.tags),
-    demoUrl: readString(meta, metaKeys.demoUrl) || undefined,
-    githubUrl: readString(record, 'gitRepoUrl', 'git_repo_url') || undefined,
-    repoUrl: readString(record, 'gitRepoUrl', 'git_repo_url') || undefined,
-    previewUrl: readString(meta, metaKeys.previewImage) || undefined,
-    previewImage: readString(meta, metaKeys.previewImage) || undefined,
-    publishedAt: formatDate(readString(record, 'publishedAt', 'published_at')),
-    isOfficial: readBoolean(meta, metaKeys.isOfficial) ?? false,
-    screenshots: readStringArray(meta, metaKeys.screenshots),
-    features: readStringArray(meta, metaKeys.features),
-    techStack: readStringArray(meta, metaKeys.techStack),
-    architecture: readString(meta, 'architecture') || undefined,
-    usageCount: readNumber(meta, metaKeys.usageCount),
-    rating: readNumber(meta, metaKeys.rating),
-    license: readString(meta, metaKeys.license) || undefined,
-    overviewMarkdown: readString(meta, 'overviewMarkdown') || undefined,
-    relatedAppId: readString(meta, metaKeys.relatedAppId) || undefined,
-  };
-}
-
-function readMetadata(record: Record<string, unknown>): Record<string, unknown> {
-  const raw = record.metadata;
-  if (raw && typeof raw === 'object' && !Array.isArray(raw)) {
-    return raw as Record<string, unknown>;
-  }
-  if (typeof raw === 'string' && raw) {
-    try {
-      const parsed = JSON.parse(raw);
-      return parsed && typeof parsed === 'object' ? parsed : {};
-    } catch {
-      return {};
-    }
-  }
-  return {};
-}
-
-function readPageItems<T>(value: unknown): T[] {
-  if (!value || typeof value !== 'object' || !Array.isArray((value as Record<string, unknown>).items)) {
-    return [];
-  }
-  return (value as Record<string, unknown>).items as T[];
-}
-
-function readStringArray(record: Record<string, unknown>, key: string): string[] {
-  const value = record[key];
-  if (Array.isArray(value)) {
-    return value.filter((entry): entry is string => typeof entry === 'string');
-  }
-  if (typeof value === 'string' && value.trim()) {
-    return value
-      .split(',')
-      .map((entry) => entry.trim())
-      .filter(Boolean);
-  }
-  return [];
-}
-
-function readString(record: Record<string, unknown> | undefined, ...keys: string[]): string {
-  if (!record) {
-    return '';
-  }
-  for (const key of keys) {
-    const value = record[key];
-    if (typeof value === 'string' && value.trim()) {
-      return value.trim();
-    }
-  }
-  return '';
-}
-
-function readNumber(record: Record<string, unknown> | undefined, ...keys: string[]): number | undefined {
-  if (!record) {
-    return undefined;
-  }
-  for (const key of keys) {
-    const value = record[key];
-    if (typeof value === 'number' && Number.isFinite(value)) {
-      return value;
-    }
-    if (typeof value === 'string' && value.trim()) {
-      const parsed = Number.parseFloat(value);
-      if (Number.isFinite(parsed)) {
-        return parsed;
-      }
-    }
-  }
-  return undefined;
-}
-
-function readBoolean(record: Record<string, unknown> | undefined, ...keys: string[]): boolean | undefined {
-  if (!record) {
-    return undefined;
-  }
-  for (const key of keys) {
-    const value = record[key];
-    if (typeof value === 'boolean') {
-      return value;
-    }
-    if (value === 'true') {
-      return true;
-    }
-    if (value === 'false') {
-      return false;
-    }
-  }
-  return undefined;
-}
-
-function formatDate(value: string): string {
-  if (!value) {
-    return '';
-  }
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) {
-    return value;
-  }
-  return date.toISOString().slice(0, 10);
 }

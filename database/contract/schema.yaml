@@ -84,15 +84,6 @@ tables:
   - name: appstore_install_event
     lifecycle_status: active
     owner: appstore-platform
-  - name: appstore_app_template
-    lifecycle_status: active
-    owner: appstore-platform
-  - name: appstore_app_template_version
-    lifecycle_status: active
-    owner: appstore-platform
-  - name: appstore_app_template_usage
-    lifecycle_status: active
-    owner: appstore-platform
   - name: appstore_catalog_search_history
     lifecycle_status: active
     owner: appstore-platform

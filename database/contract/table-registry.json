@@ -153,24 +153,6 @@
       "lifecycle_status": "active"
     },
     {
-      "table_name": "appstore_app_template",
-      "owner": "appstore-platform",
-      "compliance_level": "L2",
-      "lifecycle_status": "active"
-    },
-    {
-      "table_name": "appstore_app_template_version",
-      "owner": "appstore-platform",
-      "compliance_level": "L2",
-      "lifecycle_status": "active"
-    },
-    {
-      "table_name": "appstore_app_template_usage",
-      "owner": "appstore-platform",
-      "compliance_level": "L2",
-      "lifecycle_status": "active"
-    },
-    {
       "table_name": "appstore_catalog_search_history",
       "owner": "appstore-platform",
       "compliance_level": "L2",

@@ -255,10 +255,10 @@ mod tests {
     fn sqlite_translates_pg_type_casts() {
         assert_eq!(
             adapt_sql(
-                "SELECT t.tenant_id::text, COALESCE(t.metadata::text, '{}') FROM appstore_app_template t",
+                "SELECT t.tenant_id::text, COALESCE(t.metadata::text, '{}') FROM appstore_category t",
                 AppstoreSqlDialect::Sqlite,
             ),
-            "SELECT CAST(t.tenant_id AS TEXT), COALESCE(CAST(t.metadata AS TEXT), '{}') FROM appstore_app_template t",
+            "SELECT CAST(t.tenant_id AS TEXT), COALESCE(CAST(t.metadata AS TEXT), '{}') FROM appstore_category t",
         );
     }
 

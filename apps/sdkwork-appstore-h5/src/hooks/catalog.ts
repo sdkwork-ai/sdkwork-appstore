@@ -218,36 +218,38 @@ function toTemplateCard(row: Record<string, unknown>): AppTemplateCard {
   };
 }
 
-/** App template marketplace list (templateType filterable). */
-export function useTemplates(templateType: 'APP' | 'PLUGIN', query: string) {
-  return useApi(
+/**
+ * The app-template marketplace is retired: application scaffolds are served by
+ * the deploy service (`/app/v3/api/app_templates`), and the appstore catalog no
+ * longer exposes a template surface. The hook keeps its shape so the page still
+ * renders, and reports an empty shelf instead of calling a deleted endpoint.
+ */
+const retiredTemplateMessage =
+  'The app-template marketplace is retired: application scaffolds are served by the deploy service, not the appstore catalog.';
+
+/** App template marketplace list (retired capability; always empty). */
+export function useTemplates(_templateType: 'APP' | 'PLUGIN', query: string) {
+  return useApi<AppTemplateCard[]>(
     async () => {
-      const page = await getStoreClient().catalog.listTemplates({
-        templateType,
-        q: query.trim() || undefined,
-        limit: 50,
-      });
-      return (page.items as unknown as Record<string, unknown>[]).map(toTemplateCard);
+      console.warn(retiredTemplateMessage);
+      return [];
     },
-    { refreshKey: `${templateType}:${query}` },
+    { refreshKey: `templates:${query}` },
   );
 }
 
-/** One template detail by id (route param). */
+/** One template detail by id (retired capability; always null). */
 export function useTemplate(templateId: string) {
-  return useApi(
+  return useApi<AppTemplateCard | null>(
     async () => {
-      if (!templateId) {
-        return null;
-      }
-      const template = await getStoreClient().catalog.getTemplate(templateId);
-      return toTemplateCard(template as unknown as Record<string, unknown>);
+      console.warn(retiredTemplateMessage);
+      return null;
     },
     { refreshKey: templateId },
   );
 }
 
-/** Curated AI expert card rendered by the 专家 surfaces (catalog EXPERT rows). */
+/** Curated AI expert card rendered by the 专家 surfaces (catalog.experts.*). */
 export interface ExpertCatalogCard {
   id: string;
   name: string;
@@ -269,25 +271,32 @@ export interface ExpertScenarioCard {
   expertCount: number;
 }
 
+/**
+ * Map one `CatalogExpert` wire record onto the expert card.
+ *
+ * The roster keeps its presentation payload in `profile`, so the card reads the
+ * nickname, tags, prompts, rating and badge from there while the name, category
+ * and featured flag are ordinary catalog columns.
+ */
 function toExpertCard(row: Record<string, unknown>): ExpertCatalogCard {
-  const metadata =
-    row.metadata && typeof row.metadata === 'object' && !Array.isArray(row.metadata)
-      ? (row.metadata as Record<string, unknown>)
+  const profile =
+    row.profile && typeof row.profile === 'object' && !Array.isArray(row.profile)
+      ? (row.profile as Record<string, unknown>)
       : {};
-  const tags = Array.isArray(metadata.tags)
-    ? metadata.tags.filter((tag): tag is string => typeof tag === 'string')
+  const tags = Array.isArray(profile.tags)
+    ? profile.tags.filter((tag): tag is string => typeof tag === 'string')
     : [];
   return {
     id: String(row.id ?? ''),
-    name: String(row.templateName ?? row.template_code ?? '专家'),
-    title: String(metadata.nickname ?? metadata.authorName ?? '专家'),
+    name: String(row.expertName ?? row.expert_name ?? '专家'),
+    title: String(profile.nickname ?? profile.authorName ?? '专家'),
     description: String(row.description ?? ''),
-    category: String(metadata.filterTag ?? row.categoryCode ?? '综合'),
+    category: String(profile.filterTag ?? row.categoryCode ?? '综合'),
     tags,
-    popularity: Number(metadata.popularity ?? metadata.usageCount ?? 0),
-    rating: Number(metadata.rating ?? 5),
-    badge: metadata.badge ? String(metadata.badge) : undefined,
-    isOfficial: metadata.isOfficial === true,
+    popularity: Number(profile.popularity ?? profile.usageCount ?? 0),
+    rating: Number(profile.rating ?? 5),
+    badge: profile.badge ? String(profile.badge) : undefined,
+    isOfficial: profile.isOfficial === true,
   };
 }
 
@@ -319,15 +328,14 @@ function matchesExpertQuery(expert: ExpertCatalogCard, normalized: string): bool
 }
 
 /**
- * Curated expert catalog (templateType=EXPERT templates) plus derived
- * scenario chips. The full set is fetched once and filtered client-side so
+ * Curated expert catalog read through `catalog.experts.list` plus derived
+ * scenario chips. The full roster is fetched once and filtered client-side so
  * the scenario counts stay stable while typing.
  */
 export function useExperts(query: string) {
   return useApi(
     async () => {
-      const page = await getStoreClient().catalog.listTemplates({
-        templateType: 'EXPERT',
+      const page = await getStoreClient().catalog.listExperts({
         limit: 100,
       });
       const experts = (page.items as unknown as Record<string, unknown>[]).map(

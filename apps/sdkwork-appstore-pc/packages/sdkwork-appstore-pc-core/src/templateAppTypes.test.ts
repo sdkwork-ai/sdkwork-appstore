@@ -1,22 +1,12 @@
 import { describe, expect, it } from 'vitest';
 
-import type { AppTemplate } from '@sdkwork/appstore-app-sdk';
-
 import { TEMPLATE_APP_TYPES, resolveTemplateAppType } from './templateAppTypes';
 import { TEMPLATE_PLATFORMS } from './types';
 
-/**
- * Compile-time guard: every platform code the storefront offers must stay
- * assignable to the generated app SDK's `AppTemplate.templatePlatform` union.
- * The assertion fails to compile when OpenAPI and this taxonomy drift apart.
- */
-const CONTRACT_TEMPLATE_PLATFORMS: readonly NonNullable<
-  AppTemplate['templatePlatform']
->[] = TEMPLATE_PLATFORMS;
-
 describe('resolveTemplateAppType', () => {
-  it('offers only platform codes the generated contract accepts', () => {
-    expect(CONTRACT_TEMPLATE_PLATFORMS).toHaveLength(TEMPLATE_PLATFORMS.length);
+  it('offers exactly the platform codes the taxonomy declares', () => {
+    expect(TEMPLATE_PLATFORMS).toHaveLength(TEMPLATE_APP_TYPES.length);
+    expect(new Set(TEMPLATE_PLATFORMS).size).toBe(TEMPLATE_PLATFORMS.length);
   });
 
   it('keeps the metadata list and the filter-row codes in the same order', () => {

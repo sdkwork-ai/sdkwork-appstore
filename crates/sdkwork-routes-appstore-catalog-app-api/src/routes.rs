@@ -142,56 +142,10 @@ pub const ROUTES: &[RouteDefinition] = &[
         handler: "catalog_search_history_clear",
         service_method: "catalog_search_history_clear",
     },
-    // Public template shelf: browsing the expert roster (and the plugin, skill
-    // and connector shelves built on the same templates) must not require a
-    // signed-in user. `DualTokenOrAnonymous` still resolves a signed-in
-    // principal when the dual-token pair is supplied, so per-user state such as
-    // `isEnabled` keeps coming back; an application-scoped request is admitted
-    // as an anonymous catalog read.
-    RouteDefinition {
-        method: "GET",
-        path: "/app/v3/api/appstore/catalog/templates",
-        operation_id: "appstore.catalog.templates.list",
-        auth: RouteAuth::DualTokenOrAnonymous,
-        handler: "catalog_templates_list",
-        service_method: "catalog_templates_list",
-    },
-    RouteDefinition {
-        method: "GET",
-        path: "/app/v3/api/appstore/catalog/templates/{templateId}",
-        operation_id: "appstore.catalog.templates.retrieve",
-        auth: RouteAuth::DualTokenOrAnonymous,
-        handler: "catalog_template_retrieve",
-        service_method: "catalog_template_retrieve",
-    },
-    RouteDefinition {
-        method: "POST",
-        path: "/app/v3/api/appstore/catalog/templates",
-        operation_id: "appstore.catalog.templates.create",
-        auth: RouteAuth::DualToken,
-        handler: "catalog_template_create",
-        service_method: "catalog_template_create",
-    },
-    RouteDefinition {
-        method: "POST",
-        path: "/app/v3/api/appstore/catalog/templates/{templateId}/usage",
-        operation_id: "appstore.catalog.templates.usage.create",
-        auth: RouteAuth::DualToken,
-        handler: "catalog_template_usage_create",
-        service_method: "catalog_template_usage_create",
-    },
-    RouteDefinition {
-        method: "GET",
-        path: "/app/v3/api/appstore/catalog/templates/{templateId}/suggestions",
-        operation_id: "appstore.catalog.templates.suggestions.retrieve",
-        auth: RouteAuth::DualTokenOrAnonymous,
-        handler: "catalog_template_suggestions_retrieve",
-        service_method: "catalog_template_suggestions_retrieve",
-    },
     // Public expert roster: the AI expert page reads its own catalog store
-    // (`appstore_expert_catalog`), not the template shelf. Like the template
-    // shelf reads it stays open to an application-scoped request so the page
-    // renders before a user session exists.
+    // (`appstore_expert_catalog`), never an application-scaffold shelf. These
+    // reads stay open to an application-scoped request so the page renders
+    // before a user session exists.
     RouteDefinition {
         method: "GET",
         path: "/app/v3/api/appstore/catalog/experts",
