@@ -234,3 +234,6 @@ tables:
   - name: appstore_application_version
     lifecycle_status: active
     owner: appstore-platform
+  - name: appstore_expert_catalog
+    lifecycle_status: active
+    owner: appstore-platform

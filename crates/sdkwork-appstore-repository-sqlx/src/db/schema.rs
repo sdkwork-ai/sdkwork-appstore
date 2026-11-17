@@ -4,7 +4,7 @@
 //! including the folded 0002 platform-evolution and 0005 web-store tables, plus
 //! the 0003 user-store and 0004 SKU migrations, and the 0007 rename plus 0008
 //! application-version migrations) so the registry matches the live schema:
-//! 75 tables total.
+//! 76 tables total.
 
 pub const APPSTORE_TABLES: &[&str] = &[
     "appstore_idempotency_key",
@@ -14,6 +14,7 @@ pub const APPSTORE_TABLES: &[&str] = &[
     "appstore_application",
     "appstore_application_dependency",
     "appstore_application_version",
+    "appstore_expert_catalog",
     "appstore_category",
     "appstore_category_localization",
     "appstore_tag",
