@@ -84,7 +84,7 @@ type ApplicationGroupId = "iam" | "deploy" | "app-store";
 | `blueprint` | 运行时/身份定义（OAuth、scope、域名、包），按版本冻结 | iam |
 | `product application` | 跨租户的产品身份（开发与发布） | appstore |
 | `listing` / `sku` | 商品、定价、规格 | appstore |
-| `scaffold` | 设计期生成器输入 | appstore |
+| `scaffold` | 设计期生成器输入 | deploy |
 
 ### 3.2 表清单（全部使用已注册前缀）
 
@@ -104,7 +104,7 @@ type ApplicationGroupId = "iam" | "deploy" | "app-store";
 | 12 | `appstore_application_listing` | appstore | `appstore_listing` | 上架 |
 | 13 | `appstore_application_listing_price` | appstore | `appstore_listing_price` | **唯一计价权威** |
 | 14 | `appstore_application_deployment_binding` | appstore | `appstore_app_deployment_binding` | 分发目标（N:1） |
-| 15 | `appstore_application_scaffold` | appstore | `appstore_app_template` | 设计期 |
+| 15 | `deploy_application_scaffold` | deploy | `deploy_app_template` 改造 | 设计期（平台唯一脚手架） |
 
 ### 3.3 一对一怎么落地
 
@@ -249,7 +249,7 @@ sid / jti / iat / exp / kid
 **未决**
 
 1. `appstore_application_deployment_binding`（分发目标）是否并入链接表，还是保持独立——建议独立，避免把"身份"与"分发"混成一张多态表。
-2. `deploy_application_template` 是否保留：若市场能力并入 `appstore_application_scaffold` + `listing`，可整体下线。
+2. PAID 模板的 order/payment 购买路径移交 `appstore_application_listing_price` 的排期——deploy 模板改为脚手架后，commerce 必须整体迁出。
 3. 生命周期状态机词表的最终取值（三套枚举取并集）。
 4. 控制台改为读链接 API 的排期，决定 S1 能否一次完成。
 
@@ -273,16 +273,25 @@ sid / jti / iat / exp / kid
 | 市场商品模板 | `deploy_app_template*` | 是，商品与定价 |
 | **构建配方** | `deploy_build_template` | **不是**：toolchain / commands / artifact outputs / quality gates |
 
-### 处置
+### 处置（定案：脚手架统一到 deploy）
 
 | 表 | 处置 | 理由 |
 | --- | --- | --- |
-| `iam_application_template`、`_package` | **吸收**，不建独立蓝图表 | 身份切片并入产品版本（包、scopes、app 类型），域与 OAuth 凭据并入安装；第三份定义必然漂移 |
-| `appstore_app_template`、`_version`、`_usage` | **保留**，改名 `appstore_application_scaffold*` | 唯一的"模板"概念：开发者从模板创建应用 |
-| `deploy_app_template`、`_version`、`_category` | **下线** | 与 scaffold + listing 重复；须先把 PAID 模板的 order/payment 购买路径迁到 listing |
+| `iam_application_template`、`_package` | **完整移除** | 身份切片并入产品版本（包、scopes、app 类型），域与 OAuth 凭据并入安装；第三份定义必然漂移 |
+| `appstore_app_template`、`_version`、`_usage` | **完整移除**，数据迁入 deploy 脚手架 | 与 deploy 脚手架重复；appstore 只保留商品与发布 |
+| `deploy_app_template`、`_version`、`_category` | **改造为脚手架**：去掉 `pricing_*`、`visibility`、审核状态、`install_count`，补 `app_config_schema`、`variable_schema`、`dependency_manifest`、`capability_manifest`、`git_url`/`ref`/`sub_path` | 平台唯一的"模板"概念：开发者从脚手架创建应用 |
 | `deploy_build_template` | **改名** `deploy_build_recipe` | 与"应用模板"彻底解耦，消除第 4 种语义 |
 
-**收敛结果：9 张 → 3 张**（scaffold + version + usage），"template" 只保留脚手架一个含义。
+**收敛结果：9 张 template 表 → 0 张**。脚手架收敛为 deploy 的 3 张表（`deploy_application_scaffold` + `_version` + `_category`），"template" 一词在应用身份领域消失。
+
+### 移除的连带影响
+
+| 项 | 处理 |
+| --- | --- |
+| `appstore_app_sku.source_template_id` / `source_template_version_id` | 改指向 deploy 脚手架版本（跨模块软引用 + 校验） |
+| appstore 种子 `008`/`014`/`015`、`materialize_module_template_seed.mjs`、`catalog_repository.rs` 的模板查询 | 迁入 deploy 或删除 |
+| deploy `template_market.rs` 的购买/审核路径（PAID 经 order/payment） | 迁入 appstore listing_price |
+| iam `applications.register` 接口、embedded bootstrap、种子 `003`、`IamTables` 常量 | 随表移除一并删除 |
 
 ### 根因
 
