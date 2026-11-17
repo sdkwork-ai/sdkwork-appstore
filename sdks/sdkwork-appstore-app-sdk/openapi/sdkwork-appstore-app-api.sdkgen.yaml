@@ -600,6 +600,71 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AppTemplateSuggestionsResponse'
+  /app/v3/api/appstore/catalog/experts:
+    get:
+      tags:
+      - catalog
+      summary: List the storefront AI expert roster
+      description: Reads the curated expert catalog directly, so the expert page no
+        longer depends on the template shelf. Only published, non-deleted experts
+        are returned. Ordering follows sort_weight ascending by default; the opaque
+        cursor from pageInfo continues the same ordering.
+      operationId: appstore.catalog.experts.list
+      security:
+      - AuthToken: []
+        AccessToken: []
+      parameters:
+      - name: category_code
+        in: query
+        description: Scenario card code the roster is filtered by, for example the
+          engineering-development scenario card.
+        schema:
+          type: string
+      - name: sort
+        in: query
+        description: '`sort_weight_asc` (default) keeps the curated editorial order;
+          `sort_weight_desc` lists the heaviest weight first.'
+        schema:
+          type: string
+          enum:
+          - sort_weight_asc
+          - sort_weight_desc
+          default: sort_weight_asc
+      - $ref: '#/components/parameters/Cursor'
+      - $ref: '#/components/parameters/PageSize'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CatalogExpertListResponse'
+  /app/v3/api/appstore/catalog/experts/{expertRef}:
+    get:
+      tags:
+      - catalog
+      summary: Retrieve one AI expert of the storefront roster
+      description: '`expertRef` is either the expert catalog row id or the stable
+        expertCode, so a client that only knows the curated code can still open the
+        detail page. Draft, soft-deleted and unknown experts resolve to 404.'
+      operationId: appstore.catalog.experts.retrieve
+      security:
+      - AuthToken: []
+        AccessToken: []
+      parameters:
+      - name: expertRef
+        in: path
+        required: true
+        description: Expert catalog row id or stable expert code.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CatalogExpertResponse'
   /app/v3/api/appstore/catalog/feedback:
     post:
       tags:
@@ -4016,6 +4081,86 @@ components:
             properties:
               item:
                 $ref: '#/components/schemas/AppTemplateSuggestions'
+    CatalogExpert:
+      type: object
+      additionalProperties: false
+      description: One curated AI expert of the storefront roster. The roster has
+        its own catalog store, so reading it never depends on the template shelf.
+      required:
+      - id
+      - expertCode
+      - expertName
+      - profile
+      - featured
+      - sortWeight
+      - createdAt
+      - updatedAt
+      properties:
+        id:
+          type: string
+        expertCode:
+          type: string
+          description: Stable public code of the expert (for example exp-senior-dev).
+        expertName:
+          type: string
+        description:
+          type: string
+        categoryCode:
+          type: string
+          description: Scenario card the expert is grouped under, derived from the
+            stored catalog rows.
+        profile:
+          type: object
+          additionalProperties: true
+          description: Presentation payload the storefront renders (nickname, tags,
+            prompts, avatar icon, popularity, rating, badge, usage counters).
+        featured:
+          type: boolean
+        sortWeight:
+          type: integer
+          description: Editorial weight the roster is ordered by.
+        publishedAt:
+          type: string
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    CatalogExpertListResponse:
+      allOf:
+      - $ref: '#/components/schemas/SdkWorkApiResponse'
+      - type: object
+        required:
+        - data
+        properties:
+          data:
+            type: object
+            required:
+            - items
+            - pageInfo
+            properties:
+              items:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CatalogExpert'
+              pageInfo:
+                $ref: '#/components/schemas/PageInfo'
+    CatalogExpertResponse:
+      allOf:
+      - $ref: '#/components/schemas/SdkWorkApiResponse'
+      - type: object
+        required:
+        - data
+        properties:
+          data:
+            type: object
+            required:
+            - item
+            properties:
+              item:
+                $ref: '#/components/schemas/CatalogExpert'
     ListingRating:
       type: object
       additionalProperties: false

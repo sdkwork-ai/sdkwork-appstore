@@ -724,6 +724,28 @@ pub struct AppTemplateUsageRow {
     pub created_at: DateTime<Utc>,
 }
 
+/// One row of the curated AI expert roster (`appstore_expert_catalog`,
+/// migration 0009). `profile_json` is the presentation payload the storefront
+/// renders; it is TEXT in the catalog store, so it is decoded here rather than
+/// by the database driver.
+#[derive(Debug, Clone, FromRow)]
+pub struct ExpertCatalogRow {
+    pub id: String,
+    pub tenant_id: String,
+    pub organization_id: String,
+    pub expert_code: String,
+    pub expert_name: String,
+    pub description: Option<String>,
+    pub category_code: Option<String>,
+    pub profile_json: String,
+    pub expert_status: String,
+    pub featured: bool,
+    pub sort_weight: i32,
+    pub published_at: Option<DateTime<Utc>>,
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
+}
+
 #[derive(Debug, Clone, FromRow)]
 pub struct FeedbackRow {
     pub id: String,

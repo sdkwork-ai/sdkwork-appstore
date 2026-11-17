@@ -37,6 +37,8 @@ Prefix lock:
 | `appstore.catalog.templates.retrieve` | GET | `/app/v3/api/appstore/catalog/templates/{templateId}` | `appstore.catalog.read` |
 | `appstore.catalog.templates.usage.create` | POST | `/app/v3/api/appstore/catalog/templates/{templateId}/usage` | none |
 | `appstore.catalog.templates.suggestions.retrieve` | GET | `/app/v3/api/appstore/catalog/templates/{templateId}/suggestions` | `appstore.catalog.read` |
+| `appstore.catalog.experts.list` | GET | `/app/v3/api/appstore/catalog/experts` | `appstore.catalog.read` |
+| `appstore.catalog.experts.retrieve` | GET | `/app/v3/api/appstore/catalog/experts/{expertRef}` | `appstore.catalog.read` |
 | `appstore.catalog.listings.list` | GET | `/app/v3/api/appstore/catalog/listings/search` | `appstore.catalog.read` |
 
 ## App API — Listings

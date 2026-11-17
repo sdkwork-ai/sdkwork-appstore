@@ -604,6 +604,27 @@ pub const APPSTORE_ENTITLEMENT_COLUMNS: &[&str] = &[
     "updated_at",
 ];
 
+pub const APPSTORE_EXPERT_CATALOG_COLUMNS: &[&str] = &[
+    "id",
+    "tenant_id",
+    "organization_id",
+    "expert_code",
+    "expert_name",
+    "description",
+    "category_code",
+    "profile_json",
+    "expert_status",
+    "visibility",
+    "featured",
+    "sort_weight",
+    "owner_user_id",
+    "version",
+    "published_at",
+    "deleted_at",
+    "created_at",
+    "updated_at",
+];
+
 pub const APPSTORE_DOWNLOAD_GRANT_COLUMNS: &[&str] = &[
     "id",
     "tenant_id",

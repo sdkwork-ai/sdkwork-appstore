@@ -7,20 +7,21 @@ use crate::db::rows::{
     CatalogCollectionLocalizationRow, CatalogCollectionRow, CatalogFeaturedSlotRow,
     CatalogSearchHistoryRow, CatalogTrendingTermRow, CategoryLocalizationRow, CategoryRow,
     CompliancePermissionDisclosureRow, ComplianceProfileRow, DownloadGrantRow, EntitlementRow,
-    FeedbackRow, InstallEventRow, ListingCategoryBindingRow, ListingLocalizationRow,
-    ListingMediaRow, ListingMetricSnapshotRow, ListingRatingRow, ListingRow, ListingSearchRow,
-    ListingSubmissionRow, MarketChannelRow, MarketReleaseRow, ModerationDecisionRow,
-    ModerationReviewRow, PublisherMemberRow, PublisherRow, PublisherVerificationRow,
-    RegionalAvailabilityRow, ReleaseArtifactRow, ReleaseChannelRow, ReleaseNoteLocalizationRow,
-    ReleaseRolloutRow, ReleaseRow, UserCategoryItemRow, UserCategoryRow, UserLibraryItemRow,
-    UserStoreShareRow, UserWishlistItemRow,
+    ExpertCatalogRow, FeedbackRow, InstallEventRow, ListingCategoryBindingRow,
+    ListingLocalizationRow, ListingMediaRow, ListingMetricSnapshotRow, ListingRatingRow,
+    ListingRow, ListingSearchRow, ListingSubmissionRow, MarketChannelRow, MarketReleaseRow,
+    ModerationDecisionRow, ModerationReviewRow, PublisherMemberRow, PublisherRow,
+    PublisherVerificationRow, RegionalAvailabilityRow, ReleaseArtifactRow, ReleaseChannelRow,
+    ReleaseNoteLocalizationRow, ReleaseRolloutRow, ReleaseRow, UserCategoryItemRow,
+    UserCategoryRow, UserLibraryItemRow, UserStoreShareRow, UserWishlistItemRow,
 };
 use sdkwork_appstore_catalog_service::domain::models::{
     AppTemplate, AppTemplateUsage, AppTemplateUsageKind, AudienceScope as CatalogAudienceScope,
     CatalogChartSnapshot, CatalogCollection, CatalogCollectionItem, CatalogCollectionLocalization,
     CatalogFeaturedSlot, Category, CategoryId, CategoryLocalization, CategoryStatus, CollectionId,
-    CollectionStatus, CollectionType, FeaturedSlotId, FeaturedSlotStatus, Feedback,
-    ListingMetricSnapshot, ListingSummary, PlatformScope, SearchHistoryEntry, TrendingTerm,
+    CollectionStatus, CollectionType, ExpertCatalogEntry, FeaturedSlotId, FeaturedSlotStatus,
+    Feedback, ListingMetricSnapshot, ListingSummary, PlatformScope, SearchHistoryEntry,
+    TrendingTerm,
 };
 use sdkwork_appstore_compliance_service::domain::models::{
     CompliancePermissionDisclosure, ComplianceProfile, ComplianceProfileId, ComplianceStatus,
@@ -1242,6 +1243,33 @@ pub fn map_app_template_row_to_domain(row: AppTemplateRow) -> Result<AppTemplate
         created_at: row.created_at,
         updated_at: row.updated_at,
     })
+}
+
+/// Maps one `appstore_expert_catalog` row.
+///
+/// `profile_json` is presentation payload owned by the catalog seed/migration,
+/// so a malformed value degrades to an empty object instead of failing the
+/// whole expert page — the expert's name, code, category and ordering are
+/// ordinary columns and stay readable.
+pub fn map_expert_catalog_row_to_domain(row: ExpertCatalogRow) -> ExpertCatalogEntry {
+    let profile = serde_json::from_str(&row.profile_json)
+        .unwrap_or_else(|_| serde_json::Value::Object(Default::default()));
+    ExpertCatalogEntry {
+        id: row.id,
+        tenant_id: row.tenant_id,
+        organization_id: row.organization_id,
+        expert_code: row.expert_code,
+        expert_name: row.expert_name,
+        description: row.description,
+        category_code: row.category_code,
+        profile,
+        expert_status: row.expert_status,
+        featured: row.featured,
+        sort_weight: row.sort_weight,
+        published_at: row.published_at,
+        created_at: row.created_at,
+        updated_at: row.updated_at,
+    }
 }
 
 pub fn map_app_template_usage_row_to_domain(

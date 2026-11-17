@@ -1,11 +1,12 @@
 use sdkwork_appstore_catalog_service::domain::commands::{
     CategoriesListRequest, CategoryRetrieveRequest, ChartsRetrieveRequest,
     CollectionRetrieveRequest, CollectionsListRequest, EventRetrieveRequest, EventsListRequest,
-    FeaturedListRequest, FeedbackCreateRequest, HomeRetrieveRequest, ListingsSearchRequest,
-    RecentlyUpdatedListRequest, RecommendationsListRequest, SearchHistoryClearRequest,
-    SearchHistoryListRequest, SearchHistoryUpsertRequest, SearchSuggestionsListRequest,
-    SearchTrendingListRequest, TemplateCreateRequest, TemplateRetrieveRequest,
-    TemplateSuggestionsRetrieveRequest, TemplateUsageCreateRequest, TemplatesListRequest,
+    ExpertRetrieveRequest, ExpertsListRequest, FeaturedListRequest, FeedbackCreateRequest,
+    HomeRetrieveRequest, ListingsSearchRequest, RecentlyUpdatedListRequest,
+    RecommendationsListRequest, SearchHistoryClearRequest, SearchHistoryListRequest,
+    SearchHistoryUpsertRequest, SearchSuggestionsListRequest, SearchTrendingListRequest,
+    TemplateCreateRequest, TemplateRetrieveRequest, TemplateSuggestionsRetrieveRequest,
+    TemplateUsageCreateRequest, TemplatesListRequest,
 };
 
 pub fn map_home_retrieve(locale: Option<String>, platform: Option<String>) -> HomeRetrieveRequest {
@@ -365,4 +366,30 @@ pub fn map_feedback_create(
     req.listing_id = listing_id;
     req.app_key = app_key;
     req
+}
+
+pub fn map_experts_list(
+    category_code: Option<String>,
+    sort: Option<String>,
+    cursor: Option<String>,
+    page_size: Option<i32>,
+) -> ExpertsListRequest {
+    let mut req = ExpertsListRequest::new();
+    if let Some(v) = category_code {
+        req = req.with_category_code(v);
+    }
+    if let Some(v) = sort {
+        req = req.with_sort(v);
+    }
+    if let Some(v) = cursor {
+        req = req.with_cursor(v);
+    }
+    if let Some(v) = page_size {
+        req = req.with_page_size(v);
+    }
+    req
+}
+
+pub fn map_expert_retrieve(expert_ref: String) -> ExpertRetrieveRequest {
+    ExpertRetrieveRequest::new(expert_ref)
 }

@@ -19,7 +19,7 @@ use crate::db::rows::{
     AppTemplateRow, AppTemplateUsageRow, CatalogChartSnapshotRow, CatalogCollectionItemRow,
     CatalogCollectionLocalizationRow, CatalogCollectionRow, CatalogFeaturedSlotRow,
     CatalogSearchHistoryRow, CatalogTrendingTermRow, CategoryLocalizationRow, CategoryRow,
-    ListingMetricSnapshotRow, ListingSearchRow, ListingSuggestionRow,
+    ExpertCatalogRow, ListingMetricSnapshotRow, ListingSearchRow, ListingSuggestionRow,
 };
 use crate::mapper::row_mapper::{
     map_app_template_row_to_domain, map_app_template_usage_row_to_domain,
@@ -27,23 +27,25 @@ use crate::mapper::row_mapper::{
     map_category_row_to_domain, map_chart_snapshot_row_to_domain, map_collection_domain_to_row,
     map_collection_item_domain_to_row, map_collection_item_row_to_domain,
     map_collection_localization_row_to_domain, map_collection_row_to_domain,
-    map_featured_slot_domain_to_row, map_featured_slot_row_to_domain,
-    map_listing_search_row_to_domain, map_metric_snapshot_row_to_domain,
-    map_search_history_row_to_domain, map_trending_term_row_to_domain,
+    map_expert_catalog_row_to_domain, map_featured_slot_domain_to_row,
+    map_featured_slot_row_to_domain, map_listing_search_row_to_domain,
+    map_metric_snapshot_row_to_domain, map_search_history_row_to_domain,
+    map_trending_term_row_to_domain,
 };
 
 use sdkwork_appstore_catalog_service::context::AppstoreRequestContext;
 use sdkwork_appstore_catalog_service::domain::models::{
     AppTemplate, AppTemplateUsage, AppTemplateUsageCounts, AppTemplateUsageKind,
     CatalogChartSnapshot, CatalogCollection, CatalogCollectionItem, CatalogCollectionLocalization,
-    CatalogFeaturedSlot, Category, CategoryId, CategoryLocalization, CollectionId, Feedback,
-    ListingMetricSnapshot, ListingSummary, OperatorDashboardStats, OperatorSearchAnalytics,
-    PublisherAnalyticsOverview, PublisherListingMetricsSummary, SearchHistoryEntry,
-    SearchSuggestion, TrendingTerm,
+    CatalogFeaturedSlot, Category, CategoryId, CategoryLocalization, CollectionId,
+    ExpertCatalogEntry, Feedback, ListingMetricSnapshot, ListingSummary, OperatorDashboardStats,
+    OperatorSearchAnalytics, PublisherAnalyticsOverview, PublisherListingMetricsSummary,
+    SearchHistoryEntry, SearchSuggestion, TrendingTerm,
 };
 use sdkwork_appstore_catalog_service::error::AppstoreServiceError;
 use sdkwork_appstore_catalog_service::ports::repository::{
-    CatalogRepositoryPort, TemplateFeedOrder, TemplateFeedQuery,
+    CatalogRepositoryPort, ExpertCatalogQuery, ExpertSortOrder, TemplateFeedOrder,
+    TemplateFeedQuery,
 };
 
 #[derive(Debug, Clone)]
@@ -2061,7 +2063,9 @@ impl CatalogRepositoryPort for SqlxCatalogRepository {
         }
         match query.order {
             TemplateFeedOrder::Latest => {
-                sql.push_str("ORDER BY t.published_at DESC NULLS LAST, t.created_at DESC, t.id DESC\n");
+                sql.push_str(
+                    "ORDER BY t.published_at DESC NULLS LAST, t.created_at DESC, t.id DESC\n",
+                );
             }
             TemplateFeedOrder::Popular => {
                 sql.push_str(
@@ -2374,6 +2378,102 @@ impl CatalogRepositoryPort for SqlxCatalogRepository {
             .map_err(|e| AppstoreServiceError::Internal(format!("Database error: {}", e)))?;
         Ok(())
     }
+
+    async fn find_expert_catalog_entries(
+        &self,
+        context: &AppstoreRequestContext,
+        query: ExpertCatalogQuery<'_>,
+    ) -> Result<Vec<ExpertCatalogEntry>, AppstoreServiceError> {
+        let mut sql = String::from(
+            r#"
+            SELECT id, tenant_id, organization_id, expert_code, expert_name, description,
+                   category_code, COALESCE(profile_json, '{}') AS profile_json,
+                   expert_status, featured, sort_weight, published_at, created_at, updated_at
+            FROM appstore_expert_catalog
+            WHERE tenant_id = ? AND expert_status = 'published' AND deleted_at IS NULL
+            "#,
+        );
+
+        if query.category_code.is_some() {
+            sql.push_str("  AND category_code = ?\n");
+        }
+
+        // Keyset pagination over the exact ordering below; a malformed cursor
+        // degrades to the first page instead of hiding rows.
+        let cursor_key = query.cursor.and_then(parse_expert_cursor);
+        if cursor_key.is_some() {
+            match query.order {
+                ExpertSortOrder::SortWeightAsc => {
+                    sql.push_str("  AND (sort_weight > ? OR (sort_weight = ? AND id > ?))\n");
+                }
+                ExpertSortOrder::SortWeightDesc => {
+                    sql.push_str("  AND (sort_weight < ? OR (sort_weight = ? AND id < ?))\n");
+                }
+            }
+        }
+
+        // `id` breaks ties so `sort_weight` alone never makes two rows
+        // interchangeable across page boundaries.
+        match query.order {
+            ExpertSortOrder::SortWeightAsc => {
+                sql.push_str("ORDER BY sort_weight ASC, id ASC\n");
+            }
+            ExpertSortOrder::SortWeightDesc => {
+                sql.push_str("ORDER BY sort_weight DESC, id DESC\n");
+            }
+        }
+        sql.push_str("LIMIT ?\n");
+
+        let adapted = self.db.adapt_sql(&sql);
+        let mut q = self
+            .db
+            .query_as::<ExpertCatalogRow>(&adapted)
+            .bind(context.tenant_id.as_str());
+        if let Some(category_code) = query.category_code {
+            q = q.bind(category_code);
+        }
+        if let Some((sort_weight, last_id)) = cursor_key {
+            q = q.bind(sort_weight).bind(sort_weight).bind(last_id);
+        }
+        q = q.bind(query.limit);
+
+        let rows = q
+            .fetch_all(&self.db)
+            .await
+            .map_err(|e| AppstoreServiceError::Internal(format!("Database error: {}", e)))?;
+        Ok(rows
+            .into_iter()
+            .map(map_expert_catalog_row_to_domain)
+            .collect())
+    }
+
+    async fn find_expert_catalog_entry(
+        &self,
+        context: &AppstoreRequestContext,
+        expert_ref: &str,
+    ) -> Result<Option<ExpertCatalogEntry>, AppstoreServiceError> {
+        let row = self
+            .db
+            .query_as::<ExpertCatalogRow>(&self.db.adapt_sql(
+                r#"
+                SELECT id, tenant_id, organization_id, expert_code, expert_name, description,
+                       category_code, COALESCE(profile_json, '{}') AS profile_json,
+                       expert_status, featured, sort_weight, published_at, created_at, updated_at
+                FROM appstore_expert_catalog
+                WHERE tenant_id = ? AND expert_status = 'published' AND deleted_at IS NULL
+                  AND (id = ? OR expert_code = ?)
+                LIMIT 1
+                "#,
+            ))
+            .bind(context.tenant_id.as_str())
+            .bind(expert_ref)
+            .bind(expert_ref)
+            .fetch_optional(&self.db)
+            .await
+            .map_err(|e| AppstoreServiceError::Internal(format!("Database error: {}", e)))?;
+
+        Ok(row.map(map_expert_catalog_row_to_domain))
+    }
 }
 
 fn template_bigint_id(id: &str) -> i64 {
@@ -2422,4 +2522,44 @@ fn rand_hex_suffix() -> u32 {
         .unwrap_or_default()
         .subsec_nanos();
     seed.wrapping_mul(2654435761).rotate_left(13)
+}
+
+/// Split an opaque expert cursor into its `(sort_weight, id)` keyset.
+///
+/// The catalog service emits `"{sort_weight}:{id}"` (see
+/// `service::expert_catalog::expert_cursor`). A malformed value returns `None`
+/// so the lookup starts at the first page instead of silently filtering rows
+/// out from an arbitrary key.
+fn parse_expert_cursor(cursor: &str) -> Option<(i32, String)> {
+    match cursor.split_once(':') {
+        Some((sort_weight, id)) if !id.is_empty() => {
+            Some((sort_weight.parse::<i32>().ok()?, id.to_string()))
+        }
+        _ => None,
+    }
+}
+
+#[cfg(test)]
+mod expert_cursor_tests {
+    use super::parse_expert_cursor;
+
+    #[test]
+    fn parses_the_service_cursor_format() {
+        assert_eq!(
+            parse_expert_cursor("7:531000000000000007"),
+            Some((7, "531000000000000007".to_string()))
+        );
+        assert_eq!(
+            parse_expert_cursor("-3:exp-senior-dev"),
+            Some((-3, "exp-senior-dev".to_string()))
+        );
+    }
+
+    #[test]
+    fn rejects_malformed_cursors_so_a_page_restarts() {
+        assert_eq!(parse_expert_cursor(""), None);
+        assert_eq!(parse_expert_cursor("not-a-weight:531000000000000007"), None);
+        assert_eq!(parse_expert_cursor("7:"), None);
+        assert_eq!(parse_expert_cursor("7"), None);
+    }
 }

@@ -135,6 +135,18 @@ const HTTP_ROUTES: &[HttpRoute] = &[
         "appstore",
         "appstore.catalog.templates.suggestions.retrieve",
     ),
+    HttpRoute::dual_token_or_anonymous(
+        HttpMethod::Get,
+        "/app/v3/api/appstore/catalog/experts",
+        "appstore",
+        "appstore.catalog.experts.list",
+    ),
+    HttpRoute::dual_token_or_anonymous(
+        HttpMethod::Get,
+        "/app/v3/api/appstore/catalog/experts/{expertRef}",
+        "appstore",
+        "appstore.catalog.experts.retrieve",
+    ),
     HttpRoute::dual_token(
         HttpMethod::Post,
         "/app/v3/api/appstore/catalog/feedback",

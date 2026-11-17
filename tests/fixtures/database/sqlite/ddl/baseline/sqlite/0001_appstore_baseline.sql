@@ -756,6 +756,39 @@ CREATE INDEX IF NOT EXISTS idx_appstore_download_grant_active
 CREATE INDEX IF NOT EXISTS idx_appstore_install_event_listing
   ON appstore_install_event (tenant_id, listing_id, occurred_at DESC);
 
+-- AI expert catalog: migration 0009 adds this table to the live PostgreSQL
+-- chain. Experts were previously stored in appstore_app_template with
+-- template_type = 'EXPERT' — the expert page now reads this table only, so the
+-- repository tests need it here.
+CREATE TABLE IF NOT EXISTS appstore_expert_catalog (
+  id TEXT PRIMARY KEY,
+  tenant_id TEXT NOT NULL,
+  organization_id TEXT NOT NULL DEFAULT '0',
+  expert_code TEXT NOT NULL,
+  expert_name TEXT NOT NULL,
+  description TEXT,
+  category_code TEXT,
+  profile_json TEXT NOT NULL DEFAULT '{}',
+  expert_status TEXT NOT NULL DEFAULT 'draft',
+  visibility INTEGER NOT NULL DEFAULT 0,
+  featured INTEGER NOT NULL DEFAULT 0,
+  sort_weight INTEGER NOT NULL DEFAULT 0,
+  owner_user_id TEXT,
+  version INTEGER NOT NULL DEFAULT 0,
+  published_at TEXT,
+  deleted_at TEXT,
+  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS uk_appstore_expert_catalog_code
+  ON appstore_expert_catalog (tenant_id, expert_code)
+  WHERE deleted_at IS NULL;
+
+CREATE INDEX IF NOT EXISTS idx_appstore_expert_catalog_listing
+  ON appstore_expert_catalog (tenant_id, category_code, sort_weight, id)
+  WHERE deleted_at IS NULL;
+
 CREATE TABLE IF NOT EXISTS appstore_app_template (
   id TEXT PRIMARY KEY,
   uuid TEXT NOT NULL,

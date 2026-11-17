@@ -4,9 +4,51 @@ use crate::context::AppstoreRequestContext;
 use crate::domain::models::{
     CatalogChartSnapshot, CatalogCollection, CatalogCollectionItem, CatalogCollectionLocalization,
     CatalogFeaturedSlot, Category, CategoryId, CategoryLocalization, CollectionId,
-    ListingMetricSnapshot, ListingSummary, SearchHistoryEntry, SearchSuggestion, TrendingTerm,
+    ExpertCatalogEntry, ListingMetricSnapshot, ListingSummary, SearchHistoryEntry,
+    SearchSuggestion, TrendingTerm,
 };
 use crate::error::AppstoreServiceResult;
+
+/// Ranking applied to the public expert roster.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ExpertSortOrder {
+    /// Lightest weight first: the curated editorial order (default).
+    SortWeightAsc,
+    /// Heaviest weight first.
+    SortWeightDesc,
+}
+
+impl ExpertSortOrder {
+    pub const SORT_WEIGHT_ASC: &'static str = "sort_weight_asc";
+    pub const SORT_WEIGHT_DESC: &'static str = "sort_weight_desc";
+
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            Self::SortWeightAsc => Self::SORT_WEIGHT_ASC,
+            Self::SortWeightDesc => Self::SORT_WEIGHT_DESC,
+        }
+    }
+
+    pub fn from_str(value: &str) -> Option<Self> {
+        match value {
+            Self::SORT_WEIGHT_ASC => Some(Self::SortWeightAsc),
+            Self::SORT_WEIGHT_DESC => Some(Self::SortWeightDesc),
+            _ => None,
+        }
+    }
+}
+
+/// One expert roster page lookup: the public filter, the ordering and the
+/// keyset window. `limit` is the number of rows the store may return, so the
+/// service asks for one extra row to detect a following page without a count.
+#[derive(Debug, Clone, Copy)]
+pub struct ExpertCatalogQuery<'a> {
+    pub category_code: Option<&'a str>,
+    pub order: ExpertSortOrder,
+    /// Opaque keyset cursor of the previous page (`"{sort_weight}:{id}"`).
+    pub cursor: Option<&'a str>,
+    pub limit: i32,
+}
 
 /// Ranking applied to a template discovery feed.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -377,4 +419,22 @@ pub trait CatalogRepositoryPort: Send + Sync {
         context: &AppstoreRequestContext,
         feedback: &crate::domain::models::Feedback,
     ) -> AppstoreServiceResult<()>;
+
+    /// Public expert roster page from `appstore_expert_catalog`: published and
+    /// not deleted rows only, ordered by `sort_weight` (then `id`) so the
+    /// keyset cursor in [`ExpertCatalogQuery::cursor`] is a stable total order.
+    async fn find_expert_catalog_entries(
+        &self,
+        context: &AppstoreRequestContext,
+        query: ExpertCatalogQuery<'_>,
+    ) -> AppstoreServiceResult<Vec<ExpertCatalogEntry>>;
+
+    /// One published expert addressed by catalog row id **or** `expert_code`;
+    /// the two key spaces are resolved in a single lookup because both are
+    /// stable public identifiers of the curated roster.
+    async fn find_expert_catalog_entry(
+        &self,
+        context: &AppstoreRequestContext,
+        expert_ref: &str,
+    ) -> AppstoreServiceResult<Option<ExpertCatalogEntry>>;
 }

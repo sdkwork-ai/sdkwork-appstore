@@ -1,12 +1,12 @@
 use crate::handlers::{
     catalog_categories_list, catalog_categories_retrieve, catalog_charts_retrieve,
     catalog_collections_list, catalog_collections_retrieve, catalog_events_list,
-    catalog_events_retrieve, catalog_featured_list, catalog_feedback_create, catalog_home_retrieve,
-    catalog_listings_search, catalog_recently_updated_list, catalog_recommendations_list,
-    catalog_search_history_clear, catalog_search_history_list, catalog_search_history_upsert,
-    catalog_search_suggestions_list, catalog_search_trending_list, catalog_template_create,
-    catalog_template_retrieve, catalog_template_suggestions_retrieve, catalog_template_usage_create,
-    catalog_templates_list,
+    catalog_events_retrieve, catalog_expert_retrieve, catalog_experts_list, catalog_featured_list,
+    catalog_feedback_create, catalog_home_retrieve, catalog_listings_search,
+    catalog_recently_updated_list, catalog_recommendations_list, catalog_search_history_clear,
+    catalog_search_history_list, catalog_search_history_upsert, catalog_search_suggestions_list,
+    catalog_search_trending_list, catalog_template_create, catalog_template_retrieve,
+    catalog_template_suggestions_retrieve, catalog_template_usage_create, catalog_templates_list,
 };
 use axum::extract::{Extension, Json, Path, Query, State};
 use axum::http::StatusCode;
@@ -109,6 +109,15 @@ struct CatalogTemplatesListQuery {
 
 #[derive(Debug, serde::Deserialize)]
 struct CatalogTemplateSuggestionsQuery {
+    page_size: Option<i32>,
+}
+
+#[derive(Debug, serde::Deserialize)]
+struct CatalogExpertsListQuery {
+    category_code: Option<String>,
+    /// `sort_weight_asc` (default) or `sort_weight_desc`.
+    sort: Option<String>,
+    cursor: Option<String>,
     page_size: Option<i32>,
 }
 
@@ -232,6 +241,14 @@ pub fn routes() -> Router<AppState> {
         .route(
             "/app/v3/api/appstore/catalog/templates/{templateId}/suggestions",
             get(catalog_template_suggestions_retrieve_handler),
+        )
+        .route(
+            "/app/v3/api/appstore/catalog/experts",
+            get(catalog_experts_list_handler),
+        )
+        .route(
+            "/app/v3/api/appstore/catalog/experts/{expertRef}",
+            get(catalog_expert_retrieve_handler),
         )
         .route(
             "/app/v3/api/appstore/catalog/feedback",
@@ -789,6 +806,58 @@ async fn catalog_feedback_create_handler(
     .await
     {
         Ok(result) => created(context.as_ref(), result.feedback),
+        Err(error) => map_catalog_error(context.as_ref(), error),
+    }
+}
+
+async fn catalog_experts_list_handler(
+    State(state): State<AppState>,
+    context: Option<Extension<WebRequestContext>>,
+    Query(query): Query<CatalogExpertsListQuery>,
+) -> Response {
+    let ctx = match to_catalog_context(context.as_ref()) {
+        Ok(ctx) => ctx,
+        Err(resp) => return resp,
+    };
+    match catalog_experts_list(
+        &state.catalog_service,
+        &ctx,
+        query.category_code,
+        query.sort,
+        query.cursor,
+        query.page_size,
+    )
+    .await
+    {
+        Ok(result) => ok_page(
+            context.as_ref(),
+            result.experts,
+            result.next_cursor,
+            result.has_more,
+        ),
+        Err(error) => map_catalog_error(context.as_ref(), error),
+    }
+}
+
+async fn catalog_expert_retrieve_handler(
+    State(state): State<AppState>,
+    Path(expert_ref): Path<String>,
+    context: Option<Extension<WebRequestContext>>,
+) -> Response {
+    let ctx = match to_catalog_context(context.as_ref()) {
+        Ok(ctx) => ctx,
+        Err(resp) => return resp,
+    };
+    match catalog_expert_retrieve(&state.catalog_service, &ctx, expert_ref).await {
+        Ok(result) => match result.expert {
+            Some(expert) => ok_item(context.as_ref(), expert),
+            None => map_catalog_error(
+                context.as_ref(),
+                sdkwork_appstore_catalog_service::error::AppstoreServiceError::NotFound(
+                    "Expert not found".to_string(),
+                ),
+            ),
+        },
         Err(error) => map_catalog_error(context.as_ref(), error),
     }
 }

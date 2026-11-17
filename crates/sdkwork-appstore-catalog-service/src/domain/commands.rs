@@ -1130,6 +1130,65 @@ impl FeedbackCreateRequest {
     }
 }
 
+/// Public expert roster lookup: the category filter, the ordering and the page
+/// window the storefront's expert page asks for.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct ExpertsListRequest {
+    pub category_code: Option<String>,
+    /// `sort_weight_asc` (default) or `sort_weight_desc`.
+    pub sort: Option<String>,
+    pub cursor: Option<String>,
+    pub page_size: Option<i32>,
+}
+
+impl ExpertsListRequest {
+    pub fn new() -> Self {
+        Self {
+            category_code: None,
+            sort: None,
+            cursor: None,
+            page_size: None,
+        }
+    }
+
+    pub fn with_category_code(mut self, category_code: impl Into<String>) -> Self {
+        self.category_code = Some(category_code.into());
+        self
+    }
+
+    pub fn with_sort(mut self, sort: impl Into<String>) -> Self {
+        self.sort = Some(sort.into());
+        self
+    }
+
+    pub fn with_cursor(mut self, cursor: impl Into<String>) -> Self {
+        self.cursor = Some(cursor.into());
+        self
+    }
+
+    pub fn with_page_size(mut self, page_size: i32) -> Self {
+        self.page_size = Some(page_size);
+        self
+    }
+}
+
+/// Expert detail lookup addressed by either key space: the catalog row id or
+/// the stable `expert_code` the curated roster is published under.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct ExpertRetrieveRequest {
+    pub expert_ref: String,
+}
+
+impl ExpertRetrieveRequest {
+    pub fn new(expert_ref: impl Into<String>) -> Self {
+        Self {
+            expert_ref: expert_ref.into(),
+        }
+    }
+}
+
 #[cfg(test)]
 mod wire_casing_tests {
     use super::{CategoryLocalizationInput, CollectionItemInput, CollectionLocalizationInput};

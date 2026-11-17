@@ -5,8 +5,9 @@ use serde::{Deserialize, Serialize};
 use super::models::{
     AppTemplate, CatalogChartSnapshot, CatalogCollection, CatalogCollectionItem,
     CatalogCollectionLocalization, CatalogFeaturedSlot, Category, CategoryLocalization,
-    CategoryWithLocalizations, CollectionWithItems, Feedback, ListingMetricSnapshot,
-    ListingSummary, SearchHistoryEntry, SearchSuggestion, TemplateSuggestions, TrendingTerm,
+    CategoryWithLocalizations, CollectionWithItems, ExpertCatalogEntry, Feedback,
+    ListingMetricSnapshot, ListingSummary, SearchHistoryEntry, SearchSuggestion,
+    TemplateSuggestions, TrendingTerm,
 };
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -701,6 +702,54 @@ impl TemplateRetrieveResult {
         Self {
             operation_id,
             template: None,
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct ExpertsListResult {
+    pub operation_id: &'static str,
+    pub experts: Vec<ExpertCatalogEntry>,
+    pub next_cursor: Option<String>,
+    pub has_more: bool,
+}
+
+impl ExpertsListResult {
+    pub fn new(
+        operation_id: &'static str,
+        experts: Vec<ExpertCatalogEntry>,
+        next_cursor: Option<String>,
+        has_more: bool,
+    ) -> Self {
+        Self {
+            operation_id,
+            experts,
+            next_cursor,
+            has_more,
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct ExpertRetrieveResult {
+    pub operation_id: &'static str,
+    pub expert: Option<ExpertCatalogEntry>,
+}
+
+impl ExpertRetrieveResult {
+    pub fn found(operation_id: &'static str, expert: ExpertCatalogEntry) -> Self {
+        Self {
+            operation_id,
+            expert: Some(expert),
+        }
+    }
+
+    pub fn not_found(operation_id: &'static str) -> Self {
+        Self {
+            operation_id,
+            expert: None,
         }
     }
 }

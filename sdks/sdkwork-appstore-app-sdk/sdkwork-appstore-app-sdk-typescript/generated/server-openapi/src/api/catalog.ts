@@ -1,7 +1,7 @@
 import { appApiPath } from './paths';
 import type { ApiRequestOptions, HttpClient } from '../http/client';
 
-import type { AppTemplate, AppTemplateCreateRequest, AppTemplateSuggestions, AppTemplateUsageCreateRequest, AppTemplateUsageResult, CatalogChartSnapshot, CatalogCollection, CatalogFeaturedSlot, Category, Feedback, FeedbackCreateRequest, HomeFeedData, ListingSummary, PageInfo, SdkWorkPageData, SearchHistoryUpsertRequest } from '../types';
+import type { AppTemplate, AppTemplateCreateRequest, AppTemplateSuggestions, AppTemplateUsageCreateRequest, AppTemplateUsageResult, CatalogChartSnapshot, CatalogCollection, CatalogExpert, CatalogFeaturedSlot, Category, Feedback, FeedbackCreateRequest, HomeFeedData, ListingSummary, PageInfo, SdkWorkPageData, SearchHistoryUpsertRequest } from '../types';
 
 
 export interface CatalogAppstoreCatalogFeedbackCreateParams {
@@ -25,6 +25,38 @@ export class CatalogAppstoreCatalogFeedbackApi {
       {}
     );
     return this.client.request<Feedback>(appApiPath(`/appstore/catalog/feedback`), { ...(requestOptions?.signal !== undefined ? { signal: requestOptions.signal } : {}), ...(requestOptions?.timeout !== undefined ? { timeout: requestOptions.timeout } : {}), method: 'POST' as any, body, contentType: 'application/json', ...(requestHeaders !== undefined ? { headers: requestHeaders } : {}), sdkworkUnwrapKind: 'item' });
+  }
+}
+
+export interface CatalogAppstoreCatalogExpertsListParams {
+  categoryCode?: string;
+  sort?: 'sort_weight_asc' | 'sort_weight_desc';
+  cursor?: string;
+  pageSize?: number;
+}
+
+export class CatalogAppstoreCatalogExpertsApi {
+  private client: HttpClient;
+
+  constructor(client: HttpClient) {
+    this.client = client;
+  }
+
+
+/** List the storefront AI expert roster */
+  async list(params?: CatalogAppstoreCatalogExpertsListParams, requestOptions?: ApiRequestOptions): Promise<{ items: CatalogExpert[]; pageInfo: PageInfo; }> {
+    const query = buildQueryString([
+      { name: 'category_code', value: params?.categoryCode, style: 'form', explode: true, allowReserved: false },
+      { name: 'sort', value: params?.sort, style: 'form', explode: true, allowReserved: false },
+      { name: 'cursor', value: params?.cursor, style: 'form', explode: true, allowReserved: false },
+      { name: 'page_size', value: params?.pageSize, style: 'form', explode: true, allowReserved: false },
+    ]);
+    return this.client.request<{ items: CatalogExpert[]; pageInfo: PageInfo; }>(appendQueryString(appApiPath(`/appstore/catalog/experts`), query), { ...(requestOptions?.signal !== undefined ? { signal: requestOptions.signal } : {}), ...(requestOptions?.timeout !== undefined ? { timeout: requestOptions.timeout } : {}), method: 'GET' as any, sdkworkUnwrapKind: 'page' });
+  }
+
+/** Retrieve one AI expert of the storefront roster */
+  async retrieve(expertRef: string, requestOptions?: ApiRequestOptions): Promise<CatalogExpert> {
+    return this.client.request<CatalogExpert>(appApiPath(`/appstore/catalog/experts/${serializePathParameter(expertRef, { name: 'expertRef', style: 'simple', explode: false })}`), { ...(requestOptions?.signal !== undefined ? { signal: requestOptions.signal } : {}), ...(requestOptions?.timeout !== undefined ? { timeout: requestOptions.timeout } : {}), method: 'GET' as any, sdkworkUnwrapKind: 'item' });
   }
 }
 
@@ -443,6 +475,7 @@ export class CatalogAppstoreCatalogApi {
   public readonly events: CatalogAppstoreCatalogEventsApi;
   public readonly search: CatalogAppstoreCatalogSearchApi;
   public readonly templates: CatalogAppstoreCatalogTemplatesApi;
+  public readonly experts: CatalogAppstoreCatalogExpertsApi;
   public readonly feedback: CatalogAppstoreCatalogFeedbackApi;
 
   constructor(client: HttpClient) {
@@ -457,6 +490,7 @@ export class CatalogAppstoreCatalogApi {
     this.events = new CatalogAppstoreCatalogEventsApi(client);
     this.search = new CatalogAppstoreCatalogSearchApi(client);
     this.templates = new CatalogAppstoreCatalogTemplatesApi(client);
+    this.experts = new CatalogAppstoreCatalogExpertsApi(client);
     this.feedback = new CatalogAppstoreCatalogFeedbackApi(client);
   }
 

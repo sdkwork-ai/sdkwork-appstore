@@ -19,6 +19,8 @@ This document maps each route operation to its generated handler and service met
 | `appstore.catalog.templates.retrieve` | `sdkwork-routes-appstore-catalog-app-api` | `catalog_template_retrieve` | `sdkwork-appstore-catalog-service` | `template_retrieve` | Implemented |
 | `appstore.catalog.templates.usage.create` | `sdkwork-routes-appstore-catalog-app-api` | `catalog_template_usage_create` | `sdkwork-appstore-catalog-service` | `template_usage_create` | Implemented |
 | `appstore.catalog.templates.suggestions.retrieve` | `sdkwork-routes-appstore-catalog-app-api` | `catalog_template_suggestions_retrieve` | `sdkwork-appstore-catalog-service` | `template_suggestions_retrieve` | Implemented |
+| `appstore.catalog.experts.list` | `sdkwork-routes-appstore-catalog-app-api` | `catalog_experts_list` | `sdkwork-appstore-catalog-service` | `experts_list` | Implemented |
+| `appstore.catalog.experts.retrieve` | `sdkwork-routes-appstore-catalog-app-api` | `catalog_expert_retrieve` | `sdkwork-appstore-catalog-service` | `expert_retrieve` | Implemented |
 | `appstore.catalog.feedback.create` | `sdkwork-routes-appstore-catalog-app-api` | `catalog_feedback_create` | `sdkwork-appstore-catalog-service` | `feedback_create` | Implemented |
 | `appstore.catalog.collections.create` | `sdkwork-routes-appstore-catalog-backend-api` | `catalog_collections_create` | `sdkwork-appstore-catalog-service` | `catalog_collections_create` | Implemented |
 | `appstore.catalog.collections.update` | `sdkwork-routes-appstore-catalog-backend-api` | `catalog_collections_update` | `sdkwork-appstore-catalog-service` | `catalog_collections_update` | Implemented |

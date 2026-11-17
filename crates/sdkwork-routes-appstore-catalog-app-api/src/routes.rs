@@ -188,6 +188,26 @@ pub const ROUTES: &[RouteDefinition] = &[
         handler: "catalog_template_suggestions_retrieve",
         service_method: "catalog_template_suggestions_retrieve",
     },
+    // Public expert roster: the AI expert page reads its own catalog store
+    // (`appstore_expert_catalog`), not the template shelf. Like the template
+    // shelf reads it stays open to an application-scoped request so the page
+    // renders before a user session exists.
+    RouteDefinition {
+        method: "GET",
+        path: "/app/v3/api/appstore/catalog/experts",
+        operation_id: "appstore.catalog.experts.list",
+        auth: RouteAuth::DualTokenOrAnonymous,
+        handler: "catalog_experts_list",
+        service_method: "catalog_experts_list",
+    },
+    RouteDefinition {
+        method: "GET",
+        path: "/app/v3/api/appstore/catalog/experts/{expertRef}",
+        operation_id: "appstore.catalog.experts.retrieve",
+        auth: RouteAuth::DualTokenOrAnonymous,
+        handler: "catalog_expert_retrieve",
+        service_method: "catalog_expert_retrieve",
+    },
     RouteDefinition {
         method: "POST",
         path: "/app/v3/api/appstore/catalog/feedback",

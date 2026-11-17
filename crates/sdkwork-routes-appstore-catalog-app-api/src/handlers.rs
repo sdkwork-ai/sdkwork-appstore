@@ -2,12 +2,13 @@ use crate::mapper;
 use sdkwork_appstore_catalog_service::context::AppstoreRequestContext;
 use sdkwork_appstore_catalog_service::domain::results::{
     CategoriesListResult, CategoryRetrieveResult, ChartsRetrieveResult, CollectionRetrieveResult,
-    CollectionsListResult, EventRetrieveResult, EventsListResult, FeaturedListResult,
-    FeedbackCreateResult, HomeRetrieveResult, ListingsSearchResult, RecentlyUpdatedListResult,
-    RecommendationsListResult, SearchHistoryClearResult, SearchHistoryListResult,
-    SearchHistoryUpsertResult, SearchSuggestionsListResult, SearchTrendingListResult,
-    TemplateCreateResult, TemplateRetrieveResult, TemplateSuggestionsRetrieveResult,
-    TemplateUsageCreateResult, TemplatesListResult,
+    CollectionsListResult, EventRetrieveResult, EventsListResult, ExpertRetrieveResult,
+    ExpertsListResult, FeaturedListResult, FeedbackCreateResult, HomeRetrieveResult,
+    ListingsSearchResult, RecentlyUpdatedListResult, RecommendationsListResult,
+    SearchHistoryClearResult, SearchHistoryListResult, SearchHistoryUpsertResult,
+    SearchSuggestionsListResult, SearchTrendingListResult, TemplateCreateResult,
+    TemplateRetrieveResult, TemplateSuggestionsRetrieveResult, TemplateUsageCreateResult,
+    TemplatesListResult,
 };
 use sdkwork_appstore_catalog_service::error::AppstoreServiceError;
 use sdkwork_appstore_catalog_service::CatalogOperations;
@@ -129,6 +130,16 @@ pub const ROUTE_HANDLER_PLANS: &[RouteHandlerPlan] = &[
         operation_id: "appstore.catalog.templates.suggestions.retrieve",
         handler_name: "catalog_template_suggestions_retrieve",
         service_method: "template_suggestions_retrieve",
+    },
+    RouteHandlerPlan {
+        operation_id: "appstore.catalog.experts.list",
+        handler_name: "catalog_experts_list",
+        service_method: "experts_list",
+    },
+    RouteHandlerPlan {
+        operation_id: "appstore.catalog.experts.retrieve",
+        handler_name: "catalog_expert_retrieve",
+        service_method: "expert_retrieve",
     },
     RouteHandlerPlan {
         operation_id: "appstore.catalog.feedback.create",
@@ -417,4 +428,25 @@ pub async fn catalog_feedback_create<S: CatalogOperations>(
     let cmd =
         mapper::request::map_feedback_create(feedback_type, content, contact, listing_id, app_key);
     service.feedback_create(context, cmd).await
+}
+
+pub async fn catalog_experts_list<S: CatalogOperations>(
+    service: &S,
+    context: &AppstoreRequestContext,
+    category_code: Option<String>,
+    sort: Option<String>,
+    cursor: Option<String>,
+    page_size: Option<i32>,
+) -> Result<ExpertsListResult, AppstoreServiceError> {
+    let cmd = mapper::request::map_experts_list(category_code, sort, cursor, page_size);
+    service.experts_list(context, cmd).await
+}
+
+pub async fn catalog_expert_retrieve<S: CatalogOperations>(
+    service: &S,
+    context: &AppstoreRequestContext,
+    expert_ref: String,
+) -> Result<ExpertRetrieveResult, AppstoreServiceError> {
+    let cmd = mapper::request::map_expert_retrieve(expert_ref);
+    service.expert_retrieve(context, cmd).await
 }

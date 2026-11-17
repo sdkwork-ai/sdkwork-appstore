@@ -596,6 +596,34 @@ pub struct AppTemplateUsageCounts {
     pub clone_count: i64,
 }
 
+/// One curated AI expert of the storefront roster.
+///
+/// The roster is `appstore_expert_catalog` (migration 0009), not the retired
+/// template family: the template table only ever carried these rows with
+/// `template_type = 'EXPERT'`, so reading the expert page from the template
+/// shelf tied presentation content to a scaffold store. The presentation
+/// payload the storefront renders — nickname, tags, prompts, avatar, rating,
+/// popularity, badge, usage counters — travels verbatim in [`Self::profile`].
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+#[serde(rename_all = "camelCase")]
+pub struct ExpertCatalogEntry {
+    pub id: String,
+    pub tenant_id: String,
+    pub organization_id: String,
+    pub expert_code: String,
+    pub expert_name: String,
+    pub description: Option<String>,
+    pub category_code: Option<String>,
+    pub profile: serde_json::Value,
+    pub expert_status: String,
+    pub featured: bool,
+    pub sort_weight: i32,
+    pub published_at: Option<DateTime<Utc>>,
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 #[serde(rename_all = "camelCase")]

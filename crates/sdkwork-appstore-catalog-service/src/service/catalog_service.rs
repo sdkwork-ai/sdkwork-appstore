@@ -12,13 +12,13 @@ use crate::domain::commands::{
     AnalyticsPublisherOverviewRequest, CategoriesListRequest, CategoryCreateRequest,
     CategoryRetrieveRequest, CategoryUpdateRequest, ChartsRetrieveRequest, CollectionCreateRequest,
     CollectionItemsUpsertRequest, CollectionRetrieveRequest, CollectionUpdateRequest,
-    CollectionsListRequest, EventRetrieveRequest, EventsListRequest, FeaturedListRequest,
-    FeaturedUpsertRequest, FeedbackCreateRequest, HomeRetrieveRequest, ListingsSearchRequest,
-    MetricsRetrieveRequest, PublicFeaturedListRequest, RecentlyUpdatedListRequest,
-    RecommendationsListRequest, SearchHistoryClearRequest, SearchHistoryListRequest,
-    SearchHistoryUpsertRequest, SearchSuggestionsListRequest, SearchTrendingListRequest,
-    TemplateCreateRequest, TemplateRetrieveRequest, TemplateSuggestionsRetrieveRequest,
-    TemplateUsageCreateRequest, TemplatesListRequest,
+    CollectionsListRequest, EventRetrieveRequest, EventsListRequest, ExpertRetrieveRequest,
+    ExpertsListRequest, FeaturedListRequest, FeaturedUpsertRequest, FeedbackCreateRequest,
+    HomeRetrieveRequest, ListingsSearchRequest, MetricsRetrieveRequest, PublicFeaturedListRequest,
+    RecentlyUpdatedListRequest, RecommendationsListRequest, SearchHistoryClearRequest,
+    SearchHistoryListRequest, SearchHistoryUpsertRequest, SearchSuggestionsListRequest,
+    SearchTrendingListRequest, TemplateCreateRequest, TemplateRetrieveRequest,
+    TemplateSuggestionsRetrieveRequest, TemplateUsageCreateRequest, TemplatesListRequest,
 };
 use crate::domain::models::{
     AppTemplate, AppTemplateUsage, AppTemplateUsageKind, AudienceScope, CatalogChartSnapshot,
@@ -34,19 +34,18 @@ use crate::domain::results::{
     AnalyticsPublisherOverviewResult, CategoriesListResult, CategoryCreateResult,
     CategoryRetrieveResult, CategoryUpdateResult, ChartsRetrieveResult, CollectionCreateResult,
     CollectionItemsUpsertResult, CollectionRetrieveResult, CollectionUpdateResult,
-    CollectionsListResult, EventRetrieveResult, EventsListResult, FeaturedListResult,
-    FeaturedUpsertResult, FeedbackCreateResult, HomeRetrieveResult, ListingsSearchResult,
-    MetricsRetrieveResult, PublicFeaturedListResult, RecentlyUpdatedListResult,
-    RecommendationsListResult, SearchHistoryClearResult, SearchHistoryListResult,
-    SearchHistoryUpsertResult, SearchSuggestionsListResult, SearchTrendingListResult,
-    TemplateCreateResult, TemplateRetrieveResult, TemplateSuggestionsRetrieveResult,
-    TemplateUsageCreateResult, TemplatesListResult,
+    CollectionsListResult, EventRetrieveResult, EventsListResult, ExpertRetrieveResult,
+    ExpertsListResult, FeaturedListResult, FeaturedUpsertResult, FeedbackCreateResult,
+    HomeRetrieveResult, ListingsSearchResult, MetricsRetrieveResult, PublicFeaturedListResult,
+    RecentlyUpdatedListResult, RecommendationsListResult, SearchHistoryClearResult,
+    SearchHistoryListResult, SearchHistoryUpsertResult, SearchSuggestionsListResult,
+    SearchTrendingListResult, TemplateCreateResult, TemplateRetrieveResult,
+    TemplateSuggestionsRetrieveResult, TemplateUsageCreateResult, TemplatesListResult,
 };
 use crate::error::{AppstoreServiceError, AppstoreServiceResult};
-use crate::ports::repository::{
-    CatalogRepositoryPort, TemplateFeedOrder, TemplateFeedQuery,
-};
+use crate::ports::repository::{CatalogRepositoryPort, TemplateFeedOrder, TemplateFeedQuery};
 use crate::ports::search_federation::CatalogSearchFederationPort;
+use crate::service::expert_catalog::{paginate_experts, ExpertListQuery};
 use std::sync::Arc;
 
 #[async_trait::async_trait]
@@ -267,6 +266,20 @@ pub trait CatalogOperations {
         context: &AppstoreRequestContext,
         request: FeedbackCreateRequest,
     ) -> AppstoreServiceResult<FeedbackCreateResult>;
+
+    /// Public expert roster page read from the expert catalog store.
+    async fn experts_list(
+        &self,
+        context: &AppstoreRequestContext,
+        request: ExpertsListRequest,
+    ) -> AppstoreServiceResult<ExpertsListResult>;
+
+    /// One expert addressed by catalog row id or by `expert_code`.
+    async fn expert_retrieve(
+        &self,
+        context: &AppstoreRequestContext,
+        request: ExpertRetrieveRequest,
+    ) -> AppstoreServiceResult<ExpertRetrieveResult>;
 
     /// Operator-facing category listing that returns every non-deleted status.
     async fn admin_categories_list(
@@ -2370,6 +2383,53 @@ where
             "appstore.catalog.feedback.create",
             feedback,
         ))
+    }
+
+    async fn experts_list(
+        &self,
+        context: &AppstoreRequestContext,
+        request: ExpertsListRequest,
+    ) -> AppstoreServiceResult<ExpertsListResult> {
+        let query = ExpertListQuery::from_request(&request)?;
+        let rows = self
+            .repository
+            .find_expert_catalog_entries(context, query.as_repository_query())
+            .await?;
+        let (experts, next_cursor, has_more) = paginate_experts(rows, query.limit);
+
+        Ok(ExpertsListResult::new(
+            "appstore.catalog.experts.list",
+            experts,
+            next_cursor,
+            has_more,
+        ))
+    }
+
+    async fn expert_retrieve(
+        &self,
+        context: &AppstoreRequestContext,
+        request: ExpertRetrieveRequest,
+    ) -> AppstoreServiceResult<ExpertRetrieveResult> {
+        let expert_ref = request.expert_ref.trim();
+        if expert_ref.is_empty() {
+            return Err(AppstoreServiceError::ValidationFailed(
+                "expertRef is required".to_string(),
+            ));
+        }
+
+        match self
+            .repository
+            .find_expert_catalog_entry(context, expert_ref)
+            .await?
+        {
+            Some(expert) => Ok(ExpertRetrieveResult::found(
+                "appstore.catalog.experts.retrieve",
+                expert,
+            )),
+            None => Ok(ExpertRetrieveResult::not_found(
+                "appstore.catalog.experts.retrieve",
+            )),
+        }
     }
 }
 
