@@ -89,7 +89,8 @@
     "check:token-utilities": "node scripts/check-token-utilities.mjs --root apps/sdkwork-appstore-pc",
     "check:control-shape": "node scripts/check-control-shape.mjs --root apps/sdkwork-appstore-pc",
     "test:jsx-class-scan": "node scripts/dev/jsx-class-scan.test.mjs",
-    "migrate:control-shape": "node scripts/migrate-control-shape.mjs"
+    "migrate:control-shape": "node scripts/migrate-control-shape.mjs",
+    "check:release-access-token:require-anchor": "node ../sdkwork-specs/tools/check-release-access-token-env.mjs --root . --require-anchor"
   },
   "exports": {
     ".": {

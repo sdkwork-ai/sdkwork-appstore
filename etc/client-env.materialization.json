@@ -22,7 +22,7 @@
       "runtimeTarget": "flutter-android",
       "bindings": {},
       "accessToken": {
-        "appId": "sdkwork-appstore",
+        "appIdEnv": "SDKWORK_DEPLOY_APPLICATION_ID",
         "tenantId": "100001",
         "organizationId": "0",
         "permissionScope": [
@@ -37,7 +37,7 @@
       "runtimeTarget": "mini-program",
       "bindings": {},
       "accessToken": {
-        "appId": "sdkwork-appstore",
+        "appIdEnv": "SDKWORK_DEPLOY_APPLICATION_ID",
         "tenantId": "100001",
         "organizationId": "0",
         "permissionScope": [
@@ -52,7 +52,7 @@
       "runtimeTarget": "browser",
       "bindings": {},
       "accessToken": {
-        "appId": "sdkwork-appstore-h5",
+        "appIdEnv": "SDKWORK_DEPLOY_APPLICATION_ID",
         "tenantId": "100001",
         "organizationId": "0",
         "permissionScope": [
@@ -67,7 +67,7 @@
       "runtimeTarget": "browser",
       "bindings": {},
       "accessToken": {
-        "appId": "sdkwork-appstore-pc",
+        "appIdEnv": "SDKWORK_DEPLOY_APPLICATION_ID",
         "tenantId": "100001",
         "organizationId": "0",
         "permissionScope": [
@@ -82,7 +82,7 @@
       "runtimeTarget": "harmony-native",
       "bindings": {},
       "accessToken": {
-        "appId": "sdkwork-appstore",
+        "appIdEnv": "SDKWORK_DEPLOY_APPLICATION_ID",
         "tenantId": "100001",
         "organizationId": "0",
         "permissionScope": [
