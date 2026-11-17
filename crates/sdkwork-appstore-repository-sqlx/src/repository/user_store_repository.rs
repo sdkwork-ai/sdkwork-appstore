@@ -101,15 +101,18 @@ impl UserStoreRepositoryPort for SqlxUserStoreRepository {
         &self,
         context: &AppstoreRequestContext,
         category_id: &UserCategoryId,
+        owner_user_id: &str,
     ) -> Result<Option<UserCategory>, AppstoreServiceError> {
         let row = self
             .db
             .query_as::<UserCategoryRow>(&format!(
-                r#"SELECT {} FROM appstore_user_category WHERE id = ? AND tenant_id = ?"#,
+                r#"SELECT {} FROM appstore_user_category
+            WHERE id = ? AND tenant_id = ? AND owner_user_id = ?"#,
                 columns_csv(APPSTORE_USER_CATEGORY_COLUMNS)
             ))
             .bind(category_id.as_str())
             .bind(&context.tenant_id)
+            .bind(owner_user_id)
             .fetch_optional(&self.db)
             .await
             .map_err(db_error)?;
@@ -147,6 +150,7 @@ impl UserStoreRepositoryPort for SqlxUserStoreRepository {
         &self,
         context: &AppstoreRequestContext,
         category_ids: &[String],
+        owner_user_id: &str,
     ) -> Result<Vec<UserCategory>, AppstoreServiceError> {
         if category_ids.is_empty() {
             return Ok(Vec::new());
@@ -154,13 +158,14 @@ impl UserStoreRepositoryPort for SqlxUserStoreRepository {
         let placeholders = vec!["?"; category_ids.len()].join(", ");
         let sql = format!(
             r#"SELECT {} FROM appstore_user_category
-            WHERE tenant_id = ? AND id IN ({placeholders})"#,
+            WHERE tenant_id = ? AND owner_user_id = ? AND id IN ({placeholders})"#,
             columns_csv(APPSTORE_USER_CATEGORY_COLUMNS)
         );
         let mut query = self
             .db
             .query_as::<UserCategoryRow>(&sql)
-            .bind(&context.tenant_id);
+            .bind(&context.tenant_id)
+            .bind(owner_user_id);
         for id in category_ids {
             query = query.bind(id);
         }
@@ -230,7 +235,7 @@ impl UserStoreRepositoryPort for SqlxUserStoreRepository {
                 r#"UPDATE appstore_user_category SET
                 name = ?, description = ?, icon_media_resource_id = ?,
                 sort_order = ?, category_status = ?, updated_at = ?
-            WHERE id = ? AND tenant_id = ? AND organization_id = ?"#,
+            WHERE id = ? AND tenant_id = ? AND organization_id = ? AND owner_user_id = ?"#,
             )
             .bind(&category.name)
             .bind(&category.description)
@@ -241,6 +246,7 @@ impl UserStoreRepositoryPort for SqlxUserStoreRepository {
             .bind(&category.id)
             .bind(&context.tenant_id)
             .bind(&context.organization_id)
+            .bind(&context.user_id)
             .execute_unified(&self.db)
             .await
             .map_err(db_error)?;
@@ -252,22 +258,36 @@ impl UserStoreRepositoryPort for SqlxUserStoreRepository {
         context: &AppstoreRequestContext,
         category_id: &UserCategoryId,
     ) -> Result<(), AppstoreServiceError> {
+        // Cascade by parent owner: the subquery makes both statements no-ops
+        // for a category the caller does not own, so a foreign id can never
+        // drop another user's items or category row.
         self.db
             .query(
-                "DELETE FROM appstore_user_category_item WHERE tenant_id = ? AND organization_id = ? AND user_category_id = ?",
+                r#"DELETE FROM appstore_user_category_item
+            WHERE tenant_id = ? AND organization_id = ?
+              AND user_category_id IN (
+                SELECT id FROM appstore_user_category
+                WHERE id = ? AND tenant_id = ? AND owner_user_id = ?
+              )"#,
             )
             .bind(&context.tenant_id)
             .bind(&context.organization_id)
             .bind(category_id.as_str())
+            .bind(&context.tenant_id)
+            .bind(&context.user_id)
             .execute_unified(&self.db)
             .await
             .map_err(db_error)?;
 
         self.db
-            .query("DELETE FROM appstore_user_category WHERE tenant_id = ? AND organization_id = ? AND id = ?")
+            .query(
+                r#"DELETE FROM appstore_user_category
+            WHERE tenant_id = ? AND organization_id = ? AND id = ? AND owner_user_id = ?"#,
+            )
             .bind(&context.tenant_id)
             .bind(&context.organization_id)
             .bind(category_id.as_str())
+            .bind(&context.user_id)
             .execute_unified(&self.db)
             .await
             .map_err(db_error)?;
@@ -278,21 +298,30 @@ impl UserStoreRepositoryPort for SqlxUserStoreRepository {
         &self,
         context: &AppstoreRequestContext,
         category_id: &UserCategoryId,
+        owner_user_id: &str,
         cursor: Option<&str>,
         limit: i32,
     ) -> Result<Vec<UserCategoryItem>, AppstoreServiceError> {
+        // Items carry no owner column of their own; the parent-owner predicate
+        // joins the category so an id for someone else's category lists nothing.
         let rows = if let Some(cursor) = cursor {
             let (cursor_order, cursor_id) = parse_order_cursor(cursor)?;
             self.db
                 .query_as::<UserCategoryItemRow>(&format!(
-                    r#"SELECT {} FROM appstore_user_category_item
-                WHERE tenant_id = ? AND user_category_id = ?
-                  AND (sort_order > ? OR (sort_order = ? AND id > ?))
-                ORDER BY sort_order ASC, id ASC LIMIT ?"#,
+                    r#"SELECT {} FROM appstore_user_category_item i
+                WHERE i.tenant_id = ? AND i.user_category_id = ?
+                  AND EXISTS (
+                    SELECT 1 FROM appstore_user_category c
+                    WHERE c.id = i.user_category_id AND c.tenant_id = i.tenant_id
+                      AND c.owner_user_id = ?
+                  )
+                  AND (i.sort_order > ? OR (i.sort_order = ? AND i.id > ?))
+                ORDER BY i.sort_order ASC, i.id ASC LIMIT ?"#,
                     columns_csv(APPSTORE_USER_CATEGORY_ITEM_COLUMNS)
                 ))
                 .bind(&context.tenant_id)
                 .bind(category_id.as_str())
+                .bind(owner_user_id)
                 .bind(cursor_order)
                 .bind(cursor_order)
                 .bind(&cursor_id)
@@ -303,13 +332,19 @@ impl UserStoreRepositoryPort for SqlxUserStoreRepository {
         } else {
             self.db
                 .query_as::<UserCategoryItemRow>(&format!(
-                    r#"SELECT {} FROM appstore_user_category_item
-                WHERE tenant_id = ? AND user_category_id = ?
-                ORDER BY sort_order ASC, id ASC LIMIT ?"#,
+                    r#"SELECT {} FROM appstore_user_category_item i
+                WHERE i.tenant_id = ? AND i.user_category_id = ?
+                  AND EXISTS (
+                    SELECT 1 FROM appstore_user_category c
+                    WHERE c.id = i.user_category_id AND c.tenant_id = i.tenant_id
+                      AND c.owner_user_id = ?
+                  )
+                ORDER BY i.sort_order ASC, i.id ASC LIMIT ?"#,
                     columns_csv(APPSTORE_USER_CATEGORY_ITEM_COLUMNS)
                 ))
                 .bind(&context.tenant_id)
                 .bind(category_id.as_str())
+                .bind(owner_user_id)
                 .bind(limit)
                 .fetch_all(&self.db)
                 .await
@@ -326,15 +361,25 @@ impl UserStoreRepositoryPort for SqlxUserStoreRepository {
         &self,
         context: &AppstoreRequestContext,
         item_id: &UserCategoryItemId,
+        category_id: &UserCategoryId,
+        owner_user_id: &str,
     ) -> Result<Option<UserCategoryItem>, AppstoreServiceError> {
         let row = self
             .db
             .query_as::<UserCategoryItemRow>(&format!(
-                r#"SELECT {} FROM appstore_user_category_item WHERE id = ? AND tenant_id = ?"#,
+                r#"SELECT {} FROM appstore_user_category_item i
+            WHERE i.id = ? AND i.tenant_id = ? AND i.user_category_id = ?
+              AND EXISTS (
+                SELECT 1 FROM appstore_user_category c
+                WHERE c.id = i.user_category_id AND c.tenant_id = i.tenant_id
+                  AND c.owner_user_id = ?
+              )"#,
                 columns_csv(APPSTORE_USER_CATEGORY_ITEM_COLUMNS)
             ))
             .bind(item_id.as_str())
             .bind(&context.tenant_id)
+            .bind(category_id.as_str())
+            .bind(owner_user_id)
             .fetch_optional(&self.db)
             .await
             .map_err(db_error)?;
@@ -349,17 +394,24 @@ impl UserStoreRepositoryPort for SqlxUserStoreRepository {
         context: &AppstoreRequestContext,
         category_id: &UserCategoryId,
         listing_id: &str,
+        owner_user_id: &str,
     ) -> Result<Option<UserCategoryItem>, AppstoreServiceError> {
         let row = self
             .db
             .query_as::<UserCategoryItemRow>(&format!(
-                r#"SELECT {} FROM appstore_user_category_item
-            WHERE tenant_id = ? AND user_category_id = ? AND listing_id = ?"#,
+                r#"SELECT {} FROM appstore_user_category_item i
+            WHERE i.tenant_id = ? AND i.user_category_id = ? AND i.listing_id = ?
+              AND EXISTS (
+                SELECT 1 FROM appstore_user_category c
+                WHERE c.id = i.user_category_id AND c.tenant_id = i.tenant_id
+                  AND c.owner_user_id = ?
+              )"#,
                 columns_csv(APPSTORE_USER_CATEGORY_ITEM_COLUMNS)
             ))
             .bind(&context.tenant_id)
             .bind(category_id.as_str())
             .bind(listing_id)
+            .bind(owner_user_id)
             .fetch_optional(&self.db)
             .await
             .map_err(db_error)?;
@@ -373,20 +425,28 @@ impl UserStoreRepositoryPort for SqlxUserStoreRepository {
         &self,
         context: &AppstoreRequestContext,
         category_ids: &[String],
+        owner_user_id: &str,
     ) -> Result<Vec<(String, i64)>, AppstoreServiceError> {
         if category_ids.is_empty() {
             return Ok(Vec::new());
         }
         let placeholders = vec!["?"; category_ids.len()].join(", ");
         let sql = format!(
-            r#"SELECT user_category_id, COUNT(*) FROM appstore_user_category_item
-            WHERE tenant_id = ? AND user_category_id IN ({placeholders})
-            GROUP BY user_category_id"#
+            r#"SELECT i.user_category_id, COUNT(*) FROM appstore_user_category_item i
+            WHERE i.tenant_id = ?
+              AND EXISTS (
+                SELECT 1 FROM appstore_user_category c
+                WHERE c.id = i.user_category_id AND c.tenant_id = i.tenant_id
+                  AND c.owner_user_id = ?
+              )
+              AND i.user_category_id IN ({placeholders})
+            GROUP BY i.user_category_id"#
         );
         let mut query = self
             .db
             .query_as::<(String, i64)>(&sql)
-            .bind(&context.tenant_id);
+            .bind(&context.tenant_id)
+            .bind(owner_user_id);
         for id in category_ids {
             query = query.bind(id);
         }
@@ -426,11 +486,19 @@ impl UserStoreRepositoryPort for SqlxUserStoreRepository {
         context: &AppstoreRequestContext,
         item: &UserCategoryItem,
     ) -> Result<(), AppstoreServiceError> {
+        // Owner predicate via the parent category: a foreign item id updates
+        // no row.
         self.db
             .query(
                 r#"UPDATE appstore_user_category_item SET
                 note = ?, sort_order = ?, updated_at = ?
-            WHERE id = ? AND tenant_id = ? AND organization_id = ?"#,
+            WHERE id = ? AND tenant_id = ? AND organization_id = ?
+              AND EXISTS (
+                SELECT 1 FROM appstore_user_category c
+                WHERE c.id = appstore_user_category_item.user_category_id
+                  AND c.tenant_id = appstore_user_category_item.tenant_id
+                  AND c.owner_user_id = ?
+              )"#,
             )
             .bind(&item.note)
             .bind(item.sort_order)
@@ -438,6 +506,7 @@ impl UserStoreRepositoryPort for SqlxUserStoreRepository {
             .bind(&item.id)
             .bind(&context.tenant_id)
             .bind(&context.organization_id)
+            .bind(&context.user_id)
             .execute_unified(&self.db)
             .await
             .map_err(db_error)?;
@@ -450,10 +519,20 @@ impl UserStoreRepositoryPort for SqlxUserStoreRepository {
         item_id: &UserCategoryItemId,
     ) -> Result<(), AppstoreServiceError> {
         self.db
-            .query("DELETE FROM appstore_user_category_item WHERE id = ? AND tenant_id = ? AND organization_id = ?")
+            .query(
+                r#"DELETE FROM appstore_user_category_item
+            WHERE id = ? AND tenant_id = ? AND organization_id = ?
+              AND EXISTS (
+                SELECT 1 FROM appstore_user_category c
+                WHERE c.id = appstore_user_category_item.user_category_id
+                  AND c.tenant_id = appstore_user_category_item.tenant_id
+                  AND c.owner_user_id = ?
+              )"#,
+            )
             .bind(item_id.as_str())
             .bind(&context.tenant_id)
             .bind(&context.organization_id)
+            .bind(&context.user_id)
             .execute_unified(&self.db)
             .await
             .map_err(db_error)?;
@@ -471,7 +550,13 @@ impl UserStoreRepositoryPort for SqlxUserStoreRepository {
                 .query(
                     r#"UPDATE appstore_user_category_item
                 SET sort_order = ?, updated_at = ?
-                WHERE id = ? AND tenant_id = ? AND organization_id = ? AND user_category_id = ?"#,
+                WHERE id = ? AND tenant_id = ? AND organization_id = ? AND user_category_id = ?
+                  AND EXISTS (
+                    SELECT 1 FROM appstore_user_category c
+                    WHERE c.id = appstore_user_category_item.user_category_id
+                      AND c.tenant_id = appstore_user_category_item.tenant_id
+                      AND c.owner_user_id = ?
+                  )"#,
                 )
                 .bind(position as i32)
                 .bind(chrono::Utc::now())
@@ -479,6 +564,7 @@ impl UserStoreRepositoryPort for SqlxUserStoreRepository {
                 .bind(&context.tenant_id)
                 .bind(&context.organization_id)
                 .bind(category_id.as_str())
+                .bind(&context.user_id)
                 .execute_unified(&self.db)
                 .await
                 .map_err(db_error)?;
@@ -491,6 +577,8 @@ impl UserStoreRepositoryPort for SqlxUserStoreRepository {
         context: &AppstoreRequestContext,
         share_token: &str,
     ) -> Result<Option<UserStoreShare>, AppstoreServiceError> {
+        // The token is the capability credential for the public view, so this
+        // lookup stays tenant-scoped and deliberately has no owner predicate.
         let row = self
             .db
             .query_as::<UserStoreShareRow>(&format!(
@@ -513,15 +601,18 @@ impl UserStoreRepositoryPort for SqlxUserStoreRepository {
         &self,
         context: &AppstoreRequestContext,
         share_id: &UserStoreShareId,
+        owner_user_id: &str,
     ) -> Result<Option<UserStoreShare>, AppstoreServiceError> {
         let row = self
             .db
             .query_as::<UserStoreShareRow>(&format!(
-                r#"SELECT {} FROM appstore_user_store_share WHERE id = ? AND tenant_id = ?"#,
+                r#"SELECT {} FROM appstore_user_store_share
+            WHERE id = ? AND tenant_id = ? AND owner_user_id = ?"#,
                 columns_csv(APPSTORE_USER_STORE_SHARE_COLUMNS)
             ))
             .bind(share_id.as_str())
             .bind(&context.tenant_id)
+            .bind(owner_user_id)
             .fetch_optional(&self.db)
             .await
             .map_err(db_error)?;
@@ -644,7 +735,7 @@ impl UserStoreRepositoryPort for SqlxUserStoreRepository {
                 r#"UPDATE appstore_user_store_share SET
                 title = ?, description = ?, share_scope = ?, selected_category_ids_json = ?,
                 share_visibility = ?, share_status = ?, expires_at = ?, updated_at = ?
-            WHERE id = ? AND tenant_id = ?"#,
+            WHERE id = ? AND tenant_id = ? AND owner_user_id = ?"#,
             )
             .bind(&share.title)
             .bind(&share.description)
@@ -656,6 +747,7 @@ impl UserStoreRepositoryPort for SqlxUserStoreRepository {
             .bind(share.updated_at)
             .bind(&share.id)
             .bind(&context.tenant_id)
+            .bind(&context.user_id)
             .execute_unified(&self.db)
             .await
             .map_err(db_error)?;
@@ -667,6 +759,8 @@ impl UserStoreRepositoryPort for SqlxUserStoreRepository {
         context: &AppstoreRequestContext,
         share_id: &UserStoreShareId,
     ) -> Result<(), AppstoreServiceError> {
+        // Public view counter, reached with the token rather than ownership;
+        // it stays tenant-scoped by design.
         self.db
             .query(
                 r#"UPDATE appstore_user_store_share

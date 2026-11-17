@@ -37,11 +37,12 @@ impl ListingCommerceInfo {
     }
 
     /// Whether the listing is live on the storefront. Only a live listing may
-    /// mint download grants through the consumer library surface; hidden and
-    /// non-active listings stay in the publisher preview, so a grant request
-    /// for them is indistinguishable from a missing artifact. The predicate
-    /// matches `Listing::is_visible` (`active` and `visible`/`featured`) and
-    /// is fail-closed: an unknown storefront value is not downloadable.
+    /// be adopted into the consumer library or mint download grants; hidden
+    /// and non-active listings stay in the publisher preview, so an install or
+    /// grant request for them is indistinguishable from a missing listing.
+    /// The predicate matches `Listing::is_visible` (`active` and
+    /// `visible`/`featured`) and is fail-closed: an unknown storefront value is
+    /// not adoptable.
     pub fn is_downloadable(&self) -> bool {
         let status = self.listing_status.trim();
         let visibility = self.storefront_visibility.trim();

@@ -334,7 +334,7 @@ where
         let category_ids: Vec<String> = categories.iter().map(|c| c.id.clone()).collect();
         let counts = self
             .repository
-            .count_items_by_categories(context, &category_ids)
+            .count_items_by_categories(context, &category_ids, &owner_user_id)
             .await?;
         let item_counts: Vec<CategoryItemCount> = counts
             .into_iter()
@@ -361,9 +361,12 @@ where
         let owner_user_id = Self::require_user_id(context)?;
         let category = self
             .repository
-            .find_category_by_id(context, &UserCategoryId::new(&request.user_category_id))
+            .find_category_by_id(
+                context,
+                &UserCategoryId::new(&request.user_category_id),
+                &owner_user_id,
+            )
             .await?
-            .filter(|c| c.owner_user_id == owner_user_id)
             .ok_or_else(|| AppstoreServiceError::NotFound("Category not found".to_string()))?;
         Ok(CategoryRetrieveResult {
             operation_id: "appstore.userStore.category.retrieve",
@@ -380,9 +383,8 @@ where
         let category_id = UserCategoryId::new(&request.user_category_id);
         let mut category = self
             .repository
-            .find_category_by_id(context, &category_id)
+            .find_category_by_id(context, &category_id, &owner_user_id)
             .await?
-            .filter(|c| c.owner_user_id == owner_user_id)
             .ok_or_else(|| AppstoreServiceError::NotFound("Category not found".to_string()))?;
 
         if let Some(name) = request.name.as_deref() {
@@ -427,9 +429,8 @@ where
         let category_id = UserCategoryId::new(&request.user_category_id);
         let category = self
             .repository
-            .find_category_by_id(context, &category_id)
+            .find_category_by_id(context, &category_id, &owner_user_id)
             .await?
-            .filter(|c| c.owner_user_id == owner_user_id)
             .ok_or_else(|| AppstoreServiceError::NotFound("Category not found".to_string()))?;
         drop(category);
 
@@ -456,9 +457,8 @@ where
         let category_id = UserCategoryId::new(&request.user_category_id);
         let category = self
             .repository
-            .find_category_by_id(context, &category_id)
+            .find_category_by_id(context, &category_id, &owner_user_id)
             .await?
-            .filter(|c| c.owner_user_id == owner_user_id)
             .ok_or_else(|| AppstoreServiceError::NotFound("Category not found".to_string()))?;
         let _ = category;
 
@@ -475,6 +475,7 @@ where
                 context,
                 &category_id,
                 listing_card.listing_id.as_str(),
+                &owner_user_id,
             )
             .await?;
         if existing.is_some() {
@@ -485,7 +486,7 @@ where
 
         let count = self
             .repository
-            .count_items_by_categories(context, &[category_id.as_str().to_string()])
+            .count_items_by_categories(context, &[category_id.as_str().to_string()], &owner_user_id)
             .await?
             .first()
             .map(|(_, count)| *count)
@@ -525,17 +526,20 @@ where
         let category_id = UserCategoryId::new(&request.user_category_id);
         let category = self
             .repository
-            .find_category_by_id(context, &category_id)
+            .find_category_by_id(context, &category_id, &owner_user_id)
             .await?
-            .filter(|c| c.owner_user_id == owner_user_id)
             .ok_or_else(|| AppstoreServiceError::NotFound("Category not found".to_string()))?;
         let _ = category;
 
         let item = self
             .repository
-            .find_item_by_id(context, &UserCategoryItemId::new(&request.item_id))
+            .find_item_by_id(
+                context,
+                &UserCategoryItemId::new(&request.item_id),
+                &category_id,
+                &owner_user_id,
+            )
             .await?
-            .filter(|i| i.user_category_id == category_id.as_str())
             .ok_or_else(|| AppstoreServiceError::NotFound("Category item not found".to_string()))?;
         let _ = item;
 
@@ -554,16 +558,21 @@ where
         let category_id = UserCategoryId::new(&request.user_category_id);
         let category = self
             .repository
-            .find_category_by_id(context, &category_id)
+            .find_category_by_id(context, &category_id, &owner_user_id)
             .await?
-            .filter(|c| c.owner_user_id == owner_user_id)
             .ok_or_else(|| AppstoreServiceError::NotFound("Category not found".to_string()))?;
         drop(category);
 
         let limit = request.page_size.unwrap_or(50).clamp(1, 200);
         let mut items = self
             .repository
-            .find_items_by_category(context, &category_id, request.cursor.as_deref(), limit + 1)
+            .find_items_by_category(
+                context,
+                &category_id,
+                &owner_user_id,
+                request.cursor.as_deref(),
+                limit + 1,
+            )
             .await?;
 
         let has_more = items.len() > limit as usize;
@@ -609,9 +618,8 @@ where
         let category_id = UserCategoryId::new(&request.user_category_id);
         let category = self
             .repository
-            .find_category_by_id(context, &category_id)
+            .find_category_by_id(context, &category_id, &owner_user_id)
             .await?
-            .filter(|c| c.owner_user_id == owner_user_id)
             .ok_or_else(|| AppstoreServiceError::NotFound("Category not found".to_string()))?;
         let _ = category;
 
@@ -722,9 +730,8 @@ where
         let share_id = UserStoreShareId::new(&request.share_id);
         let mut share = self
             .repository
-            .find_share_by_id(context, &share_id)
+            .find_share_by_id(context, &share_id, &owner_user_id)
             .await?
-            .filter(|s| s.owner_user_id == owner_user_id)
             .ok_or_else(|| AppstoreServiceError::NotFound("Share not found".to_string()))?;
 
         if let Some(title) = request.title.as_deref() {
@@ -768,9 +775,8 @@ where
         let share_id = UserStoreShareId::new(&request.share_id);
         let mut share = self
             .repository
-            .find_share_by_id(context, &share_id)
+            .find_share_by_id(context, &share_id, &owner_user_id)
             .await?
-            .filter(|s| s.owner_user_id == owner_user_id)
             .ok_or_else(|| AppstoreServiceError::NotFound("Share not found".to_string()))?;
 
         share.status = ShareStatus::Revoked;
@@ -791,9 +797,8 @@ where
         let share_id = UserStoreShareId::new(&request.share_id);
         let mut share = self
             .repository
-            .find_share_by_id(context, &share_id)
+            .find_share_by_id(context, &share_id, &owner_user_id)
             .await?
-            .filter(|s| s.owner_user_id == owner_user_id)
             .ok_or_else(|| AppstoreServiceError::NotFound("Share not found".to_string()))?;
 
         share.share_token = generate_share_token();
@@ -827,7 +832,7 @@ where
         let category_ids: Vec<String> = categories.iter().map(|c| c.id.clone()).collect();
         let counts = self
             .repository
-            .count_items_by_categories(context, &category_ids)
+            .count_items_by_categories(context, &category_ids, &share.owner_user_id)
             .await?;
 
         let summaries: Vec<PublicCategorySummary> = categories
@@ -872,18 +877,20 @@ where
         Self::validate_publicly_viewable(&share)?;
 
         let category_id = UserCategoryId::new(&request.user_category_id);
+        // The share owner is the effective owner for the public view: the
+        // token names whose store is being read, and the category must belong
+        // to that owner as well as being active.
+        let owner_user_id = share.owner_user_id.clone();
         let category = self
             .repository
-            .find_category_by_id(context, &category_id)
+            .find_category_by_id(context, &category_id, &owner_user_id)
             .await?
-            .filter(|c| {
-                c.owner_user_id == share.owner_user_id && c.status == UserCategoryStatus::Active
-            })
+            .filter(|c| c.status == UserCategoryStatus::Active)
             .ok_or_else(|| AppstoreServiceError::NotFound("Category not found".to_string()))?;
 
         let visible_owner_categories = self
             .repository
-            .find_categories_by_owner(context, &share.owner_user_id, None, i32::MAX)
+            .find_categories_by_owner(context, &owner_user_id, None, i32::MAX)
             .await?;
         let visible = Self::categories_in_scope(&share, &visible_owner_categories);
         if !visible.iter().any(|c| c.id == category.id) {
@@ -895,7 +902,13 @@ where
         let limit = request.page_size.unwrap_or(50).clamp(1, 200);
         let mut items = self
             .repository
-            .find_items_by_category(context, &category_id, request.cursor.as_deref(), limit + 1)
+            .find_items_by_category(
+                context,
+                &category_id,
+                &owner_user_id,
+                request.cursor.as_deref(),
+                limit + 1,
+            )
             .await?;
 
         let has_more = items.len() > limit as usize;

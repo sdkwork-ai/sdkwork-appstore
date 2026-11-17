@@ -9,6 +9,10 @@
 //! R2 — `POST /app/v3/api/download_grants` must refuse to mint a grant from a
 //!      listing that is not live on the storefront (hidden / non-active), and
 //!      must not write a grant row for it.
+//!
+//! R2b — `POST /app/v3/api/library/install` must apply the same storefront
+//!      gate: a hidden or unlisted product cannot be recorded in the caller's
+//!      library, while an active visible/featured product still installs.
 
 use chrono::Utc;
 use sqlx::SqlitePool;
@@ -16,7 +20,7 @@ use sqlx::SqlitePool;
 use sdkwork_appstore_library_service::context::AppstoreRequestContext as LibraryRequestContext;
 use sdkwork_appstore_library_service::error::AppstoreServiceError as LibraryError;
 use sdkwork_appstore_library_service::{
-    CreateDownloadGrantRequest, LibraryOperations, LibraryService,
+    CreateDownloadGrantRequest, LibraryInstallRequest, LibraryOperations, LibraryService,
 };
 use sdkwork_appstore_release_service::context::AppstoreRequestContext as ReleaseRequestContext;
 use sdkwork_appstore_release_service::{
@@ -381,4 +385,120 @@ async fn featured_listing_mints_download_grant() {
         .expect("a featured listing is public and must mint a download grant");
 
     assert_eq!(result.grant.listing_id, "listing-1");
+}
+
+// ---------------------------------------------------------------------------
+// R2b: install requires a live storefront listing
+// ---------------------------------------------------------------------------
+
+/// Neither the library row nor the install event may be written when the
+/// listing gate rejects the install.
+async fn assert_library_untouched(pool: &SqlitePool) {
+    let installed: i64 = sqlx::query_scalar("SELECT COUNT(*) FROM appstore_user_library_item")
+        .fetch_one(pool)
+        .await
+        .unwrap();
+    assert_eq!(
+        installed, 0,
+        "no library row may be written for a product that is not live"
+    );
+    let events: i64 = sqlx::query_scalar("SELECT COUNT(*) FROM appstore_install_event")
+        .fetch_one(pool)
+        .await
+        .unwrap();
+    assert_eq!(
+        events, 0,
+        "no install event may be recorded for a product that is not live"
+    );
+}
+
+#[tokio::test]
+async fn hidden_listing_cannot_be_installed() {
+    let pool = setup_db().await;
+    // Active but hidden: only the storefront visibility blocks the install.
+    insert_listing(&pool, "listing-1", "app-1", "active", "hidden").await;
+
+    let error = library_service(&pool)
+        .library_install(
+            &library_ctx(TENANT_MEMBER),
+            LibraryInstallRequest::new("listing-1", "windows"),
+        )
+        .await
+        .expect_err("a hidden listing must not be installable");
+
+    assert!(
+        matches!(error, LibraryError::NotFound(_)),
+        "a hidden listing must be indistinguishable from a missing one, got {error:?}"
+    );
+    assert_library_untouched(&pool).await;
+}
+
+#[tokio::test]
+async fn unlisted_listing_cannot_be_installed() {
+    let pool = setup_db().await;
+    // Visible but not yet active (publisher preview): the lifecycle blocks it.
+    insert_listing(&pool, "listing-1", "app-1", "draft", "visible").await;
+
+    let error = library_service(&pool)
+        .library_install(
+            &library_ctx(TENANT_MEMBER),
+            LibraryInstallRequest::new("listing-1", "windows"),
+        )
+        .await
+        .expect_err("a non-active listing must not be installable");
+
+    assert!(
+        matches!(error, LibraryError::NotFound(_)),
+        "a non-active listing must be indistinguishable from a missing one, got {error:?}"
+    );
+    assert_library_untouched(&pool).await;
+}
+
+#[tokio::test]
+async fn live_listing_can_be_installed() {
+    let pool = setup_db().await;
+    insert_listing(&pool, "listing-1", "app-1", "active", "visible").await;
+
+    let result = library_service(&pool)
+        .library_install(
+            &library_ctx(TENANT_MEMBER),
+            LibraryInstallRequest::new("listing-1", "windows"),
+        )
+        .await
+        .expect("an active visible listing must install")
+        .library_item;
+
+    assert_eq!(result.listing_id, "listing-1");
+    assert_eq!(result.user_id, TENANT_MEMBER);
+
+    let installed: i64 = sqlx::query_scalar("SELECT COUNT(*) FROM appstore_user_library_item")
+        .fetch_one(&pool)
+        .await
+        .unwrap();
+    assert_eq!(installed, 1);
+}
+
+#[tokio::test]
+async fn featured_listing_can_be_installed() {
+    // `featured` is a public storefront visibility, so the install gate must
+    // not over-tighten to `visible` only.
+    let pool = setup_db().await;
+    insert_listing(&pool, "listing-1", "app-1", "active", "featured").await;
+
+    let result = library_service(&pool)
+        .library_install(
+            &library_ctx(TENANT_MEMBER),
+            LibraryInstallRequest::new("listing-1", "windows"),
+        )
+        .await
+        .expect("a featured listing is public and must install")
+        .library_item;
+
+    assert_eq!(result.listing_id, "listing-1");
+
+    let installed: i64 = sqlx::query_scalar("SELECT COUNT(*) FROM appstore_user_library_item")
+        .fetch_one(&pool)
+        .await
+        .unwrap();
+    assert_eq!(installed, 1);
 }

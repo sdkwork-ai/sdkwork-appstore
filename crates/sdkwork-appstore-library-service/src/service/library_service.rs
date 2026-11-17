@@ -270,8 +270,9 @@ where
         }
 
         // Commercial gating before any library mutation: the listing must
-        // exist, the platform must be one the app ships for, and PAID
-        // listings require an active entitlement (FREEMIUM adopts like FREE).
+        // exist, be live on the storefront, the platform must be one the app
+        // ships for, and PAID listings require an active entitlement
+        // (FREEMIUM adopts like FREE).
         let commerce = self
             .repository
             .find_listing_commerce_info(context, &request.listing_id)
@@ -279,6 +280,17 @@ where
             .ok_or_else(|| {
                 AppstoreServiceError::NotFound(format!("Listing not found: {}", request.listing_id))
             })?;
+        // Hidden and non-active listings stay in the publisher preview, so an
+        // install attempt for one must be indistinguishable from a missing
+        // listing: the same NotFound, and no library row or install event is
+        // written. Checking before the platform gate also keeps the listing's
+        // distribution from leaking through a validation error.
+        if !commerce.is_downloadable() {
+            return Err(AppstoreServiceError::NotFound(format!(
+                "Listing not found: {}",
+                request.listing_id
+            )));
+        }
         if !commerce.supports_platform(&request.platform) {
             return Err(AppstoreServiceError::ValidationFailed(format!(
                 "Listing {} is not distributed for platform {}",

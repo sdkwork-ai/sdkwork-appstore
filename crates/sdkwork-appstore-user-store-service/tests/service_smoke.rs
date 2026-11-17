@@ -7,7 +7,10 @@ use chrono::Utc;
 
 use sdkwork_appstore_user_store_service::context::AppstoreRequestContext;
 use sdkwork_appstore_user_store_service::domain::commands::{
-    AddCategoryItemRequest, CreateCategoryRequest, CreateShareRequest, RetrieveCategoryRequest,
+    AddCategoryItemRequest, CreateCategoryRequest, CreateShareRequest, DeleteCategoryRequest,
+    ListCategoryItemsRequest, RegenerateShareTokenRequest, RemoveCategoryItemRequest,
+    ReorderCategoryItemsRequest, RetrieveCategoryRequest, RevokeShareRequest,
+    UpdateCategoryRequest, UpdateShareRequest,
 };
 use sdkwork_appstore_user_store_service::domain::models::{
     ListingCard, UserCategory, UserCategoryItem, UserStoreShare,
@@ -46,6 +49,23 @@ impl InMemoryRepository {
     fn lock(&self) -> std::sync::MutexGuard<'_, InMemoryState> {
         self.state.lock().unwrap()
     }
+
+    /// Mirrors the SQL owner predicate: an item belongs to the caller only
+    /// through the category that owns it.
+    fn item_owned_by(
+        state: &InMemoryState,
+        item: &UserCategoryItem,
+        tenant_id: &str,
+        owner_user_id: &str,
+    ) -> bool {
+        state
+            .categories
+            .get(&item.user_category_id)
+            .map(|category| {
+                category.tenant_id == tenant_id && category.owner_user_id == owner_user_id
+            })
+            .unwrap_or(false)
+    }
 }
 
 #[async_trait::async_trait]
@@ -78,12 +98,13 @@ impl UserStoreRepositoryPort for InMemoryRepository {
         &self,
         context: &AppstoreRequestContext,
         category_id: &sdkwork_appstore_user_store_service::domain::models::UserCategoryId,
+        owner_user_id: &str,
     ) -> Result<Option<UserCategory>, AppstoreServiceError> {
         Ok(self
             .lock()
             .categories
             .get(category_id.as_str())
-            .filter(|c| c.tenant_id == context.tenant_id)
+            .filter(|c| c.tenant_id == context.tenant_id && c.owner_user_id == owner_user_id)
             .cloned())
     }
 
@@ -106,13 +127,15 @@ impl UserStoreRepositoryPort for InMemoryRepository {
 
     async fn find_categories_by_ids(
         &self,
-        _context: &AppstoreRequestContext,
+        context: &AppstoreRequestContext,
         category_ids: &[String],
+        owner_user_id: &str,
     ) -> Result<Vec<UserCategory>, AppstoreServiceError> {
         let state = self.lock();
         Ok(category_ids
             .iter()
             .filter_map(|id| state.categories.get(id).cloned())
+            .filter(|c| c.tenant_id == context.tenant_id && c.owner_user_id == owner_user_id)
             .collect())
     }
 
@@ -142,12 +165,22 @@ impl UserStoreRepositoryPort for InMemoryRepository {
 
     async fn update_category(
         &self,
-        _context: &AppstoreRequestContext,
+        context: &AppstoreRequestContext,
         category: &UserCategory,
     ) -> Result<(), AppstoreServiceError> {
-        self.lock()
+        let mut state = self.lock();
+        let owned = state
             .categories
-            .insert(category.id.clone(), category.clone());
+            .get(&category.id)
+            .map(|existing| {
+                existing.tenant_id == context.tenant_id && existing.owner_user_id == context.user_id
+            })
+            .unwrap_or(false);
+        if owned {
+            state
+                .categories
+                .insert(category.id.clone(), category.clone());
+        }
         Ok(())
     }
 
@@ -157,10 +190,20 @@ impl UserStoreRepositoryPort for InMemoryRepository {
         category_id: &sdkwork_appstore_user_store_service::domain::models::UserCategoryId,
     ) -> Result<(), AppstoreServiceError> {
         let mut state = self.lock();
-        state.items.retain(|_, item| {
-            !(item.tenant_id == context.tenant_id && item.user_category_id == category_id.as_str())
-        });
-        state.categories.remove(category_id.as_str());
+        let owned = state
+            .categories
+            .get(category_id.as_str())
+            .map(|category| {
+                category.tenant_id == context.tenant_id && category.owner_user_id == context.user_id
+            })
+            .unwrap_or(false);
+        if owned {
+            state.items.retain(|_, item| {
+                !(item.tenant_id == context.tenant_id
+                    && item.user_category_id == category_id.as_str())
+            });
+            state.categories.remove(category_id.as_str());
+        }
         Ok(())
     }
 
@@ -168,6 +211,7 @@ impl UserStoreRepositoryPort for InMemoryRepository {
         &self,
         context: &AppstoreRequestContext,
         category_id: &sdkwork_appstore_user_store_service::domain::models::UserCategoryId,
+        owner_user_id: &str,
         cursor: Option<&str>,
         limit: i32,
     ) -> Result<Vec<UserCategoryItem>, AppstoreServiceError> {
@@ -176,7 +220,9 @@ impl UserStoreRepositoryPort for InMemoryRepository {
             .items
             .values()
             .filter(|i| {
-                i.tenant_id == context.tenant_id && i.user_category_id == category_id.as_str()
+                i.tenant_id == context.tenant_id
+                    && i.user_category_id == category_id.as_str()
+                    && Self::item_owned_by(&state, i, &context.tenant_id, owner_user_id)
             })
             .cloned()
             .collect();
@@ -194,12 +240,18 @@ impl UserStoreRepositoryPort for InMemoryRepository {
         &self,
         context: &AppstoreRequestContext,
         item_id: &sdkwork_appstore_user_store_service::domain::models::UserCategoryItemId,
+        category_id: &sdkwork_appstore_user_store_service::domain::models::UserCategoryId,
+        owner_user_id: &str,
     ) -> Result<Option<UserCategoryItem>, AppstoreServiceError> {
-        Ok(self
-            .lock()
+        let state = self.lock();
+        Ok(state
             .items
             .get(item_id.as_str())
-            .filter(|i| i.tenant_id == context.tenant_id)
+            .filter(|i| {
+                i.tenant_id == context.tenant_id
+                    && i.user_category_id == category_id.as_str()
+                    && Self::item_owned_by(&state, i, &context.tenant_id, owner_user_id)
+            })
             .cloned())
     }
 
@@ -208,15 +260,17 @@ impl UserStoreRepositoryPort for InMemoryRepository {
         context: &AppstoreRequestContext,
         category_id: &sdkwork_appstore_user_store_service::domain::models::UserCategoryId,
         listing_id: &str,
+        owner_user_id: &str,
     ) -> Result<Option<UserCategoryItem>, AppstoreServiceError> {
-        Ok(self
-            .lock()
+        let state = self.lock();
+        Ok(state
             .items
             .values()
             .find(|i| {
                 i.tenant_id == context.tenant_id
                     && i.user_category_id == category_id.as_str()
                     && i.listing_id == listing_id
+                    && Self::item_owned_by(&state, i, &context.tenant_id, owner_user_id)
             })
             .cloned())
     }
@@ -225,6 +279,7 @@ impl UserStoreRepositoryPort for InMemoryRepository {
         &self,
         context: &AppstoreRequestContext,
         category_ids: &[String],
+        owner_user_id: &str,
     ) -> Result<Vec<(String, i64)>, AppstoreServiceError> {
         let state = self.lock();
         Ok(category_ids
@@ -233,7 +288,11 @@ impl UserStoreRepositoryPort for InMemoryRepository {
                 let count = state
                     .items
                     .values()
-                    .filter(|i| i.tenant_id == context.tenant_id && &i.user_category_id == id)
+                    .filter(|i| {
+                        i.tenant_id == context.tenant_id
+                            && &i.user_category_id == id
+                            && Self::item_owned_by(&state, i, &context.tenant_id, owner_user_id)
+                    })
                     .count() as i64;
                 (id.clone(), count)
             })
@@ -251,34 +310,63 @@ impl UserStoreRepositoryPort for InMemoryRepository {
 
     async fn update_item(
         &self,
-        _context: &AppstoreRequestContext,
+        context: &AppstoreRequestContext,
         item: &UserCategoryItem,
     ) -> Result<(), AppstoreServiceError> {
-        self.lock().items.insert(item.id.clone(), item.clone());
+        let mut state = self.lock();
+        let owned = state
+            .items
+            .get(&item.id)
+            .map(|existing| {
+                Self::item_owned_by(&state, existing, &context.tenant_id, &context.user_id)
+            })
+            .unwrap_or(false);
+        if owned {
+            state.items.insert(item.id.clone(), item.clone());
+        }
         Ok(())
     }
 
     async fn delete_item(
         &self,
-        _context: &AppstoreRequestContext,
+        context: &AppstoreRequestContext,
         item_id: &sdkwork_appstore_user_store_service::domain::models::UserCategoryItemId,
     ) -> Result<(), AppstoreServiceError> {
-        self.lock().items.remove(item_id.as_str());
+        let mut state = self.lock();
+        let owned = state
+            .items
+            .get(item_id.as_str())
+            .map(|existing| {
+                Self::item_owned_by(&state, existing, &context.tenant_id, &context.user_id)
+            })
+            .unwrap_or(false);
+        if owned {
+            state.items.remove(item_id.as_str());
+        }
         Ok(())
     }
 
     async fn reorder_items(
         &self,
-        _context: &AppstoreRequestContext,
+        context: &AppstoreRequestContext,
         category_id: &sdkwork_appstore_user_store_service::domain::models::UserCategoryId,
         ordered_item_ids: &[String],
     ) -> Result<(), AppstoreServiceError> {
         let mut state = self.lock();
         for (position, item_id) in ordered_item_ids.iter().enumerate() {
+            let owned = state
+                .items
+                .get(item_id)
+                .map(|item| {
+                    item.user_category_id == category_id.as_str()
+                        && Self::item_owned_by(&state, item, &context.tenant_id, &context.user_id)
+                })
+                .unwrap_or(false);
+            if !owned {
+                continue;
+            }
             if let Some(item) = state.items.get_mut(item_id) {
-                if item.user_category_id == category_id.as_str() {
-                    item.sort_order = position as i32;
-                }
+                item.sort_order = position as i32;
             }
         }
         Ok(())
@@ -301,12 +389,13 @@ impl UserStoreRepositoryPort for InMemoryRepository {
         &self,
         context: &AppstoreRequestContext,
         share_id: &sdkwork_appstore_user_store_service::domain::models::UserStoreShareId,
+        owner_user_id: &str,
     ) -> Result<Option<UserStoreShare>, AppstoreServiceError> {
         Ok(self
             .lock()
             .shares
             .get(share_id.as_str())
-            .filter(|s| s.tenant_id == context.tenant_id)
+            .filter(|s| s.tenant_id == context.tenant_id && s.owner_user_id == owner_user_id)
             .cloned())
     }
 
@@ -351,10 +440,20 @@ impl UserStoreRepositoryPort for InMemoryRepository {
 
     async fn update_share(
         &self,
-        _context: &AppstoreRequestContext,
+        context: &AppstoreRequestContext,
         share: &UserStoreShare,
     ) -> Result<(), AppstoreServiceError> {
-        self.lock().shares.insert(share.id.clone(), share.clone());
+        let mut state = self.lock();
+        let owned = state
+            .shares
+            .get(&share.id)
+            .map(|existing| {
+                existing.tenant_id == context.tenant_id && existing.owner_user_id == context.user_id
+            })
+            .unwrap_or(false);
+        if owned {
+            state.shares.insert(share.id.clone(), share.clone());
+        }
         Ok(())
     }
 
@@ -574,4 +673,129 @@ async fn unauthenticated_management_call_rejected() {
         result,
         Err(AppstoreServiceError::PermissionDenied(_))
     ));
+}
+
+#[tokio::test]
+async fn cross_user_category_mutation_rejected() {
+    let service = service();
+    let owner = test_context("tenant-1", "user-1");
+    let stranger = test_context("tenant-1", "user-2");
+
+    let created = service
+        .category_create(&owner, CreateCategoryRequest::new("private"))
+        .await
+        .unwrap();
+    let added = service
+        .item_add(
+            &owner,
+            AddCategoryItemRequest::new(&created.category.id, "listing-1"),
+        )
+        .await
+        .unwrap();
+
+    // Ownership is part of the query, so every management path resolves the
+    // foreign category to not-found instead of touching the owner's rows.
+    let mut update_request = UpdateCategoryRequest::new(&created.category.id);
+    update_request.name = Some("hijacked".to_string());
+    let update = service.category_update(&stranger, update_request).await;
+    assert!(matches!(update, Err(AppstoreServiceError::NotFound(_))));
+
+    let delete = service
+        .category_delete(&stranger, DeleteCategoryRequest::new(&created.category.id))
+        .await;
+    assert!(matches!(delete, Err(AppstoreServiceError::NotFound(_))));
+
+    let list = service
+        .items_list(
+            &stranger,
+            ListCategoryItemsRequest::new(&created.category.id),
+        )
+        .await;
+    assert!(matches!(list, Err(AppstoreServiceError::NotFound(_))));
+
+    let add = service
+        .item_add(
+            &stranger,
+            AddCategoryItemRequest::new(&created.category.id, "listing-1"),
+        )
+        .await;
+    assert!(matches!(add, Err(AppstoreServiceError::NotFound(_))));
+
+    let remove = service
+        .item_remove(
+            &stranger,
+            RemoveCategoryItemRequest::new(&created.category.id, &added.item.id),
+        )
+        .await;
+    assert!(matches!(remove, Err(AppstoreServiceError::NotFound(_))));
+
+    let reorder = service
+        .items_reorder(
+            &stranger,
+            ReorderCategoryItemsRequest::new(&created.category.id, vec![added.item.id.clone()]),
+        )
+        .await;
+    assert!(matches!(reorder, Err(AppstoreServiceError::NotFound(_))));
+
+    // The owner's data is untouched by the rejected attempts.
+    let owner_categories = service
+        .categories_list(&owner, Default::default())
+        .await
+        .unwrap();
+    assert_eq!(owner_categories.items.len(), 1);
+    assert_eq!(owner_categories.items[0].name, "private");
+
+    let owner_items = service
+        .items_list(&owner, ListCategoryItemsRequest::new(&created.category.id))
+        .await
+        .unwrap();
+    assert_eq!(owner_items.items.len(), 1);
+    assert_eq!(owner_items.items[0].item.id, added.item.id);
+}
+
+#[tokio::test]
+async fn cross_user_share_mutation_rejected() {
+    let service = service();
+    let owner = test_context("tenant-1", "user-1");
+    let stranger = test_context("tenant-1", "user-2");
+    let visitor = test_context("tenant-1", "");
+
+    let share = service
+        .share_create(&owner, CreateShareRequest::new("My Appstore"))
+        .await
+        .unwrap();
+    let original_token = share.share.share_token.clone();
+
+    let mut update_request = UpdateShareRequest::new(&share.share.id);
+    update_request.title = Some("hijacked".to_string());
+    let update = service.share_update(&stranger, update_request).await;
+    assert!(matches!(update, Err(AppstoreServiceError::NotFound(_))));
+
+    let revoke = service
+        .share_revoke(&stranger, RevokeShareRequest::new(&share.share.id))
+        .await;
+    assert!(matches!(revoke, Err(AppstoreServiceError::NotFound(_))));
+
+    let regenerate = service
+        .share_regenerate_token(&stranger, RegenerateShareTokenRequest::new(&share.share.id))
+        .await;
+    assert!(matches!(regenerate, Err(AppstoreServiceError::NotFound(_))));
+
+    // The owner still holds one active share with its original token, and the
+    // public view stays readable through that token alone.
+    let owner_shares = service.shares_list(&owner, None, None).await.unwrap();
+    assert_eq!(owner_shares.items.len(), 1);
+    assert_eq!(owner_shares.items[0].title, "My Appstore");
+    assert_eq!(owner_shares.items[0].share_token, original_token);
+
+    let view = service
+        .public_user_store_view(
+            &visitor,
+            sdkwork_appstore_user_store_service::domain::commands::PublicUserStoreViewRequest::new(
+                &original_token,
+            ),
+        )
+        .await
+        .unwrap();
+    assert_eq!(view.share_token, original_token);
 }
