@@ -111,6 +111,14 @@ function createListingsFacade(client: SdkworkAppstoreAppClient) {
     getEditorial: (id: string) => api.editorial.retrieve(id),
     listRatings: (id: string, p?: { cursor?: string; limit?: number }) => api.ratings.list(id, pageParams(p)),
     updateRating: (id: string, body: ListingRatingUpsertRequest) => api.ratings.update(id, body),
+    /**
+     * Remix download coordinates of a published listing.
+     * @param id - listing id.
+     * @returns the deploy-owned coordinates, or a `404` for a listing that is
+     *   not remixable and a `503` when the deploy integration cannot be
+     *   consulted.
+     */
+    getRemix: (id: string) => api.remix.retrieve(id),
   };
 }
 

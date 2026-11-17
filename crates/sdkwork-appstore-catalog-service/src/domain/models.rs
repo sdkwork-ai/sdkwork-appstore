@@ -392,6 +392,14 @@ pub struct ListingSummary {
     /// (`platform code -> qrUrl`), preferred by QR distributions.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub platform_links: Option<std::collections::BTreeMap<String, String>>,
+    /// Whether the listing currently offers a remix download.
+    ///
+    /// Not a catalog column: the catalog route projects it per response from
+    /// the deployment binding plus deploy's source readiness. Every read path
+    /// that does not project it reports `false`, which is the safe default
+    /// ("do not offer remix") rather than a claim.
+    #[serde(default)]
+    pub remixable: bool,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]

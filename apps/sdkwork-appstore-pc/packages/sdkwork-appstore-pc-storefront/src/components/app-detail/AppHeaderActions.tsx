@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Heart, Share } from 'lucide-react';
+import { GitFork, Heart, Share } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { AppItem, DistributionAction } from '@sdkwork/appstore-pc-core';
 import {
@@ -13,6 +13,7 @@ import { useInstall } from '../../providers/InstallProvider';
 import { AppStoreService } from '../../services/api';
 import { formatPrice } from '../../lib/utils';
 import { AddToCategoryPopover } from '../user-store/AddToCategoryPopover';
+import { RemixModal } from '../remix/RemixModal';
 import { AppInstallButton } from './AppInstallButton';
 
 interface AppHeaderActionsProps {
@@ -23,6 +24,7 @@ export const AppHeaderActions: React.FC<AppHeaderActionsProps> = ({ app }) => {
   const { t, i18n } = useTranslation();
   const { installApp, requestQr, host } = useInstall();
   const [wishlisted, setWishlisted] = useState(false);
+  const [remixOpen, setRemixOpen] = useState(false);
 
   // One plan for the header: the install call to action renders from it, and
   // the fallback acquire button is only used when the listing has no desktop
@@ -88,6 +90,18 @@ export const AppHeaderActions: React.FC<AppHeaderActionsProps> = ({ app }) => {
         ) : (
           <AppInstallButton app={app} plan={plan} />
         )}
+        {/* Remix is only offered when the listing currently has a usable
+            source download; the flag is server-derived per read. */}
+        {app.remixable === true && (
+          <button
+            type="button"
+            onClick={() => setRemixOpen(true)}
+            className="inline-flex h-10 cursor-pointer items-center gap-1.5 rounded-full bg-store-raised px-4 py-2 text-sm font-medium text-store-ink transition-colors hover:bg-store-subtle"
+          >
+            <GitFork className="h-4 w-4" />
+            {t('remix.action')}
+          </button>
+        )}
         <div className="flex h-10 items-center gap-3">
           <button
             type="button"
@@ -119,6 +133,7 @@ export const AppHeaderActions: React.FC<AppHeaderActionsProps> = ({ app }) => {
         onOpen={handleOpen}
         onQr={(target, action) => requestQr(target, action.group)}
       />
+      {remixOpen && <RemixModal app={app} onClose={() => setRemixOpen(false)} />}
     </div>
   );
 };

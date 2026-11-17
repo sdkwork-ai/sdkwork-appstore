@@ -4,7 +4,14 @@ import {
   type AppStoreServicePort,
 } from '@sdkwork/appstore-pc-core';
 
-import type { AppItem, EditorialCollection, EventItem, Review, SpecReviewSubmitInput } from '../types';
+import type {
+  AppItem,
+  EditorialCollection,
+  EventItem,
+  ListingRemixDownload,
+  Review,
+  SpecReviewSubmitInput,
+} from '../types';
 
 /** Bounded storefront page for catalog grid views (PAGINATION_SPEC §3: max 200,
  * keep interactive surfaces small). */
@@ -140,6 +147,7 @@ export function createAppStoreServicePort(
       rating: readNumber(item, 'averageRating', 'average_rating') ?? 0,
       reviewsCount: readNumber(item, 'ratingCount', 'rating_count') ?? 0,
       description: readString(item, 'description') || '',
+      remixable: readBoolean(item, 'remixable'),
       screenshots: readStringArray(item, 'screenshots', 'mediaScreenshots'),
       platforms: readPlatformCodes(item),
       accessUrl: readString(item, 'accessUrl', 'access_url') || undefined,
@@ -476,6 +484,21 @@ export function createAppStoreServicePort(
         }
       }
       return app;
+    },
+
+    /**
+     * Remix download coordinates of one listing.
+     *
+     * The wire payload is normalized into the package-owned `ListingRemixDownload`
+     * shape so a mode without its matching coordinates is rejected here rather
+     * than surfacing as an undefined field three layers up.
+     */
+    async getListingRemix(listingId: string): Promise<ListingRemixDownload> {
+      const raw = (await client.listings.getRemix(listingId)) as unknown as Record<
+        string,
+        unknown
+      >;
+      return normalizeRemixDownload(raw);
     },
 
     async getReviewsByAppId(id: string): Promise<Review[]> {
@@ -911,6 +934,79 @@ function readArray(record: Record<string, unknown>, ...keys: string[]): Record<s
     }
   }
   return [];
+}
+
+/**
+ * Normalize the generated remix payload into the storefront-owned shape.
+ *
+ * @param raw - wire payload of `listings.remix.retrieve`.
+ * @returns coordinates of the selected transport.
+ * @throws when the declared mode and its coordinates disagree, so the caller
+ *   reports a broken download instead of rendering an empty one.
+ */
+function normalizeRemixDownload(raw: Record<string, unknown>): ListingRemixDownload {
+  const mode = readString(raw, 'mode').toUpperCase();
+  if (mode === 'GIT') {
+    const git = readRecord(raw, 'git');
+    const repoUrl = readString(git, 'repoUrl', 'repo_url');
+    if (git === undefined || !repoUrl) {
+      throw new Error('The remix download declares GIT without repository coordinates.');
+    }
+    const subPath = readString(git, 'subPath', 'sub_path');
+    return {
+      mode: 'GIT',
+      git: {
+        repoUrl,
+        repoRef: readString(git, 'repoRef', 'repo_ref'),
+        ...(subPath ? { subPath } : {}),
+      },
+    };
+  }
+  if (mode === 'ARCHIVE') {
+    const archive = readRecord(raw, 'archive');
+    const driveNodeId = readString(archive, 'driveNodeId', 'drive_node_id');
+    if (archive === undefined || !driveNodeId) {
+      throw new Error('The remix download declares ARCHIVE without a Drive node identity.');
+    }
+    const contentLength = readString(archive, 'contentLength', 'content_length');
+    const checksum = readString(archive, 'checksumSha256', 'checksum_sha256');
+    return {
+      mode: 'ARCHIVE',
+      archive: {
+        artifactId: readString(archive, 'artifactId', 'artifact_id'),
+        driveNodeId,
+        fileName: readString(archive, 'fileName', 'file_name') || 'source.zip',
+        ...(contentLength ? { contentLength } : {}),
+        ...(checksum ? { checksumSha256: checksum } : {}),
+      },
+    };
+  }
+  throw new Error(`The remix download declares an unsupported mode: ${mode || '(missing)'}.`);
+}
+
+/** Reads a nested object value, ignoring arrays and scalars. */
+function readRecord(
+  record: Record<string, unknown> | undefined,
+  key: string,
+): Record<string, unknown> | undefined {
+  const value = record?.[key];
+  if (value === null || typeof value !== 'object' || Array.isArray(value)) {
+    return undefined;
+  }
+  return value as Record<string, unknown>;
+}
+
+/** Reads the first boolean-valued key; anything else is false. */
+function readBoolean(record: Record<string, unknown> | undefined, ...keys: string[]): boolean {
+  if (!record) {
+    return false;
+  }
+  for (const key of keys) {
+    if (record[key] === true) {
+      return true;
+    }
+  }
+  return false;
 }
 
 function readString(record: Record<string, unknown> | undefined, ...keys: string[]): string {

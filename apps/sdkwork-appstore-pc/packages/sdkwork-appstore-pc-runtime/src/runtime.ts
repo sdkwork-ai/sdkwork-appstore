@@ -29,6 +29,7 @@ import { configureAppstorePcDemandClaims } from './demandClaims';
 import { configureAppstorePcUserStore } from './userStore';
 import { configureAppstorePcPaidCheckout } from './paidCheckout';
 import { configureAppstorePcArtifactUpload } from './artifactUpload';
+import { configureAppstorePcRemixArchive } from './remixArchive';
 import { configureAppstorePcDeveloperMarketSurface } from './developerMarket';
 
 export interface AppstorePcRuntime {
@@ -92,6 +93,10 @@ export function createAppstorePcRuntime(
     baseUrl: normalizeGeneratedSdkBaseUrl(config.appApiBaseUrl, '/app/v3/api'),
     tokenManager,
     appClient: sdkClients.app,
+  });
+  configureAppstorePcRemixArchive({
+    baseUrl: normalizeGeneratedSdkBaseUrl(config.appApiBaseUrl, '/app/v3/api'),
+    tokenManager,
   });
   configureAppstorePcPaidCheckout({
     // The cloudrouter domains surface rides the shared gateway origin.

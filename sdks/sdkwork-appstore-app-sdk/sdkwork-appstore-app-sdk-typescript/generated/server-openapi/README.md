@@ -76,9 +76,9 @@ const result = await client.catalog.appstore.catalog.home.retrieve();
 ### listings
 
 ```typescript
-// Retrieve listing detail
+// Retrieve a listing's remix download coordinates
 const listingId = '1';
-const result = await client.listings.appstore.listings.retrieve(listingId);
+const result = await client.listings.appstore.listings.remix.retrieve(listingId);
 ```
 
 ### releases

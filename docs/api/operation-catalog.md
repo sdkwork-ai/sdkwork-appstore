@@ -25,6 +25,7 @@ Prefix lock:
 | `appstore.catalog.feedback.create` | POST | `/app/v3/api/appstore/catalog/feedback` | `appstore.catalog.write` |
 | `appstore.listings.ratings.list` | GET | `/app/v3/api/listings/{listingId}/ratings` | `appstore.listings.read` |
 | `appstore.listings.ratings.update` | PUT | `/app/v3/api/listings/{listingId}/ratings/me` | `appstore.listings.write` |
+| `appstore.listings.remix.retrieve` | GET | `/app/v3/api/appstore/listings/{listingId}/remix` | `appstore.listings.read` |
 | `appstore.catalog.recommendations.list` | GET | `/app/v3/api/appstore/catalog/recommendations` | 鈥?(tier 0 public) |
 | `appstore.catalog.recentlyUpdated.list` | GET | `/app/v3/api/appstore/catalog/recently_updated` | 鈥?(tier 0 public) |
 | `appstore.catalog.events.list` | GET | `/app/v3/api/appstore/catalog/events` | 鈥?(tier 0 public) |

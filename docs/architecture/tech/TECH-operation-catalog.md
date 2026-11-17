@@ -55,6 +55,7 @@ Prefix lock:
 | `appstore.listings.ratings.list` | GET | `/app/v3/api/listings/{listingId}/ratings` | `appstore.listings.read` |
 | `appstore.listings.ratings.update` | PUT | `/app/v3/api/listings/{listingId}/ratings/me` | none |
 | `appstore.listings.releases.history.list` | GET | `/app/v3/api/listings/{listingId}/releases/history` | `appstore.listings.read` |
+| `appstore.listings.remix.retrieve` | GET | `/app/v3/api/appstore/listings/{listingId}/remix` | `appstore.listings.read` |
 | `appstore.listings.similar.list` | GET | `/app/v3/api/listings/{listingId}/similar` | `appstore.listings.read` |
 | `appstore.listings.submissions.create` | POST | `/app/v3/api/listings/{listingId}/submissions` | `appstore.listings.submit` |
 

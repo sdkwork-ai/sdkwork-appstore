@@ -15,6 +15,42 @@ export interface ListingArtifact {
   checksumSha256?: string;
 }
 
+/**
+ * Transport a remix download uses.
+ *
+ * `GIT` gives the visitor clone coordinates: a browser cannot run git, so the
+ * storefront shows the command instead. `ARCHIVE` gives a Drive node whose
+ * bytes the storefront fetches and unpacks locally.
+ */
+export type RemixMode = 'GIT' | 'ARCHIVE';
+
+/** Clone coordinates of a remixable listing. */
+export interface RemixGitCoordinates {
+  repoUrl: string;
+  repoRef: string;
+  /** Directory inside the repository that holds the application. */
+  subPath?: string;
+}
+
+/** Source-archive coordinates of a remixable listing. */
+export interface RemixArchiveCoordinates {
+  artifactId: string;
+  driveNodeId: string;
+  /** Archive file name, including its extension. */
+  fileName: string;
+  /** Archive size in bytes as a decimal string (`int64` wire contract). */
+  contentLength?: string;
+  /** Published SHA-256 (hex); absent when deploy recorded none. */
+  checksumSha256?: string;
+}
+
+/** One resolved remix download: the mode plus its coordinates. */
+export interface ListingRemixDownload {
+  mode: RemixMode;
+  git?: RemixGitCoordinates;
+  archive?: RemixArchiveCoordinates;
+}
+
 export interface AppItem {
   id: string;
   name: string;
@@ -25,6 +61,13 @@ export interface AppItem {
   reviewsCount: number;
   ratingBreakdown?: [number, number, number, number, number]; // [5 star, 4 star, 3, 2, 1] percentages
   description: string;
+  /**
+   * Whether the listing currently offers a remix download (source taken into a
+   * local project). Server-derived: true only for a published listing bound to
+   * a deploy application whose remix switch is on and whose source is READY.
+   * Unresolvable availability is `false`, so the action is simply absent.
+   */
+  remixable?: boolean;
   /** Raw platform codes this listing ships for (see platforms.ts display groups). */
   platforms?: string[];
   /** Store pricing model (FREE/FREEMIUM/PAID) driving the acquisition gate. */

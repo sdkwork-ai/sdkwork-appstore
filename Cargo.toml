@@ -10,6 +10,7 @@ members = [
   "crates/sdkwork-appstore-analytics-worker",
   "crates/sdkwork-appstore-publisher-service",
   "crates/sdkwork-appstore-listing-service",
+  "crates/sdkwork-appstore-remix-service",
   "crates/sdkwork-appstore-release-service",
   "crates/sdkwork-appstore-catalog-service",
   "crates/sdkwork-appstore-library-service",
@@ -75,6 +76,7 @@ sdkwork-web-bootstrap = { path = "../sdkwork-web-framework/crates/sdkwork-web-bo
 sdkwork-appstore-repository-sqlx = { path = "crates/sdkwork-appstore-repository-sqlx" }
 sdkwork-appstore-catalog-service = { path = "crates/sdkwork-appstore-catalog-service" }
 sdkwork-appstore-listing-service = { path = "crates/sdkwork-appstore-listing-service" }
+sdkwork-appstore-remix-service = { path = "crates/sdkwork-appstore-remix-service" }
 sdkwork-appstore-release-service = { path = "crates/sdkwork-appstore-release-service" }
 sdkwork-appstore-publisher-service = { path = "crates/sdkwork-appstore-publisher-service" }
 sdkwork-appstore-library-service = { path = "crates/sdkwork-appstore-library-service" }

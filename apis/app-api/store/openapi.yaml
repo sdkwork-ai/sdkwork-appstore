@@ -522,6 +522,38 @@ paths:
               schema:
                 $ref: '#/components/schemas/FeedbackResponse'
       x-sdkwork-idempotent: true
+  /app/v3/api/appstore/listings/{listingId}/remix:
+    get:
+      tags:
+      - listings
+      summary: Retrieve a listing's remix download coordinates
+      description: 'How a visitor takes this listing''s application source into a
+        local project. Remix is available only when the listing is published and visible
+        on the storefront, a deployment binding maps its application to a sdkwork-deploy
+        application, that deploy application has remix enabled, and its source is
+        currently READY. Every other case is 404. When the App Store deployment cannot
+        consult deploy (APPSTORE_DEPLOY_BASE_URL is not configured, or deploy is unreachable)
+        the read is 503 naming the missing configuration instead of a fabricated 404,
+        because availability cannot be decided.
+
+        mode selects the transport: GIT returns repoUrl/repoRef/subPath for the client
+        to clone itself, ARCHIVE returns the Drive node identity, file name, content
+        length, and published SHA-256 so the client fetches the bytes through the
+        Drive app API and verifies them. The App Store never proxies source bytes
+        and never mints a signed URL.'
+      operationId: appstore.listings.remix.retrieve
+      security:
+      - AuthToken: []
+        AccessToken: []
+      parameters:
+      - $ref: '#/components/parameters/ListingId'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListingRemixResponse'
   /app/v3/api/listings:
     post:
       tags:
@@ -1960,6 +1992,7 @@ components:
       - displayName
       - listingSlug
       - pricingModel
+      - remixable
       properties:
         id:
           type: string
@@ -2017,6 +2050,13 @@ components:
           description: Per-platform scan/delivery links (appstore_app_platform qrUrl).
           additionalProperties:
             type: string
+        remixable:
+          type: boolean
+          description: Whether this listing currently offers a remix download. True
+            only when the listing is published and visible, a deployment binding maps
+            its application to a deploy application with remix enabled, and that deploy
+            application's source is READY. Unresolvable availability (no binding,
+            deploy unreachable, unset integration) reports false.
     ListingResponse:
       allOf:
       - $ref: '#/components/schemas/SdkWorkApiResponse'
@@ -2052,6 +2092,83 @@ components:
             type: array
             items:
               type: string
+    ListingRemixResponse:
+      allOf:
+      - $ref: '#/components/schemas/SdkWorkApiResponse'
+      - type: object
+        required:
+        - data
+        properties:
+          data:
+            type: object
+            required:
+            - item
+            properties:
+              item:
+                $ref: '#/components/schemas/ListingRemixDownload'
+    ListingRemixDownload:
+      type: object
+      description: Deploy-owned download coordinates projected for the storefront.
+        `mode` selects which coordinate object is populated; the other is absent.
+      required:
+      - mode
+      properties:
+        mode:
+          type: string
+          enum:
+          - GIT
+          - ARCHIVE
+        git:
+          $ref: '#/components/schemas/ListingRemixGitCoordinates'
+        archive:
+          $ref: '#/components/schemas/ListingRemixArchiveCoordinates'
+    ListingRemixGitCoordinates:
+      type: object
+      description: Clone coordinates. A web page cannot run git, so the client displays
+        the command (and subPath) for the user to run.
+      required:
+      - repoUrl
+      - repoRef
+      properties:
+        repoUrl:
+          type: string
+          description: Clone URL of the application repository.
+        repoRef:
+          type: string
+          description: Effective ref to check out.
+        subPath:
+          type: string
+          description: Directory inside the repository that holds the application,
+            when the repository carries more than the application.
+    ListingRemixArchiveCoordinates:
+      type: object
+      description: Source archive coordinates. The client fetches the bytes through
+        the Drive app API (nodes download URLs or download grants) and verifies the
+        SHA-256 before unpacking.
+      required:
+      - artifactId
+      - driveNodeId
+      - fileName
+      properties:
+        artifactId:
+          type: string
+          description: Deploy artifact identity the archive was uploaded as.
+        driveNodeId:
+          type: string
+          description: Drive node that holds the archive bytes.
+        fileName:
+          type: string
+          description: Original archive file name, including its extension.
+        contentLength:
+          type: string
+          format: int64
+          pattern: ^-?[0-9]+$
+          x-sdkwork-int64-string: true
+          description: Archive size in bytes, as a decimal string.
+        checksumSha256:
+          type: string
+          description: Published SHA-256 digest (hex) of the archive, when deploy
+            recorded one. The client must refuse to unpack bytes that do not match.
     ListingCreateRequest:
       type: object
       required:

@@ -6,6 +6,7 @@ use sdkwork_appstore_market_service::service::market_service::MarketService;
 use sdkwork_appstore_moderation_service::service::moderation_service::ModerationService;
 use sdkwork_appstore_publisher_service::service::publisher_service::PublisherService;
 use sdkwork_appstore_release_service::service::release_service::ReleaseService;
+use sdkwork_appstore_remix_service::RemixService;
 use sdkwork_appstore_repository_sqlx::repository::catalog_repository::SqlxCatalogRepository;
 use sdkwork_appstore_repository_sqlx::repository::compliance_repository::SqlxComplianceRepository;
 use sdkwork_appstore_repository_sqlx::repository::library_repository::SqlxLibraryRepository;
@@ -14,6 +15,7 @@ use sdkwork_appstore_repository_sqlx::repository::market_repository::SqlxMarketR
 use sdkwork_appstore_repository_sqlx::repository::moderation_repository::SqlxModerationRepository;
 use sdkwork_appstore_repository_sqlx::repository::publisher_repository::SqlxPublisherRepository;
 use sdkwork_appstore_repository_sqlx::repository::release_repository::SqlxReleaseRepository;
+use sdkwork_appstore_repository_sqlx::repository::remix_repository::SqlxRemixRepository;
 use sdkwork_appstore_repository_sqlx::repository::user_store_repository::SqlxUserStoreRepository;
 use sdkwork_appstore_user_store_service::service::user_store_service::UserStoreService;
 
@@ -28,4 +30,8 @@ pub struct AppState {
     pub compliance_service: ComplianceService<SqlxComplianceRepository>,
     pub market_service: MarketService<SqlxMarketRepository>,
     pub user_store_service: UserStoreService<SqlxUserStoreRepository>,
+    /// Remix availability and download projection. Separate from the catalog
+    /// and listing services because it reads the deployment binding and calls
+    /// sdkwork-deploy; those services must stay deploy-agnostic.
+    pub remix_service: RemixService<SqlxRemixRepository>,
 }

@@ -22,6 +22,12 @@
     {
       "file": "crates/sdkwork-appstore-service-host/src/integrations/drive_uploader.rs",
       "reason": "Explicit HTTP opt-in, default is in-process, startup-validated. File-scoped entry for the second detection mode: this is the Drive upload-session HTTP client, used only by DriveHttpAdapter (drive_http_adapter.rs), which APPSTORE_INTEGRATION_MODE=http selects and which fails at startup without APPSTORE_DRIVE_BASE_URL. It is not a leftover upload path: the default in-process Drive port already uploads through DriveUploaderService::upload_bytes (prepare -> object write -> part mark -> completion), so no default deployment can reach this file."
+    },
+    {
+      "file": "crates/sdkwork-appstore-service-host/src/integrations/deploy_remix.rs",
+      "envVar": "APPSTORE_DEPLOY_BASE_URL",
+      "module": "deploy",
+      "reason": "Remix deliberately reads sdkwork-deploy over HTTP, and there is no in-process alternative to opt out of: deploy owns the application source pointer and re-derives source readiness (repository validation, artifact liveness) on every read, and this repository consumes no deploy service crate. The read is a projection of deploy-owned coordinates, not a business transaction, so the order->account failure mode in MODULE_SPEC.md \u00a74.2.6 (a write committed before a failed cross-module call) cannot occur. The endpoint is resolved per request instead of at boot, and a missing APPSTORE_DEPLOY_BASE_URL answers 503 naming that exact variable rather than fabricating a download. `deploy` is not part of the checker's sibling-module vocabulary, so this entry is documentation for review rather than a checker suppression."
     }
   ]
 }

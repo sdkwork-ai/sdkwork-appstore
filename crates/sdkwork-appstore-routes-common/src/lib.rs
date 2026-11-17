@@ -15,5 +15,7 @@ pub use context::{
     unauthorized_response, AppstoreRequestContext,
 };
 pub use route_definition::RouteDefinition;
-pub use service_error::{map_appstore_service_error, map_display_error, AppstoreServiceErrorKind};
+pub use service_error::{
+    map_appstore_service_error, map_display_error, map_remix_error, AppstoreServiceErrorKind,
+};
 pub use state::AppState;

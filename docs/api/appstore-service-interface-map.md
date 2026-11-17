@@ -168,3 +168,9 @@ This document maps each route operation to its generated handler and service met
 | `appstore.releases.public.retrieve` | `sdkwork-routes-release-open-api` | `releases_public_retrieve` | `sdkwork-appstore-release-service` | `releases_public_retrieve` | Implemented |
 | `appstore.publish.automation.submissions.create` | `sdkwork-routes-automation-open-api` | `publish_automation_submissions_create` | `sdkwork-appstore-release-service` | `publish_automation_submissions_create` | Implemented |
 
+## sdkwork-appstore-remix-service
+
+| operationId | routeCrate | handler | serviceCrate | serviceMethod | Status |
+| --- | --- | --- | --- | --- | --- |
+| `appstore.listings.remix.retrieve` | `sdkwork-routes-listing-app-api` | `listings_remix_retrieve` | `sdkwork-appstore-remix-service` | `resolve_listing_remix` | Implemented |
+

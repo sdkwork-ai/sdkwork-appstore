@@ -15,6 +15,39 @@ pub struct IntegrationHttpClient {
     access_token: Option<String>,
 }
 
+/// Typed failure of one outbound integration call.
+///
+/// The plain `String` variants elsewhere in this module stay for call sites
+/// that only need a diagnostic. A caller that must distinguish "the peer does
+/// not know this resource" from "the peer is down" uses this enum instead, so a
+/// stale cross-module pointer cannot be reported as an outage.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum IntegrationHttpError {
+    /// The peer answered `404`.
+    NotFound,
+    /// The peer answered a non-success status other than `404`.
+    Status { status: u16, body: String },
+    /// The request never produced a response.
+    Transport(String),
+    /// The response body was not the expected envelope payload.
+    Decode(String),
+}
+
+impl std::fmt::Display for IntegrationHttpError {
+    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::NotFound => write!(formatter, "integration resource not found (404)"),
+            Self::Status { status, body } => {
+                write!(formatter, "integration request returned {status}: {body}")
+            }
+            Self::Transport(message) => write!(formatter, "integration request failed: {message}"),
+            Self::Decode(message) => write!(formatter, "integration response invalid: {message}"),
+        }
+    }
+}
+
+impl std::error::Error for IntegrationHttpError {}
+
 impl IntegrationHttpClient {
     pub fn new(
         base_url: impl Into<String>,
@@ -51,6 +84,19 @@ impl IntegrationHttpClient {
         path: &str,
         query: &[(&str, &str)],
     ) -> Result<T, String> {
+        self.get_envelope_item_detailed(path, query)
+            .await
+            .map_err(|error| error.to_string())
+    }
+
+    /// GET an `{ code, data: { item } }` envelope while preserving the failure
+    /// class. Use this when a `404` means "the peer no longer has this
+    /// resource" rather than "the peer is unavailable".
+    pub async fn get_envelope_item_detailed<T: DeserializeOwned>(
+        &self,
+        path: &str,
+        query: &[(&str, &str)],
+    ) -> Result<T, IntegrationHttpError> {
         let url = format!("{}{}", self.base_url, path);
         let mut request = self.client.get(&url);
         request = self.apply_auth(request);
@@ -61,20 +107,26 @@ impl IntegrationHttpClient {
         let response = request
             .send()
             .await
-            .map_err(|error| format!("integration GET {path} failed: {error}"))?;
+            .map_err(|error| IntegrationHttpError::Transport(format!("GET {path}: {error}")))?;
 
-        if !response.status().is_success() {
-            let status = response.status();
+        let status = response.status();
+        if status == reqwest::StatusCode::NOT_FOUND {
+            return Err(IntegrationHttpError::NotFound);
+        }
+        if !status.is_success() {
             let body = response.text().await.unwrap_or_default();
-            return Err(format!("integration GET {path} returned {status}: {body}"));
+            return Err(IntegrationHttpError::Status {
+                status: status.as_u16(),
+                body,
+            });
         }
 
         let payload: Value = response
             .json()
             .await
-            .map_err(|error| format!("integration GET {path} invalid JSON: {error}"))?;
+            .map_err(|error| IntegrationHttpError::Decode(format!("GET {path}: {error}")))?;
 
-        extract_envelope_item(payload)
+        extract_envelope_item(payload).map_err(IntegrationHttpError::Decode)
     }
 
     pub async fn post_envelope_item<T: DeserializeOwned, B: serde::Serialize>(

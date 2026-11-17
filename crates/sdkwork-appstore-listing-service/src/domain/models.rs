@@ -297,6 +297,13 @@ pub struct Listing {
     /// Direct-open URL for web/H5 distributions; the QR scan target otherwise.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub access_url: Option<String>,
+    /// Whether the listing currently offers a remix download.
+    ///
+    /// Derived per read from the deployment binding plus deploy's source
+    /// readiness (see `sdkwork-appstore-remix-service`); it is never stored, and
+    /// an unreadable binding or unreachable deploy resolves to `false`.
+    #[serde(default)]
+    pub remixable: bool,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]

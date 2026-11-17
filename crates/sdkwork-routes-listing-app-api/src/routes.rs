@@ -140,6 +140,17 @@ pub const ROUTES: &[RouteDefinition] = &[
         handler: "listings_rating_update",
         service_method: "listings_rating_update",
     },
+    // Remix reads live under the `appstore` path namespace, next to the catalog
+    // reads a storefront product page already uses, because the projection is
+    // deploy-owned and is not a listing mutation.
+    RouteDefinition {
+        method: "GET",
+        path: "/app/v3/api/appstore/listings/{listingId}/remix",
+        operation_id: "appstore.listings.remix.retrieve",
+        auth: RouteAuth::DualToken,
+        handler: "listings_remix_retrieve",
+        service_method: "resolve_listing_remix",
+    },
 ];
 
 pub fn route_definitions() -> &'static [RouteDefinition] {

@@ -401,6 +401,12 @@ const HTTP_ROUTES: &[HttpRoute] = &[
     ),
     HttpRoute::dual_token(
         HttpMethod::Get,
+        "/app/v3/api/appstore/listings/{listingId}/remix",
+        "appstore",
+        "appstore.listings.remix.retrieve",
+    ),
+    HttpRoute::dual_token(
+        HttpMethod::Get,
         "/app/v3/api/user_store/categories",
         "appstore",
         "appstore.userStore.category.list",

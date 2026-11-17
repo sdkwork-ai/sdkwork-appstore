@@ -317,6 +317,14 @@ pub fn map_listing_error(
     )
 }
 
+/// Map a remix read failure (`404` / `503` / `500`) for a route handler.
+pub fn map_remix_error(
+    ext: Option<&Extension<WebRequestContext>>,
+    error: sdkwork_appstore_remix_service::RemixServiceError,
+) -> Response {
+    crate::map_remix_error(web_context(ext), error)
+}
+
 pub fn map_publisher_error(
     ext: Option<&Extension<WebRequestContext>>,
     error: sdkwork_appstore_publisher_service::error::AppstoreServiceError,

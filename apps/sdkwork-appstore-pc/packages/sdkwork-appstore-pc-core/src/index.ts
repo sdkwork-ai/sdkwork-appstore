@@ -4,6 +4,7 @@ export * from './distribution';
 export * from './download';
 export * from './installTarget';
 export * from './platforms';
+export * from './remix';
 export * from './runtime';
 export * from './sdk';
 export * from './session';

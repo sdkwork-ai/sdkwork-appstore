@@ -95,6 +95,11 @@ pub const ROUTE_HANDLER_PLANS: &[RouteHandlerPlan] = &[
         handler_name: "listings_editorial_retrieve",
         service_method: "retrieve_listing_editorial",
     },
+    RouteHandlerPlan {
+        operation_id: "appstore.listings.remix.retrieve",
+        handler_name: "listings_remix_retrieve",
+        service_method: "resolve_listing_remix",
+    },
 ];
 
 pub fn route_handler_plans() -> &'static [RouteHandlerPlan] {

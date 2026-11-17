@@ -11,6 +11,7 @@
 pub mod appbase;
 pub mod comments;
 pub mod commerce;
+pub mod deploy_remix;
 pub mod drive;
 pub mod drive_http_adapter;
 pub mod drive_inprocess;
@@ -30,6 +31,7 @@ pub mod search_http_adapter;
 pub mod search_inprocess;
 pub mod search_projection_http_adapter;
 
+pub use deploy_remix::{DeployRemixAdapter, READINESS_CACHE_TTL};
 pub use drive_http_adapter::DriveHttpAdapter;
 pub use drive_inprocess::{DriveServiceSubject, InProcessDriveAdapter};
 pub use market_channel_adapter::MarketChannelIntegrationAdapter;

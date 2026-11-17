@@ -27,4 +27,6 @@ export interface ListingSummary {
   accessUrl?: string;
   /** Per-platform scan/delivery links (appstore_app_platform qrUrl). */
   platformLinks?: Record<string, string>;
+  /** Whether this listing currently offers a remix download. True only when the listing is published and visible, a deployment binding maps its application to a deploy application with remix enabled, and that deploy application's source is READY. Unresolvable availability (no binding, deploy unreachable, unset integration) reports false. */
+  remixable: boolean;
 }

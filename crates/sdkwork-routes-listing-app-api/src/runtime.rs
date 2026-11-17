@@ -13,7 +13,8 @@ use sdkwork_appstore_listing_service::domain::commands::RegionEntry;
 use sdkwork_web_core::WebRequestContext;
 
 use sdkwork_appstore_routes_common::http_support::{
-    created, map_listing_error, ok_item, ok_page, to_listing_context, CursorPageSizeQuery,
+    created, map_listing_error, map_remix_error, ok_item, ok_page, to_listing_context,
+    to_listing_context_public, CursorPageSizeQuery,
 };
 use sdkwork_appstore_routes_common::AppState;
 
@@ -136,6 +137,10 @@ pub fn routes() -> Router<AppState> {
             "/app/v3/api/listings/{listingId}/ratings/me",
             put(listing_rating_update_handler),
         )
+        .route(
+            "/app/v3/api/appstore/listings/{listingId}/remix",
+            get(listing_remix_retrieve),
+        )
 }
 
 async fn listing_retrieve(
@@ -148,8 +153,43 @@ async fn listing_retrieve(
         Err(resp) => return resp,
     };
     match listings_retrieve(&state.listing_service, &ctx, listing_id).await {
-        Ok(result) => ok_item(context.as_ref(), result.listing),
+        Ok(mut result) => {
+            // Remix availability is derived per read from the deployment
+            // binding and deploy's readiness verdict; the listing row itself
+            // carries no remix state.
+            if let Some(listing) = result.listing.as_mut() {
+                listing.remixable = state
+                    .remix_service
+                    .is_app_remixable(&ctx.tenant_id, &listing.app_id)
+                    .await;
+            }
+            ok_item(context.as_ref(), result.listing)
+        }
         Err(error) => map_listing_error(context.as_ref(), error),
+    }
+}
+
+/// Remix download coordinates of one storefront listing.
+///
+/// The storefront offers remix only for a published listing whose bound deploy
+/// application has remix enabled and a ready source. Every other case is a
+/// `404`; an App Store deployment that cannot consult deploy answers `503`
+/// naming the unset `APPSTORE_DEPLOY_BASE_URL`.
+async fn listing_remix_retrieve(
+    State(state): State<AppState>,
+    Path(listing_id): Path<String>,
+    context: Option<Extension<WebRequestContext>>,
+) -> Response {
+    // A remix read is a storefront product read: it needs a tenant, not a
+    // signed-in user, matching the catalog reads on the same page.
+    let ctx = to_listing_context_public(context.as_ref());
+    match state
+        .remix_service
+        .resolve_listing_remix(&ctx.tenant_id, &listing_id)
+        .await
+    {
+        Ok(download) => ok_item(context.as_ref(), download),
+        Err(error) => map_remix_error(context.as_ref(), error),
     }
 }
 

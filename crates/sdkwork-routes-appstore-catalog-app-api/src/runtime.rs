@@ -20,6 +20,32 @@ use sdkwork_appstore_routes_common::http_support::{
 };
 use sdkwork_appstore_routes_common::AppState;
 
+use sdkwork_appstore_catalog_service::domain::models::ListingSummary;
+
+/// Project `remixable` onto a page of listing summaries.
+///
+/// Remix is a deploy-owned projection, so the catalog service stays deploy
+/// agnostic and the route attaches the flag once for the whole page: one
+/// binding lookup plus one deploy readiness read per distinct deploy
+/// application. A binding or deploy failure degrades to `false` for the
+/// affected rows instead of failing the page.
+async fn decorate_remixable(state: &AppState, tenant_id: &str, listings: &mut [ListingSummary]) {
+    if listings.is_empty() {
+        return;
+    }
+    let app_ids: Vec<String> = listings
+        .iter()
+        .map(|listing| listing.app_id.clone())
+        .collect();
+    let remixable = state
+        .remix_service
+        .remixable_app_ids(tenant_id, &app_ids)
+        .await;
+    for listing in listings.iter_mut() {
+        listing.remixable = remixable.contains(&listing.app_id);
+    }
+}
+
 #[derive(Debug, serde::Deserialize)]
 struct CatalogHomeQuery {
     locale: Option<String>,
@@ -375,12 +401,16 @@ async fn catalog_listings_search_handler(
     )
     .await
     {
-        Ok(result) => ok_page(
-            context.as_ref(),
-            result.listings,
-            result.next_cursor,
-            result.has_more,
-        ),
+        Ok(result) => {
+            let mut listings = result.listings;
+            decorate_remixable(&state, &ctx.tenant_id, &mut listings).await;
+            ok_page(
+                context.as_ref(),
+                listings,
+                result.next_cursor,
+                result.has_more,
+            )
+        }
         Err(error) => map_catalog_error(context.as_ref(), error),
     }
 }
@@ -404,12 +434,16 @@ async fn catalog_recommendations_list_handler(
     )
     .await
     {
-        Ok(result) => ok_page(
-            context.as_ref(),
-            result.listings,
-            result.next_cursor,
-            result.has_more,
-        ),
+        Ok(result) => {
+            let mut listings = result.listings;
+            decorate_remixable(&state, &ctx.tenant_id, &mut listings).await;
+            ok_page(
+                context.as_ref(),
+                listings,
+                result.next_cursor,
+                result.has_more,
+            )
+        }
         Err(error) => map_catalog_error(context.as_ref(), error),
     }
 }
@@ -432,12 +466,16 @@ async fn catalog_recently_updated_list_handler(
     )
     .await
     {
-        Ok(result) => ok_page(
-            context.as_ref(),
-            result.listings,
-            result.next_cursor,
-            result.has_more,
-        ),
+        Ok(result) => {
+            let mut listings = result.listings;
+            decorate_remixable(&state, &ctx.tenant_id, &mut listings).await;
+            ok_page(
+                context.as_ref(),
+                listings,
+                result.next_cursor,
+                result.has_more,
+            )
+        }
         Err(error) => map_catalog_error(context.as_ref(), error),
     }
 }

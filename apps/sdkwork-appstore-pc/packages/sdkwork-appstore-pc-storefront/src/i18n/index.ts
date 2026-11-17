@@ -28,6 +28,7 @@ import { events as eventsZh } from './zh-CN/appstore/storefront/events';
 import { publisher as publisherZh } from './zh-CN/appstore/storefront/publisher';
 import { consoleLocales as consoleLocalesZh } from './zh-CN/appstore/console/console';
 import { install as installZh } from './zh-CN/appstore/system/install';
+import { remix as remixZh } from './zh-CN/appstore/storefront/remix';
 import { developerMarketZhCN } from '@sdkwork/appstore-pc-developer-market/i18n';
 
 import { nav as navEn } from './en/appstore/storefront/nav';
@@ -57,6 +58,7 @@ import { events as eventsEn } from './en/appstore/storefront/events';
 import { publisher as publisherEn } from './en/appstore/storefront/publisher';
 import { consoleLocales as consoleLocalesEn } from './en/appstore/console/console';
 import { install as installEn } from './en/appstore/system/install';
+import { remix as remixEn } from './en/appstore/storefront/remix';
 import { developerMarketEn } from '@sdkwork/appstore-pc-developer-market/i18n';
 
 const SAVED_LANG_KEY = 'app_language';
@@ -93,6 +95,7 @@ const zhCN = {
   publisher: publisherZh,
   console: consoleLocalesZh,
   install: installZh,
+  remix: remixZh,
 };
 
 const en = {
@@ -126,6 +129,7 @@ const en = {
   publisher: publisherEn,
   console: consoleLocalesEn,
   install: installEn,
+  remix: remixEn,
 };
 
 // A dedicated instance, not the i18next module singleton: the storefront is

@@ -23,6 +23,7 @@ use sdkwork_appstore_repository_sqlx::repository::market_repository::SqlxMarketR
 use sdkwork_appstore_repository_sqlx::repository::moderation_repository::SqlxModerationRepository;
 use sdkwork_appstore_repository_sqlx::repository::publisher_repository::SqlxPublisherRepository;
 use sdkwork_appstore_repository_sqlx::repository::release_repository::SqlxReleaseRepository;
+use sdkwork_appstore_repository_sqlx::repository::remix_repository::SqlxRemixRepository;
 use sdkwork_appstore_repository_sqlx::repository::user_store_repository::{
     SqlxListingCardProvider, SqlxUserStoreRepository,
 };
@@ -30,7 +31,8 @@ use sdkwork_appstore_repository_sqlx::AppstoreSqlxDb;
 use sdkwork_appstore_routes_common::AppState;
 use sdkwork_appstore_service_host::integrations::http_market_channel_connector::register_http_market_connectors;
 use sdkwork_appstore_service_host::integrations::{
-    integration_ports_from_env, MarketChannelIntegrationAdapter, PlatformIntegrationAdapter,
+    integration_ports_from_env, DeployRemixAdapter, MarketChannelIntegrationAdapter,
+    PlatformIntegrationAdapter,
 };
 use sdkwork_appstore_user_store_service::service::user_store_service::UserStoreService;
 use sdkwork_database_sqlx::DatabasePool;
@@ -72,6 +74,18 @@ pub async fn assemble_api_router_with_pool(pool: DatabasePool) -> Result<ApiAsse
         "appstore sibling-module integration ports resolved"
     );
 
+    // Remix reads deploy's per-application source readiness over HTTP. The
+    // adapter is always built; a deployment that leaves APPSTORE_DEPLOY_BASE_URL
+    // unset keeps the endpoint answering 503 with that exact variable name
+    // instead of failing startup or advertising a download it cannot resolve.
+    let deploy_remix = DeployRemixAdapter::from_env();
+    tracing::info!(
+        deploy_remix_configured = std::env::var("APPSTORE_DEPLOY_BASE_URL")
+            .map(|value| !value.trim().is_empty())
+            .unwrap_or(false),
+        "appstore remix deploy integration resolved"
+    );
+
     let publisher_repo = SqlxPublisherRepository::new(db.clone());
     let listing_repo = SqlxListingRepository::new(db.clone());
     let release_repo = SqlxReleaseRepository::new(db.clone());
@@ -81,6 +95,7 @@ pub async fn assemble_api_router_with_pool(pool: DatabasePool) -> Result<ApiAsse
     let compliance_repo = SqlxComplianceRepository::new(db.clone());
     let market_repo = SqlxMarketRepository::new(db.clone());
     let user_store_repo = SqlxUserStoreRepository::new(db.clone());
+    let remix_repo = SqlxRemixRepository::new(db.clone());
 
     let listing_service = {
         let mut service = ListingService::new(listing_repo);
@@ -146,6 +161,8 @@ pub async fn assemble_api_router_with_pool(pool: DatabasePool) -> Result<ApiAsse
             let listing_cards = Arc::new(SqlxListingCardProvider::new(db.clone()));
             UserStoreService::new(user_store_repo).with_listing_cards(listing_cards)
         },
+        remix_service: sdkwork_appstore_remix_service::RemixService::new(remix_repo)
+            .with_deploy_port(Arc::new(deploy_remix)),
     };
 
     let business = Router::new()

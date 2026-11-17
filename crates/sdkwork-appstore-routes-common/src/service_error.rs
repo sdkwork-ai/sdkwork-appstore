@@ -16,6 +16,11 @@ pub enum AppstoreServiceErrorKind {
     PermissionDenied(String),
     Conflict(String),
     Internal(String),
+    /// A dependency the read needs is not configured or not reachable, so the
+    /// answer is undecidable. Distinct from `Internal`: the caller may retry
+    /// once the named configuration or dependency is fixed, and the detail is
+    /// public (it names an environment variable, never an internal trace).
+    ServiceUnavailable(String),
 }
 
 impl AppstoreServiceErrorKind {
@@ -28,6 +33,7 @@ impl AppstoreServiceErrorKind {
             | Self::PermissionDenied(message)
             | Self::Conflict(message)
             | Self::Internal(message) => message,
+            Self::ServiceUnavailable(message) => message,
         }
     }
 }
@@ -93,12 +99,39 @@ pub fn map_appstore_service_error(
                 SdkWorkResultCode::InternalError,
             )
         }
+        AppstoreServiceErrorKind::ServiceUnavailable(message) => {
+            tracing::warn!(%message, "appstore dependency unavailable");
+            (
+                StatusCode::SERVICE_UNAVAILABLE,
+                SdkWorkResultCode::ServiceUnavailable,
+            )
+        }
     };
     let detail = match &error {
         AppstoreServiceErrorKind::Internal(_) => INTERNAL_ERROR_PUBLIC_DETAIL,
         _ => error.message(),
     };
     map_service_error_message(context, status, result_code, detail)
+}
+
+/// Map a remix read failure onto the shared problem-detail surface.
+///
+/// Remix keeps three outcomes apart on purpose: a listing without a usable
+/// download is `404`, an integration that cannot be consulted is `503` naming
+/// the missing configuration, and an unexpected failure is `500`.
+pub fn map_remix_error(
+    context: Option<&WebRequestContext>,
+    error: sdkwork_appstore_remix_service::RemixServiceError,
+) -> Response {
+    use sdkwork_appstore_remix_service::RemixServiceError;
+    let kind = match error {
+        RemixServiceError::NotFound(message) => AppstoreServiceErrorKind::NotFound(message),
+        RemixServiceError::Unavailable(message) => {
+            AppstoreServiceErrorKind::ServiceUnavailable(message)
+        }
+        RemixServiceError::Internal(message) => AppstoreServiceErrorKind::Internal(message),
+    };
+    map_appstore_service_error(context, kind)
 }
 
 pub fn map_display_error(

@@ -803,3 +803,13 @@ pub struct EntitlementRow {
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
 }
+
+/// One live deployment binding of a store application, projected onto the
+/// remix workflow. `deploy_app_id` is a BIGINT in the schema and is cast to
+/// TEXT in the query so the wire keeps the module's string identity convention.
+#[derive(Debug, Clone, FromRow)]
+pub struct RemixBindingRow {
+    pub app_id: String,
+    pub deploy_app_id: String,
+    pub deploy_app_uuid: Option<String>,
+}

@@ -1,4 +1,11 @@
-import type { AppItem, Review, EditorialCollection, CategoryDetail, EventItem } from '../types';
+import type {
+  AppItem,
+  Review,
+  EditorialCollection,
+  CategoryDetail,
+  EventItem,
+  ListingRemixDownload,
+} from '../types';
 
 /**
  * Input of {@link IAppStoreSDK.submitSpecReview}: one scored comment on an
@@ -57,6 +64,13 @@ export interface IAppStoreSDK {
   saveSearchTerm(term: string): Promise<void>;
   clearSearchHistory(): Promise<void>;
   getAppById(id: string): Promise<AppItem | undefined>;
+  /**
+   * Remix download coordinates of a published listing.
+   *
+   * Rejects with the generated SDK error: `404` means "this listing has no
+   * remix download" and `503` means the deploy integration cannot be consulted.
+   */
+  getListingRemix(listingId: string): Promise<ListingRemixDownload>;
   getReviewsByAppId(id: string): Promise<Review[]>;
   submitReview(reviewData: { appId: string; user: string; rating: number; title: string; comment: string }): Promise<Review>;
   likeReview(reviewId: string): Promise<boolean>;
@@ -113,6 +127,7 @@ export const AppStoreService: IAppStoreSDK = {
   saveSearchTerm: (term) => appStorePort.saveSearchTerm(term),
   clearSearchHistory: () => appStorePort.clearSearchHistory(),
   getAppById: (id) => appStorePort.getAppById(id),
+  getListingRemix: (listingId) => appStorePort.getListingRemix(listingId),
   getReviewsByAppId: (id) => appStorePort.getReviewsByAppId(id),
   submitReview: (reviewData) => appStorePort.submitReview(reviewData),
   likeReview: (reviewId) => appStorePort.likeReview(reviewId),
@@ -155,6 +170,7 @@ function createUnconfiguredAppStorePort(): AppStoreServicePort {
     saveSearchTerm: async () => unavailable(),
     clearSearchHistory: async () => unavailable(),
     getAppById: async () => unavailable(),
+    getListingRemix: async () => unavailable(),
     getReviewsByAppId: async () => unavailable(),
     submitReview: async () => unavailable(),
     likeReview: async () => unavailable(),

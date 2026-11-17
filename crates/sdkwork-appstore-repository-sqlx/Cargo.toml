@@ -21,6 +21,7 @@ sdkwork-web-core.workspace = true
 tracing = "0.1"
 sdkwork-appstore-catalog-service.workspace = true
 sdkwork-appstore-listing-service.workspace = true
+sdkwork-appstore-remix-service.workspace = true
 sdkwork-appstore-publisher-service.workspace = true
 sdkwork-appstore-release-service.workspace = true
 sdkwork-appstore-library-service.workspace = true

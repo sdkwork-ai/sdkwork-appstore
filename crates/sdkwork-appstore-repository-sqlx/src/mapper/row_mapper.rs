@@ -246,6 +246,9 @@ pub fn map_listing_row_to_domain(row: ListingRow) -> Result<Listing, String> {
         // (join appstore_application); plain row loads carry none.
         platforms: None,
         access_url: None,
+        // Remix availability is derived per read (deploy binding + deploy
+        // readiness), never stored on the row.
+        remixable: false,
     })
 }
 
@@ -794,6 +797,9 @@ pub fn map_listing_search_row_to_domain(row: ListingSearchRow) -> ListingSummary
         // Attached post-mapping by the catalog repository from
         // appstore_application_platform rows; the search row itself carries none.
         platform_links: None,
+        // Remix availability is projected by the catalog route from the deploy
+        // binding and deploy's readiness verdict, never by this row mapper.
+        remixable: false,
     }
 }
 

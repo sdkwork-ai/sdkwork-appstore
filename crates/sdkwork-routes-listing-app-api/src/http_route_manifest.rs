@@ -105,6 +105,12 @@ const HTTP_ROUTES: &[HttpRoute] = &[
         "appstore",
         "appstore.listings.ratings.update",
     ),
+    HttpRoute::dual_token(
+        HttpMethod::Get,
+        "/app/v3/api/appstore/listings/{listingId}/remix",
+        "appstore",
+        "appstore.listings.remix.retrieve",
+    ),
 ];
 
 pub fn app_route_manifest() -> HttpRouteManifest {

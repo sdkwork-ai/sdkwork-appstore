@@ -1,7 +1,7 @@
 import { appApiPath } from './paths';
 import type { ApiRequestOptions, HttpClient } from '../http/client';
 
-import type { ListingCategoryBindRequest, ListingCreateRequest, ListingDetail, ListingLocalization, ListingLocalizationUpsertRequest, ListingMedia, ListingMediaAttachRequest, ListingRating, ListingRatingUpsertRequest, ListingSubmission, ListingSubmissionCreateRequest, ListingUpdateRequest, PageInfo, RegionalAvailabilityUpdateRequest, Release, SdkWorkPageData } from '../types';
+import type { ListingCategoryBindRequest, ListingCreateRequest, ListingDetail, ListingLocalization, ListingLocalizationUpsertRequest, ListingMedia, ListingMediaAttachRequest, ListingRating, ListingRatingUpsertRequest, ListingRemixDownload, ListingSubmission, ListingSubmissionCreateRequest, ListingUpdateRequest, PageInfo, RegionalAvailabilityUpdateRequest, Release, SdkWorkPageData } from '../types';
 
 
 export interface ListingsAppstoreListingsSubmissionsCreateParams {
@@ -230,12 +230,27 @@ export class ListingsAppstoreListingsLocalizationApi {
   }
 }
 
+export class ListingsAppstoreListingsRemixApi {
+  private client: HttpClient;
+
+  constructor(client: HttpClient) {
+    this.client = client;
+  }
+
+
+/** Retrieve a listing's remix download coordinates */
+  async retrieve(listingId: string, requestOptions?: ApiRequestOptions): Promise<ListingRemixDownload> {
+    return this.client.request<ListingRemixDownload>(appApiPath(`/appstore/listings/${serializePathParameter(listingId, { name: 'listingId', style: 'simple', explode: false })}/remix`), { ...(requestOptions?.signal !== undefined ? { signal: requestOptions.signal } : {}), ...(requestOptions?.timeout !== undefined ? { timeout: requestOptions.timeout } : {}), method: 'GET' as any, sdkworkUnwrapKind: 'item' });
+  }
+}
+
 export interface ListingsAppstoreListingsCreateParams {
   idempotencyKey: string;
 }
 
 export class ListingsAppstoreListingsApi {
   private client: HttpClient;
+  public readonly remix: ListingsAppstoreListingsRemixApi;
   public readonly localization: ListingsAppstoreListingsLocalizationApi;
   public readonly media: ListingsAppstoreListingsMediaApi;
   public readonly categories: ListingsAppstoreListingsCategoriesApi;
@@ -249,6 +264,7 @@ export class ListingsAppstoreListingsApi {
 
   constructor(client: HttpClient) {
     this.client = client;
+    this.remix = new ListingsAppstoreListingsRemixApi(client);
     this.localization = new ListingsAppstoreListingsLocalizationApi(client);
     this.media = new ListingsAppstoreListingsMediaApi(client);
     this.categories = new ListingsAppstoreListingsCategoriesApi(client);

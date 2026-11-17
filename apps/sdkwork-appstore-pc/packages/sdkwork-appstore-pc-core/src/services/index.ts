@@ -9,4 +9,5 @@ export * from './demandClaims';
 export * from './checkout';
 export * from './console';
 export * from './install';
+export * from './remixArchive';
 export * from './userStore';
