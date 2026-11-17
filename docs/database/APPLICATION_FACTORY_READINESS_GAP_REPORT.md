@@ -84,14 +84,21 @@
 | --- | --- | --- |
 | R1 | deploy 暴露 scaffold API（读/写/安装），appstore 模板表置只读 | deploy 契约通过；appstore 不再新增模板 |
 
-**R1 现状（2026-11-17 核查）**：读/写/提交 API 已存在，无需新建。
+**R1 现状（2026-11-17 核查，含一处更正）**：读/写/提交 API 已存在，无需新建。
 
-- 应用面：`/app/v3/api/marketplace/templates`（list / create / retrieve / update / delete / submit），
-  见 `crates/sdkwork-routes-deploy-app-api/src/template_market_routes.rs` 与 `http_route_manifest.rs`。
-- 管理面：`appTemplates.*`，权限 `deploy.appTemplates.read|write`，
-  见 `crates/sdkwork-routes-deploy-backend-api/src/http_route_manifest.rs`。
+- 应用面脚手架 CRUD：**`/app/v3/api/app_templates`**（list / create / retrieve / update / delete / submit），
+  版本：`/app/v3/api/app_templates/{uuid}/versions`。证据：`route-manifest.json` L2468–2656。
+- 市场浏览：`/app/v3/api/marketplace/templates`（**只有 list / retrieve**），证据同文件 L2420–2444。
+  （早期记录把它写成 CRUD，属误记，已更正。）
+- 管理面：`appTemplates.*`，权限 `deploy.appTemplates.read|write`。
 - 存储：`deploy_application_scaffold*`（P1 已改名），唯一脚手架权威已就位。
-- 剩余：把 appstore 模板写接口置只读（或下线），并把三个消费面切到上述 API。
+- 消费面核查：birdcoder2「我的应用模板 / 发布为模板 / 从模板安装」**已经**调用 deploy 的
+  `client.template.appTemplates.*`（`@sdkwork/deployments-app-sdk`），无 appstore 模板调用；
+  因此 R3 在客户端层已满足，无需迁移。
+- 剩余真实缺口：市场模板安装复用了作者作用域的 retrieve/版本读取（
+  `sdkwork-intelligence-deploy-service/src/app.rs:2109-2119`、`template_market.rs:809`），
+  安装他人市场模板会取不到版本/制品；需服务端放开为市场读取。
+
 
 | R2 | admin 应用中心切到 scaffold API + 安装链接 API | 页面无 metadata 写入；一对一路径改走接口 |
 | R3 | birdcoder2 三个流程切到 deploy scaffold API | 我的应用模板/发布为模板/从模板安装全部可用 |
