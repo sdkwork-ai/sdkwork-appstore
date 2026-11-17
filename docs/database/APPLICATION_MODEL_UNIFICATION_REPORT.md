@@ -93,8 +93,8 @@ type ApplicationGroupId = "iam" | "deploy" | "app-store";
 | 1 | `deploy_application` | deploy | `deploy_app` | 锚点 |
 | 2 | `deploy_application_link` | deploy | **新表**，取代 `metadata.integrations` | 1:1 链接 |
 | 3 | `deploy_application_template` | deploy | `deploy_app_template`（去价格） | 市场模板 |
-| 4 | `iam_application_blueprint` | iam | `iam_application_template` | 1:N 安装 |
-| 5 | `iam_application_blueprint_version` | iam | `iam_application_template_package` 父级 | 版本冻结 |
+| 4 | （不建表） | — | `iam_application_template` 被吸收 | 身份切片并入产品版本；域与凭据进安装 |
+| 5 | （不建表） | — | `iam_application_template_package` 被吸收 | 产物元数据并入产品版本 |
 | 6 | `iam_application_installation` | iam | `iam_tenant_application` | **1:1 ← deploy_application** |
 | 7 | `iam_application_installation_surface` | iam | 新 | 替代单值 `application_type` |
 | 8 | `iam_application_installation_credential` | iam | `app_id` 迁出 | OAuth client |
@@ -252,3 +252,38 @@ sid / jti / iat / exp / kid
 2. `deploy_application_template` 是否保留：若市场能力并入 `appstore_application_scaffold` + `listing`，可整体下线。
 3. 生命周期状态机词表的最终取值（三套枚举取并集）。
 4. 控制台改为读链接 API 的排期，决定 S1 能否一次完成。
+
+## 11. 模板概念收敛（v3 补记）
+
+### 实测：9 张表带 `template`，4 种互不相同的语义
+
+| 模块 | 表数 | 带 `template` 的表 |
+| --- | --- | --- |
+| iam | 67 | `iam_application_template`、`iam_application_template_package` |
+| deploy | 67 | `deploy_app_template`、`deploy_app_template_version`、`deploy_app_template_category`、`deploy_build_template` |
+| appstore | 74 | `appstore_app_template`、`appstore_app_template_version`、`appstore_app_template_usage` |
+| cloudrouter | 92 | 无 |
+
+四种语义：
+
+| 语义 | 表 | 是不是"应用模板" |
+| --- | --- | --- |
+| 运行时身份定义 | `iam_application_template*` | 是，但内容是身份切片 |
+| 设计期脚手架 | `appstore_app_template*` | 是，生成器输入 |
+| 市场商品模板 | `deploy_app_template*` | 是，商品与定价 |
+| **构建配方** | `deploy_build_template` | **不是**：toolchain / commands / artifact outputs / quality gates |
+
+### 处置
+
+| 表 | 处置 | 理由 |
+| --- | --- | --- |
+| `iam_application_template`、`_package` | **吸收**，不建独立蓝图表 | 身份切片并入产品版本（包、scopes、app 类型），域与 OAuth 凭据并入安装；第三份定义必然漂移 |
+| `appstore_app_template`、`_version`、`_usage` | **保留**，改名 `appstore_application_scaffold*` | 唯一的"模板"概念：开发者从模板创建应用 |
+| `deploy_app_template`、`_version`、`_category` | **下线** | 与 scaffold + listing 重复；须先把 PAID 模板的 order/payment 购买路径迁到 listing |
+| `deploy_build_template` | **改名** `deploy_build_recipe` | 与"应用模板"彻底解耦，消除第 4 种语义 |
+
+**收敛结果：9 张 → 3 张**（scaffold + version + usage），"template" 只保留脚手架一个含义。
+
+### 根因
+
+三套系统各自负责应用生命周期的一段，每段都复制了一份"应用定义"：IAM 复制的是身份，appstore 复制的是商品，deploy 复制的是运行与构建。没有统一身份主轴时，复制是唯一能让各自跑起来的做法；主轴建立后，这些副本就都成了需要收敛的债。
