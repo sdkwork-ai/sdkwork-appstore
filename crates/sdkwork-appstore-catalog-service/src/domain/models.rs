@@ -220,6 +220,87 @@ pub struct Category {
     pub updated_at: DateTime<Utc>,
 }
 
+/// The storefront taxonomy is a five-level tree.
+pub const CATEGORY_MAX_DEPTH: i32 = 5;
+
+/// Derive the only legal level for a category from its parent.
+///
+/// Root categories stay at level 1 unless the caller explicitly asks for
+/// another legal root level; a child must be exactly one level below its parent
+/// and may never exceed [`CATEGORY_MAX_DEPTH`].
+pub fn derive_category_level(
+    parent_level: Option<i32>,
+    requested_level: Option<i32>,
+) -> Result<i32, String> {
+    match parent_level {
+        Some(parent) => {
+            let derived = parent + 1;
+            if derived > CATEGORY_MAX_DEPTH {
+                return Err(format!(
+                    "Category depth cannot exceed {CATEGORY_MAX_DEPTH} levels"
+                ));
+            }
+            if let Some(requested) = requested_level {
+                if requested != derived {
+                    return Err("Category level must be the parent level plus one".to_string());
+                }
+            }
+            Ok(derived)
+        }
+        None => {
+            let level = requested_level.unwrap_or(1);
+            if !(1..=CATEGORY_MAX_DEPTH).contains(&level) {
+                return Err(format!(
+                    "Category level must be between 1 and {CATEGORY_MAX_DEPTH}"
+                ));
+            }
+            Ok(level)
+        }
+    }
+}
+
+/// Height of the category subtree rooted at `root_id` (a leaf has height 1).
+///
+/// The service uses this before a re-parent so an already-valid tree cannot be
+/// pushed past [`CATEGORY_MAX_DEPTH`] just because the moved node itself fits.
+pub fn category_subtree_height(root_id: &str, categories: &[Category]) -> i32 {
+    if !categories
+        .iter()
+        .any(|category| category.id.as_str() == root_id)
+    {
+        return 0;
+    }
+    let mut children: std::collections::HashMap<String, Vec<String>> =
+        std::collections::HashMap::new();
+    for category in categories {
+        if let Some(parent_id) = category.parent_category_id.as_deref() {
+            children
+                .entry(parent_id.to_string())
+                .or_default()
+                .push(category.id.0.clone());
+        }
+    }
+
+    fn visit(
+        id: &str,
+        children: &std::collections::HashMap<String, Vec<String>>,
+        seen: &mut std::collections::HashSet<String>,
+    ) -> i32 {
+        if !seen.insert(id.to_string()) {
+            return 0;
+        }
+        let mut tallest = 0;
+        if let Some(kids) = children.get(id) {
+            for child in kids {
+                tallest = tallest.max(visit(child, children, seen));
+            }
+        }
+        1 + tallest
+    }
+
+    visit(root_id, &children, &mut std::collections::HashSet::new())
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 #[serde(rename_all = "camelCase")]
@@ -523,4 +604,56 @@ pub struct Feedback {
     pub app_key: Option<String>,
     pub status: String,
     pub created_at: DateTime<Utc>,
+}
+
+#[cfg(test)]
+mod category_level_tests {
+    use super::{
+        category_subtree_height, derive_category_level, Category, CategoryId, CategoryStatus,
+        CATEGORY_MAX_DEPTH,
+    };
+
+    fn category(id: &str, parent_id: Option<&str>) -> Category {
+        Category {
+            id: CategoryId::new(id),
+            tenant_id: "tenant-1".to_string(),
+            category_code: id.to_string(),
+            parent_category_id: parent_id.map(ToOwned::to_owned),
+            category_level: 1,
+            status: CategoryStatus::Active,
+            sort_order: 0,
+            icon_media_resource_id: None,
+            created_at: chrono::Utc::now(),
+            updated_at: chrono::Utc::now(),
+        }
+    }
+
+    #[test]
+    fn root_levels_stay_within_the_cap() {
+        assert_eq!(derive_category_level(None, None), Ok(1));
+        assert_eq!(derive_category_level(None, Some(3)), Ok(3));
+        assert!(derive_category_level(None, Some(0)).is_err());
+        assert!(derive_category_level(None, Some(CATEGORY_MAX_DEPTH + 1)).is_err());
+    }
+
+    #[test]
+    fn child_levels_follow_the_parent_and_stop_at_five() {
+        assert_eq!(derive_category_level(Some(1), None), Ok(2));
+        assert_eq!(derive_category_level(Some(4), Some(5)), Ok(5));
+        assert!(derive_category_level(Some(5), None).is_err());
+        assert!(derive_category_level(Some(2), Some(4)).is_err());
+    }
+
+    #[test]
+    fn subtree_height_drives_the_move_cap() {
+        let categories = [
+            category("root", None),
+            category("child", Some("root")),
+            category("grandchild", Some("child")),
+            category("other", None),
+        ];
+        assert_eq!(category_subtree_height("root", &categories), 3);
+        assert_eq!(category_subtree_height("grandchild", &categories), 1);
+        assert_eq!(category_subtree_height("missing", &categories), 0);
+    }
 }

@@ -20,11 +20,12 @@ use crate::domain::commands::{
     SearchTrendingListRequest,
 };
 use crate::domain::models::{
-    AudienceScope, CatalogChartSnapshot, CatalogCollection, CatalogCollectionItem,
-    CatalogCollectionLocalization, CatalogFeaturedSlot, Category, CategoryId, CategoryLocalization,
-    CategoryStatus, CategoryWithLocalizations, CollectionId, CollectionStatus, CollectionType,
-    CollectionWithItems, FeaturedSlotId, FeaturedSlotStatus, Feedback, ListingSummary,
-    PlatformScope, SearchHistoryEntry,
+    category_subtree_height, derive_category_level, AudienceScope, CatalogChartSnapshot,
+    CatalogCollection, CatalogCollectionItem, CatalogCollectionLocalization, CatalogFeaturedSlot,
+    Category, CategoryId, CategoryLocalization, CategoryStatus, CategoryWithLocalizations,
+    CollectionId, CollectionStatus, CollectionType, CollectionWithItems, FeaturedSlotId,
+    FeaturedSlotStatus, Feedback, ListingSummary, PlatformScope, SearchHistoryEntry,
+    CATEGORY_MAX_DEPTH,
 };
 use crate::domain::results::{
     AnalyticsOperatorDashboardResult, AnalyticsOperatorSearchResult,
@@ -296,6 +297,36 @@ impl<R> CatalogService<R> {
     pub fn with_search_federation(mut self, port: Arc<dyn CatalogSearchFederationPort>) -> Self {
         self.search_federation = Some(port);
         self
+    }
+}
+
+impl<R: CatalogRepositoryPort> CatalogService<R> {
+    async fn load_all_categories(
+        &self,
+        context: &AppstoreRequestContext,
+    ) -> AppstoreServiceResult<Vec<Category>> {
+        let mut categories = Vec::new();
+        let mut cursor: Option<String> = None;
+        // The repository cursor is `"{sort_order}:{category_id}"`; page until
+        // exhausted so subtree validation never silently truncates the tree.
+        for _ in 0..50 {
+            let page = self
+                .repository
+                .find_categories(context, cursor.as_deref(), 200)
+                .await?;
+            if page.is_empty() {
+                break;
+            }
+            let page_len = page.len();
+            if let Some(last) = page.last() {
+                cursor = Some(format!("{}:{}", last.sort_order, last.id.as_str()));
+            }
+            categories.extend(page);
+            if page_len < 200 {
+                break;
+            }
+        }
+        Ok(categories)
     }
 }
 
@@ -594,12 +625,29 @@ where
         let now = Utc::now();
         let category_id = CategoryId::new(Uuid::new_v4().to_string());
 
+        let parent_level = if let Some(parent_id) = request.parent_category_id.as_deref() {
+            let parent = self
+                .repository
+                .find_category_by_id(context, &CategoryId::new(parent_id.to_string()))
+                .await?
+                .ok_or_else(|| {
+                    AppstoreServiceError::ValidationFailed(format!(
+                        "Parent category not found: {parent_id}"
+                    ))
+                })?;
+            Some(parent.category_level)
+        } else {
+            None
+        };
+        let category_level = derive_category_level(parent_level, request.category_level)
+            .map_err(AppstoreServiceError::ValidationFailed)?;
+
         let category = Category {
             id: category_id.clone(),
             tenant_id: context.tenant_id.clone(),
             category_code: request.category_code,
             parent_category_id: request.parent_category_id,
-            category_level: request.category_level.unwrap_or(1),
+            category_level,
             status: CategoryStatus::Active,
             sort_order: request.sort_order.unwrap_or(0),
             icon_media_resource_id: request.icon_media_resource_id,
@@ -655,13 +703,75 @@ where
 
         let mut updated_fields = Vec::new();
 
-        if let Some(parent_category_id) = request.parent_category_id {
-            category.parent_category_id = Some(parent_category_id);
-            updated_fields.push("parent_category_id".to_string());
+        let requested_parent = request.parent_category_id.clone();
+        let mut derived_level = None;
+        if let Some(parent_id) = requested_parent.as_deref() {
+            if parent_id == request.category_id {
+                return Err(AppstoreServiceError::ValidationFailed(
+                    "A category cannot be its own parent".to_string(),
+                ));
+            }
+            let parent = self
+                .repository
+                .find_category_by_id(context, &CategoryId::new(parent_id.to_string()))
+                .await?
+                .ok_or_else(|| {
+                    AppstoreServiceError::ValidationFailed(format!(
+                        "Parent category not found: {parent_id}"
+                    ))
+                })?;
+
+            // Walk the ancestor chain so a re-parent cannot create a cycle.
+            let mut cursor = parent.parent_category_id.clone();
+            let mut seen = std::collections::HashSet::new();
+            while let Some(ancestor_id) = cursor {
+                if ancestor_id == request.category_id {
+                    return Err(AppstoreServiceError::ValidationFailed(
+                        "A category cannot be moved below its own descendant".to_string(),
+                    ));
+                }
+                if !seen.insert(ancestor_id.clone()) {
+                    break;
+                }
+                cursor = self
+                    .repository
+                    .find_category_by_id(context, &CategoryId::new(ancestor_id))
+                    .await?
+                    .and_then(|ancestor| ancestor.parent_category_id);
+            }
+
+            let categories = self.load_all_categories(context).await?;
+            let subtree_height = category_subtree_height(category_id.as_str(), &categories);
+            if parent.category_level + subtree_height > CATEGORY_MAX_DEPTH {
+                return Err(AppstoreServiceError::ValidationFailed(format!(
+                    "Category subtree cannot exceed {CATEGORY_MAX_DEPTH} levels"
+                )));
+            }
+
+            derived_level = Some(
+                derive_category_level(Some(parent.category_level), request.category_level)
+                    .map_err(AppstoreServiceError::ValidationFailed)?,
+            );
         }
 
-        if let Some(level) = request.category_level {
-            category.category_level = level;
+        if let Some(parent_id) = requested_parent {
+            category.parent_category_id = Some(parent_id);
+            updated_fields.push("parent_category_id".to_string());
+            if let Some(level) = derived_level {
+                category.category_level = level;
+                updated_fields.push("category_level".to_string());
+            }
+        } else if let Some(level) = request.category_level {
+            let parent_level = if let Some(parent_id) = category.parent_category_id.clone() {
+                self.repository
+                    .find_category_by_id(context, &CategoryId::new(parent_id))
+                    .await?
+                    .map(|parent| parent.category_level)
+            } else {
+                None
+            };
+            category.category_level = derive_category_level(parent_level, Some(level))
+                .map_err(AppstoreServiceError::ValidationFailed)?;
             updated_fields.push("category_level".to_string());
         }
 
