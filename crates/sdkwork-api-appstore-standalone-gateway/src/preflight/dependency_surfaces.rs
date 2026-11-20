@@ -10,15 +10,15 @@
 //! separate dependency (platform, market channels).
 //!
 //! Endpoint variables are owned by
-//! `sdkwork_appstore_service_host::integrations::ports`, the single place that
+//! `sdkwork_api_appstore_assembly::integrations::ports`, the single place that
 //! may select a split-deployment transport. This module records *which* surface
 //! is active, never *where* it lives.
 
-use sdkwork_appstore_service_host::integrations::flag_enabled;
-use sdkwork_appstore_service_host::integrations::ports::{
+use sdkwork_api_appstore_assembly::integrations::flag_enabled;
+use sdkwork_api_appstore_assembly::integrations::ports::{
     APPSTORE_SEARCH_ENABLED_ENV, APPSTORE_SEARCH_PROJECTION_ENABLED_ENV,
 };
-use sdkwork_appstore_service_host::integrations::IntegrationMode;
+use sdkwork_api_appstore_assembly::integrations::IntegrationMode;
 
 /// How a dependency surface became active.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -80,7 +80,7 @@ pub fn dependency_surfaces() -> Vec<DependencySurface> {
 
 /// Surfaces activated by the current process configuration.
 pub fn active_dependency_surfaces() -> Vec<DependencySurface> {
-    let mode = sdkwork_appstore_service_host::integrations::integration_mode()
+    let mode = sdkwork_api_appstore_assembly::integrations::integration_mode()
         .unwrap_or(IntegrationMode::InProcess);
     active_dependency_surfaces_for(mode, &environment_flags())
 }
@@ -136,7 +136,7 @@ mod tests {
         active_dependency_surfaces_for, dependency_surfaces, DependencySurface,
         EnvironmentFlags, SurfaceActivation,
     };
-    use sdkwork_appstore_service_host::integrations::IntegrationMode;
+    use sdkwork_api_appstore_assembly::integrations::IntegrationMode;
 
     #[test]
     fn drive_is_the_only_always_on_surface() {

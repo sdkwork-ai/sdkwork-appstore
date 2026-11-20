@@ -92,7 +92,7 @@ App（一个产品）
 
 | 新表 | 职责 |
 | --- | --- |
-| `appstore_listing_price` | 区域定价：`(listing, region, starts_at)` 唯一、currency、`NUMERIC(12,2)` 金额、价格档位、生效窗口（付费 App 各区域定价，对标 ASC price tiers / Play country pricing） |
+| `appstore_application_listing_price` | 区域定价：`(listing, region, starts_at)` 唯一、currency、`NUMERIC(12,2)` 金额、价格档位、生效窗口（付费 App 各区域定价，对标 ASC price tiers / Play country pricing） |
 | `appstore_promo_code_batch` / `appstore_promo_code` | 兑换码批次与单码（code_hash 唯一防枚举，`ledger_event` L3），对标 ASC promo codes / Play promo |
 
 ### 3.5 测试分发（对标 TestFlight / Play 内外测轨道）
@@ -147,7 +147,7 @@ pnpm db:drift:check
 
 ## 6. 边界与后续建议（未在本次实施）
 
-1. **commerce 边界**：交易、订单、台账归 commerce 域（AGENTS.md 依赖边界）。`appstore_listing_price`/`promo_code` 仅覆盖目录与展示侧，兑换核销需调用 commerce 授权。
+1. **commerce 边界**：交易、订单、台账归 commerce 域（AGENTS.md 依赖边界）。`appstore_application_listing_price`/`promo_code` 仅覆盖目录与展示侧，兑换核销需调用 commerce 授权。
 2. **expand→contract 计划**：`app/listing` 重复字段与 `listing_metric_snapshot` → `analytics_metric_daily` 的收敛，安排在数据回填与读路径切换验证完成后（建议单独立项，按 DATABASE_SPEC 走 backfill→validate→cutover→cleanup）。
 3. **分区**：`appstore_install_event`、`appstore_analytics_metric_daily` 数据量上来后按 `snapshot_date`/`occurred_at` 做 PostgreSQL 原生 RANGE 分区。
 4. **ID 风格统一**：`appstore_app_template` 系列的 BIGINT+uuid 风格建议在模板域重构时对齐 TEXT 雪花（L0→L1）。

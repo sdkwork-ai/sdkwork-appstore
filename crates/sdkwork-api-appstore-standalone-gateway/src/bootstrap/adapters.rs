@@ -2,17 +2,17 @@
 //!
 //! The gateway does **not** decide how App Store reaches sibling modules; that
 //! decision (and its environment contract) lives in
-//! `sdkwork_appstore_service_host::integrations::ports` so there is exactly one
+//! `sdkwork_api_appstore_assembly::integrations::ports` so there is exactly one
 //! place that can select the split-deployment transport (MODULE_SPEC.md §4.2).
 //!
 //! This module only reports what the gateway observed, for startup logs and the
 //! readiness surface. It never reads a sibling endpoint variable itself.
 
-use sdkwork_appstore_service_host::integrations::flag_enabled;
-use sdkwork_appstore_service_host::integrations::ports::{
+use sdkwork_api_appstore_assembly::integrations::flag_enabled;
+use sdkwork_api_appstore_assembly::integrations::ports::{
     APPSTORE_SEARCH_ENABLED_ENV, APPSTORE_SEARCH_PROJECTION_ENABLED_ENV,
 };
-use sdkwork_appstore_service_host::integrations::IntegrationMode;
+use sdkwork_api_appstore_assembly::integrations::IntegrationMode;
 
 /// Which optional dependency surfaces this process activated.
 #[derive(Debug, Clone, Default)]
@@ -35,7 +35,7 @@ impl DependencyAdapters {
     /// startup depend on a sibling endpoint.
     pub fn from_env() -> Self {
         let mode =
-            sdkwork_appstore_service_host::integrations::integration_mode()
+            sdkwork_api_appstore_assembly::integrations::integration_mode()
                 .unwrap_or(IntegrationMode::InProcess);
         Self::from_parts(
             mode,
@@ -77,7 +77,7 @@ impl DependencyAdapters {
 #[cfg(test)]
 mod tests {
     use super::DependencyAdapters;
-    use sdkwork_appstore_service_host::integrations::IntegrationMode;
+    use sdkwork_api_appstore_assembly::integrations::IntegrationMode;
 
     #[test]
     fn the_default_transport_is_in_process() {

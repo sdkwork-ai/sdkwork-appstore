@@ -3,6 +3,7 @@ use std::time::Duration;
 use sdkwork_api_appstore_assembly::http_route_manifest::{
     appstore_open_api_prefixes, appstore_public_path_prefixes,
 };
+use sdkwork_api_appstore_assembly::integrations::integration_mode;
 use sdkwork_database_sqlx::enable_process_shared_database_pool;
 use sdkwork_iam_web_adapter::{
     build_web_framework_builder_with_open_api_prefixes, iam_web_request_context_resolver_from_env,
@@ -30,7 +31,7 @@ async fn main() -> Result<(), String> {
     // Fail fast on a misspelled integration mode. The default is the in-process
     // transport (MODULE_SPEC.md §4.2), so this cannot fail for an unconfigured
     // deployment.
-    let integration_mode = sdkwork_appstore_service_host::integrations::integration_mode()?;
+    let integration_mode = integration_mode()?;
     let adapters = bootstrap::adapters::DependencyAdapters::from_env();
     tracing::info!(
         bind = %config.bind_address,

@@ -53,7 +53,7 @@ fn expert_catalog_reads_are_pathed_and_open_to_the_storefront() {
 #[test]
 fn retired_app_template_shelf_is_not_served() {
     // Application scaffolds moved to the deploy service's
-    // `/app/v3/api/app_templates` surface; the appstore template shelf is gone,
+    // `/app/v3/api/scaffolds` surface; the appstore template shelf is gone,
     // so no route may still expose it.
     for entry in route_definitions() {
         assert!(

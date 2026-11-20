@@ -1683,7 +1683,7 @@ CREATE TABLE IF NOT EXISTS appstore_rating_distribution_snapshot (
 ```
 
 
-## appstore_listing_price
+## appstore_application_listing_price
 
 - profile: master
 - complianceLevel: L2
@@ -1691,7 +1691,7 @@ CREATE TABLE IF NOT EXISTS appstore_rating_distribution_snapshot (
 ### DDL
 
 ```sql
-CREATE TABLE IF NOT EXISTS appstore_listing_price (
+CREATE TABLE IF NOT EXISTS appstore_application_listing_price (
   id TEXT PRIMARY KEY,
   tenant_id TEXT NOT NULL,
   organization_id TEXT NOT NULL DEFAULT '0',

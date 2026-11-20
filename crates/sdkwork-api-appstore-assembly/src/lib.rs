@@ -13,6 +13,14 @@ pub use bootstrap::{
     ApiAssemblyContribution,
 };
 
+/// Owner-assembly integration surface for the standalone gateway.
+///
+/// The gateway must compose through this assembly instead of depending on the
+/// service host directly; the host remains an assembly implementation detail.
+pub mod integrations {
+    pub use sdkwork_appstore_service_host::integrations::*;
+}
+
 pub fn assembly_route_count() -> usize {
     generated::ROUTE_CRATE_COUNT
 }

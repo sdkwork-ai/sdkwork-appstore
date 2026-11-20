@@ -170,7 +170,7 @@ tables:
   - name: appstore_rating_distribution_snapshot
     profile: read_model
     complianceLevel: L2
-  - name: appstore_listing_price
+  - name: appstore_application_listing_price
     profile: master
     complianceLevel: L2
   - name: appstore_promo_code_batch
