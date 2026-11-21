@@ -18,6 +18,7 @@ This module is in **initialization state** for greenfield deployments:
 2. **Migrations** — `database/migrations/{engine}/` is reserved for post-GA incremental schema changes only. It is intentionally empty at initialization.
 3. **Drift** — run `pnpm db:drift:check` before release.
 
+
 ## Lifecycle policy
 
 - `lifecycle.seedOnBoot` is `true`: the storefront catalog (categories, apps,
