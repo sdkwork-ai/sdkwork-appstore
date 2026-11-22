@@ -63,6 +63,10 @@ export default function App() {
         <Route element={<MobileLayout />}>
           {/* Public routes */}
           <Route path="/login" element={<LoginPage />} />
+          {/* Provider callback of the website's OAuth client: the IAM login
+              surface registers this path, so the brick renders the code
+              exchange here instead of the account login route. */}
+          <Route path="/oauth/callback" element={<LoginPage />} />
           <Route path="/" element={<HomePage />} />
           <Route path="/browse/apps" element={<AppsBrowsePage />} />
           <Route path="/browse/games" element={<GamesBrowsePage />} />
