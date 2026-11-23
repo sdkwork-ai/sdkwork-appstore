@@ -72,7 +72,7 @@ export function McpPage({ searchQuery }: McpPageProps = {}) {
 
   const categoryFilter = useCatalogCategoryFilter<McpServerItem>({
     registry: registryCategories,
-    allLabel: t('mcp.header.allCategories'),
+    allLabel: t('mcp.filter.allCategories'),
     matches: matchServerCategory,
   });
 
